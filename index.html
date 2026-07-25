@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moreleads Agency - Client Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans p-4 md:p-8">
+
+    <div class="max-w-2xl mx-auto space-y-6">
+
+        <!-- 1. AUTHENTICATION CARD (LOGIN / SIGNUP) -->
+        <div id="authSection" class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+            <h1 class="text-2xl font-bold mb-2 text-slate-900">Business Portal</h1>
+            <p class="text-sm text-slate-500 mb-6">Log in or register your business account.</p>
+
+            <form id="authForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Business Name</label>
+                    <input type="text" id="authBusinessName" placeholder="Novus Aesthetics" class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Email Address</label>
+                    <input type="email" id="authEmail" required placeholder="alana@novusaesthetics.co.uk" class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Password</label>
+                    <input type="password" id="authPassword" required placeholder="••••••••" class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                
+                <div class="flex gap-3 pt-2">
+                    <button type="button" id="loginBtn" class="w-1/2 bg-slate-900 text-white font-medium py-3 rounded-lg text-sm hover:bg-slate-800">Log In</button>
+                    <button type="button" id="signUpBtn" class="w-1/2 bg-blue-600 text-white font-medium py-3 rounded-lg text-sm hover:bg-blue-700">Register</button>
+                </div>
+            </form>
+            <div id="authMessage" class="mt-4 text-center text-sm font-medium hidden"></div>
+        </div>
+
+        <!-- 2. CLIENT DASHBOARD (HIDDEN UNTIL LOGGED IN & APPROVED) -->
+        <div id="dashboardSection" class="hidden space-y-6">
+            
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Business Dashboard</span>
+                    <h2 id="businessTitle" class="text-xl font-bold text-slate-900">Loading...</h2>
+                </div>
+                <button id="logoutBtn" class="text-xs text-red-600 font-semibold hover:underline">Log Out</button>
+            </div>
+
+            <!-- TAB 1: ADD SERVICES & DURATIONS -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+                <h3 class="text-lg font-bold mb-4 text-slate-900">1. Manage Treatments & Durations</h3>
+                <form id="serviceForm" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="srvTitle" placeholder="Treatment Name" required class="border rounded-lg p-2.5 text-sm">
+                    <select id="srvDuration" required class="border rounded-lg p-2.5 text-sm bg-white">
+                        <option value="15">15 Minutes</option>
+                        <option value="30">30 Minutes</option>
+                        <option value="45">45 Minutes</option>
+                        <option value="60" selected>1 Hour (60 mins)</option>
+                        <option value="90">1.5 Hours (90 mins)</option>
+                        <option value="120">2 Hours (120 mins)</option>
+                    </select>
+                    <input type="number" id="srvPrice" placeholder="Price (£)" required class="border rounded-lg p-2.5 text-sm">
+                    <button type="submit" class="md:col-span-3 bg-blue-600 text-white font-medium py-2.5 rounded-lg text-sm hover:bg-blue-700">Add Service</button>
+                </form>
+            </div>
+
+            <!-- TAB 2: 15-MINUTE SCHEDULE BLOCK BUILDER -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+                <h3 class="text-lg font-bold mb-4 text-slate-900">2. Set Available Time Blocks</h3>
+                <form id="blockForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Select Date</label>
+                        <input type="date" id="blkDate" required class="w-full border rounded-lg p-2.5 text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Start Time (15m increments)</label>
+                            <input type="time" id="blkStart" step="900" required class="w-full border rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">End Time (15m increments)</label>
+                            <input type="time" id="blkEnd" step="900" required class="w-full border rounded-lg p-2.5 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Max Concurrent Bookings</label>
+                        <input type="number" id="blkCapacity" value="1" min="1" required class="w-full border rounded-lg p-2.5 text-sm">
+                        <p class="text-xs text-slate-400 mt-1">Set to 1 for 1-on-1 treatments (prevents overlapping appointments).</p>
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 text-white font-medium py-2.5 rounded-lg text-sm hover:bg-slate-800">Publish Schedule Block</button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // --- YOUR SUPABASE CREDENTIALS ---
+        const SUPABASE_URL = 'https://ianascnxkxypebudjai.supabase.co';
+        const SUPABASE_KEY = 'PASTE_YOUR_ANON_KEY_HERE'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- AUTHENTICATION ENGINE ---
+        document.getElementById('signUpBtn').addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const business_name = document.getElementById('authBusinessName').value;
+
+            if(!business_name) { alert('Please provide your business name.'); return; }
+
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            
+            if (error) {
+                showAuthMessage(error.message, 'red');
+            } else {
+                await supabaseClient.from('profiles').insert([{ id: data.user.id, business_name, is_approved: false }]);
+                showAuthMessage('Account created! Awaiting admin approval.', 'amber');
+            }
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                showAuthMessage(error.message, 'red');
+            } else {
+                checkApprovalAndLoad(data.user);
+            }
+        });
+
+        async function checkApprovalAndLoad(user) {
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+
+            if (!profile || !profile.is_approved) {
+                showAuthMessage('Account pending approval by Moreleads admin.', 'amber');
+                await supabaseClient.auth.signOut();
+                return;
+            }
+
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('businessTitle').innerText = profile.business_name;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            location.reload();
+        });
+
+        function showAuthMessage(msg, color) {
+            const el = document.getElementById('authMessage');
+            el.innerText = msg;
+            el.className = `mt-4 text-center text-sm font-medium text-${color}-600`;
+            el.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
