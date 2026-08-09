@@ -1,198 +1,1523 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moreleads Agency - Client Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Moreleads booking dashboard and customer appointment booking.">
+  <title>Moreleads Booking Portal</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#172033",
+            brand: {
+              50: "#eef8ff",
+              100: "#d9efff",
+              500: "#1687d9",
+              600: "#0872bd",
+              700: "#075b98"
+            },
+            coral: "#ff765d"
+          },
+          boxShadow: {
+            soft: "0 18px 50px rgba(23, 32, 51, 0.08)"
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    [hidden], .hidden {
+      display: none !important;
+    }
+    body {
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-bg {
+      background: radial-gradient(circle at 10% 0, rgba(22, 135, 217, .10), transparent 32rem),
+                  radial-gradient(circle at 95% 5%, rgba(255, 118, 93, .09), transparent 28rem),
+                  #f7f9fc;
+    }
+    .field {
+      width: 100%;
+      border: 1px solid #d8dee9;
+      border-radius: .8rem;
+      padding: .75rem .9rem;
+      background: white;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field:focus {
+      border-color: #1687d9;
+      box-shadow: 0 0 0 3px rgba(22, 135, 217, .13);
+    }
+    .label {
+      display: block;
+      margin-bottom: .4rem;
+      color: #344054;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      border-radius: .8rem;
+      padding: .72rem 1rem;
+      font-size: .85rem;
+      font-weight: 700;
+      transition: .15s;
+    }
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: .55;
+    }
+    .btn-primary {
+      background: #0872bd;
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #075b98;
+      transform: translateY(-1px);
+    }
+    .btn-dark {
+      background: #172033;
+      color: white;
+    }
+    .btn-dark:hover:not(:disabled) {
+      background: #2a354c;
+    }
+    .btn-light {
+      background: white;
+      color: #344054;
+      border: 1px solid #d8dee9;
+    }
+    .btn-light:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #b8c2d1;
+    }
+    .card {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid #e5eaf1;
+      border-radius: 1.25rem;
+      box-shadow: 0 12px 35px rgba(23, 32, 51, .055);
+    }
+    .nav-tab.active {
+      background: white;
+      color: #172033;
+      box-shadow: 0 2px 9px rgba(23, 32, 51, .08);
+    }
+    .service-choice.selected,
+    .slot-choice.selected {
+      border-color: #1687d9;
+      background: #eef8ff;
+      box-shadow: 0 0 0 3px rgba(22, 135, 217, .11);
+    }
+    .spinner {
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 3px solid #d9efff;
+      border-top-color: #0872bd;
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation-duration: .01ms !important;
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 font-sans p-4 md:p-8">
 
-    <div class="max-w-2xl mx-auto space-y-6">
+<body class="app-bg min-h-screen text-slate-800 font-sans">
+  <div id="toastRegion" class="fixed right-4 top-4 z-50 w-[calc(100%-2rem)] max-w-sm space-y-2" aria-live="polite"></div>
 
-        <!-- 1. AUTHENTICATION CARD (LOGIN / SIGNUP) -->
-        <div id="authSection" class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
-            <h1 class="text-2xl font-bold mb-2 text-slate-900">Business Portal</h1>
-            <p class="text-sm text-slate-500 mb-6">Log in or register your business account.</p>
-
-            <form id="authForm" class="space-y-4" onsubmit="return false;">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Business Name</label>
-                    <input type="text" id="authBusinessName" placeholder="Novus Aesthetics" class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Email Address</label>
-                    <input type="email" id="authEmail" required placeholder="alana@novusaesthetics.co.uk" class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Password</label>
-                    <input type="password" id="authPassword" required placeholder="••••••••" class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                
-                <div class="flex gap-3 pt-2">
-                    <button type="button" id="loginBtn" class="w-1/2 bg-slate-900 text-white font-medium py-3 rounded-lg text-sm hover:bg-slate-800 transition-colors">Log In</button>
-                    <button type="button" id="signUpBtn" class="w-1/2 bg-blue-600 text-white font-medium py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors">Register</button>
-                </div>
-            </form>
-            <div id="authMessage" class="mt-4 text-center text-sm font-medium hidden"></div>
-        </div>
-
-        <!-- 2. CLIENT DASHBOARD (HIDDEN UNTIL LOGGED IN & APPROVED) -->
-        <div id="dashboardSection" class="hidden space-y-6">
-            
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 flex justify-between items-center">
-                <div>
-                    <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Business Dashboard</span>
-                    <h2 id="businessTitle" class="text-xl font-bold text-slate-900">Loading...</h2>
-                </div>
-                <button id="logoutBtn" class="text-xs text-red-600 font-semibold hover:underline">Log Out</button>
-            </div>
-
-            <!-- TAB 1: ADD SERVICES & DURATIONS -->
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
-                <h3 class="text-lg font-bold mb-4 text-slate-900">1. Manage Treatments & Durations</h3>
-                <form id="serviceForm" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input type="text" id="srvTitle" placeholder="Treatment Name" required class="border rounded-lg p-2.5 text-sm">
-                    <select id="srvDuration" required class="border rounded-lg p-2.5 text-sm bg-white">
-                        <option value="15">15 Minutes</option>
-                        <option value="30">30 Minutes</option>
-                        <option value="45">45 Minutes</option>
-                        <option value="60" selected>1 Hour (60 mins)</option>
-                        <option value="90">1.5 Hours (90 mins)</option>
-                        <option value="120">2 Hours (120 mins)</option>
-                    </select>
-                    <input type="number" id="srvPrice" placeholder="Price (£)" required class="border rounded-lg p-2.5 text-sm">
-                    <button type="submit" class="md:col-span-3 bg-blue-600 text-white font-medium py-2.5 rounded-lg text-sm hover:bg-blue-700">Add Service</button>
-                </form>
-            </div>
-
-            <!-- TAB 2: 15-MINUTE SCHEDULE BLOCK BUILDER -->
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
-                <h3 class="text-lg font-bold mb-4 text-slate-900">2. Set Available Time Blocks</h3>
-                <form id="blockForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Select Date</label>
-                        <input type="date" id="blkDate" required class="w-full border rounded-lg p-2.5 text-sm">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Start Time (15m increments)</label>
-                            <input type="time" id="blkStart" step="900" required class="w-full border rounded-lg p-2.5 text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">End Time (15m increments)</label>
-                            <input type="time" id="blkEnd" step="900" required class="w-full border rounded-lg p-2.5 text-sm">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Max Concurrent Bookings</label>
-                        <input type="number" id="blkCapacity" value="1" min="1" required class="w-full border rounded-lg p-2.5 text-sm">
-                        <p class="text-xs text-slate-400 mt-1">Set to 1 for 1-on-1 treatments (prevents overlapping appointments).</p>
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 text-white font-medium py-2.5 rounded-lg text-sm hover:bg-slate-800">Publish Schedule Block</button>
-                </form>
-            </div>
-
-        </div>
-
+  <!-- Loading View -->
+  <section id="loadingView" class="min-h-screen flex items-center justify-center p-6">
+    <div class="text-center">
+      <div class="spinner mx-auto mb-4" aria-hidden="true"></div>
+      <p class="text-sm font-semibold text-slate-500">Loading booking portal…</p>
     </div>
+  </section>
 
-    <script>
-        // --- YOUR SUPABASE CREDENTIALS ---
-        const SUPABASE_URL = 'https://ianascnxkxypebudjai.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_T9d9Q6e7pkjIOfgq2gzPHg_FzSYut1p'; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- Auth View -->
+  <section id="authView" class="hidden min-h-screen p-4 md:p-8">
+    <div class="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl overflow-hidden rounded-[1.75rem] bg-white shadow-soft lg:grid-cols-[1.05fr_.95fr]">
+      <div class="relative hidden overflow-hidden bg-ink p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <div class="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-brand-500/20 blur-2xl"></div>
+        <div class="absolute -bottom-32 -left-24 h-96 w-96 rounded-full bg-coral/15 blur-3xl"></div>
+        <div class="relative">
+          <div class="mb-14 flex items-center gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-2xl bg-brand-500 font-black">M</div>
+            <span class="text-lg font-bold">Moreleads Bookings</span>
+          </div>
+          <p class="mb-5 text-xs font-bold uppercase tracking-[.22em] text-brand-100">Your appointments, organised</p>
+          <h1 class="max-w-lg text-4xl font-bold leading-tight">A simple booking system your clients will actually enjoy using.</h1>
+          <p class="mt-5 max-w-md text-base leading-7 text-slate-300">Create services, publish your availability and share one clean booking link.</p>
+        </div>
+        <div class="relative grid grid-cols-3 gap-3 text-xs text-slate-300">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <strong class="mb-1 block text-xl text-white">01</strong>Set services
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <strong class="mb-1 block text-xl text-white">02</strong>Add hours
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <strong class="mb-1 block text-xl text-white">03</strong>Take bookings
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center justify-center p-6 sm:p-12">
+        <div class="w-full max-w-md">
+          <div class="mb-10 flex items-center gap-3 lg:hidden">
+            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-600 font-black text-white">M</div>
+            <span class="font-bold text-ink">Moreleads Bookings</span>
+          </div>
+          <p class="text-xs font-bold uppercase tracking-[.2em] text-brand-600">Business portal</p>
+          <h2 id="authHeading" class="mt-2 text-3xl font-bold text-ink">Welcome back</h2>
+          <p id="authSubheading" class="mt-2 text-sm text-slate-500">Log in to manage your booking page.</p>
+          <div class="mt-7 grid grid-cols-2 rounded-xl bg-slate-100 p-1">
+            <button id="loginModeBtn" type="button" class="auth-mode rounded-lg bg-white px-3 py-2 text-sm font-bold text-ink shadow-sm">Log in</button>
+            <button id="registerModeBtn" type="button" class="auth-mode rounded-lg px-3 py-2 text-sm font-bold text-slate-500">Register</button>
+          </div>
+          <form id="authForm" class="mt-7 space-y-4">
+            <div id="businessNameField" class="hidden">
+              <label class="label" for="authBusinessName">Business name</label>
+              <input id="authBusinessName" class="field" type="text" maxlength="100" autocomplete="organization" placeholder="Your business name">
+            </div>
+            <div>
+              <label class="label" for="authEmail">Email address</label>
+              <input id="authEmail" class="field" type="email" required autocomplete="email" placeholder="you@business.co.uk">
+            </div>
+            <div>
+              <div class="flex items-center justify-between">
+                <label class="label" for="authPassword">Password</label>
+                <button id="forgotPasswordBtn" class="mb-1 text-xs font-bold text-brand-600 hover:underline" type="button">Forgot password?</button>
+              </div>
+              <input id="authPassword" class="field" type="password" required minlength="8" autocomplete="current-password" placeholder="At least 8 characters">
+            </div>
+            <button id="authSubmitBtn" class="btn btn-primary w-full" type="submit">Log in</button>
+          </form>
+          <div id="authMessage" class="mt-4 hidden rounded-xl px-4 py-3 text-sm" role="status"></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // --- AUTHENTICATION ENGINE ---
-        document.getElementById('signUpBtn').addEventListener('click', async () => {
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
-            const business_name = document.getElementById('authBusinessName').value;
+  <!-- Pending View -->
+  <section id="pendingView" class="hidden min-h-screen items-center justify-center p-5">
+    <div class="card w-full max-w-lg p-8 text-center sm:p-10">
+      <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-amber-100 text-2xl">⏳</div>
+      <p class="mt-6 text-xs font-bold uppercase tracking-[.18em] text-amber-600">Approval pending</p>
+      <h1 class="mt-2 text-2xl font-bold text-ink">Your account is nearly ready</h1>
+      <p class="mt-3 text-sm leading-6 text-slate-500">A Moreleads administrator needs to approve <strong id="pendingBusinessName" class="text-slate-700">your business</strong> before the dashboard opens.</p>
+      <button id="pendingLogoutBtn" type="button" class="btn btn-light mt-7">Log out</button>
+    </div>
+  </section>
 
-            if(!email || !password) {
-                showAuthMessage('Please fill in both email and password.', 'red');
-                return;
-            }
+  <!-- Dashboard View -->
+  <section id="dashboardView" class="hidden min-h-screen">
+    <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div class="flex min-w-0 items-center gap-3">
+          <div class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand-600 font-black text-white">M</div>
+          <div class="min-w-0">
+            <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Booking dashboard</p>
+            <h1 id="dashboardBusinessName" class="truncate font-bold text-ink">Business</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="openBookingPageBtn" type="button" class="btn btn-primary hidden sm:inline-flex">View booking page ↗</button>
+          <button id="logoutBtn" type="button" class="btn btn-light">Log out</button>
+        </div>
+      </div>
+    </header>
 
-            if(!business_name) { 
-                showAuthMessage('Please provide your business name.', 'red'); 
-                return; 
-            }
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
+      <div class="mb-7 overflow-x-auto">
+        <nav class="inline-flex min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" aria-label="Dashboard sections">
+          <button class="nav-tab active rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="overview" type="button">Overview</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="availability" type="button">Availability</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
+        </nav>
+      </div>
 
-            showAuthMessage('Registering account...', 'blue');
+      <div id="dashboardDataWarning" class="mb-6 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"></div>
 
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            
-            if (error) {
-                showAuthMessage(error.message, 'red');
-            } else if (data.user) {
-                // Insert profile record
-                const { error: profileError } = await supabaseClient.from('profiles').insert([
-                    { id: data.user.id, business_name: business_name, is_approved: false }
-                ]);
+      <!-- Overview Tab -->
+      <section id="tab-overview" class="dashboard-tab space-y-6">
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="card p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Services</p>
+            <p id="statServices" class="mt-2 text-3xl font-bold text-ink">0</p>
+            <p class="mt-1 text-xs text-slate-500">available to customers</p>
+          </article>
+          <article class="card p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Open dates</p>
+            <p id="statDates" class="mt-2 text-3xl font-bold text-ink">0</p>
+            <p class="mt-1 text-xs text-slate-500">with active availability</p>
+          </article>
+          <article class="card p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Upcoming</p>
+            <p id="statBookings" class="mt-2 text-3xl font-bold text-ink">0</p>
+            <p class="mt-1 text-xs text-slate-500">future appointments</p>
+          </article>
+          <article class="card p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booked value</p>
+            <p id="statValue" class="mt-2 text-3xl font-bold text-ink">£0</p>
+            <p class="mt-1 text-xs text-slate-500">from upcoming bookings</p>
+          </article>
+        </div>
 
-                if (profileError) {
-                    showAuthMessage('Account created, but profile setup failed: ' + profileError.message, 'red');
-                } else {
-                    showAuthMessage('Account created! Awaiting admin approval.', 'amber');
-                }
-            }
-        });
+        <div class="grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
+          <article class="card p-5 sm:p-6">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Next appointments</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Coming up</h2>
+              </div>
+              <button class="text-sm font-bold text-brand-600 hover:underline" data-go-tab="bookings" type="button">See all</button>
+            </div>
+            <div id="overviewBookings" class="mt-5 space-y-3"></div>
+          </article>
 
-        document.getElementById('loginBtn').addEventListener('click', async () => {
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer link</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Share your page</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Send this link to customers or add it to your website and social profiles.</p>
+            <label class="label mt-5" for="publicBookingUrl">Public booking URL</label>
+            <div class="flex gap-2">
+              <input id="publicBookingUrl" class="field min-w-0 text-xs" type="url" readonly>
+              <button id="copyBookingUrlBtn" type="button" class="btn btn-dark shrink-0">Copy</button>
+            </div>
+            <button id="mobileOpenBookingPageBtn" type="button" class="btn btn-light mt-3 w-full sm:hidden">View booking page ↗</button>
+          </article>
+        </div>
+      </section>
 
-            if(!email || !password) {
-                showAuthMessage('Please enter both email and password.', 'red');
-                return;
-            }
+      <!-- Services Tab -->
+      <section id="tab-services" class="dashboard-tab hidden">
+        <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Service editor</p>
+            <h2 id="serviceFormHeading" class="mt-1 text-xl font-bold text-ink">Add a service</h2>
+            <p class="mt-2 text-sm text-slate-500">Create the treatments or appointments customers can book.</p>
+            <form id="serviceForm" class="mt-6 space-y-4">
+              <input id="serviceEditId" type="hidden">
+              <div>
+                <label class="label" for="srvTitle">Service name</label>
+                <input id="srvTitle" class="field" type="text" required maxlength="120" placeholder="e.g. Initial consultation">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="label" for="srvDuration">Duration</label>
+                  <select id="srvDuration" class="field" required>
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60" selected>60 minutes</option>
+                    <option value="75">75 minutes</option>
+                    <option value="90">90 minutes</option>
+                    <option value="120">120 minutes</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" for="srvPrice">Price (£)</label>
+                  <input id="srvPrice" class="field" type="number" required min="0" step="0.01" placeholder="65.00">
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button id="serviceSubmitBtn" class="btn btn-primary flex-1" type="submit">Add service</button>
+                <button id="serviceCancelEditBtn" class="btn btn-light hidden" type="button">Cancel</button>
+              </div>
+            </form>
+          </article>
 
-            showAuthMessage('Logging in...', 'blue');
+          <article class="card p-5 sm:p-6">
+            <div class="flex items-end justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Your menu</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Services</h2>
+              </div>
+              <span id="serviceCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 services</span>
+            </div>
+            <div id="servicesList" class="mt-5 space-y-3"></div>
+          </article>
+        </div>
+      </section>
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                showAuthMessage(error.message, 'red');
-            } else {
-                checkApprovalAndLoad(data.user);
-            }
-        });
+      <!-- Availability Tab -->
+      <section id="tab-availability" class="dashboard-tab hidden">
+        <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
+            <h2 id="blockFormHeading" class="mt-1 text-xl font-bold text-ink">Add availability</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Publish a window customers can book within. Times use Europe/London.</p>
+            <form id="blockForm" class="mt-6 space-y-4">
+              <input id="blockEditId" type="hidden">
+              <div>
+                <label class="label" for="blkDate">Date</label>
+                <input id="blkDate" class="field" type="date" required>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="label" for="blkStart">Starts</label>
+                  <input id="blkStart" class="field" type="time" step="900" required>
+                </div>
+                <div>
+                  <label class="label" for="blkEnd">Ends</label>
+                  <input id="blkEnd" class="field" type="time" step="900" required>
+                </div>
+              </div>
+              <div>
+                <label class="label" for="blkCapacity">Concurrent capacity</label>
+                <input id="blkCapacity" class="field" type="number" min="1" max="100" value="1" required>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Use 1 for one-to-one appointments. Higher numbers allow that many customers at once.</p>
+              </div>
+              <div class="flex gap-2">
+                <button id="blockSubmitBtn" class="btn btn-dark flex-1" type="submit">Publish availability</button>
+                <button id="blockCancelEditBtn" class="btn btn-light hidden" type="button">Cancel</button>
+              </div>
+            </form>
+          </article>
 
-        async function checkApprovalAndLoad(user) {
-            const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Published schedule</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Upcoming availability</h2>
+              </div>
+              <label class="flex items-center gap-2 text-xs font-bold text-slate-500">
+                <input id="showPastBlocks" type="checkbox" class="rounded border-slate-300 text-brand-600"> Show past dates
+              </label>
+            </div>
+            <div id="blocksList" class="mt-5 space-y-3"></div>
+          </article>
+        </div>
+      </section>
 
-            if (error || !profile || !profile.is_approved) {
-                showAuthMessage('Account pending approval by Moreleads admin.', 'amber');
-                await supabaseClient.auth.signOut();
-                return;
-            }
+      <!-- Bookings Tab -->
+      <section id="tab-bookings" class="dashboard-tab hidden">
+        <article class="card p-5 sm:p-6">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Appointment diary</p>
+              <h2 class="mt-1 text-xl font-bold text-ink">Bookings</h2>
+            </div>
+            <select id="bookingFilter" class="field w-auto min-w-40">
+              <option value="upcoming">Upcoming</option>
+              <option value="past">Past</option>
+              <option value="all">All bookings</option>
+            </select>
+          </div>
+          <div id="bookingsList" class="mt-6 space-y-3"></div>
+        </article>
+      </section>
+    </div>
+  </section>
 
-            document.getElementById('authSection').classList.add('hidden');
-            document.getElementById('dashboardSection').classList.remove('hidden');
-            document.getElementById('businessTitle').innerText = profile.business_name;
+  <!-- Public Booking View -->
+  <section id="publicBookingView" class="hidden min-h-screen">
+    <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur">
+      <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+        <div class="min-w-0">
+          <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Online booking</p>
+          <h1 id="publicBusinessName" class="truncate text-lg font-bold text-ink">Business</h1>
+        </div>
+        <div class="text-right">
+          <p class="text-xs font-bold text-slate-600">Europe/London</p>
+          <p class="text-[.68rem] text-slate-400">All appointment times</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-4 py-7 sm:px-6 lg:py-10" aria-labelledby="publicBusinessName">
+      <div id="publicError" class="card hidden p-8 text-center sm:p-10"></div>
+      <div id="bookingJourney" class="grid gap-6 lg:grid-cols-[1.35fr_.65fr]">
+        <div class="space-y-5">
+          <!-- Step 1 -->
+          <article class="card p-5 sm:p-7">
+            <div class="flex items-center gap-3">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white">1</span>
+              <div>
+                <h2 class="font-bold text-ink">Choose a service</h2>
+                <p class="text-xs text-slate-500">What would you like to book?</p>
+              </div>
+            </div>
+            <div id="publicServices" class="mt-5 grid gap-3 sm:grid-cols-2"></div>
+          </article>
+
+          <!-- Step 2 -->
+          <article id="dateStep" class="card p-5 opacity-50 sm:p-7">
+            <div class="flex items-center gap-3">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">2</span>
+              <div>
+                <h2 class="font-bold text-ink">Choose a date</h2>
+                <p class="text-xs text-slate-500">Select a date to see available times.</p>
+              </div>
+            </div>
+            <div class="mt-5 max-w-xs">
+              <label class="label" for="publicDate">Appointment date</label>
+              <input id="publicDate" class="field" type="date" disabled>
+            </div>
+          </article>
+
+          <!-- Step 3 -->
+          <article id="timeStep" class="card p-5 opacity-50 sm:p-7">
+            <div class="flex items-center gap-3">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">3</span>
+              <div>
+                <h2 class="font-bold text-ink">Choose a time</h2>
+                <p class="text-xs text-slate-500">Only currently available times are shown.</p>
+              </div>
+            </div>
+            <div id="slotsMessage" class="mt-5 text-sm text-slate-500">Choose a service and date first.</div>
+            <div id="publicSlots" class="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"></div>
+          </article>
+
+          <!-- Step 4 -->
+          <article id="detailsStep" class="card p-5 opacity-50 sm:p-7">
+            <div class="flex items-center gap-3">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">4</span>
+              <div>
+                <h2 class="font-bold text-ink">Your details</h2>
+                <p class="text-xs text-slate-500">We’ll use these details for your appointment.</p>
+              </div>
+            </div>
+            <form id="customerBookingForm" class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="label" for="customerName">Full name</label>
+                <input id="customerName" class="field" type="text" required maxlength="120" autocomplete="name" placeholder="Your name" disabled>
+              </div>
+              <div>
+                <label class="label" for="customerEmail">Email address</label>
+                <input id="customerEmail" class="field" type="email" required maxlength="200" autocomplete="email" placeholder="you@example.com" disabled>
+              </div>
+              <label class="sm:col-span-2 flex items-start gap-2.5 text-xs leading-5 text-slate-500">
+                <input id="bookingConsent" class="mt-1 rounded border-slate-300 text-brand-600" type="checkbox" required disabled>
+                <span>I confirm these appointment details are correct and agree that the business may contact me about this booking.</span>
+              </label>
+              <button id="confirmBookingBtn" class="btn btn-primary sm:col-span-2" type="submit" disabled>Confirm booking</button>
+            </form>
+          </article>
+
+          <!-- Success Screen -->
+          <article id="bookingSuccess" class="card hidden border-emerald-200 bg-emerald-50 p-7 text-center sm:p-10">
+            <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500 text-2xl text-white">✓</div>
+            <p class="mt-5 text-xs font-bold uppercase tracking-[.18em] text-emerald-700">Booking confirmed</p>
+            <h2 class="mt-2 text-2xl font-bold text-ink">You’re all booked in</h2>
+            <p id="successSummary" class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600"></p>
+            <button id="bookAnotherBtn" class="btn btn-light mt-6" type="button">Book another appointment</button>
+          </article>
+        </div>
+
+        <!-- Sidebar Summary -->
+        <aside class="h-fit lg:sticky lg:top-6">
+          <article class="card overflow-hidden">
+            <div class="bg-ink p-5 text-white sm:p-6">
+              <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-100">Your appointment</p>
+              <h2 class="mt-1 text-xl font-bold">Booking summary</h2>
+            </div>
+            <dl class="divide-y divide-slate-100 p-5 text-sm sm:p-6">
+              <div class="py-3 first:pt-0">
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Service</dt>
+                <dd id="summaryService" class="mt-1 font-bold text-slate-700">Not selected</dd>
+              </div>
+              <div class="py-3">
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Date</dt>
+                <dd id="summaryDate" class="mt-1 font-bold text-slate-700">Not selected</dd>
+              </div>
+              <div class="py-3">
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Time</dt>
+                <dd id="summaryTime" class="mt-1 font-bold text-slate-700">Not selected</dd>
+              </div>
+              <div class="flex items-end justify-between pt-4">
+                <dt class="font-bold text-slate-500">Price</dt>
+                <dd id="summaryPrice" class="text-2xl font-bold text-ink">—</dd>
+              </div>
+            </dl>
+          </article>
+        </aside>
+      </div>
+    </main>
+    <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by Moreleads</footer>
+  </section>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    "use strict";
+
+    const SUPABASE_URL = "https://ianascnxkxypebudjai.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_T9d9Q6e7pkjIOfgq2gzPHg_FzSYut1p";
+    const BUSINESS_TIME_ZONE = "Europe/London";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const publicClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
+
+    const state = {
+      authMode: "login",
+      user: null,
+      profile: null,
+      services: [],
+      blocks: [],
+      bookings: [],
+      bookingsError: null,
+      publicProfile: null,
+      publicServices: [],
+      selectedService: null,
+      selectedDate: "",
+      selectedSlot: null,
+      publicBookingsReadable: true
+    };
+
+    const $ = id => document.getElementById(id);
+    const money = val => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(Number(val || 0));
+    const escapeHtml = (str = "") => String(str).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
+    const cleanTime = (timeStr = "") => String(timeStr).slice(0, 5);
+    const todayKey = () => dateKeyInZone(new Date());
+
+    function showOnly(viewId) {
+      ["loadingView", "authView", "pendingView", "dashboardView", "publicBookingView"].forEach(id => {
+        const el = $(id);
+        el.classList.toggle("hidden", id !== viewId);
+        if (id === "pendingView") el.classList.toggle("flex", id === viewId);
+      });
+    }
+
+    function setBusy(btn, isBusy, busyText = "Please wait…") {
+      if (!btn) return;
+      if (isBusy) {
+        btn.dataset.originalLabel = btn.textContent;
+        btn.textContent = busyText;
+        btn.disabled = true;
+      } else {
+        btn.textContent = btn.dataset.originalLabel || btn.textContent;
+        btn.disabled = false;
+      }
+    }
+
+    function toast(message, type = "success") {
+      const styles = {
+        success: "border-emerald-200 bg-emerald-50 text-emerald-900",
+        error: "border-red-200 bg-red-50 text-red-900",
+        info: "border-blue-200 bg-blue-50 text-blue-900"
+      };
+      const toastEl = document.createElement("div");
+      toastEl.className = `rounded-xl border px-4 py-3 text-sm font-semibold shadow-lg ${styles[type] || styles.info}`;
+      toastEl.textContent = message;
+      $("toastRegion").appendChild(toastEl);
+      window.setTimeout(() => toastEl.remove(), 4500);
+    }
+
+    function setAuthMessage(msg, type = "error") {
+      const el = $("authMessage");
+      const styles = {
+        error: "border border-red-200 bg-red-50 text-red-800",
+        success: "border border-emerald-200 bg-emerald-50 text-emerald-800",
+        info: "border border-blue-200 bg-blue-50 text-blue-800"
+      };
+      el.className = `mt-4 rounded-xl px-4 py-3 text-sm ${styles[type] || styles.info}`;
+      el.textContent = msg;
+    }
+
+    function dateKeyInZone(dateObj) {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: BUSINESS_TIME_ZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(dateObj).reduce((acc, p) => (acc[p.type] = p.value, acc), {});
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function londonDate(dateStr, timeStr) {
+      const [year, month, day] = dateStr.split("-").map(Number);
+      const [hours, minutes] = cleanTime(timeStr).split(":").map(Number);
+      const utcTimestamp = Date.UTC(year, month - 1, day, hours, minutes, 0);
+      let adjusted = utcTimestamp;
+
+      const formatter = new Intl.DateTimeFormat("en-GB", {
+        timeZone: BUSINESS_TIME_ZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+      });
+
+      for (let i = 0; i < 3; i++) {
+        const parts = formatter.formatToParts(new Date(adjusted)).reduce((acc, p) => (acc[p.type] = p.value, acc), {});
+        const diff = utcTimestamp - Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), Number(parts.hour), Number(parts.minute), Number(parts.second));
+        if (!diff) break;
+        adjusted += diff;
+      }
+      return new Date(adjusted);
+    }
+
+    function prettyDate(dateInput, includeYear = true) {
+      const d = dateInput instanceof Date ? dateInput : londonDate(String(dateInput).slice(0, 10), "12:00");
+      return new Intl.DateTimeFormat("en-GB", {
+        timeZone: BUSINESS_TIME_ZONE,
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        ...(includeYear ? { year: "numeric" } : {})
+      }).format(d);
+    }
+
+    function prettyDateTime(isoString) {
+      return new Intl.DateTimeFormat("en-GB", {
+        timeZone: BUSINESS_TIME_ZONE,
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      }).format(new Date(isoString));
+    }
+
+    function prettyTime(dateObj) {
+      return new Intl.DateTimeFormat("en-GB", {
+        timeZone: BUSINESS_TIME_ZONE,
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      }).format(dateObj);
+    }
+
+    function friendlyDbError(err, actionText = "complete this action") {
+      const fullMsg = `${err?.code || ""} ${err?.message || ""}`.toLowerCase();
+      if (fullMsg.includes("row-level security") || fullMsg.includes("42501") || fullMsg.includes("permission denied")) {
+        return `Supabase security policies are blocking the app from trying to ${actionText}.`;
+      }
+      return err?.message || `Unable to ${actionText}. Please try again.`;
+    }
+
+    function emptyState(title, subtitle) {
+      return `<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center">
+        <p class="font-bold text-slate-600">${escapeHtml(title)}</p>
+        <p class="mt-1 text-sm text-slate-400">${escapeHtml(subtitle)}</p>
+      </div>`;
+    }
+
+    async function init() {
+      const businessId = new URLSearchParams(window.location.search).get("business");
+      $("blkDate").min = todayKey();
+      $("publicDate").min = todayKey();
+      bindEvents();
+
+      if (businessId) {
+        return await loadPublicBookingPage(businessId);
+      }
+
+      const { data, error } = await supabaseClient.auth.getUser();
+      if (!error && data?.user) {
+        await loadOwner(data.user);
+      } else {
+        showOnly("authView");
+      }
+    }
+
+    function bindEvents() {
+      $("loginModeBtn").addEventListener("click", () => setAuthMode("login"));
+      $("registerModeBtn").addEventListener("click", () => setAuthMode("register"));
+      $("authForm").addEventListener("submit", handleAuth);
+      $("forgotPasswordBtn").addEventListener("click", handlePasswordReset);
+      $("logoutBtn").addEventListener("click", logout);
+      $("pendingLogoutBtn").addEventListener("click", logout);
+      $("openBookingPageBtn").addEventListener("click", openPublicBookingPage);
+      $("mobileOpenBookingPageBtn").addEventListener("click", openPublicBookingPage);
+      $("copyBookingUrlBtn").addEventListener("click", copyPublicUrl);
+
+      document.querySelectorAll(".nav-tab").forEach(tab => tab.addEventListener("click", () => switchTab(tab.dataset.tab)));
+      document.querySelectorAll("[data-go-tab]").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.goTab)));
+
+      $("serviceForm").addEventListener("submit", saveService);
+      $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
+      $("servicesList").addEventListener("click", handleServiceListClick);
+
+      $("blockForm").addEventListener("submit", saveBlock);
+      $("blockCancelEditBtn").addEventListener("click", resetBlockForm);
+      $("blocksList").addEventListener("click", handleBlockListClick);
+      $("showPastBlocks").addEventListener("change", renderBlocks);
+
+      $("bookingFilter").addEventListener("change", renderBookings);
+      $("bookingsList").addEventListener("click", handleBookingListClick);
+
+      $("publicServices").addEventListener("click", handlePublicServiceClick);
+      $("publicDate").addEventListener("change", handlePublicDateChange);
+      $("publicSlots").addEventListener("click", handlePublicSlotClick);
+      $("customerBookingForm").addEventListener("submit", submitCustomerBooking);
+      $("bookAnotherBtn").addEventListener("click", resetPublicJourney);
+    }
+
+    function setAuthMode(mode) {
+      state.authMode = mode;
+      const isRegister = mode === "register";
+
+      $("businessNameField").classList.toggle("hidden", !isRegister);
+      $("authBusinessName").required = isRegister;
+      $("authPassword").autocomplete = isRegister ? "new-password" : "current-password";
+      $("authHeading").textContent = isRegister ? "Create your account" : "Welcome back";
+      $("authSubheading").textContent = isRegister ? "Register your business to start setting up." : "Log in to manage your booking page.";
+      $("authSubmitBtn").textContent = isRegister ? "Register business" : "Log in";
+      $("forgotPasswordBtn").classList.toggle("hidden", isRegister);
+
+      $("loginModeBtn").className = "auth-mode rounded-lg px-3 py-2 text-sm font-bold " + (isRegister ? "text-slate-500" : "bg-white text-ink shadow-sm");
+      $("registerModeBtn").className = "auth-mode rounded-lg px-3 py-2 text-sm font-bold " + (isRegister ? "bg-white text-ink shadow-sm" : "text-slate-500");
+      $("authMessage").classList.add("hidden");
+    }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const email = $("authEmail").value.trim();
+      const password = $("authPassword").value;
+      const businessName = $("authBusinessName").value.trim();
+      const submitBtn = $("authSubmitBtn");
+
+      setBusy(submitBtn, true, state.authMode === "register" ? "Creating account…" : "Logging in…");
+
+      try {
+        if (state.authMode === "register") {
+          const redirectUrl = `${window.location.origin}${window.location.pathname}`;
+          const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: { data: { business_name: businessName }, emailRedirectTo: redirectUrl }
+          });
+          if (error) throw error;
+
+          if (data.session && data.user) {
+            const { error: pErr } = await supabaseClient.from("profiles").insert({
+              id: data.user.id,
+              business_name: businessName,
+              is_approved: false
+            });
+            if (pErr && pErr.code !== "23505") throw pErr;
+            await loadOwner(data.user);
+          } else {
+            setAuthMessage("Account created. Check your email to confirm it, then return here and log in.", "success");
+          }
+        } else {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          await loadOwner(data.user);
+        }
+      } catch (err) {
+        setAuthMessage(err.message || "Authentication failed. Please try again.", "error");
+      } finally {
+        setBusy(submitBtn, false);
+      }
+    }
+
+    async function handlePasswordReset() {
+      const email = $("authEmail").value.trim();
+      if (!email) {
+        setAuthMessage("Enter your email address first, then select “Forgot password?”.", "info");
+        return $("authEmail").focus();
+      }
+
+      const redirectUrl = `${window.location.origin}${window.location.pathname}`;
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
+      setAuthMessage(error ? error.message : "Password reset email sent. Check your inbox.", error ? "error" : "success");
+    }
+
+    async function logout() {
+      await supabaseClient.auth.signOut({ scope: "local" });
+      window.location.assign(window.location.pathname);
+    }
+
+    async function ensureProfile(userObj) {
+      let { data, error } = await supabaseClient.from("profiles").select("*").eq("id", userObj.id).maybeSingle();
+      if (error) throw error;
+      if (data) return data;
+
+      const businessName = userObj.user_metadata?.business_name?.trim();
+      if (!businessName) throw new Error("Your profile is missing a business name. Please contact Moreleads support.");
+
+      const inserted = await supabaseClient.from("profiles").insert({
+        id: userObj.id,
+        business_name: businessName,
+        is_approved: false
+      }).select().single();
+
+      if (inserted.error) throw inserted.error;
+      return inserted.data;
+    }
+
+    async function loadOwner(userObj) {
+      showOnly("loadingView");
+      try {
+        state.user = userObj;
+        state.profile = await ensureProfile(userObj);
+
+        if (!state.profile.is_approved) {
+          $("pendingBusinessName").textContent = state.profile.business_name;
+          return showOnly("pendingView");
         }
 
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await supabaseClient.auth.signOut();
-            location.reload();
-        });
+        $("dashboardBusinessName").textContent = state.profile.business_name;
+        $("publicBookingUrl").value = buildPublicUrl(state.profile.id);
 
-        function showAuthMessage(msg, color) {
-            const el = document.getElementById('authMessage');
-            el.innerText = msg;
-            
-            const colorClasses = {
-                red: 'text-red-600',
-                blue: 'text-blue-600',
-                amber: 'text-amber-600',
-                emerald: 'text-emerald-600'
-            };
+        await loadDashboardData();
+        showOnly("dashboardView");
+      } catch (err) {
+        showOnly("authView");
+        setAuthMessage(friendlyDbError(err, "load your account"), "error");
+      }
+    }
 
-            el.className = `mt-4 text-center text-sm font-medium ${colorClasses[color] || 'text-slate-600'}`;
-            el.classList.remove('hidden');
+    async function loadDashboardData() {
+      const pId = state.profile.id;
+      const [srvRes, blkRes, bkgRes] = await Promise.all([
+        supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),
+        supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),
+        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", pId).order("start_time", { ascending: true })
+      ]);
+
+      if (srvRes.error) throw srvRes.error;
+      if (blkRes.error) throw blkRes.error;
+
+      state.services = srvRes.data || [];
+      state.blocks = blkRes.data || [];
+      state.bookings = bkgRes.data || [];
+      state.bookingsError = bkgRes.error || null;
+
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      renderStats();
+      renderServices();
+      renderBlocks();
+      renderBookings();
+      renderOverviewBookings();
+
+      const warnEl = $("dashboardDataWarning");
+      if (state.bookingsError) {
+        warnEl.textContent = `${friendlyDbError(state.bookingsError, "read bookings")} The Services and Availability sections can still be used.`;
+        warnEl.classList.remove("hidden");
+      } else {
+        warnEl.classList.add("hidden");
+      }
+    }
+
+    function renderStats() {
+      const now = Date.now();
+      const upcoming = state.bookings.filter(b => new Date(b.start_time).getTime() >= now);
+      const activeDates = new Set(state.blocks.filter(b => b.is_active && b.block_date >= todayKey()).map(b => b.block_date));
+      const totalVal = upcoming.reduce((acc, b) => acc + Number(b.services?.price || state.services.find(s => s.id === b.service_id)?.price || 0), 0);
+
+      $("statServices").textContent = state.services.length;
+      $("statDates").textContent = activeDates.size;
+      $("statBookings").textContent = upcoming.length;
+      $("statValue").textContent = money(totalVal);
+    }
+
+    function renderOverviewBookings() {
+      const upcoming = state.bookings.filter(b => new Date(b.start_time) >= new Date()).slice(0, 4);
+      $("overviewBookings").innerHTML = upcoming.length
+        ? upcoming.map(b => bookingCard(b)).join("")
+        : emptyState("No upcoming bookings", "New customer appointments will appear here.");
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabId));
+      document.querySelectorAll(".dashboard-tab").forEach(el => el.classList.toggle("hidden", el.id !== `tab-${tabId}`));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function buildPublicUrl(profileId) {
+      const u = new URL(window.location.href);
+      u.search = "";
+      u.hash = "";
+      u.searchParams.set("business", profileId);
+      return u.toString();
+    }
+
+    function openPublicBookingPage() {
+      window.open(buildPublicUrl(state.profile.id), "_blank", "noopener");
+    }
+
+    async function copyPublicUrl() {
+      try {
+        await navigator.clipboard.writeText($("publicBookingUrl").value);
+        toast("Booking link copied.");
+      } catch {
+        $("publicBookingUrl").select();
+        document.execCommand("copy");
+        toast("Booking link copied.");
+      }
+    }
+
+    function renderServices() {
+      $("serviceCountBadge").textContent = `${state.services.length} service${state.services.length === 1 ? "" : "s"}`;
+      $("servicesList").innerHTML = state.services.length ? state.services.map(s => `
+        <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="min-w-0">
+            <h3 class="truncate font-bold text-ink">${escapeHtml(s.title)}</h3>
+            <p class="mt-1 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>
+          </div>
+          <div class="flex shrink-0 gap-2">
+            <button class="btn btn-light !px-3 !py-2" type="button" data-service-action="edit" data-id="${s.id}">Edit</button>
+            <button class="btn !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-service-action="delete" data-id="${s.id}">Delete</button>
+          </div>
+        </div>
+      `).join("") : emptyState("No services yet", "Add your first service using the form.");
+    }
+
+    async function saveService(e) {
+      e.preventDefault();
+      const editId = $("serviceEditId").value;
+      const payload = {
+        profile_id: state.profile.id,
+        title: $("srvTitle").value.trim(),
+        duration_minutes: Number($("srvDuration").value),
+        price: Number($("srvPrice").value)
+      };
+
+      const btn = $("serviceSubmitBtn");
+      setBusy(btn, true, editId ? "Saving…" : "Adding…");
+
+      const query = editId
+        ? supabaseClient.from("services").update(payload).eq("id", editId).eq("profile_id", state.profile.id)
+        : supabaseClient.from("services").insert(payload);
+
+      const { error } = await query;
+      setBusy(btn, false);
+
+      if (error) return toast(friendlyDbError(error, "save this service"), "error");
+
+      toast(editId ? "Service updated." : "Service added.");
+      resetServiceForm();
+      await refreshServices();
+    }
+
+    async function refreshServices() {
+      const { data, error } = await supabaseClient.from("services").select("*").eq("profile_id", state.profile.id).order("created_at");
+      if (error) return toast(friendlyDbError(error, "refresh services"), "error");
+      state.services = data || [];
+      renderServices();
+      renderStats();
+    }
+
+    function handleServiceListClick(e) {
+      const actionBtn = e.target.closest("[data-service-action]");
+      if (!actionBtn) return;
+
+      const service = state.services.find(s => s.id === actionBtn.dataset.id);
+      if (!service) return;
+
+      if (actionBtn.dataset.serviceAction === "edit") {
+        $("serviceEditId").value = service.id;
+        $("srvTitle").value = service.title;
+        $("srvDuration").value = service.duration_minutes;
+        $("srvPrice").value = Number(service.price).toFixed(2);
+        $("serviceFormHeading").textContent = "Edit service";
+        $("serviceSubmitBtn").textContent = "Save changes";
+        $("serviceCancelEditBtn").classList.remove("hidden");
+        $("srvTitle").focus();
+      } else if (actionBtn.dataset.serviceAction === "delete") {
+        deleteService(service);
+      }
+    }
+
+    async function deleteService(service) {
+      if (!window.confirm(`Delete “${service.title}”? Any bookings linked to this service may also be deleted.`)) return;
+
+      const { error } = await supabaseClient.from("services").delete().eq("id", service.id).eq("profile_id", state.profile.id);
+      if (error) return toast(friendlyDbError(error, "delete this service"), "error");
+
+      toast("Service deleted.");
+      if ($("serviceEditId").value === service.id) resetServiceForm();
+      await refreshServices();
+      await refreshBookings();
+    }
+
+    function resetServiceForm() {
+      $("serviceForm").reset();
+      $("srvDuration").value = "60";
+      $("serviceEditId").value = "";
+      $("serviceFormHeading").textContent = "Add a service";
+      $("serviceSubmitBtn").textContent = "Add service";
+      $("serviceCancelEditBtn").classList.add("hidden");
+    }
+
+    function renderBlocks() {
+      const showPast = $("showPastBlocks").checked;
+      const list = state.blocks.filter(b => showPast || b.block_date >= todayKey());
+
+      $("blocksList").innerHTML = list.length ? list.map(b => `
+        <div class="flex flex-col gap-3 rounded-2xl border ${b.is_active ? "border-slate-200" : "border-slate-200 bg-slate-50 opacity-65"} p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="font-bold text-ink">${escapeHtml(prettyDate(b.block_date))}</h3>
+              <span class="rounded-full px-2 py-0.5 text-[.68rem] font-bold ${b.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}">
+                ${b.is_active ? "Active" : "Paused"}
+              </span>
+            </div>
+            <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))} · capacity ${Number(b.max_capacity)}</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="toggle" data-id="${b.id}">${b.is_active ? "Pause" : "Activate"}</button>
+            <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="edit" data-id="${b.id}">Edit</button>
+            <button class="btn !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-block-action="delete" data-id="${b.id}">Delete</button>
+          </div>
+        </div>
+      `).join("") : emptyState("No availability found", showPast ? "Publish a new time block using the form." : "Publish upcoming availability or show past dates.");
+    }
+
+    async function saveBlock(e) {
+      e.preventDefault();
+      const editId = $("blockEditId").value;
+      const blockDate = $("blkDate").value;
+      const startTime = cleanTime($("blkStart").value);
+      const endTime = cleanTime($("blkEnd").value);
+
+      if (!isQuarterHour(startTime) || !isQuarterHour(endTime)) return toast("Start and end times must use 15-minute increments.", "error");
+      if (endTime <= startTime) return toast("End time must be later than start time.", "error");
+
+      const hasOverlap = state.blocks.some(b => b.id !== editId && b.block_date === blockDate && startTime < cleanTime(b.end_time) && endTime > cleanTime(b.start_time));
+      if (hasOverlap) return toast("This time overlaps another availability block on the same date.", "error");
+
+      const payload = {
+        profile_id: state.profile.id,
+        block_date: blockDate,
+        start_time: startTime,
+        end_time: endTime,
+        max_capacity: Number($("blkCapacity").value),
+        is_active: true
+      };
+
+      const btn = $("blockSubmitBtn");
+      setBusy(btn, true, editId ? "Saving…" : "Publishing…");
+
+      const query = editId
+        ? supabaseClient.from("schedule_blocks").update(payload).eq("id", editId).eq("profile_id", state.profile.id)
+        : supabaseClient.from("schedule_blocks").insert(payload);
+
+      const { error } = await query;
+      setBusy(btn, false);
+
+      if (error) return toast(friendlyDbError(error, "save this availability"), "error");
+
+      toast(editId ? "Availability updated." : "Availability published.");
+      resetBlockForm();
+      await refreshBlocks();
+    }
+
+    function isQuarterHour(timeStr) {
+      const minutes = Number(String(timeStr).split(":")[1]);
+      return Number.isInteger(minutes) && minutes % 15 === 0;
+    }
+
+    async function refreshBlocks() {
+      const { data, error } = await supabaseClient.from("schedule_blocks").select("*").eq("profile_id", state.profile.id).order("block_date").order("start_time");
+      if (error) return toast(friendlyDbError(error, "refresh availability"), "error");
+      state.blocks = data || [];
+      renderBlocks();
+      renderStats();
+    }
+
+    function handleBlockListClick(e) {
+      const actionBtn = e.target.closest("[data-block-action]");
+      if (!actionBtn) return;
+
+      const block = state.blocks.find(b => b.id === actionBtn.dataset.id);
+      if (!block) return;
+
+      const action = actionBtn.dataset.blockAction;
+      if (action === "edit") {
+        $("blockEditId").value = block.id;
+        $("blkDate").value = block.block_date;
+        $("blkStart").value = cleanTime(block.start_time);
+        $("blkEnd").value = cleanTime(block.end_time);
+        $("blkCapacity").value = block.max_capacity;
+        $("blockFormHeading").textContent = "Edit availability";
+        $("blockSubmitBtn").textContent = "Save changes";
+        $("blockCancelEditBtn").classList.remove("hidden");
+        $("blkDate").focus();
+      } else if (action === "toggle") {
+        toggleBlock(block);
+      } else if (action === "delete") {
+        deleteBlock(block);
+      }
+    }
+
+    async function toggleBlock(block) {
+      const { error } = await supabaseClient.from("schedule_blocks").update({ is_active: !block.is_active }).eq("id", block.id).eq("profile_id", state.profile.id);
+      if (error) return toast(friendlyDbError(error, "update this availability"), "error");
+      toast(block.is_active ? "Availability paused." : "Availability activated.");
+      await refreshBlocks();
+    }
+
+    async function deleteBlock(block) {
+      if (!window.confirm(`Delete availability for ${prettyDate(block.block_date)} at ${cleanTime(block.start_time)}?`)) return;
+
+      const { error } = await supabaseClient.from("schedule_blocks").delete().eq("id", block.id).eq("profile_id", state.profile.id);
+      if (error) return toast(friendlyDbError(error, "delete this availability"), "error");
+
+      toast("Availability deleted.");
+      if ($("blockEditId").value === block.id) resetBlockForm();
+      await refreshBlocks();
+    }
+
+    function resetBlockForm() {
+      $("blockForm").reset();
+      $("blkCapacity").value = "1";
+      $("blockEditId").value = "";
+      $("blockFormHeading").textContent = "Add availability";
+      $("blockSubmitBtn").textContent = "Publish availability";
+      $("blockCancelEditBtn").classList.add("hidden");
+    }
+
+    function bookingCard(b, allowCancel = false) {
+      const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
+      return `
+        <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h3 class="font-bold text-ink">${escapeHtml(b.customer_name)}</h3>
+              <span class="text-xs font-semibold text-brand-600">${escapeHtml(srv.title || "Service")}</span>
+            </div>
+            <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}</p>
+          </div>
+          ${allowCancel ? `<button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-booking-action="delete" data-id="${b.id}">Cancel booking</button>` : ""}
+        </div>
+      `;
+    }
+
+    function renderBookings() {
+      if (state.bookingsError) {
+        return $("bookingsList").innerHTML = emptyState("Bookings cannot be read", friendlyDbError(state.bookingsError, "read bookings"));
+      }
+
+      const filter = $("bookingFilter").value;
+      const now = Date.now();
+      const filtered = state.bookings.filter(b => {
+        if (filter === "all") return true;
+        return filter === "upcoming" ? new Date(b.start_time).getTime() >= now : new Date(b.start_time).getTime() < now;
+      });
+
+      if (filter === "past") {
+        filtered.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+      } else {
+        filtered.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+      }
+
+      $("bookingsList").innerHTML = filtered.length
+        ? filtered.map(b => bookingCard(b, true)).join("")
+        : emptyState(`No ${filter === "all" ? "" : filter} bookings`, "Appointments in this category will appear here.");
+    }
+
+    async function refreshBookings() {
+      const res = await supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", state.profile.id).order("start_time");
+      state.bookings = res.data || [];
+      state.bookingsError = res.error || null;
+      renderBookings();
+      renderOverviewBookings();
+      renderStats();
+    }
+
+    async function handleBookingListClick(e) {
+      const cancelBtn = e.target.closest('[data-booking-action="delete"]');
+      if (!cancelBtn) return;
+
+      const booking = state.bookings.find(b => b.id === cancelBtn.dataset.id);
+      if (!booking || !window.confirm(`Cancel the booking for ${booking.customer_name}? This removes it permanently.`)) return;
+
+      const { error } = await supabaseClient.from("bookings").delete().eq("id", booking.id).eq("profile_id", state.profile.id);
+      if (error) return toast(friendlyDbError(error, "cancel this booking"), "error");
+
+      toast("Booking cancelled.");
+      await refreshBookings();
+    }
+
+    async function loadPublicBookingPage(profileId) {
+      showOnly("loadingView");
+      try {
+        const { data: prof, error: pErr } = await publicClient.from("profiles").select("id, business_name, is_approved").eq("id", profileId).eq("is_approved", true).maybeSingle();
+        if (pErr) throw pErr;
+        if (!prof) throw new Error("This booking page is not available. The business may still be awaiting approval.");
+
+        const { data: srvs, error: sErr } = await publicClient.from("services").select("*").eq("profile_id", profileId).order("created_at");
+        if (sErr) throw sErr;
+
+        state.publicProfile = prof;
+        state.publicServices = srvs || [];
+
+        $("publicBusinessName").textContent = prof.business_name;
+        document.title = `Book with ${prof.business_name}`;
+
+        renderPublicServices();
+        showOnly("publicBookingView");
+      } catch (err) {
+        showOnly("publicBookingView");
+        $("bookingJourney").classList.add("hidden");
+
+        const errCard = $("publicError");
+        errCard.innerHTML = `
+          <div class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-red-50 text-xl">!</div>
+          <h1 class="mt-5 text-2xl font-bold text-ink">Booking page unavailable</h1>
+          <p class="mt-2 text-sm text-slate-500">${escapeHtml(friendlyDbError(err, "load this booking page"))}</p>
+        `;
+        errCard.classList.remove("hidden");
+      }
+    }
+
+    function renderPublicServices() {
+      $("publicServices").innerHTML = state.publicServices.length ? state.publicServices.map(s => `
+        <button type="button" class="service-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-service-id="${s.id}">
+          <span class="block font-bold text-ink">${escapeHtml(s.title)}</span>
+          <span class="mt-2 flex items-center justify-between gap-3 text-sm">
+            <span class="text-slate-500">${Number(s.duration_minutes)} minutes</span>
+            <strong class="text-brand-700">${money(s.price)}</strong>
+          </span>
+        </button>
+      `).join("") : emptyState("No services available", "This business has not published any bookable services yet.");
+    }
+
+    function handlePublicServiceClick(e) {
+      const btn = e.target.closest("[data-service-id]");
+      if (!btn) return;
+
+      state.selectedService = state.publicServices.find(s => s.id === btn.dataset.serviceId) || null;
+      state.selectedDate = "";
+      state.selectedSlot = null;
+
+      document.querySelectorAll(".service-choice").forEach(el => el.classList.toggle("selected", el.dataset.serviceId === btn.dataset.serviceId));
+
+      $("publicDate").disabled = false;
+      $("publicDate").value = "";
+
+      activateStep("dateStep");
+      deactivateStep("timeStep");
+      deactivateDetails();
+
+      $("publicSlots").innerHTML = "";
+      $("slotsMessage").textContent = "Choose a date to see available times.";
+      updateSummary();
+    }
+
+    async function handlePublicDateChange() {
+      state.selectedDate = $("publicDate").value;
+      state.selectedSlot = null;
+
+      deactivateDetails();
+      updateSummary();
+
+      if (state.selectedDate && state.selectedService) {
+        activateStep("timeStep");
+        $("slotsMessage").innerHTML = '<span class="inline-flex items-center gap-2"><span class="spinner !h-4 !w-4 !border-2"></span>Checking availability…</span>';
+        $("publicSlots").innerHTML = "";
+        await loadAvailableSlots();
+      }
+    }
+
+    async function loadAvailableSlots() {
+      const startIso = londonDate(state.selectedDate, "00:00").toISOString();
+      const endIso = new Date(londonDate(state.selectedDate, "00:00").getTime() + 93600000).toISOString();
+
+      const [blkRes, bkgRes] = await Promise.all([
+        publicClient.from("schedule_blocks").select("*").eq("profile_id", state.publicProfile.id).eq("block_date", state.selectedDate).eq("is_active", true).order("start_time"),
+        publicClient.from("bookings").select("start_time, end_time").eq("profile_id", state.publicProfile.id).lt("start_time", endIso).gt("end_time", startIso)
+      ]);
+
+      if (blkRes.error) {
+        return $("slotsMessage").textContent = friendlyDbError(blkRes.error, "load availability");
+      }
+
+      state.publicBookingsReadable = !bkgRes.error;
+      const slots = buildSlots(blkRes.data || [], bkgRes.data || [], Number(state.selectedService.duration_minutes));
+
+      $("slotsMessage").textContent = slots.length
+        ? `${slots.length} time${slots.length === 1 ? "" : "s"} available`
+        : "No times are available for this service on this date.";
+
+      $("publicSlots").innerHTML = slots.map((slot, idx) => `
+        <button type="button" class="slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-slot-index="${idx}">
+          ${escapeHtml(prettyTime(slot.start))}
+        </button>
+      `).join("");
+
+      $("publicSlots")._slots = slots;
+    }
+
+    function buildSlots(blocks, existingBookings, durationMins) {
+      const slotMap = new Map();
+      const durationMs = 60 * durationMins * 1000;
+      const leadTimeCutoff = Date.now() + 300000;
+
+      blocks.forEach(block => {
+        const bStart = londonDate(block.block_date, block.start_time);
+        const bEnd = londonDate(block.block_date, block.end_time);
+
+        for (let t = bStart.getTime(); t + durationMs <= bEnd.getTime(); t += 900000) {
+          if (t < leadTimeCutoff) continue;
+
+          const slotStart = new Date(t);
+          const slotEnd = new Date(t + durationMs);
+          const maxCap = Number(block.max_capacity || 1);
+
+          if (hasCapacity(slotStart, slotEnd, maxCap, existingBookings)) {
+            const existing = slotMap.get(t);
+            if (!existing || existing.capacity < maxCap) {
+              slotMap.set(t, { start: slotStart, end: slotEnd, capacity: maxCap });
+            }
+          }
         }
-    </script>
+      });
+
+      return [...slotMap.values()].sort((a, b) => a.start - b.start);
+    }
+
+    function hasCapacity(startObj, endObj, capacity, existingBookings) {
+      const step = 900000;
+      for (let t = startObj.getTime(); t < endObj.getTime(); t += step) {
+        const windowEnd = Math.min(t + step, endObj.getTime());
+        const concurrent = existingBookings.filter(b => new Date(b.start_time).getTime() < windowEnd && new Date(b.end_time).getTime() > t).length;
+        if (concurrent >= capacity) return false;
+      }
+      return true;
+    }
+
+    function handlePublicSlotClick(e) {
+      const btn = e.target.closest("[data-slot-index]");
+      if (!btn) return;
+
+      const slots = $("publicSlots")._slots || [];
+      state.selectedSlot = slots[Number(btn.dataset.slotIndex)] || null;
+
+      document.querySelectorAll(".slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
+
+      if (state.selectedSlot) activateDetails();
+      updateSummary();
+    }
+
+    function activateStep(stepId) {
+      const el = $(stepId);
+      el.classList.remove("opacity-50");
+      const badge = el.querySelector("span");
+      if (badge) badge.className = "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white";
+    }
+
+    function deactivateStep(stepId) {
+      const el = $(stepId);
+      el.classList.add("opacity-50");
+      const badge = el.querySelector("span");
+      if (badge) badge.className = "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500";
+    }
+
+    function activateDetails() {
+      activateStep("detailsStep");
+      ["customerName", "customerEmail", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = false);
+    }
+
+    function deactivateDetails() {
+      deactivateStep("detailsStep");
+      ["customerName", "customerEmail", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = true);
+    }
+
+    function updateSummary() {
+      $("summaryService").textContent = state.selectedService?.title || "Not selected";
+      $("summaryPrice").textContent = state.selectedService ? money(state.selectedService.price) : "—";
+      $("summaryDate").textContent = state.selectedDate ? prettyDate(state.selectedDate) : "Not selected";
+      $("summaryTime").textContent = state.selectedSlot ? `${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}` : "Not selected";
+    }
+
+    async function submitCustomerBooking(e) {
+      e.preventDefault();
+      if (!state.selectedService || !state.selectedDate || !state.selectedSlot) {
+        return toast("Choose a service, date and time first.", "error");
+      }
+
+      const submitBtn = $("confirmBookingBtn");
+      setBusy(submitBtn, true, "Confirming…");
+
+      const { data: checkBkgs, error: checkErr } = await publicClient
+        .from("bookings")
+        .select("start_time, end_time")
+        .eq("profile_id", state.publicProfile.id)
+        .lt("start_time", state.selectedSlot.end.toISOString())
+        .gt("end_time", state.selectedSlot.start.toISOString());
+
+      if (!checkErr && !hasCapacity(state.selectedSlot.start, state.selectedSlot.end, state.selectedSlot.capacity, checkBkgs || [])) {
+        setBusy(submitBtn, false);
+        toast("That time has just been taken. Please choose another.", "error");
+        return await loadAvailableSlots();
+      }
+
+      const payload = {
+        profile_id: state.publicProfile.id,
+        service_id: state.selectedService.id,
+        customer_name: $("customerName").value.trim(),
+        customer_email: $("customerEmail").value.trim().toLowerCase(),
+        start_time: state.selectedSlot.start.toISOString(),
+        end_time: state.selectedSlot.end.toISOString()
+      };
+
+      const { error } = await publicClient.from("bookings").insert(payload);
+      setBusy(submitBtn, false);
+
+      if (error) {
+        return toast(friendlyDbError(error, "create this booking"), "error");
+      }
+
+      const summaryText = `${state.selectedService.title} with ${state.publicProfile.business_name} on ${prettyDateTime(state.selectedSlot.start.toISOString())}.`;
+      $("successSummary").textContent = summaryText;
+
+      ["dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
+      $("bookingSuccess").classList.remove("hidden");
+      $("bookingSuccess").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function resetPublicJourney() {
+      state.selectedService = null;
+      state.selectedDate = "";
+      state.selectedSlot = null;
+
+      $("customerBookingForm").reset();
+      $("publicDate").value = "";
+      $("publicDate").disabled = true;
+
+      document.querySelectorAll(".service-choice, .slot-choice").forEach(el => el.classList.remove("selected"));
+
+      ["dateStep", "timeStep", "detailsStep"].forEach(id => {
+        $(id).classList.remove("hidden");
+        deactivateStep(id);
+      });
+
+      deactivateDetails();
+      $("publicSlots").innerHTML = "";
+      $("slotsMessage").textContent = "Choose a service and date first.";
+      $("bookingSuccess").classList.add("hidden");
+
+      updateSummary();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    init();
+  </script>
 </body>
 </html>
