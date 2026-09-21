@@ -57,6 +57,66 @@
       border-color: #1687d9;
       box-shadow: 0 0 0 3px rgba(22, 135, 217, .13);
     }
+    .rich-editor-shell {
+      overflow: hidden;
+      border: 1px solid #d8dee9;
+      border-radius: .8rem;
+      background: white;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .rich-editor-shell:focus-within {
+      border-color: #1687d9;
+      box-shadow: 0 0 0 3px rgba(22, 135, 217, .13);
+    }
+    .rich-editor-toolbar {
+      display: flex;
+      gap: .35rem;
+      padding: .5rem;
+      border-bottom: 1px solid #e5eaf1;
+      background: #f8fafc;
+    }
+    .format-btn {
+      display: inline-flex;
+      width: 2rem;
+      height: 2rem;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d8dee9;
+      border-radius: .55rem;
+      background: white;
+      color: #344054;
+      font-size: .82rem;
+      font-weight: 800;
+    }
+    .format-btn:hover,
+    .format-btn:focus-visible {
+      border-color: #1687d9;
+      color: #0872bd;
+      outline: none;
+    }
+    .rich-editor {
+      min-height: 7.5rem;
+      max-height: 16rem;
+      overflow-y: auto;
+      padding: .8rem .9rem;
+      color: #344054;
+      font-size: .9rem;
+      line-height: 1.6;
+      outline: none;
+    }
+    .rich-editor:empty::before {
+      content: attr(data-placeholder);
+      color: #98a2b3;
+      pointer-events: none;
+    }
+    .service-description {
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+    .service-description p,
+    .service-description div {
+      margin-top: .25rem;
+    }
     .label {
       display: block;
       margin-bottom: .4rem;
@@ -323,6 +383,21 @@
                 <label class="label" for="srvTitle">Service name</label>
                 <input id="srvTitle" class="field" type="text" required maxlength="120" placeholder="e.g. Initial consultation">
               </div>
+              <div>
+                <div class="flex items-end justify-between gap-3">
+                  <label class="label" for="srvDescription">Description <span class="font-normal text-slate-400">(optional)</span></label>
+                  <span id="srvDescriptionCount" class="mb-1 text-[.68rem] font-semibold text-slate-400">0/2000</span>
+                </div>
+                <div class="rich-editor-shell">
+                  <div class="rich-editor-toolbar" aria-label="Description formatting">
+                    <button class="format-btn" type="button" data-format-command="bold" aria-label="Bold" title="Bold"><strong>B</strong></button>
+                    <button class="format-btn italic" type="button" data-format-command="italic" aria-label="Italic" title="Italic">I</button>
+                    <button class="format-btn underline" type="button" data-format-command="underline" aria-label="Underline" title="Underline">U</button>
+                  </div>
+                  <div id="srvDescription" class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Add useful details, what’s included, preparation notes or anything customers should know…"></div>
+                </div>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Use bold, italic or underline for emphasis. Maximum 2,000 characters.</p>
+              </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="label" for="srvDuration">Duration</label>
@@ -367,7 +442,7 @@
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
             <h2 id="blockFormHeading" class="mt-1 text-xl font-bold text-ink">Add availability</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Publish a window customers can book within. Times use Europe/London.</p>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Publish a window customers can book within. Start and end times can be set to any minute. Times use Europe/London.</p>
             <form id="blockForm" class="mt-6 space-y-4">
               <input id="blockEditId" type="hidden">
               <div>
@@ -377,11 +452,11 @@
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="label" for="blkStart">Starts</label>
-                  <input id="blkStart" class="field" type="time" step="900" required>
+                  <input id="blkStart" class="field" type="time" step="60" required>
                 </div>
                 <div>
                   <label class="label" for="blkEnd">Ends</label>
-                  <input id="blkEnd" class="field" type="time" step="900" required>
+                  <input id="blkEnd" class="field" type="time" step="60" required>
                 </div>
               </div>
               <div>
@@ -590,6 +665,43 @@
     const $ = id => document.getElementById(id);
     const money = val => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(Number(val || 0));
     const escapeHtml = (str = "") => String(str).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
+
+    function sanitiseServiceDescription(html = "") {
+      const template = document.createElement("template");
+      template.innerHTML = String(html || "");
+      const allowed = new Set(["B", "STRONG", "I", "EM", "U", "BR", "P", "DIV"]);
+      const elements = [...template.content.querySelectorAll("*")];
+
+      elements.forEach(el => {
+        if (!allowed.has(el.tagName)) {
+          el.replaceWith(...el.childNodes);
+          return;
+        }
+        [...el.attributes].forEach(attr => el.removeAttribute(attr.name));
+      });
+
+      return template.innerHTML.trim();
+    }
+
+    function serviceDescriptionTextLength() {
+      return ($("srvDescription")?.innerText || "").replace(/\n{3,}/g, "\n\n").trim().length;
+    }
+
+    function updateDescriptionCount() {
+      const count = serviceDescriptionTextLength();
+      const el = $("srvDescriptionCount");
+      if (!el) return;
+      el.textContent = `${count}/2000`;
+      el.classList.toggle("text-red-600", count > 2000);
+      el.classList.toggle("text-slate-400", count <= 2000);
+    }
+
+    function getServiceDescriptionHtml() {
+      const editor = $("srvDescription");
+      if (!editor) return "";
+      if (!(editor.innerText || "").trim()) return "";
+      return sanitiseServiceDescription(editor.innerHTML);
+    }
     const cleanTime = (timeStr = "") => String(timeStr).slice(0, 5);
     const todayKey = () => dateKeyInZone(new Date());
 
@@ -714,6 +826,120 @@
       return err?.message || `Unable to ${actionText}. Please try again.`;
     }
 
+    // Authentication errors are intentionally translated into useful but privacy-safe
+    // messages. In particular, login never confirms whether a specific email exists.
+    function friendlyAuthError(err, mode = "login") {
+      const code = String(err?.code || "").toLowerCase();
+      const message = String(err?.message || "").toLowerCase();
+      const name = String(err?.name || "").toLowerCase();
+      const status = Number(err?.status || 0);
+
+      const isNetworkError =
+        name.includes("typeerror") ||
+        message.includes("failed to fetch") ||
+        message.includes("networkerror") ||
+        message.includes("network request failed") ||
+        message.includes("load failed") ||
+        message.includes("fetch failed");
+
+      if (isNetworkError) {
+        if (navigator.onLine === false) {
+          return "You appear to be offline. Reconnect to the internet and try again.";
+        }
+        return "We couldn't reach the secure login service. Check your connection and try again. If other websites are working, temporarily disable any ad-blocking, privacy or CORS browser extension for this page and retry.";
+      }
+
+      if (code === "invalid_credentials" || message.includes("invalid login credentials")) {
+        return "The email address or password is incorrect. For privacy, we can't say which one. Check both, or use “Forgot password?”.";
+      }
+
+      if (code === "email_not_confirmed" || message.includes("email not confirmed")) {
+        return "Your email address has not been confirmed yet. Open the confirmation email we sent you, then try logging in again. Check your spam or junk folder too.";
+      }
+
+      if (
+        code === "over_request_rate_limit" ||
+        code === "over_email_send_rate_limit" ||
+        status === 429 ||
+        message.includes("rate limit") ||
+        message.includes("too many requests")
+      ) {
+        return "There have been too many attempts in a short period. Please wait a few minutes before trying again.";
+      }
+
+      if (code === "email_address_invalid" || message.includes("invalid email")) {
+        return "That email address does not appear to be valid. Check it for typing mistakes and try again.";
+      }
+
+      if (
+        code === "weak_password" ||
+        message.includes("password should be") ||
+        message.includes("password must") ||
+        message.includes("weak password")
+      ) {
+        return "That password does not meet the security requirements. Use at least 8 characters and avoid an easily guessed password.";
+      }
+
+      if (
+        code === "email_provider_disabled" ||
+        code === "signup_disabled" ||
+        message.includes("signups not allowed") ||
+        message.includes("signup is disabled")
+      ) {
+        return mode === "register"
+          ? "New email registrations are currently unavailable. Please contact Moreleads support."
+          : "Email and password login is currently unavailable. Please contact Moreleads support.";
+      }
+
+      // Do not confirm account existence during registration.
+      if (
+        code === "email_exists" ||
+        code === "user_already_exists" ||
+        message.includes("already registered") ||
+        message.includes("already exists")
+      ) {
+        return "We couldn't create an account with those details. If you've registered before, use Log in or “Forgot password?”.";
+      }
+
+      if (status >= 500) {
+        return "The secure login service is temporarily unavailable. Please try again shortly.";
+      }
+
+      return mode === "register"
+        ? "We couldn't create the account. Check the details above and try again."
+        : "We couldn't log you in. Check your details and try again.";
+    }
+
+    function validateAuthFields(email, password, businessName) {
+      const emailInput = $("authEmail");
+
+      if (!email) {
+        return { message: "Enter your email address.", field: "authEmail" };
+      }
+
+      if (!emailInput.checkValidity()) {
+        return { message: "Enter a valid email address, for example name@business.co.uk.", field: "authEmail" };
+      }
+
+      if (!password) {
+        return { message: "Enter your password.", field: "authPassword" };
+      }
+
+      if (password.length < 8) {
+        return { message: "Your password must be at least 8 characters long.", field: "authPassword" };
+      }
+
+      if (state.authMode === "register" && !businessName) {
+        return { message: "Enter your business name to create an account.", field: "authBusinessName" };
+      }
+
+      if (state.authMode === "register" && businessName.length < 2) {
+        return { message: "Enter your full business name.", field: "authBusinessName" };
+      }
+
+      return null;
+    }
+
     function emptyState(title, subtitle) {
       return `<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center">
         <p class="font-bold text-slate-600">${escapeHtml(title)}</p>
@@ -756,6 +982,15 @@
       $("serviceForm").addEventListener("submit", saveService);
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
       $("servicesList").addEventListener("click", handleServiceListClick);
+      $("srvDescription").addEventListener("input", updateDescriptionCount);
+      document.querySelectorAll("[data-format-command]").forEach(btn => {
+        btn.addEventListener("mousedown", e => e.preventDefault());
+        btn.addEventListener("click", () => {
+          $("srvDescription").focus();
+          document.execCommand(btn.dataset.formatCommand, false, null);
+          updateDescriptionCount();
+        });
+      });
 
       $("blockForm").addEventListener("submit", saveBlock);
       $("blockCancelEditBtn").addEventListener("click", resetBlockForm);
@@ -791,10 +1026,19 @@
 
     async function handleAuth(e) {
       e.preventDefault();
-      const email = $("authEmail").value.trim();
+
+      const email = $("authEmail").value.trim().toLowerCase();
       const password = $("authPassword").value;
       const businessName = $("authBusinessName").value.trim();
       const submitBtn = $("authSubmitBtn");
+
+      // Give immediate field-specific feedback before contacting Supabase.
+      const validationError = validateAuthFields(email, password, businessName);
+      if (validationError) {
+        setAuthMessage(validationError.message, "error");
+        $(validationError.field)?.focus();
+        return;
+      }
 
       setBusy(submitBtn, true, state.authMode === "register" ? "Creating account…" : "Logging in…");
 
@@ -804,8 +1048,12 @@
           const { data, error } = await supabaseClient.auth.signUp({
             email,
             password,
-            options: { data: { business_name: businessName }, emailRedirectTo: redirectUrl }
+            options: {
+              data: { business_name: businessName },
+              emailRedirectTo: redirectUrl
+            }
           });
+
           if (error) throw error;
 
           if (data.session && data.user) {
@@ -814,33 +1062,106 @@
               business_name: businessName,
               is_approved: false
             });
+
             if (pErr && pErr.code !== "23505") throw pErr;
             await loadOwner(data.user);
           } else {
-            setAuthMessage("Account created. Check your email to confirm it, then return here and log in.", "success");
+            // This wording deliberately does not reveal whether the email was
+            // already registered; Supabase may intentionally obscure that.
+            setAuthMessage(
+              "Check your email to continue. If this is a new account, use the confirmation link we sent. If you've registered before, use Log in or “Forgot password?”.",
+              "success"
+            );
           }
         } else {
-          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
           if (error) throw error;
+          if (!data?.user) throw new Error("Login completed without a user session.");
+
           await loadOwner(data.user);
         }
       } catch (err) {
-        setAuthMessage(err.message || "Authentication failed. Please try again.", "error");
+        // Keep the full technical error in DevTools for debugging, but do not
+        // expose sensitive/internal details to the person using the form.
+        console.error("Authentication error:", {
+          name: err?.name,
+          code: err?.code,
+          status: err?.status,
+          message: err?.message
+        });
+
+        setAuthMessage(friendlyAuthError(err, state.authMode), "error");
       } finally {
         setBusy(submitBtn, false);
       }
     }
 
     async function handlePasswordReset() {
-      const email = $("authEmail").value.trim();
+      const email = $("authEmail").value.trim().toLowerCase();
+      const emailInput = $("authEmail");
+
       if (!email) {
         setAuthMessage("Enter your email address first, then select “Forgot password?”.", "info");
-        return $("authEmail").focus();
+        return emailInput.focus();
       }
 
-      const redirectUrl = `${window.location.origin}${window.location.pathname}`;
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
-      setAuthMessage(error ? error.message : "Password reset email sent. Check your inbox.", error ? "error" : "success");
+      if (!emailInput.checkValidity()) {
+        setAuthMessage("Enter a valid email address first, then select “Forgot password?”.", "error");
+        return emailInput.focus();
+      }
+
+      const button = $("forgotPasswordBtn");
+      button.disabled = true;
+      const originalText = button.textContent;
+      button.textContent = "Sending…";
+
+      try {
+        const redirectUrl = `${window.location.origin}${window.location.pathname}`;
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: redirectUrl
+        });
+
+        if (error) throw error;
+
+        // Privacy-safe: do not reveal whether this email exists in the system.
+        setAuthMessage(
+          "If an account matches that email address, a password-reset email has been sent. Check your inbox and spam folder.",
+          "success"
+        );
+      } catch (err) {
+        console.error("Password reset error:", {
+          name: err?.name,
+          code: err?.code,
+          status: err?.status,
+          message: err?.message
+        });
+
+        const friendly = friendlyAuthError(err, "login");
+
+        // For non-network/non-rate-limit errors, stay deliberately generic
+        // so the reset flow cannot be used to discover registered accounts.
+        const lower = String(err?.message || "").toLowerCase();
+        const isConnectivityIssue =
+          navigator.onLine === false ||
+          lower.includes("failed to fetch") ||
+          lower.includes("network") ||
+          Number(err?.status || 0) === 429 ||
+          String(err?.code || "").toLowerCase().includes("rate_limit");
+
+        setAuthMessage(
+          isConnectivityIssue
+            ? friendly
+            : "If an account matches that email address, a password-reset email will be sent when available. Please check your inbox and spam folder.",
+          isConnectivityIssue ? "error" : "info"
+        );
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     }
 
     async function logout() {
@@ -975,9 +1296,10 @@
       $("serviceCountBadge").textContent = `${state.services.length} service${state.services.length === 1 ? "" : "s"}`;
       $("servicesList").innerHTML = state.services.length ? state.services.map(s => `
         <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
             <h3 class="truncate font-bold text-ink">${escapeHtml(s.title)}</h3>
-            <p class="mt-1 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>
+            ${s.description ? `<div class="service-description mt-1.5 max-w-2xl text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</div>` : ""}
+            <p class="mt-2 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>
           </div>
           <div class="flex shrink-0 gap-2">
             <button class="btn btn-light !px-3 !py-2" type="button" data-service-action="edit" data-id="${s.id}">Edit</button>
@@ -990,9 +1312,16 @@
     async function saveService(e) {
       e.preventDefault();
       const editId = $("serviceEditId").value;
+      const descriptionLength = serviceDescriptionTextLength();
+      if (descriptionLength > 2000) {
+        toast("Please shorten the service description to 2,000 characters or fewer.", "error");
+        return $("srvDescription").focus();
+      }
+
       const payload = {
         profile_id: state.profile.id,
         title: $("srvTitle").value.trim(),
+        description: getServiceDescriptionHtml(),
         duration_minutes: Number($("srvDuration").value),
         price: Number($("srvPrice").value)
       };
@@ -1032,6 +1361,8 @@
       if (actionBtn.dataset.serviceAction === "edit") {
         $("serviceEditId").value = service.id;
         $("srvTitle").value = service.title;
+        $("srvDescription").innerHTML = sanitiseServiceDescription(service.description || "");
+        updateDescriptionCount();
         $("srvDuration").value = service.duration_minutes;
         $("srvPrice").value = Number(service.price).toFixed(2);
         $("serviceFormHeading").textContent = "Edit service";
@@ -1057,6 +1388,8 @@
 
     function resetServiceForm() {
       $("serviceForm").reset();
+      $("srvDescription").innerHTML = "";
+      updateDescriptionCount();
       $("srvDuration").value = "60";
       $("serviceEditId").value = "";
       $("serviceFormHeading").textContent = "Add a service";
@@ -1095,7 +1428,6 @@
       const startTime = cleanTime($("blkStart").value);
       const endTime = cleanTime($("blkEnd").value);
 
-      if (!isQuarterHour(startTime) || !isQuarterHour(endTime)) return toast("Start and end times must use 15-minute increments.", "error");
       if (endTime <= startTime) return toast("End time must be later than start time.", "error");
 
       const hasOverlap = state.blocks.some(b => b.id !== editId && b.block_date === blockDate && startTime < cleanTime(b.end_time) && endTime > cleanTime(b.start_time));
@@ -1127,10 +1459,6 @@
       await refreshBlocks();
     }
 
-    function isQuarterHour(timeStr) {
-      const minutes = Number(String(timeStr).split(":")[1]);
-      return Number.isInteger(minutes) && minutes % 15 === 0;
-    }
 
     async function refreshBlocks() {
       const { data, error } = await supabaseClient.from("schedule_blocks").select("*").eq("profile_id", state.profile.id).order("block_date").order("start_time");
@@ -1290,7 +1618,8 @@
       $("publicServices").innerHTML = state.publicServices.length ? state.publicServices.map(s => `
         <button type="button" class="service-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-service-id="${s.id}">
           <span class="block font-bold text-ink">${escapeHtml(s.title)}</span>
-          <span class="mt-2 flex items-center justify-between gap-3 text-sm">
+          ${s.description ? `<span class="service-description mt-2 block text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</span>` : ""}
+          <span class="mt-3 flex items-center justify-between gap-3 text-sm">
             <span class="text-slate-500">${Number(s.duration_minutes)} minutes</span>
             <strong class="text-brand-700">${money(s.price)}</strong>
           </span>
@@ -1373,7 +1702,9 @@
         const bStart = londonDate(block.block_date, block.start_time);
         const bEnd = londonDate(block.block_date, block.end_time);
 
-        for (let t = bStart.getTime(); t + durationMs <= bEnd.getTime(); t += 900000) {
+        // Offer every valid minute inside the published availability window.
+        // The business controls the window; there is no hard-coded 15-minute grid.
+        for (let t = bStart.getTime(); t + durationMs <= bEnd.getTime(); t += 60000) {
           if (t < leadTimeCutoff) continue;
 
           const slotStart = new Date(t);
@@ -1393,7 +1724,7 @@
     }
 
     function hasCapacity(startObj, endObj, capacity, existingBookings) {
-      const step = 900000;
+      const step = 60000;
       for (let t = startObj.getTime(); t < endObj.getTime(); t += step) {
         const windowEnd = Math.min(t + step, endObj.getTime());
         const concurrent = existingBookings.filter(b => new Date(b.start_time).getTime() < windowEnd && new Date(b.end_time).getTime() > t).length;
