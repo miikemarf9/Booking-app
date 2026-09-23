@@ -484,6 +484,7 @@
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                 </select>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Recurring schedules are created as one series, so you can remove all future dates together later.</p>
               </div>
 
               <div id="blkRepeatOptions" class="hidden space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -1604,11 +1605,13 @@
             </div>
             <p class="mt-1 text-sm font-semibold text-slate-700">${escapeHtml(service?.title || "No service linked")}</p>
             <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}${buffer ? ` · ${buffer} min between customers` : ""}</p>
+            ${b.recurrence_group ? '<p class="mt-1 text-xs font-semibold text-indigo-600">Part of a recurring series</p>' : ''}
           </div>
           <div class="flex flex-wrap gap-2">
             <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="toggle" data-id="${b.id}">${b.is_active ? "Pause" : "Activate"}</button>
             <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="edit" data-id="${b.id}">Edit</button>
             <button class="btn !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-block-action="delete" data-id="${b.id}">Delete</button>
+            ${b.recurrence_group ? `<button class="btn !px-3 !py-2 bg-red-100 text-red-800 hover:bg-red-200" type="button" data-block-action="delete-series" data-id="${b.id}">Delete series</button>` : ''}
           </div>
         </div>
       `}).join("") : emptyState("No availability found", showPast ? "Publish a new time block using the form." : "Publish upcoming availability or show past dates.");
@@ -1646,6 +1649,16 @@
 
       if (dates.length > 366) return toast("Please create no more than 366 availability dates at once.", "error");
 
+      if (!editId && recurrence !== "once" && dates.length > 1) {
+        const confirmed = window.confirm(
+          `This will add ${dates.length} availability dates.\n\n` +
+          `Service: ${service.title}\n` +
+          `Starts: ${startTime}\n\n` +
+          `Continue?`
+        );
+        if (!confirmed) return;
+      }
+
       const conflictDate = dates.find(date =>
         state.blocks.some(b =>
           b.id !== editId &&
@@ -1658,6 +1671,10 @@
       if (conflictDate) {
         return toast(`This overlaps existing availability for the same service on ${prettyDate(conflictDate)}.`, "error");
       }
+
+      const recurrenceGroup = (!editId && recurrence !== "once" && dates.length > 1)
+        ? crypto.randomUUID()
+        : null;
 
       const basePayload = {
         profile_id: state.profile.id,
@@ -1680,7 +1697,11 @@
           .eq("id", editId)
           .eq("profile_id", state.profile.id));
       } else {
-        const rows = dates.map(date => ({ ...basePayload, block_date: date }));
+        const rows = dates.map(date => ({
+          ...basePayload,
+          block_date: date,
+          recurrence_group: recurrenceGroup
+        }));
         ({ error } = await supabaseClient.from("schedule_blocks").insert(rows));
       }
 
@@ -1731,6 +1752,8 @@
         toggleBlock(block);
       } else if (action === "delete") {
         deleteBlock(block);
+      } else if (action === "delete-series") {
+        deleteBlockSeries(block);
       }
     }
 
@@ -1749,6 +1772,39 @@
 
       toast("Availability deleted.");
       if ($("blockEditId").value === block.id) resetBlockForm();
+      await refreshBlocks();
+    }
+
+    async function deleteBlockSeries(block) {
+      if (!block.recurrence_group) return deleteBlock(block);
+
+      const seriesItems = state.blocks.filter(
+        b => b.recurrence_group === block.recurrence_group
+      );
+      const futureItems = seriesItems.filter(b => b.block_date >= todayKey());
+
+      const count = futureItems.length;
+      if (!count) return toast("There are no upcoming dates left in this series.", "error");
+
+      const service = state.services.find(s => s.id === block.service_id);
+      const confirmed = window.confirm(
+        `Delete ${count} upcoming dates from this recurring series?\n\n` +
+        `${service?.title || "Service"} · ${cleanTime(block.start_time)}\n\n` +
+        `Past availability will be left alone.`
+      );
+      if (!confirmed) return;
+
+      const { error } = await supabaseClient
+        .from("schedule_blocks")
+        .delete()
+        .eq("profile_id", state.profile.id)
+        .eq("recurrence_group", block.recurrence_group)
+        .gte("block_date", todayKey());
+
+      if (error) return toast(friendlyDbError(error, "delete this recurring series"), "error");
+
+      toast(`${count} upcoming availability dates deleted.`);
+      if (seriesItems.some(b => $("blockEditId").value === b.id)) resetBlockForm();
       await refreshBlocks();
     }
 
