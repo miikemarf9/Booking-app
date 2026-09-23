@@ -445,10 +445,20 @@
             <p class="mt-2 text-sm leading-6 text-slate-500">Publish a window customers can book within. Start and end times can be set to any minute. Times use Europe/London.</p>
             <form id="blockForm" class="mt-6 space-y-4">
               <input id="blockEditId" type="hidden">
+
               <div>
-                <label class="label" for="blkDate">Date</label>
+                <label class="label" for="blkService">Service</label>
+                <select id="blkService" class="field" required>
+                  <option value="">Add a service first</option>
+                </select>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">This links the availability directly to a service from your Services page.</p>
+              </div>
+
+              <div>
+                <label class="label" for="blkDate">First date</label>
                 <input id="blkDate" class="field" type="date" required>
               </div>
+
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="label" for="blkStart">Starts</label>
@@ -459,11 +469,47 @@
                   <input id="blkEnd" class="field" type="time" step="60" required>
                 </div>
               </div>
+
               <div>
-                <label class="label" for="blkCapacity">Concurrent capacity</label>
-                <input id="blkCapacity" class="field" type="number" min="1" max="100" value="1" required>
-                <p class="mt-1.5 text-xs leading-5 text-slate-400">Use 1 for one-to-one appointments. Higher numbers allow that many customers at once.</p>
+                <label class="label" for="blkBuffer">Time before the next customer <span class="font-normal text-slate-400">(optional)</span></label>
+                <select id="blkBuffer" class="field">
+                  <option value="0" selected>No extra time</option>
+                  <option value="15">15 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                  <option value="60">60 minutes</option>
+                </select>
               </div>
+
+              <div>
+                <label class="label" for="blkRecurrence">Repeat</label>
+                <select id="blkRecurrence" class="field">
+                  <option value="once" selected>One-off</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+
+              <div id="blkRepeatOptions" class="hidden space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div id="blkWeekdayWrap" class="hidden">
+                  <p class="label">Days to populate</p>
+                  <div class="grid grid-cols-4 gap-2 sm:grid-cols-7">
+                    <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="1">Mon</label>
+                    <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="2">Tue</label>
+                    <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="3">Wed</label>
+                    <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="4">Thu</label>
+                    <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="5">Fri</label>
+                    <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="6">Sat</label>
+                    <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="0">Sun</label>
+                  </div>
+                </div>
+                <div>
+                  <label class="label" for="blkRepeatUntil">Repeat until</label>
+                  <input id="blkRepeatUntil" class="field" type="date">
+                </div>
+              </div>
+
               <div class="flex gap-2">
                 <button id="blockSubmitBtn" class="btn btn-dark flex-1" type="submit">Publish availability</button>
                 <button id="blockCancelEditBtn" class="btn btn-light hidden" type="button">Cancel</button>
@@ -950,6 +996,7 @@
     async function init() {
       const businessId = new URLSearchParams(window.location.search).get("business");
       $("blkDate").min = todayKey();
+      $("blkRepeatUntil").min = todayKey();
       $("publicDate").min = todayKey();
       bindEvents();
 
@@ -996,6 +1043,11 @@
       $("blockCancelEditBtn").addEventListener("click", resetBlockForm);
       $("blocksList").addEventListener("click", handleBlockListClick);
       $("showPastBlocks").addEventListener("change", renderBlocks);
+      $("blkRecurrence").addEventListener("change", syncRecurrenceUI);
+      $("blkDate").addEventListener("change", () => {
+        $("blkRepeatUntil").min = $("blkDate").value || todayKey();
+        if ($("blkRecurrence").value === "weekly") ensureStartWeekdaySelected();
+      });
 
       $("bookingFilter").addEventListener("change", renderBookings);
       $("bookingsList").addEventListener("click", handleBookingListClick);
@@ -1231,6 +1283,7 @@
     function renderDashboard() {
       renderStats();
       renderServices();
+      renderAvailabilityServiceOptions();
       renderBlocks();
       renderBookings();
       renderOverviewBookings();
@@ -1348,6 +1401,7 @@
       if (error) return toast(friendlyDbError(error, "refresh services"), "error");
       state.services = data || [];
       renderServices();
+      renderAvailabilityServiceOptions();
       renderStats();
     }
 
@@ -1397,11 +1451,99 @@
       $("serviceCancelEditBtn").classList.add("hidden");
     }
 
+    function renderAvailabilityServiceOptions() {
+      const select = $("blkService");
+      if (!select) return;
+
+      const current = select.value;
+      if (!state.services.length) {
+        select.innerHTML = '<option value="">Add a service first</option>';
+        select.disabled = true;
+        $("blockSubmitBtn").disabled = true;
+        return;
+      }
+
+      select.disabled = false;
+      $("blockSubmitBtn").disabled = false;
+      select.innerHTML = '<option value="">Choose a service…</option>' + state.services.map(s =>
+        `<option value="${s.id}">${escapeHtml(s.title)} · ${Number(s.duration_minutes)} mins</option>`
+      ).join("");
+
+      if (state.services.some(s => s.id === current)) select.value = current;
+    }
+
+    function syncRecurrenceUI() {
+      const recurrence = $("blkRecurrence").value;
+      const recurring = recurrence !== "once";
+      $("blkRepeatOptions").classList.toggle("hidden", !recurring);
+      $("blkWeekdayWrap").classList.toggle("hidden", recurrence !== "weekly");
+      $("blkRepeatUntil").required = recurring;
+
+      if (recurring) {
+        $("blkRepeatUntil").min = $("blkDate").value || todayKey();
+      }
+      if (recurrence === "weekly") ensureStartWeekdaySelected();
+    }
+
+    function ensureStartWeekdaySelected() {
+      if (!$("blkDate").value) return;
+      const boxes = [...document.querySelectorAll(".blk-weekday")];
+      if (boxes.some(box => box.checked)) return;
+      const day = new Date(`${$("blkDate").value}T12:00:00Z`).getUTCDay();
+      const match = boxes.find(box => Number(box.value) === day);
+      if (match) match.checked = true;
+    }
+
+    function addDaysToDateKey(dateKey, days) {
+      const d = new Date(`${dateKey}T12:00:00Z`);
+      d.setUTCDate(d.getUTCDate() + days);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function recurrenceDates(startDate, recurrence, repeatUntil) {
+      if (recurrence === "once") return [startDate];
+      if (!repeatUntil || repeatUntil < startDate) return [];
+
+      const dates = [];
+
+      if (recurrence === "daily") {
+        for (let date = startDate; date <= repeatUntil; date = addDaysToDateKey(date, 1)) {
+          dates.push(date);
+          if (dates.length > 366) break;
+        }
+      } else if (recurrence === "weekly") {
+        const chosenDays = new Set(
+          [...document.querySelectorAll(".blk-weekday:checked")].map(box => Number(box.value))
+        );
+        if (!chosenDays.size) return [];
+
+        for (let date = startDate; date <= repeatUntil; date = addDaysToDateKey(date, 1)) {
+          const day = new Date(`${date}T12:00:00Z`).getUTCDay();
+          if (chosenDays.has(day)) dates.push(date);
+          if (dates.length > 366) break;
+        }
+      } else if (recurrence === "monthly") {
+        const [year, month, day] = startDate.split("-").map(Number);
+        for (let offset = 0; offset < 120; offset++) {
+          const candidate = new Date(Date.UTC(year, (month - 1) + offset, day, 12, 0, 0));
+          if (candidate.getUTCDate() !== day) continue;
+          const date = candidate.toISOString().slice(0, 10);
+          if (date > repeatUntil) break;
+          if (date >= startDate) dates.push(date);
+        }
+      }
+
+      return dates;
+    }
+
     function renderBlocks() {
       const showPast = $("showPastBlocks").checked;
       const list = state.blocks.filter(b => showPast || b.block_date >= todayKey());
 
-      $("blocksList").innerHTML = list.length ? list.map(b => `
+      $("blocksList").innerHTML = list.length ? list.map(b => {
+        const service = state.services.find(s => s.id === b.service_id);
+        const buffer = Number(b.buffer_minutes || 0);
+        return `
         <div class="flex flex-col gap-3 rounded-2xl border ${b.is_active ? "border-slate-200" : "border-slate-200 bg-slate-50 opacity-65"} p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div class="flex flex-wrap items-center gap-2">
@@ -1410,7 +1552,8 @@
                 ${b.is_active ? "Active" : "Paused"}
               </span>
             </div>
-            <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))} · capacity ${Number(b.max_capacity)}</p>
+            <p class="mt-1 text-sm font-semibold text-slate-700">${escapeHtml(service?.title || "No service linked")}</p>
+            <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}${buffer ? ` · ${buffer} min between customers` : ""}</p>
           </div>
           <div class="flex flex-wrap gap-2">
             <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="toggle" data-id="${b.id}">${b.is_active ? "Pause" : "Activate"}</button>
@@ -1418,47 +1561,86 @@
             <button class="btn !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-block-action="delete" data-id="${b.id}">Delete</button>
           </div>
         </div>
-      `).join("") : emptyState("No availability found", showPast ? "Publish a new time block using the form." : "Publish upcoming availability or show past dates.");
+      `}).join("") : emptyState("No availability found", showPast ? "Publish a new time block using the form." : "Publish upcoming availability or show past dates.");
     }
 
     async function saveBlock(e) {
       e.preventDefault();
+
       const editId = $("blockEditId").value;
+      const serviceId = $("blkService").value;
       const blockDate = $("blkDate").value;
       const startTime = cleanTime($("blkStart").value);
       const endTime = cleanTime($("blkEnd").value);
+      const bufferMinutes = Number($("blkBuffer").value || 0);
+      const recurrence = editId ? "once" : $("blkRecurrence").value;
+      const repeatUntil = $("blkRepeatUntil").value;
 
+      if (!serviceId) return toast("Choose a service first.", "error");
       if (endTime <= startTime) return toast("End time must be later than start time.", "error");
 
-      const hasOverlap = state.blocks.some(b => b.id !== editId && b.block_date === blockDate && startTime < cleanTime(b.end_time) && endTime > cleanTime(b.start_time));
-      if (hasOverlap) return toast("This time overlaps another availability block on the same date.", "error");
+      const dates = editId ? [blockDate] : recurrenceDates(blockDate, recurrence, repeatUntil);
+      if (!dates.length) {
+        return toast(
+          recurrence === "weekly"
+            ? "Choose at least one weekday and a valid repeat-until date."
+            : "Choose a valid repeat-until date.",
+          "error"
+        );
+      }
 
-      const payload = {
+      if (dates.length > 366) return toast("Please create no more than 366 availability dates at once.", "error");
+
+      const conflictDate = dates.find(date =>
+        state.blocks.some(b =>
+          b.id !== editId &&
+          b.service_id === serviceId &&
+          b.block_date === date &&
+          startTime < cleanTime(b.end_time) &&
+          endTime > cleanTime(b.start_time)
+        )
+      );
+      if (conflictDate) {
+        return toast(`This overlaps existing availability for the same service on ${prettyDate(conflictDate)}.`, "error");
+      }
+
+      const basePayload = {
         profile_id: state.profile.id,
-        block_date: blockDate,
+        service_id: serviceId,
         start_time: startTime,
         end_time: endTime,
-        max_capacity: Number($("blkCapacity").value),
+        buffer_minutes: bufferMinutes,
+        max_capacity: 1,
         is_active: true
       };
 
       const btn = $("blockSubmitBtn");
-      setBusy(btn, true, editId ? "Saving…" : "Publishing…");
+      setBusy(btn, true, editId ? "Saving…" : dates.length > 1 ? "Adding dates…" : "Publishing…");
 
-      const query = editId
-        ? supabaseClient.from("schedule_blocks").update(payload).eq("id", editId).eq("profile_id", state.profile.id)
-        : supabaseClient.from("schedule_blocks").insert(payload);
+      let error;
+      if (editId) {
+        ({ error } = await supabaseClient
+          .from("schedule_blocks")
+          .update({ ...basePayload, block_date: blockDate })
+          .eq("id", editId)
+          .eq("profile_id", state.profile.id));
+      } else {
+        const rows = dates.map(date => ({ ...basePayload, block_date: date }));
+        ({ error } = await supabaseClient.from("schedule_blocks").insert(rows));
+      }
 
-      const { error } = await query;
       setBusy(btn, false);
-
       if (error) return toast(friendlyDbError(error, "save this availability"), "error");
 
-      toast(editId ? "Availability updated." : "Availability published.");
+      toast(editId
+        ? "Availability updated."
+        : dates.length === 1
+          ? "Availability published."
+          : `${dates.length} availability dates added.`
+      );
       resetBlockForm();
       await refreshBlocks();
     }
-
 
     async function refreshBlocks() {
       const { data, error } = await supabaseClient.from("schedule_blocks").select("*").eq("profile_id", state.profile.id).order("block_date").order("start_time");
@@ -1478,10 +1660,14 @@
       const action = actionBtn.dataset.blockAction;
       if (action === "edit") {
         $("blockEditId").value = block.id;
+        $("blkService").value = block.service_id || "";
         $("blkDate").value = block.block_date;
         $("blkStart").value = cleanTime(block.start_time);
         $("blkEnd").value = cleanTime(block.end_time);
-        $("blkCapacity").value = block.max_capacity;
+        $("blkBuffer").value = String(Number(block.buffer_minutes || 0));
+        $("blkRecurrence").value = "once";
+        $("blkRecurrence").disabled = true;
+        $("blkRepeatOptions").classList.add("hidden");
         $("blockFormHeading").textContent = "Edit availability";
         $("blockSubmitBtn").textContent = "Save changes";
         $("blockCancelEditBtn").classList.remove("hidden");
@@ -1513,11 +1699,18 @@
 
     function resetBlockForm() {
       $("blockForm").reset();
-      $("blkCapacity").value = "1";
       $("blockEditId").value = "";
+      $("blkRecurrence").disabled = false;
+      $("blkRecurrence").value = "once";
+      $("blkRepeatOptions").classList.add("hidden");
+      $("blkWeekdayWrap").classList.add("hidden");
+      document.querySelectorAll(".blk-weekday").forEach(box => box.checked = false);
+      $("blkBuffer").value = "0";
+      $("blkRepeatUntil").required = false;
       $("blockFormHeading").textContent = "Add availability";
       $("blockSubmitBtn").textContent = "Publish availability";
       $("blockCancelEditBtn").classList.add("hidden");
+      renderAvailabilityServiceOptions();
     }
 
     function bookingCard(b, allowCancel = false) {
@@ -1669,7 +1862,7 @@
       const endIso = new Date(londonDate(state.selectedDate, "00:00").getTime() + 93600000).toISOString();
 
       const [blkRes, bkgRes] = await Promise.all([
-        publicClient.from("schedule_blocks").select("*").eq("profile_id", state.publicProfile.id).eq("block_date", state.selectedDate).eq("is_active", true).order("start_time"),
+        publicClient.from("schedule_blocks").select("*").eq("profile_id", state.publicProfile.id).eq("service_id", state.selectedService.id).eq("block_date", state.selectedDate).eq("is_active", true).order("start_time"),
         publicClient.from("bookings").select("start_time, end_time").eq("profile_id", state.publicProfile.id).lt("start_time", endIso).gt("end_time", startIso)
       ]);
 
@@ -1701,20 +1894,26 @@
       blocks.forEach(block => {
         const bStart = londonDate(block.block_date, block.start_time);
         const bEnd = londonDate(block.block_date, block.end_time);
+        const bufferMs = Number(block.buffer_minutes || 0) * 60000;
 
-        // Offer every valid minute inside the published availability window.
-        // The business controls the window; there is no hard-coded 15-minute grid.
         for (let t = bStart.getTime(); t + durationMs <= bEnd.getTime(); t += 60000) {
           if (t < leadTimeCutoff) continue;
 
           const slotStart = new Date(t);
-          const slotEnd = new Date(t + durationMs);
-          const maxCap = Number(block.max_capacity || 1);
+          const appointmentEnd = new Date(t + durationMs);
+          const blockedEnd = new Date(t + durationMs + bufferMs);
+          const maxCap = 1;
 
-          if (hasCapacity(slotStart, slotEnd, maxCap, existingBookings)) {
+          if (hasCapacity(slotStart, blockedEnd, maxCap, existingBookings)) {
             const existing = slotMap.get(t);
-            if (!existing || existing.capacity < maxCap) {
-              slotMap.set(t, { start: slotStart, end: slotEnd, capacity: maxCap });
+            if (!existing) {
+              slotMap.set(t, {
+                start: slotStart,
+                end: appointmentEnd,
+                blockedEnd,
+                capacity: maxCap,
+                bufferMinutes: Number(block.buffer_minutes || 0)
+              });
             }
           }
         }
@@ -1723,11 +1922,14 @@
       return [...slotMap.values()].sort((a, b) => a.start - b.start);
     }
 
-    function hasCapacity(startObj, endObj, capacity, existingBookings) {
+    function hasCapacity(startObj, blockedEndObj, capacity, existingBookings) {
       const step = 60000;
-      for (let t = startObj.getTime(); t < endObj.getTime(); t += step) {
-        const windowEnd = Math.min(t + step, endObj.getTime());
-        const concurrent = existingBookings.filter(b => new Date(b.start_time).getTime() < windowEnd && new Date(b.end_time).getTime() > t).length;
+      for (let t = startObj.getTime(); t < blockedEndObj.getTime(); t += step) {
+        const windowEnd = Math.min(t + step, blockedEndObj.getTime());
+        const concurrent = existingBookings.filter(b =>
+          new Date(b.start_time).getTime() < windowEnd &&
+          new Date(b.end_time).getTime() > t
+        ).length;
         if (concurrent >= capacity) return false;
       }
       return true;
@@ -1790,10 +1992,10 @@
         .from("bookings")
         .select("start_time, end_time")
         .eq("profile_id", state.publicProfile.id)
-        .lt("start_time", state.selectedSlot.end.toISOString())
+        .lt("start_time", state.selectedSlot.blockedEnd.toISOString())
         .gt("end_time", state.selectedSlot.start.toISOString());
 
-      if (!checkErr && !hasCapacity(state.selectedSlot.start, state.selectedSlot.end, state.selectedSlot.capacity, checkBkgs || [])) {
+      if (!checkErr && !hasCapacity(state.selectedSlot.start, state.selectedSlot.blockedEnd, state.selectedSlot.capacity, checkBkgs || [])) {
         setBusy(submitBtn, false);
         toast("That time has just been taken. Please choose another.", "error");
         return await loadAvailableSlots();
@@ -1805,7 +2007,8 @@
         customer_name: $("customerName").value.trim(),
         customer_email: $("customerEmail").value.trim().toLowerCase(),
         start_time: state.selectedSlot.start.toISOString(),
-        end_time: state.selectedSlot.end.toISOString()
+        // end_time stores the time the diary becomes free again, including any optional buffer.
+        end_time: state.selectedSlot.blockedEnd.toISOString()
       };
 
       const { error } = await publicClient.from("bookings").insert(payload);
