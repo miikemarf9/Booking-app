@@ -442,7 +442,7 @@
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
             <h2 id="blockFormHeading" class="mt-1 text-xl font-bold text-ink">Add availability</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Publish a window customers can book within. Start and end times can be set to any minute. Times use Europe/London.</p>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Choose when this service can be booked. The finish time is calculated automatically from the service duration. Times use Europe/London.</p>
             <form id="blockForm" class="mt-6 space-y-4">
               <input id="blockEditId" type="hidden">
 
@@ -459,15 +459,10 @@
                 <input id="blkDate" class="field" type="date" required>
               </div>
 
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="label" for="blkStart">Starts</label>
-                  <input id="blkStart" class="field" type="time" step="60" required>
-                </div>
-                <div>
-                  <label class="label" for="blkEnd">Ends</label>
-                  <input id="blkEnd" class="field" type="time" step="60" required>
-                </div>
+              <div>
+                <label class="label" for="blkStart">Start time</label>
+                <input id="blkStart" class="field" type="time" step="60" required>
+                <p id="blkCalculatedEnd" class="mt-1.5 text-xs leading-5 text-slate-400">Choose a service and start time; the finish time will be calculated automatically.</p>
               </div>
 
               <div>
@@ -504,9 +499,16 @@
                     <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="blk-weekday" type="checkbox" value="0">Sun</label>
                   </div>
                 </div>
-                <div>
-                  <label class="label" for="blkRepeatUntil">Repeat until</label>
-                  <input id="blkRepeatUntil" class="field" type="date">
+                <div class="space-y-3">
+                  <label class="flex cursor-pointer items-center gap-2 text-sm font-bold text-slate-700">
+                    <input id="blkUseRepeatUntil" type="checkbox" class="rounded border-slate-300 text-brand-600">
+                    Set an end date
+                  </label>
+                  <div id="blkRepeatUntilWrap" class="hidden">
+                    <label class="label" for="blkRepeatUntil">Repeat until</label>
+                    <input id="blkRepeatUntil" class="field" type="date">
+                  </div>
+                  <p id="blkAutoRepeatNote" class="text-xs leading-5 text-slate-400">If you do not set an end date, availability is automatically populated 12 months ahead.</p>
                 </div>
               </div>
 
@@ -1044,6 +1046,9 @@
       $("blocksList").addEventListener("click", handleBlockListClick);
       $("showPastBlocks").addEventListener("change", renderBlocks);
       $("blkRecurrence").addEventListener("change", syncRecurrenceUI);
+      $("blkUseRepeatUntil").addEventListener("change", syncRepeatUntilUI);
+      $("blkService").addEventListener("change", updateCalculatedEnd);
+      $("blkStart").addEventListener("change", updateCalculatedEnd);
       $("blkDate").addEventListener("change", () => {
         $("blkRepeatUntil").min = $("blkDate").value || todayKey();
         if ($("blkRecurrence").value === "weekly") ensureStartWeekdaySelected();
@@ -1470,6 +1475,7 @@
       ).join("");
 
       if (state.services.some(s => s.id === current)) select.value = current;
+      updateCalculatedEnd();
     }
 
     function syncRecurrenceUI() {
@@ -1477,12 +1483,52 @@
       const recurring = recurrence !== "once";
       $("blkRepeatOptions").classList.toggle("hidden", !recurring);
       $("blkWeekdayWrap").classList.toggle("hidden", recurrence !== "weekly");
-      $("blkRepeatUntil").required = recurring;
 
       if (recurring) {
         $("blkRepeatUntil").min = $("blkDate").value || todayKey();
+        syncRepeatUntilUI();
+      } else {
+        $("blkUseRepeatUntil").checked = false;
+        $("blkRepeatUntil").value = "";
+        syncRepeatUntilUI();
       }
+
       if (recurrence === "weekly") ensureStartWeekdaySelected();
+    }
+
+    function syncRepeatUntilUI() {
+      const recurring = $("blkRecurrence").value !== "once";
+      const enabled = recurring && $("blkUseRepeatUntil").checked;
+      $("blkRepeatUntilWrap").classList.toggle("hidden", !enabled);
+      $("blkRepeatUntil").required = enabled;
+      $("blkAutoRepeatNote").classList.toggle("hidden", !recurring || enabled);
+      if (!enabled) $("blkRepeatUntil").value = "";
+    }
+
+    function addMinutesToTime(time, minutes) {
+      const [hours, mins] = cleanTime(time).split(":").map(Number);
+      const total = hours * 60 + mins + Number(minutes || 0);
+      if (!Number.isFinite(total) || total >= 1440) return null;
+      return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+    }
+
+    function updateCalculatedEnd() {
+      const service = state.services.find(s => s.id === $("blkService").value);
+      const start = cleanTime($("blkStart").value || "");
+      const note = $("blkCalculatedEnd");
+
+      if (!service || !start) {
+        note.textContent = "Choose a service and start time; the finish time will be calculated automatically.";
+        return;
+      }
+
+      const end = addMinutesToTime(start, Number(service.duration_minutes));
+      if (!end) {
+        note.textContent = "This start time would make the appointment run into the next day. Choose an earlier time.";
+        return;
+      }
+
+      note.textContent = `${service.title}: ${start}–${end} (${Number(service.duration_minutes)} mins).`;
     }
 
     function ensureStartWeekdaySelected() {
@@ -1498,6 +1544,10 @@
       const d = new Date(`${dateKey}T12:00:00Z`);
       d.setUTCDate(d.getUTCDate() + days);
       return d.toISOString().slice(0, 10);
+    }
+
+    function defaultRepeatUntil(startDate) {
+      return addDaysToDateKey(startDate, 364);
     }
 
     function recurrenceDates(startDate, recurrence, repeatUntil) {
@@ -1571,20 +1621,25 @@
       const serviceId = $("blkService").value;
       const blockDate = $("blkDate").value;
       const startTime = cleanTime($("blkStart").value);
-      const endTime = cleanTime($("blkEnd").value);
       const bufferMinutes = Number($("blkBuffer").value || 0);
       const recurrence = editId ? "once" : $("blkRecurrence").value;
-      const repeatUntil = $("blkRepeatUntil").value;
+      const service = state.services.find(s => s.id === serviceId);
+      const useRepeatUntil = !editId && recurrence !== "once" && $("blkUseRepeatUntil").checked;
+      const repeatUntil = recurrence === "once"
+        ? blockDate
+        : (useRepeatUntil ? $("blkRepeatUntil").value : defaultRepeatUntil(blockDate));
 
-      if (!serviceId) return toast("Choose a service first.", "error");
-      if (endTime <= startTime) return toast("End time must be later than start time.", "error");
+      if (!serviceId || !service) return toast("Choose a service first.", "error");
+
+      const endTime = addMinutesToTime(startTime, Number(service.duration_minutes));
+      if (!endTime) return toast("This appointment would run into the next day. Choose an earlier start time.", "error");
 
       const dates = editId ? [blockDate] : recurrenceDates(blockDate, recurrence, repeatUntil);
       if (!dates.length) {
         return toast(
           recurrence === "weekly"
-            ? "Choose at least one weekday and a valid repeat-until date."
-            : "Choose a valid repeat-until date.",
+            ? "Choose at least one weekday and a valid end date."
+            : "Choose a valid end date.",
           "error"
         );
       }
@@ -1663,7 +1718,6 @@
         $("blkService").value = block.service_id || "";
         $("blkDate").value = block.block_date;
         $("blkStart").value = cleanTime(block.start_time);
-        $("blkEnd").value = cleanTime(block.end_time);
         $("blkBuffer").value = String(Number(block.buffer_minutes || 0));
         $("blkRecurrence").value = "once";
         $("blkRecurrence").disabled = true;
@@ -1671,6 +1725,7 @@
         $("blockFormHeading").textContent = "Edit availability";
         $("blockSubmitBtn").textContent = "Save changes";
         $("blockCancelEditBtn").classList.remove("hidden");
+        updateCalculatedEnd();
         $("blkDate").focus();
       } else if (action === "toggle") {
         toggleBlock(block);
@@ -1706,7 +1761,12 @@
       $("blkWeekdayWrap").classList.add("hidden");
       document.querySelectorAll(".blk-weekday").forEach(box => box.checked = false);
       $("blkBuffer").value = "0";
+      $("blkUseRepeatUntil").checked = false;
+      $("blkRepeatUntil").value = "";
       $("blkRepeatUntil").required = false;
+      $("blkRepeatUntilWrap").classList.add("hidden");
+      $("blkAutoRepeatNote").classList.add("hidden");
+      $("blkCalculatedEnd").textContent = "Choose a service and start time; the finish time will be calculated automatically.";
       $("blockFormHeading").textContent = "Add availability";
       $("blockSubmitBtn").textContent = "Publish availability";
       $("blockCancelEditBtn").classList.add("hidden");
