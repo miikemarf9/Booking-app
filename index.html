@@ -1607,13 +1607,21 @@
             <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}${buffer ? ` · ${buffer} min between customers` : ""}</p>
             ${b.recurrence_group ? '<p class="mt-1 text-xs font-semibold text-indigo-600">Part of a recurring series</p>' : ''}
           </div>
-          <div class="flex flex-wrap gap-2">
-            <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="toggle" data-id="${b.id}">${b.is_active ? "Pause" : "Activate"}</button>
-            <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="edit" data-id="${b.id}">Edit</button>
-            <button class="btn !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-block-action="delete" data-id="${b.id}">Delete</button>
-            ${b.recurrence_group
-              ? `<button class="btn !px-3 !py-2 bg-red-100 text-red-800 hover:bg-red-200" type="button" data-block-action="delete-series" data-id="${b.id}">Delete series</button>`
-              : `<button class="btn !px-3 !py-2 bg-amber-50 text-amber-800 hover:bg-amber-100" type="button" data-block-action="delete-matching" data-id="${b.id}">Delete matching future</button>`}
+          <div class="flex flex-wrap items-center gap-2">
+            <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-block-action="edit" data-id="${b.id}">Edit</button>
+            <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-block-action="toggle" data-id="${b.id}">${b.is_active ? "Pause" : "Activate"}</button>
+
+            <details class="relative">
+              <summary class="btn btn-light !px-3 !py-2 text-sm cursor-pointer list-none select-none">More</summary>
+              <div class="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+                <button class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50" type="button" data-block-action="delete" data-id="${b.id}">
+                  Delete this date
+                </button>
+                ${b.recurrence_group
+                  ? `<button class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50" type="button" data-block-action="delete-series" data-id="${b.id}">Delete future repeats</button>`
+                  : `<button class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50" type="button" data-block-action="delete-matching" data-id="${b.id}">Delete future repeats</button>`}
+              </div>
+            </details>
           </div>
         </div>
       `}).join("") : emptyState("No availability found", showPast ? "Publish a new time block using the form." : "Publish upcoming availability or show past dates.");
@@ -1732,6 +1740,9 @@
       const actionBtn = e.target.closest("[data-block-action]");
       if (!actionBtn) return;
 
+      const menu = actionBtn.closest("details");
+      if (menu) menu.open = false;
+
       const block = state.blocks.find(b => b.id === actionBtn.dataset.id);
       if (!block) return;
 
@@ -1797,9 +1808,9 @@
 
       const service = state.services.find(s => s.id === block.service_id);
       const confirmed = window.confirm(
-        `This will delete ${matches.length} matching future availability dates.\n\n` +
+        `Delete ${matches.length} future repeats?\n\n` +
         `${service?.title || "Service"} · ${start}–${end}\n\n` +
-        `Use this for older recurring dates created before series grouping was added. Continue?`
+        `This removes upcoming availability with the same service, time and buffer. Past dates are kept.`
       );
       if (!confirmed) return;
 
@@ -1830,9 +1841,9 @@
 
       const service = state.services.find(s => s.id === block.service_id);
       const confirmed = window.confirm(
-        `Delete ${count} upcoming dates from this recurring series?\n\n` +
+        `Delete ${count} future repeats?\n\n` +
         `${service?.title || "Service"} · ${cleanTime(block.start_time)}\n\n` +
-        `Past availability will be left alone.`
+        `This removes the remaining upcoming dates in this recurring series. Past dates are kept.`
       );
       if (!confirmed) return;
 
