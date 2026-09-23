@@ -314,6 +314,8 @@
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="availability" type="button">Availability</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Business details</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="reminders" type="button">Reminders</button>
         </nav>
       </div>
 
@@ -612,11 +614,115 @@
             <select id="bookingFilter" class="field w-auto min-w-40">
               <option value="upcoming">Upcoming</option>
               <option value="past">Past</option>
+              <option value="cancelled">Cancelled</option>
               <option value="all">All bookings</option>
             </select>
           </div>
           <div id="bookingsList" class="mt-6 space-y-3"></div>
         </article>
+      </section>
+
+      <!-- Business Details Tab -->
+      <section id="tab-settings" class="dashboard-tab hidden">
+        <div class="grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Email & contact details</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Business details</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">These details are used in booking confirmations so customers know how to contact or find you.</p>
+
+            <form id="businessDetailsForm" class="mt-6 space-y-4">
+              <div>
+                <label class="label" for="businessContactEmail">Customer contact email</label>
+                <input id="businessContactEmail" class="field" type="email" maxlength="200" placeholder="hello@yourbusiness.co.uk">
+              </div>
+              <div>
+                <label class="label" for="businessContactPhone">Phone number <span class="font-normal text-slate-400">(optional)</span></label>
+                <input id="businessContactPhone" class="field" type="tel" maxlength="50" placeholder="01234 567890">
+              </div>
+              <div>
+                <label class="label" for="businessAddress">Business address <span class="font-normal text-slate-400">(optional)</span></label>
+                <textarea id="businessAddress" class="field min-h-28 resize-y" maxlength="500" placeholder="Business address customers should attend"></textarea>
+              </div>
+              <button id="businessDetailsSubmitBtn" class="btn btn-primary w-full sm:w-auto" type="submit">Save business details</button>
+            </form>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Confirmation emails</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">What customers receive</h2>
+            <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booking confirmed</p>
+              <h3 class="mt-2 text-lg font-bold text-ink">Branded with your business name</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-500">The confirmation includes the service, appointment date and time, booked price, your contact details and private Reschedule / Cancel links.</p>
+            </div>
+            <p class="mt-4 text-sm leading-6 text-slate-500">The business also receives a separate new-booking notification containing the customer and appointment details.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Reminders Tab -->
+      <section id="tab-reminders" class="dashboard-tab hidden">
+        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Automated customer messages</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Reminders & follow-up</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Choose which emails customers receive automatically around their appointment.</p>
+
+            <form id="reminderSettingsForm" class="mt-6 space-y-4">
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <span>
+                  <span class="block font-bold text-ink">24 hours before</span>
+                  <span class="mt-1 block text-sm leading-5 text-slate-500">A reminder the day before the appointment.</span>
+                </span>
+                <input id="reminder24h" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+              </label>
+
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <span>
+                  <span class="block font-bold text-ink">2 hours before</span>
+                  <span class="mt-1 block text-sm leading-5 text-slate-500">A final reminder shortly before the appointment.</span>
+                </span>
+                <input id="reminder2h" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+              </label>
+
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <label class="flex cursor-pointer items-start justify-between gap-4">
+                  <span>
+                    <span class="block font-bold text-ink">Post-appointment follow-up</span>
+                    <span class="mt-1 block text-sm leading-5 text-slate-500">Send a thank-you/follow-up email after the appointment.</span>
+                  </span>
+                  <input id="followupEnabled" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+                </label>
+
+                <div id="followupTimingWrap" class="mt-4 hidden">
+                  <label class="label" for="followupHours">Send follow-up</label>
+                  <select id="followupHours" class="field">
+                    <option value="2">2 hours after</option>
+                    <option value="24">1 day after</option>
+                    <option value="48">2 days after</option>
+                  </select>
+                </div>
+              </div>
+
+              <button id="reminderSettingsSubmitBtn" class="btn btn-primary w-full sm:w-auto" type="submit">Save reminder settings</button>
+            </form>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">How it works</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Automatic once enabled</h2>
+            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
+              <p>Only <strong class="text-slate-700">confirmed</strong> bookings receive reminders.</p>
+              <p>If a customer cancels, future reminders stop automatically.</p>
+              <p>If a customer reschedules, reminder timing follows the new appointment time.</p>
+              <p>Emails include the service, date, time, business contact details and secure Reschedule / Cancel links.</p>
+              <p>Each reminder is logged so the same reminder is not intentionally sent twice.</p>
+            </div>
+            <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-500">
+              This reminder engine is structured so SMS and WhatsApp can be added later without changing the booking model.
+            </div>
+          </article>
+        </div>
       </section>
     </div>
   </section>
@@ -712,7 +818,15 @@
             <p class="mt-5 text-xs font-bold uppercase tracking-[.18em] text-emerald-700">Booking confirmed</p>
             <h2 class="mt-2 text-2xl font-bold text-ink">You’re all booked in</h2>
             <p id="successSummary" class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600"></p>
-            <button id="bookAnotherBtn" class="btn btn-light mt-6" type="button">Book another appointment</button>
+            <div id="successManageActions" class="mt-6 hidden flex flex-wrap justify-center gap-2">
+              <a id="successRescheduleLink" class="btn btn-primary" href="#">Reschedule booking</a>
+              <a id="successCancelLink" class="btn btn-light" href="#">Cancel booking</a>
+            </div>
+            <p id="successManageNote" class="mx-auto mt-3 hidden max-w-md text-xs leading-5 text-slate-500">
+              Keep these private links safe. No account is required to manage this appointment.
+            </p>
+            <p id="successEmailStatus" class="mx-auto mt-3 max-w-md text-xs leading-5 text-slate-500"></p>
+            <button id="bookAnotherBtn" class="btn btn-light mt-4" type="button">Book another appointment</button>
           </article>
         </div>
 
@@ -748,6 +862,101 @@
     <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by Moreleads</footer>
   </section>
 
+
+  <section id="manageBookingView" class="hidden min-h-screen">
+    <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur">
+      <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4 sm:px-6">
+        <div>
+          <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Manage appointment</p>
+          <h1 id="manageBusinessName" class="text-lg font-bold text-ink">Your booking</h1>
+        </div>
+        <span class="text-xs font-semibold text-slate-400">Secure private link</span>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-4 py-7 sm:px-6 lg:py-10">
+      <article id="manageLoading" class="card p-8 text-center">
+        <span class="spinner mx-auto"></span>
+        <p class="mt-4 text-sm font-semibold text-slate-500">Loading your booking…</p>
+      </article>
+
+      <article id="manageError" class="card hidden p-8 text-center"></article>
+
+      <div id="manageContent" class="hidden space-y-5">
+        <article class="card overflow-hidden">
+          <div class="bg-ink p-5 text-white sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-100">Appointment</p>
+                <h2 id="manageServiceName" class="mt-1 text-xl font-bold">Service</h2>
+              </div>
+              <span id="manageStatusBadge" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Confirmed</span>
+            </div>
+          </div>
+
+          <dl class="grid gap-0 divide-y divide-slate-100 p-5 text-sm sm:p-6">
+            <div class="flex items-start justify-between gap-4 py-3 first:pt-0">
+              <dt class="font-semibold text-slate-400">Customer</dt>
+              <dd id="manageCustomerName" class="text-right font-bold text-slate-700">—</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4 py-3">
+              <dt class="font-semibold text-slate-400">Date</dt>
+              <dd id="manageDate" class="text-right font-bold text-slate-700">—</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4 py-3">
+              <dt class="font-semibold text-slate-400">Time</dt>
+              <dd id="manageTime" class="text-right font-bold text-slate-700">—</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4 py-3 last:pb-0">
+              <dt class="font-semibold text-slate-400">Price booked</dt>
+              <dd id="managePrice" class="text-right text-lg font-bold text-ink">—</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article id="manageActionsCard" class="card p-5 sm:p-6">
+          <h2 class="text-lg font-bold text-ink">Manage this appointment</h2>
+          <p class="mt-1 text-sm leading-6 text-slate-500">You can move the appointment to another available time or cancel it. No account is required.</p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <button id="manageRescheduleBtn" class="btn btn-primary" type="button">Reschedule</button>
+            <button id="manageCancelBtn" class="btn btn-light" type="button">Cancel booking</button>
+          </div>
+        </article>
+
+        <article id="manageReschedulePanel" class="card hidden p-5 sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Reschedule</p>
+              <h2 class="mt-1 text-lg font-bold text-ink">Choose a new appointment</h2>
+            </div>
+            <button id="manageRescheduleCloseBtn" class="text-sm font-bold text-slate-400 hover:text-slate-700" type="button">Close</button>
+          </div>
+
+          <div class="mt-5 max-w-xs">
+            <label class="label" for="manageDateInput">New date</label>
+            <input id="manageDateInput" class="field" type="date">
+          </div>
+
+          <div id="manageSlotsMessage" class="mt-5 text-sm text-slate-500">Choose a date to see available times.</div>
+          <div id="manageSlots" class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"></div>
+
+          <div id="manageRescheduleConfirm" class="mt-5 hidden rounded-2xl border border-brand-100 bg-brand-50 p-4">
+            <p class="text-sm text-slate-600">New appointment</p>
+            <p id="manageSelectedTime" class="mt-1 font-bold text-ink"></p>
+            <button id="manageConfirmRescheduleBtn" class="btn btn-primary mt-4 w-full sm:w-auto" type="button">Confirm reschedule</button>
+          </div>
+        </article>
+
+        <article id="manageCancelledMessage" class="card hidden border-slate-200 bg-slate-50 p-6 text-center">
+          <h2 class="text-lg font-bold text-ink">This booking has been cancelled</h2>
+          <p class="mt-2 text-sm text-slate-500">The appointment time has been released and can be booked by another customer.</p>
+        </article>
+      </div>
+    </main>
+
+    <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by Moreleads</footer>
+  </section>
+
   <!-- JavaScript Application Logic -->
   <script>
     "use strict";
@@ -774,7 +983,10 @@
       selectedService: null,
       selectedDate: "",
       selectedSlot: null,
-      publicBookingsReadable: true
+      publicBookingsReadable: true,
+      manageToken: "",
+      manageBooking: null,
+      manageSelectedSlot: null
     };
 
     const $ = id => document.getElementById(id);
@@ -947,7 +1159,7 @@
     const todayKey = () => dateKeyInZone(new Date());
 
     function showOnly(viewId) {
-      ["loadingView", "authView", "pendingView", "dashboardView", "publicBookingView"].forEach(id => {
+      ["loadingView", "authView", "pendingView", "dashboardView", "publicBookingView", "manageBookingView"].forEach(id => {
         const el = $(id);
         el.classList.toggle("hidden", id !== viewId);
         if (id === "pendingView") el.classList.toggle("flex", id === viewId);
@@ -1061,6 +1273,13 @@
 
     function friendlyDbError(err, actionText = "complete this action") {
       const fullMsg = `${err?.code || ""} ${err?.message || ""}`.toLowerCase();
+
+      // PostgreSQL exclusion_violation: the database has rejected an overlapping booking.
+      // This is the final, database-level protection against simultaneous double bookings.
+      if (String(err?.code || "") === "23P01" || fullMsg.includes("bookings_no_time_overlap")) {
+        return "That appointment time has just been taken. Please choose another available time.";
+      }
+
       if (fullMsg.includes("row-level security") || fullMsg.includes("42501") || fullMsg.includes("permission denied")) {
         return `Supabase security policies are blocking the app from trying to ${actionText}.`;
       }
@@ -1189,13 +1408,23 @@
     }
 
     async function init() {
-      const businessId = new URLSearchParams(window.location.search).get("business");
+      const params = new URLSearchParams(window.location.search);
+      const manageToken = params.get("manage");
+      const manageAction = params.get("action") || "";
+      const businessId = params.get("business");
+
       $("blkDate").min = todayKey();
       $("blkRepeatUntil").min = todayKey();
       $("publicDate").min = todayKey();
+      $("manageDateInput").min = todayKey();
       renderPromoExcludedDates();
       syncPromoFields();
       bindEvents();
+
+      if (manageToken) {
+        state.manageToken = manageToken;
+        return await loadManagedBooking(manageToken, manageAction);
+      }
 
       if (businessId) {
         return await loadPublicBookingPage(businessId);
@@ -1261,12 +1490,22 @@
 
       $("bookingFilter").addEventListener("change", renderBookings);
       $("bookingsList").addEventListener("click", handleBookingListClick);
+      $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
+      $("reminderSettingsForm").addEventListener("submit", saveReminderSettings);
+      $("followupEnabled").addEventListener("change", syncReminderFields);
 
       $("publicServices").addEventListener("click", handlePublicServiceClick);
       $("publicDate").addEventListener("change", handlePublicDateChange);
       $("publicSlots").addEventListener("click", handlePublicSlotClick);
       $("customerBookingForm").addEventListener("submit", submitCustomerBooking);
       $("bookAnotherBtn").addEventListener("click", resetPublicJourney);
+
+      $("manageRescheduleBtn").addEventListener("click", openManageReschedule);
+      $("manageRescheduleCloseBtn").addEventListener("click", closeManageReschedule);
+      $("manageCancelBtn").addEventListener("click", cancelManagedBooking);
+      $("manageDateInput").addEventListener("change", loadManageAvailableSlots);
+      $("manageSlots").addEventListener("click", handleManageSlotClick);
+      $("manageConfirmRescheduleBtn").addEventListener("click", confirmManagedReschedule);
     }
 
     function setAuthMode(mode) {
@@ -1462,6 +1701,8 @@
 
         $("dashboardBusinessName").textContent = state.profile.business_name;
         $("publicBookingUrl").value = buildPublicUrl(state.profile.id);
+        populateBusinessDetails();
+        populateReminderSettings();
 
         await loadDashboardData();
         showOnly("dashboardView");
@@ -1509,7 +1750,7 @@
 
     function renderStats() {
       const now = Date.now();
-      const upcoming = state.bookings.filter(b => new Date(b.start_time).getTime() >= now);
+      const upcoming = state.bookings.filter(b => b.status !== "cancelled" && new Date(b.start_time).getTime() >= now);
       const activeDates = new Set(state.blocks.filter(b => b.is_active && b.block_date >= todayKey()).map(b => b.block_date));
       const totalVal = upcoming.reduce((acc, b) => acc + Number(b.booked_price ?? b.services?.price ?? state.services.find(s => s.id === b.service_id)?.price ?? 0), 0);
 
@@ -1520,10 +1761,116 @@
     }
 
     function renderOverviewBookings() {
-      const upcoming = state.bookings.filter(b => new Date(b.start_time) >= new Date()).slice(0, 4);
+      const upcoming = state.bookings.filter(b => b.status !== "cancelled" && new Date(b.start_time) >= new Date()).slice(0, 4);
       $("overviewBookings").innerHTML = upcoming.length
         ? upcoming.map(b => bookingCard(b)).join("")
         : emptyState("No upcoming bookings", "New customer appointments will appear here.");
+    }
+
+    function syncReminderFields() {
+      $("followupTimingWrap").classList.toggle("hidden", !$("followupEnabled").checked);
+    }
+
+    function populateReminderSettings() {
+      if (!state.profile) return;
+      $("reminder24h").checked = Boolean(state.profile.reminder_24h_enabled);
+      $("reminder2h").checked = Boolean(state.profile.reminder_2h_enabled);
+      $("followupEnabled").checked = Boolean(state.profile.followup_enabled);
+      $("followupHours").value = String(state.profile.followup_hours_after || 24);
+      syncReminderFields();
+    }
+
+    async function saveReminderSettings(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const btn = $("reminderSettingsSubmitBtn");
+      setBusy(btn, true, "Saving…");
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .update({
+          reminder_24h_enabled: $("reminder24h").checked,
+          reminder_2h_enabled: $("reminder2h").checked,
+          followup_enabled: $("followupEnabled").checked,
+          followup_hours_after: Number($("followupHours").value || 24)
+        })
+        .eq("id", state.profile.id)
+        .select("*")
+        .single();
+
+      setBusy(btn, false);
+      if (error) return toast(friendlyDbError(error, "save reminder settings"), "error");
+
+      state.profile = data;
+      populateReminderSettings();
+      toast("Reminder settings saved.");
+    }
+
+    function populateBusinessDetails() {
+      if (!state.profile) return;
+      $("businessContactEmail").value = state.profile.contact_email || state.user?.email || "";
+      $("businessContactPhone").value = state.profile.contact_phone || "";
+      $("businessAddress").value = state.profile.business_address || "";
+    }
+
+    async function saveBusinessDetails(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const contactEmail = $("businessContactEmail").value.trim().toLowerCase();
+      const contactPhone = $("businessContactPhone").value.trim();
+      const businessAddress = $("businessAddress").value.trim();
+
+      if (!contactEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+        return toast("Enter a valid customer contact email.", "error");
+      }
+
+      const btn = $("businessDetailsSubmitBtn");
+      setBusy(btn, true, "Saving…");
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .update({
+          contact_email: contactEmail,
+          contact_phone: contactPhone || null,
+          business_address: businessAddress || null
+        })
+        .eq("id", state.profile.id)
+        .select("*")
+        .single();
+
+      setBusy(btn, false);
+      if (error) return toast(friendlyDbError(error, "save your business details"), "error");
+
+      state.profile = data;
+      populateBusinessDetails();
+      toast("Business details saved.");
+    }
+
+    function currentAppBaseUrl() {
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.hash = "";
+      return url.toString();
+    }
+
+    async function sendBookingConfirmationEmail(manageToken) {
+      try {
+        const { data, error } = await publicClient.functions.invoke("send-booking-confirmation", {
+          body: {
+            manage_token: manageToken,
+            app_url: currentAppBaseUrl()
+          }
+        });
+
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        return { ok: true };
+      } catch (err) {
+        console.error("Booking email error:", err);
+        return { ok: false, error: err };
+      }
     }
 
     function switchTab(tabId) {
@@ -1538,6 +1885,15 @@
       u.hash = "";
       u.searchParams.set("business", profileId);
       return u.toString();
+    }
+
+    function buildManageUrl(token, action = "") {
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.hash = "";
+      url.searchParams.set("manage", token);
+      if (action) url.searchParams.set("action", action);
+      return url.toString();
     }
 
     function openPublicBookingPage() {
@@ -2151,16 +2507,18 @@
 
     function bookingCard(b, allowCancel = false) {
       const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
+      const cancelled = b.status === "cancelled";
       return `
-        <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-3 rounded-2xl border ${cancelled ? "border-slate-200 bg-slate-50 opacity-75" : "border-slate-200"} p-4 sm:flex-row sm:items-center sm:justify-between">
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
               <h3 class="font-bold text-ink">${escapeHtml(b.customer_name)}</h3>
               <span class="text-xs font-semibold text-brand-600">${escapeHtml(srv.title || "Service")}</span>
+              ${cancelled ? '<span class="rounded-full bg-slate-200 px-2 py-0.5 text-[.68rem] font-bold text-slate-600">Cancelled</span>' : ""}
             </div>
             <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}${b.booked_price != null ? ` · <strong class="text-slate-700">${money(b.booked_price)}</strong>` : ""}</p>
           </div>
-          ${allowCancel ? `<button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-booking-action="delete" data-id="${b.id}">Cancel booking</button>` : ""}
+          ${allowCancel && !cancelled ? `<button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-booking-action="delete" data-id="${b.id}">Cancel booking</button>` : ""}
         </div>
       `;
     }
@@ -2174,7 +2532,11 @@
       const now = Date.now();
       const filtered = state.bookings.filter(b => {
         if (filter === "all") return true;
-        return filter === "upcoming" ? new Date(b.start_time).getTime() >= now : new Date(b.start_time).getTime() < now;
+        if (filter === "cancelled") return b.status === "cancelled";
+        if (b.status === "cancelled") return false;
+        return filter === "upcoming"
+          ? new Date(b.start_time).getTime() >= now
+          : new Date(b.start_time).getTime() < now;
       });
 
       if (filter === "past") {
@@ -2202,13 +2564,222 @@
       if (!cancelBtn) return;
 
       const booking = state.bookings.find(b => b.id === cancelBtn.dataset.id);
-      if (!booking || !window.confirm(`Cancel the booking for ${booking.customer_name}? This removes it permanently.`)) return;
+      if (!booking || !window.confirm(`Cancel the booking for ${booking.customer_name}? The appointment time will become available again.`)) return;
 
-      const { error } = await supabaseClient.from("bookings").delete().eq("id", booking.id).eq("profile_id", state.profile.id);
+      const { error } = await supabaseClient
+        .from("bookings")
+        .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
+        .eq("id", booking.id)
+        .eq("profile_id", state.profile.id);
+
       if (error) return toast(friendlyDbError(error, "cancel this booking"), "error");
 
       toast("Booking cancelled.");
       await refreshBookings();
+    }
+
+
+    async function loadManagedBooking(token, requestedAction = "") {
+      showOnly("manageBookingView");
+      $("manageLoading").classList.remove("hidden");
+      $("manageError").classList.add("hidden");
+      $("manageContent").classList.add("hidden");
+
+      const { data, error } = await publicClient.rpc("public_get_booking", {
+        p_manage_token: token
+      });
+
+      $("manageLoading").classList.add("hidden");
+
+      const booking = Array.isArray(data) ? data[0] : data;
+      if (error || !booking) {
+        const card = $("manageError");
+        card.classList.remove("hidden");
+        card.innerHTML = `
+          <h2 class="text-xl font-bold text-ink">This booking link is not available</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-500">The link may be invalid or the booking may no longer exist.</p>
+        `;
+        return;
+      }
+
+      state.manageBooking = booking;
+      state.manageSelectedSlot = null;
+      renderManagedBooking();
+
+      $("manageContent").classList.remove("hidden");
+
+      if (booking.booking_status === "confirmed" && requestedAction === "reschedule") {
+        openManageReschedule();
+      } else if (booking.booking_status === "confirmed" && requestedAction === "cancel") {
+        $("manageCancelBtn").focus();
+      }
+    }
+
+    function renderManagedBooking() {
+      const b = state.manageBooking;
+      if (!b) return;
+
+      const cancelled = b.booking_status === "cancelled";
+      $("manageBusinessName").textContent = b.business_name || "Your booking";
+      $("manageServiceName").textContent = b.service_title || "Appointment";
+      $("manageCustomerName").textContent = b.customer_name || "Customer";
+      $("manageDate").textContent = prettyDate(new Date(b.start_time).toLocaleDateString("en-CA", { timeZone: BUSINESS_TIME_ZONE }));
+      $("manageTime").textContent = `${prettyTime(new Date(b.start_time))}–${prettyTime(new Date(new Date(b.start_time).getTime() + Number(b.duration_minutes || 0) * 60000))}`;
+      $("managePrice").textContent = money(b.booked_price || 0);
+
+      $("manageStatusBadge").textContent = cancelled ? "Cancelled" : "Confirmed";
+      $("manageStatusBadge").className = cancelled
+        ? "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600"
+        : "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700";
+
+      $("manageActionsCard").classList.toggle("hidden", cancelled);
+      $("manageCancelledMessage").classList.toggle("hidden", !cancelled);
+
+      if (cancelled) closeManageReschedule();
+    }
+
+    function openManageReschedule() {
+      if (!state.manageBooking || state.manageBooking.booking_status !== "confirmed") return;
+      state.manageSelectedSlot = null;
+      $("manageReschedulePanel").classList.remove("hidden");
+      $("manageDateInput").value = "";
+      $("manageSlots").innerHTML = "";
+      $("manageSlotsMessage").textContent = "Choose a date to see available times.";
+      $("manageRescheduleConfirm").classList.add("hidden");
+      $("manageReschedulePanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closeManageReschedule() {
+      state.manageSelectedSlot = null;
+      $("manageReschedulePanel").classList.add("hidden");
+      $("manageSlots").innerHTML = "";
+      $("manageRescheduleConfirm").classList.add("hidden");
+    }
+
+    async function loadManageAvailableSlots() {
+      const b = state.manageBooking;
+      const dateKey = $("manageDateInput").value;
+      state.manageSelectedSlot = null;
+      $("manageRescheduleConfirm").classList.add("hidden");
+
+      if (!b || !dateKey) {
+        $("manageSlots").innerHTML = "";
+        $("manageSlotsMessage").textContent = "Choose a date to see available times.";
+        return;
+      }
+
+      $("manageSlotsMessage").innerHTML = '<span class="inline-flex items-center gap-2"><span class="spinner !h-4 !w-4 !border-2"></span>Checking availability…</span>';
+      $("manageSlots").innerHTML = "";
+
+      const startIso = londonDate(dateKey, "00:00").toISOString();
+      const endIso = new Date(londonDate(dateKey, "00:00").getTime() + 93600000).toISOString();
+
+      const [blkRes, bkgRes] = await Promise.all([
+        publicClient
+          .from("schedule_blocks")
+          .select("*")
+          .eq("profile_id", b.profile_id)
+          .eq("service_id", b.service_id)
+          .eq("block_date", dateKey)
+          .eq("is_active", true)
+          .order("start_time"),
+        publicClient
+          .from("bookings")
+          .select("start_time, end_time, status")
+          .eq("profile_id", b.profile_id)
+          .eq("status", "confirmed")
+          .lt("start_time", endIso)
+          .gt("end_time", startIso)
+      ]);
+
+      if (blkRes.error) {
+        $("manageSlotsMessage").textContent = friendlyDbError(blkRes.error, "load availability");
+        return;
+      }
+
+      const slots = buildSlots(
+        blkRes.data || [],
+        bkgRes.data || [],
+        Number(b.duration_minutes || 0)
+      );
+
+      $("manageSlotsMessage").textContent = slots.length
+        ? `${slots.length} time${slots.length === 1 ? "" : "s"} available`
+        : "No alternative times are available on this date.";
+
+      $("manageSlots").innerHTML = slots.map((slot, idx) => `
+        <button type="button" class="manage-slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-manage-slot-index="${idx}">
+          ${escapeHtml(prettyTime(slot.start))}
+        </button>
+      `).join("");
+
+      $("manageSlots")._slots = slots;
+    }
+
+    function handleManageSlotClick(e) {
+      const btn = e.target.closest("[data-manage-slot-index]");
+      if (!btn) return;
+
+      const slots = $("manageSlots")._slots || [];
+      state.manageSelectedSlot = slots[Number(btn.dataset.manageSlotIndex)] || null;
+
+      document.querySelectorAll(".manage-slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
+
+      if (!state.manageSelectedSlot) {
+        $("manageRescheduleConfirm").classList.add("hidden");
+        return;
+      }
+
+      $("manageSelectedTime").textContent = `${prettyDate($("manageDateInput").value)} · ${prettyTime(state.manageSelectedSlot.start)}–${prettyTime(state.manageSelectedSlot.end)}`;
+      $("manageRescheduleConfirm").classList.remove("hidden");
+    }
+
+    async function confirmManagedReschedule() {
+      if (!state.manageToken || !state.manageSelectedSlot) return;
+
+      const btn = $("manageConfirmRescheduleBtn");
+      setBusy(btn, true, "Rescheduling…");
+
+      const { data, error } = await publicClient.rpc("public_reschedule_booking", {
+        p_manage_token: state.manageToken,
+        p_new_start_time: state.manageSelectedSlot.start.toISOString()
+      });
+
+      setBusy(btn, false);
+
+      if (error) {
+        const overlap = String(error?.code || "") === "23P01" || String(error?.message || "").toLowerCase().includes("bookings_no_time_overlap");
+        if (overlap) {
+          toast("That time has just been taken. Please choose another available time.", "error");
+          return await loadManageAvailableSlots();
+        }
+        return toast(friendlyDbError(error, "reschedule this booking"), "error");
+      }
+
+      toast("Your booking has been rescheduled.");
+      closeManageReschedule();
+      await loadManagedBooking(state.manageToken);
+    }
+
+    async function cancelManagedBooking() {
+      const b = state.manageBooking;
+      if (!state.manageToken || !b || b.booking_status !== "confirmed") return;
+
+      if (!window.confirm(`Cancel ${b.service_title} on ${prettyDateTime(b.start_time)}? The appointment time will become available to other customers.`)) return;
+
+      const btn = $("manageCancelBtn");
+      setBusy(btn, true, "Cancelling…");
+
+      const { data, error } = await publicClient.rpc("public_cancel_booking", {
+        p_manage_token: state.manageToken
+      });
+
+      setBusy(btn, false);
+
+      if (error) return toast(friendlyDbError(error, "cancel this booking"), "error");
+
+      toast("Your booking has been cancelled.");
+      await loadManagedBooking(state.manageToken);
     }
 
     async function loadPublicBookingPage(profileId) {
@@ -2304,7 +2875,7 @@
 
       const [blkRes, bkgRes] = await Promise.all([
         publicClient.from("schedule_blocks").select("*").eq("profile_id", state.publicProfile.id).eq("service_id", state.selectedService.id).eq("block_date", state.selectedDate).eq("is_active", true).order("start_time"),
-        publicClient.from("bookings").select("start_time, end_time").eq("profile_id", state.publicProfile.id).lt("start_time", endIso).gt("end_time", startIso)
+        publicClient.from("bookings").select("start_time, end_time, status").eq("profile_id", state.publicProfile.id).eq("status", "confirmed").lt("start_time", endIso).gt("end_time", startIso)
       ]);
 
       if (blkRes.error) {
@@ -2446,8 +3017,9 @@
 
       const { data: checkBkgs, error: checkErr } = await publicClient
         .from("bookings")
-        .select("start_time, end_time")
+        .select("start_time, end_time, status")
         .eq("profile_id", state.publicProfile.id)
+        .eq("status", "confirmed")
         .lt("start_time", state.selectedSlot.blockedEnd.toISOString())
         .gt("end_time", state.selectedSlot.start.toISOString());
 
@@ -2457,30 +3029,49 @@
         return await loadAvailableSlots();
       }
 
-      const bookedPrice = promotionForDate(state.selectedService, state.selectedDate).price;
-
-      const payload = {
-        profile_id: state.publicProfile.id,
-        service_id: state.selectedService.id,
-        customer_name: $("customerName").value.trim(),
-        customer_email: $("customerEmail").value.trim().toLowerCase(),
-        start_time: state.selectedSlot.start.toISOString(),
-        // end_time stores the time the diary becomes free again, including any optional buffer.
-        end_time: state.selectedSlot.blockedEnd.toISOString(),
-        // Supabase also recalculates this with a trigger so it cannot be trusted/changed by the browser.
-        booked_price: bookedPrice
-      };
-
-      const { error } = await publicClient.from("bookings").insert(payload);
+      const { data, error } = await publicClient.rpc("public_create_booking", {
+        p_profile_id: state.publicProfile.id,
+        p_service_id: state.selectedService.id,
+        p_customer_name: $("customerName").value.trim(),
+        p_customer_email: $("customerEmail").value.trim().toLowerCase(),
+        p_start_time: state.selectedSlot.start.toISOString()
+      });
       setBusy(submitBtn, false);
 
       if (error) {
+        const isOverlap =
+          String(error?.code || "") === "23P01" ||
+          String(error?.message || "").toLowerCase().includes("bookings_no_time_overlap");
+
+        if (isOverlap) {
+          state.selectedSlot = null;
+          updateSummary();
+          toast("That appointment time has just been taken. Please choose another available time.", "error");
+          return await loadAvailableSlots();
+        }
+
         return toast(friendlyDbError(error, "create this booking"), "error");
       }
 
-      const finalPrice = promotionForDate(state.selectedService, state.selectedDate).price;
-      const summaryText = `${state.selectedService.title} with ${state.publicProfile.business_name} on ${prettyDateTime(state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
+      const created = Array.isArray(data) ? data[0] : data;
+      if (!created?.manage_token) {
+        return toast("The booking was created, but its secure management link could not be generated.", "error");
+      }
+
+      const finalPrice = Number(created.booked_price ?? promotionForDate(state.selectedService, state.selectedDate).price);
+      const summaryText = `${state.selectedService.title} with ${state.publicProfile.business_name} on ${prettyDateTime(created.start_time || state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
       $("successSummary").textContent = summaryText;
+
+      $("successRescheduleLink").href = buildManageUrl(created.manage_token, "reschedule");
+      $("successCancelLink").href = buildManageUrl(created.manage_token, "cancel");
+      $("successManageActions").classList.remove("hidden");
+      $("successManageNote").classList.remove("hidden");
+      $("successEmailStatus").textContent = "Sending confirmation email…";
+
+      const emailResult = await sendBookingConfirmationEmail(created.manage_token);
+      $("successEmailStatus").textContent = emailResult.ok
+        ? "A confirmation email has been sent to you. The business has also been notified."
+        : "Your booking is confirmed, but the confirmation email could not be sent. Please keep the private manage-booking links above.";
 
       ["dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
       $("bookingSuccess").classList.remove("hidden");
@@ -2507,6 +3098,11 @@
       $("publicSlots").innerHTML = "";
       $("slotsMessage").textContent = "Choose a service and date first.";
       $("bookingSuccess").classList.add("hidden");
+      $("successManageActions").classList.add("hidden");
+      $("successManageNote").classList.add("hidden");
+      $("successRescheduleLink").href = "#";
+      $("successCancelLink").href = "#";
+      $("successEmailStatus").textContent = "";
 
       updateSummary();
       window.scrollTo({ top: 0, behavior: "smooth" });
