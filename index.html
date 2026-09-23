@@ -416,6 +416,72 @@
                   <input id="srvPrice" class="field" type="number" required min="0" step="0.01" placeholder="65.00">
                 </div>
               </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <label class="flex cursor-pointer items-center justify-between gap-4">
+                  <span>
+                    <span class="block text-sm font-bold text-slate-700">Run a promotional offer</span>
+                    <span class="mt-0.5 block text-xs leading-5 text-slate-400">Automatically discount eligible appointment dates.</span>
+                  </span>
+                  <input id="srvPromoEnabled" type="checkbox" class="h-4 w-4 rounded border-slate-300">
+                </label>
+
+                <div id="srvPromoFields" class="mt-5 hidden space-y-4 border-t border-slate-200 pt-4">
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label class="label" for="srvPromoType">Discount type</label>
+                      <select id="srvPromoType" class="field">
+                        <option value="percentage">Percentage off</option>
+                        <option value="fixed">Fixed amount off</option>
+                        <option value="price">Promotional price</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label id="srvPromoValueLabel" class="label" for="srvPromoValue">Discount (%)</label>
+                      <input id="srvPromoValue" class="field" type="number" min="0" step="0.01" placeholder="20">
+                    </div>
+                  </div>
+
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label class="label" for="srvPromoStart">Starts</label>
+                      <input id="srvPromoStart" class="field" type="date">
+                    </div>
+                    <div>
+                      <label class="label" for="srvPromoEnd">Ends</label>
+                      <input id="srvPromoEnd" class="field" type="date">
+                      <label class="mt-2 flex cursor-pointer items-center gap-2 text-xs font-semibold text-slate-500">
+                        <input id="srvPromoNoEnd" type="checkbox" class="rounded border-slate-300">
+                        No end date
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="label">Offer applies on</p>
+                    <div class="grid grid-cols-4 gap-2 sm:grid-cols-7">
+                      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="srv-promo-day" type="checkbox" value="1" checked>Mon</label>
+                      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="srv-promo-day" type="checkbox" value="2" checked>Tue</label>
+                      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="srv-promo-day" type="checkbox" value="3" checked>Wed</label>
+                      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="srv-promo-day" type="checkbox" value="4" checked>Thu</label>
+                      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="srv-promo-day" type="checkbox" value="5" checked>Fri</label>
+                      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="srv-promo-day" type="checkbox" value="6" checked>Sat</label>
+                      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600"><input class="srv-promo-day" type="checkbox" value="0" checked>Sun</label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="label" for="srvPromoExcludeDate">Exclude specific dates <span class="font-normal text-slate-400">(optional)</span></label>
+                    <div class="flex gap-2">
+                      <input id="srvPromoExcludeDate" class="field min-w-0" type="date">
+                      <button id="srvPromoAddExcludeBtn" class="btn btn-light shrink-0" type="button">Add date</button>
+                    </div>
+                    <div id="srvPromoExcludedList" class="mt-2 flex flex-wrap gap-2"></div>
+                    <p class="mt-1.5 text-xs leading-5 text-slate-400">Useful for bank holidays, special events or dates when you do not want the offer to apply.</p>
+                  </div>
+                </div>
+              </div>
+
               <div class="flex gap-2">
                 <button id="serviceSubmitBtn" class="btn btn-primary flex-1" type="submit">Add service</button>
                 <button id="serviceCancelEditBtn" class="btn btn-light hidden" type="button">Cancel</button>
@@ -712,6 +778,7 @@
     };
 
     const $ = id => document.getElementById(id);
+    let servicePromoExcludedDates = [];
     const money = val => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(Number(val || 0));
     const escapeHtml = (str = "") => String(str).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 
@@ -751,6 +818,131 @@
       if (!(editor.innerText || "").trim()) return "";
       return sanitiseServiceDescription(editor.innerHTML);
     }
+
+    function syncPromoFields() {
+      const enabled = $("srvPromoEnabled").checked;
+      $("srvPromoFields").classList.toggle("hidden", !enabled);
+      if (enabled && !$("srvPromoStart").value) $("srvPromoStart").value = todayKey();
+      syncPromoType();
+      syncPromoEnd();
+    }
+
+    function syncPromoType() {
+      const type = $("srvPromoType").value;
+      const label = $("srvPromoValueLabel");
+      const input = $("srvPromoValue");
+
+      if (type === "percentage") {
+        label.textContent = "Discount (%)";
+        input.placeholder = "20";
+        input.max = "100";
+      } else if (type === "fixed") {
+        label.textContent = "Amount off (£)";
+        input.placeholder = "20.00";
+        input.removeAttribute("max");
+      } else {
+        label.textContent = "Promotional price (£)";
+        input.placeholder = "150.00";
+        input.removeAttribute("max");
+      }
+    }
+
+    function syncPromoEnd() {
+      const noEnd = $("srvPromoNoEnd").checked;
+      $("srvPromoEnd").disabled = noEnd;
+      if (noEnd) $("srvPromoEnd").value = "";
+    }
+
+    function renderPromoExcludedDates() {
+      const list = $("srvPromoExcludedList");
+      if (!list) return;
+      list.innerHTML = servicePromoExcludedDates.length
+        ? servicePromoExcludedDates.map(date => `
+            <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
+              ${escapeHtml(prettyDate(date))}
+              <button type="button" class="text-slate-400 hover:text-red-600" data-remove-promo-date="${escapeHtml(date)}" aria-label="Remove ${escapeHtml(date)}">×</button>
+            </span>
+          `).join("")
+        : '<span class="text-xs text-slate-400">No excluded dates.</span>';
+    }
+
+    function addPromoExcludedDate() {
+      const date = $("srvPromoExcludeDate").value;
+      if (!date) return toast("Choose a date to exclude first.", "error");
+      if (!servicePromoExcludedDates.includes(date)) {
+        servicePromoExcludedDates.push(date);
+        servicePromoExcludedDates.sort();
+      }
+      $("srvPromoExcludeDate").value = "";
+      renderPromoExcludedDates();
+    }
+
+    function promoDayNumbers() {
+      return [...document.querySelectorAll(".srv-promo-day:checked")].map(el => Number(el.value));
+    }
+
+    function promotionLabel(service) {
+      if (!service?.promotion_enabled) return "";
+      const value = Number(service.promotion_value || 0);
+      if (service.promotion_type === "percentage") return `${value % 1 === 0 ? value.toFixed(0) : value}% off`;
+      if (service.promotion_type === "fixed") return `${money(value)} off`;
+      if (service.promotion_type === "price") return `${money(value)} promotional price`;
+      return "Promotional offer";
+    }
+
+    function promotionScheduleText(service) {
+      if (!service?.promotion_enabled) return "";
+      const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const days = Array.isArray(service.promotion_days) ? service.promotion_days.map(Number) : [];
+      const allDays = days.length === 7;
+      const dayText = allDays ? "Every day" : days.map(d => dayMap[d]).join(", ");
+      const start = service.promotion_start_date ? prettyDate(service.promotion_start_date) : "";
+      const end = service.promotion_end_date ? prettyDate(service.promotion_end_date) : "No end date";
+      return [dayText, start ? `${start}–${end}` : end].filter(Boolean).join(" · ");
+    }
+
+    function promotionForDate(service, dateKey) {
+      const basePrice = Number(service?.price || 0);
+      const result = { active: false, basePrice, price: basePrice, label: "" };
+      if (!service?.promotion_enabled || !dateKey) return result;
+
+      if (service.promotion_start_date && dateKey < service.promotion_start_date) return result;
+      if (service.promotion_end_date && dateKey > service.promotion_end_date) return result;
+
+      const excluded = Array.isArray(service.promotion_excluded_dates) ? service.promotion_excluded_dates : [];
+      if (excluded.includes(dateKey)) return result;
+
+      const days = Array.isArray(service.promotion_days) ? service.promotion_days.map(Number) : [];
+      const day = new Date(`${dateKey}T12:00:00Z`).getUTCDay();
+      if (days.length && !days.includes(day)) return result;
+
+      const value = Number(service.promotion_value || 0);
+      let finalPrice = basePrice;
+
+      if (service.promotion_type === "percentage") finalPrice = basePrice * (1 - value / 100);
+      else if (service.promotion_type === "fixed") finalPrice = basePrice - value;
+      else if (service.promotion_type === "price") finalPrice = value;
+
+      finalPrice = Math.max(0, Math.round((finalPrice + Number.EPSILON) * 100) / 100);
+
+      return {
+        active: true,
+        basePrice,
+        price: finalPrice,
+        label: promotionLabel(service)
+      };
+    }
+
+    function publicPriceHtml(service, dateKey = "") {
+      const promo = promotionForDate(service, dateKey);
+      if (!promo.active) return `<strong class="text-brand-700">${money(promo.basePrice)}</strong>`;
+
+      return `<span class="flex items-center gap-2">
+        <span class="text-slate-400 line-through">${money(promo.basePrice)}</span>
+        <strong class="text-brand-700">${money(promo.price)}</strong>
+      </span>`;
+    }
+
     const cleanTime = (timeStr = "") => String(timeStr).slice(0, 5);
     const todayKey = () => dateKeyInZone(new Date());
 
@@ -1001,6 +1193,8 @@
       $("blkDate").min = todayKey();
       $("blkRepeatUntil").min = todayKey();
       $("publicDate").min = todayKey();
+      renderPromoExcludedDates();
+      syncPromoFields();
       bindEvents();
 
       if (businessId) {
@@ -1033,6 +1227,16 @@
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
       $("servicesList").addEventListener("click", handleServiceListClick);
       $("srvDescription").addEventListener("input", updateDescriptionCount);
+      $("srvPromoEnabled").addEventListener("change", syncPromoFields);
+      $("srvPromoType").addEventListener("change", syncPromoType);
+      $("srvPromoNoEnd").addEventListener("change", syncPromoEnd);
+      $("srvPromoAddExcludeBtn").addEventListener("click", addPromoExcludedDate);
+      $("srvPromoExcludedList").addEventListener("click", e => {
+        const btn = e.target.closest("[data-remove-promo-date]");
+        if (!btn) return;
+        servicePromoExcludedDates = servicePromoExcludedDates.filter(d => d !== btn.dataset.removePromoDate);
+        renderPromoExcludedDates();
+      });
       document.querySelectorAll("[data-format-command]").forEach(btn => {
         btn.addEventListener("mousedown", e => e.preventDefault());
         btn.addEventListener("click", () => {
@@ -1307,7 +1511,7 @@
       const now = Date.now();
       const upcoming = state.bookings.filter(b => new Date(b.start_time).getTime() >= now);
       const activeDates = new Set(state.blocks.filter(b => b.is_active && b.block_date >= todayKey()).map(b => b.block_date));
-      const totalVal = upcoming.reduce((acc, b) => acc + Number(b.services?.price || state.services.find(s => s.id === b.service_id)?.price || 0), 0);
+      const totalVal = upcoming.reduce((acc, b) => acc + Number(b.booked_price ?? b.services?.price ?? state.services.find(s => s.id === b.service_id)?.price ?? 0), 0);
 
       $("statServices").textContent = state.services.length;
       $("statDates").textContent = activeDates.size;
@@ -1359,6 +1563,12 @@
             <h3 class="truncate font-bold text-ink">${escapeHtml(s.title)}</h3>
             ${s.description ? `<div class="service-description mt-1.5 max-w-2xl text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</div>` : ""}
             <p class="mt-2 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>
+            ${s.promotion_enabled ? `
+              <div class="mt-2 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                <strong>${escapeHtml(promotionLabel(s))}</strong>
+                <span class="text-emerald-700">${escapeHtml(promotionScheduleText(s))}</span>
+              </div>
+            ` : ""}
           </div>
           <div class="flex shrink-0 gap-2">
             <button class="btn btn-light !px-3 !py-2" type="button" data-service-action="edit" data-id="${s.id}">Edit</button>
@@ -1377,12 +1587,38 @@
         return $("srvDescription").focus();
       }
 
+      const promoEnabled = $("srvPromoEnabled").checked;
+      const basePrice = Number($("srvPrice").value);
+      const promoValue = Number($("srvPromoValue").value || 0);
+      const promoType = $("srvPromoType").value;
+      const promoStart = $("srvPromoStart").value;
+      const promoEnd = $("srvPromoNoEnd").checked ? null : ($("srvPromoEnd").value || null);
+      const promoDays = promoDayNumbers();
+
+      if (promoEnabled) {
+        if (!promoStart) return toast("Choose when the promotional offer starts.", "error");
+        if (!$("srvPromoNoEnd").checked && !promoEnd) return toast("Choose when the promotional offer ends, or select No end date.", "error");
+        if (promoEnd && promoEnd < promoStart) return toast("The promotional offer end date must be after its start date.", "error");
+        if (!promoDays.length) return toast("Choose at least one day for the promotional offer.", "error");
+        if (!(promoValue >= 0)) return toast("Enter a valid promotional discount.", "error");
+        if (promoType === "percentage" && (promoValue <= 0 || promoValue > 100)) return toast("Percentage discounts must be between 0 and 100%.", "error");
+        if (promoType === "fixed" && (promoValue <= 0 || promoValue > basePrice)) return toast("The fixed discount must be greater than £0 and no more than the normal price.", "error");
+        if (promoType === "price" && (promoValue < 0 || promoValue >= basePrice)) return toast("The promotional price must be lower than the normal price.", "error");
+      }
+
       const payload = {
         profile_id: state.profile.id,
         title: $("srvTitle").value.trim(),
         description: getServiceDescriptionHtml(),
         duration_minutes: Number($("srvDuration").value),
-        price: Number($("srvPrice").value)
+        price: basePrice,
+        promotion_enabled: promoEnabled,
+        promotion_type: promoEnabled ? promoType : null,
+        promotion_value: promoEnabled ? promoValue : null,
+        promotion_start_date: promoEnabled ? promoStart : null,
+        promotion_end_date: promoEnabled ? promoEnd : null,
+        promotion_days: promoEnabled ? promoDays : [0, 1, 2, 3, 4, 5, 6],
+        promotion_excluded_dates: promoEnabled ? servicePromoExcludedDates : []
       };
 
       const btn = $("serviceSubmitBtn");
@@ -1425,6 +1661,27 @@
         updateDescriptionCount();
         $("srvDuration").value = service.duration_minutes;
         $("srvPrice").value = Number(service.price).toFixed(2);
+
+        $("srvPromoEnabled").checked = !!service.promotion_enabled;
+        $("srvPromoType").value = service.promotion_type || "percentage";
+        $("srvPromoValue").value = service.promotion_value ?? "";
+        $("srvPromoStart").value = service.promotion_start_date || "";
+        $("srvPromoNoEnd").checked = !!service.promotion_enabled && !service.promotion_end_date;
+        $("srvPromoEnd").value = service.promotion_end_date || "";
+
+        const savedDays = Array.isArray(service.promotion_days)
+          ? service.promotion_days.map(Number)
+          : [0, 1, 2, 3, 4, 5, 6];
+        document.querySelectorAll(".srv-promo-day").forEach(box => {
+          box.checked = savedDays.includes(Number(box.value));
+        });
+
+        servicePromoExcludedDates = Array.isArray(service.promotion_excluded_dates)
+          ? [...service.promotion_excluded_dates]
+          : [];
+        renderPromoExcludedDates();
+        syncPromoFields();
+
         $("serviceFormHeading").textContent = "Edit service";
         $("serviceSubmitBtn").textContent = "Save changes";
         $("serviceCancelEditBtn").classList.remove("hidden");
@@ -1452,6 +1709,16 @@
       updateDescriptionCount();
       $("srvDuration").value = "60";
       $("serviceEditId").value = "";
+      $("srvPromoEnabled").checked = false;
+      $("srvPromoType").value = "percentage";
+      $("srvPromoValue").value = "";
+      $("srvPromoStart").value = "";
+      $("srvPromoEnd").value = "";
+      $("srvPromoNoEnd").checked = false;
+      document.querySelectorAll(".srv-promo-day").forEach(box => box.checked = true);
+      servicePromoExcludedDates = [];
+      renderPromoExcludedDates();
+      syncPromoFields();
       $("serviceFormHeading").textContent = "Add a service";
       $("serviceSubmitBtn").textContent = "Add service";
       $("serviceCancelEditBtn").classList.add("hidden");
@@ -1891,7 +2158,7 @@
               <h3 class="font-bold text-ink">${escapeHtml(b.customer_name)}</h3>
               <span class="text-xs font-semibold text-brand-600">${escapeHtml(srv.title || "Service")}</span>
             </div>
-            <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}</p>
+            <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}${b.booked_price != null ? ` · <strong class="text-slate-700">${money(b.booked_price)}</strong>` : ""}</p>
           </div>
           ${allowCancel ? `<button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-booking-action="delete" data-id="${b.id}">Cancel booking</button>` : ""}
         </div>
@@ -1981,9 +2248,14 @@
         <button type="button" class="service-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-service-id="${s.id}">
           <span class="block font-bold text-ink">${escapeHtml(s.title)}</span>
           ${s.description ? `<span class="service-description mt-2 block text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</span>` : ""}
+          ${s.promotion_enabled ? `
+            <span class="mt-3 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+              ${escapeHtml(promotionLabel(s))} on eligible dates
+            </span>
+          ` : ""}
           <span class="mt-3 flex items-center justify-between gap-3 text-sm">
             <span class="text-slate-500">${Number(s.duration_minutes)} minutes</span>
-            <strong class="text-brand-700">${money(s.price)}</strong>
+            <span>${publicPriceHtml(s)}</span>
           </span>
         </button>
       `).join("") : emptyState("No services available", "This business has not published any bookable services yet.");
@@ -2143,7 +2415,22 @@
 
     function updateSummary() {
       $("summaryService").textContent = state.selectedService?.title || "Not selected";
-      $("summaryPrice").textContent = state.selectedService ? money(state.selectedService.price) : "—";
+
+      if (!state.selectedService) {
+        $("summaryPrice").textContent = "—";
+      } else if (state.selectedDate) {
+        const promo = promotionForDate(state.selectedService, state.selectedDate);
+        $("summaryPrice").innerHTML = promo.active
+          ? `<span class="flex flex-col items-end leading-tight">
+              <span class="text-sm font-semibold text-slate-400 line-through">${money(promo.basePrice)}</span>
+              <span>${money(promo.price)}</span>
+              <span class="mt-1 text-[.68rem] font-bold uppercase tracking-wide text-emerald-600">${escapeHtml(promo.label)}</span>
+            </span>`
+          : money(promo.basePrice);
+      } else {
+        $("summaryPrice").textContent = money(state.selectedService.price);
+      }
+
       $("summaryDate").textContent = state.selectedDate ? prettyDate(state.selectedDate) : "Not selected";
       $("summaryTime").textContent = state.selectedSlot ? `${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}` : "Not selected";
     }
@@ -2170,6 +2457,8 @@
         return await loadAvailableSlots();
       }
 
+      const bookedPrice = promotionForDate(state.selectedService, state.selectedDate).price;
+
       const payload = {
         profile_id: state.publicProfile.id,
         service_id: state.selectedService.id,
@@ -2177,7 +2466,9 @@
         customer_email: $("customerEmail").value.trim().toLowerCase(),
         start_time: state.selectedSlot.start.toISOString(),
         // end_time stores the time the diary becomes free again, including any optional buffer.
-        end_time: state.selectedSlot.blockedEnd.toISOString()
+        end_time: state.selectedSlot.blockedEnd.toISOString(),
+        // Supabase also recalculates this with a trigger so it cannot be trusted/changed by the browser.
+        booked_price: bookedPrice
       };
 
       const { error } = await publicClient.from("bookings").insert(payload);
@@ -2187,7 +2478,8 @@
         return toast(friendlyDbError(error, "create this booking"), "error");
       }
 
-      const summaryText = `${state.selectedService.title} with ${state.publicProfile.business_name} on ${prettyDateTime(state.selectedSlot.start.toISOString())}.`;
+      const finalPrice = promotionForDate(state.selectedService, state.selectedDate).price;
+      const summaryText = `${state.selectedService.title} with ${state.publicProfile.business_name} on ${prettyDateTime(state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
       $("successSummary").textContent = summaryText;
 
       ["dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
