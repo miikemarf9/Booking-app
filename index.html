@@ -1611,7 +1611,9 @@
             <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="toggle" data-id="${b.id}">${b.is_active ? "Pause" : "Activate"}</button>
             <button class="btn btn-light !px-3 !py-2" type="button" data-block-action="edit" data-id="${b.id}">Edit</button>
             <button class="btn !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-block-action="delete" data-id="${b.id}">Delete</button>
-            ${b.recurrence_group ? `<button class="btn !px-3 !py-2 bg-red-100 text-red-800 hover:bg-red-200" type="button" data-block-action="delete-series" data-id="${b.id}">Delete series</button>` : ''}
+            ${b.recurrence_group
+              ? `<button class="btn !px-3 !py-2 bg-red-100 text-red-800 hover:bg-red-200" type="button" data-block-action="delete-series" data-id="${b.id}">Delete series</button>`
+              : `<button class="btn !px-3 !py-2 bg-amber-50 text-amber-800 hover:bg-amber-100" type="button" data-block-action="delete-matching" data-id="${b.id}">Delete matching future</button>`}
           </div>
         </div>
       `}).join("") : emptyState("No availability found", showPast ? "Publish a new time block using the form." : "Publish upcoming availability or show past dates.");
@@ -1754,6 +1756,8 @@
         deleteBlock(block);
       } else if (action === "delete-series") {
         deleteBlockSeries(block);
+      } else if (action === "delete-matching") {
+        deleteMatchingFutureBlocks(block);
       }
     }
 
@@ -1772,6 +1776,44 @@
 
       toast("Availability deleted.");
       if ($("blockEditId").value === block.id) resetBlockForm();
+      await refreshBlocks();
+    }
+
+    async function deleteMatchingFutureBlocks(block) {
+      const start = cleanTime(block.start_time);
+      const end = cleanTime(block.end_time);
+      const buffer = Number(block.buffer_minutes || 0);
+
+      const matches = state.blocks.filter(b =>
+        !b.recurrence_group &&
+        b.block_date >= todayKey() &&
+        b.service_id === block.service_id &&
+        cleanTime(b.start_time) === start &&
+        cleanTime(b.end_time) === end &&
+        Number(b.buffer_minutes || 0) === buffer
+      );
+
+      if (!matches.length) return toast("No matching future availability found.", "error");
+
+      const service = state.services.find(s => s.id === block.service_id);
+      const confirmed = window.confirm(
+        `This will delete ${matches.length} matching future availability dates.\n\n` +
+        `${service?.title || "Service"} · ${start}–${end}\n\n` +
+        `Use this for older recurring dates created before series grouping was added. Continue?`
+      );
+      if (!confirmed) return;
+
+      const ids = matches.map(b => b.id);
+      const { error } = await supabaseClient
+        .from("schedule_blocks")
+        .delete()
+        .eq("profile_id", state.profile.id)
+        .in("id", ids);
+
+      if (error) return toast(friendlyDbError(error, "delete matching availability"), "error");
+
+      toast(`${matches.length} matching future availability dates deleted.`);
+      if (matches.some(b => $("blockEditId").value === b.id)) resetBlockForm();
       await refreshBlocks();
     }
 
