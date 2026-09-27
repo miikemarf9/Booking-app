@@ -316,6 +316,7 @@
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Business details</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="reminders" type="button">Reminders</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="calendar" type="button">Calendar</button>
         </nav>
       </div>
 
@@ -721,6 +722,55 @@
             <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-500">
               This reminder engine is structured so SMS and WhatsApp can be added later without changing the booking model.
             </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Calendar Tab -->
+      <section id="tab-calendar" class="dashboard-tab hidden">
+        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Calendar integration</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Google Calendar</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Connect the Google Calendar you use for your business. Moreleads will keep the secure Google tokens on the server rather than in this browser.</p>
+
+            <div id="googleCalendarStatusBox" class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Connection status</p>
+                  <p id="googleCalendarStatusText" class="mt-1 font-bold text-ink">Not connected</p>
+                </div>
+                <span id="googleCalendarStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Not connected</span>
+              </div>
+              <p id="googleCalendarConnectedAt" class="mt-3 hidden text-xs leading-5 text-slate-500"></p>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-2">
+              <button id="connectGoogleCalendarBtn" class="btn btn-primary" type="button">Connect Google Calendar</button>
+              <button id="refreshGoogleCalendarBtn" class="btn btn-light" type="button">Check connection</button>
+            </div>
+
+            <p id="googleCalendarHelpText" class="mt-3 text-xs leading-5 text-slate-500">Click Connect Google Calendar. A new Google window will open so you can approve access. When Google confirms the connection, return here and click Check connection.</p>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 5</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">What this connection unlocks</h2>
+            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Avoid clashes</strong>
+                <span>Google busy periods can be used to stop customers selecting times when you are already occupied.</span>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Add new bookings</strong>
+                <span>Confirmed Moreleads appointments can be written into your Google Calendar automatically.</span>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Keep changes in sync</strong>
+                <span>Reschedules and cancellations can update the matching Google event instead of creating duplicates.</span>
+              </div>
+            </div>
+            <p class="mt-4 text-xs leading-5 text-slate-400">For this test we are only proving that your Google account can connect securely. The actual busy-time and event syncing comes immediately after the connection succeeds.</p>
           </article>
         </div>
       </section>
@@ -1493,6 +1543,8 @@
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
       $("reminderSettingsForm").addEventListener("submit", saveReminderSettings);
       $("followupEnabled").addEventListener("change", syncReminderFields);
+      $("connectGoogleCalendarBtn").addEventListener("click", connectGoogleCalendar);
+      $("refreshGoogleCalendarBtn").addEventListener("click", () => refreshGoogleCalendarConnection(true));
 
       $("publicServices").addEventListener("click", handlePublicServiceClick);
       $("publicDate").addEventListener("change", handlePublicDateChange);
@@ -1703,6 +1755,7 @@
         $("publicBookingUrl").value = buildPublicUrl(state.profile.id);
         populateBusinessDetails();
         populateReminderSettings();
+        populateCalendarSettings();
 
         await loadDashboardData();
         showOnly("dashboardView");
@@ -1846,6 +1899,127 @@
       state.profile = data;
       populateBusinessDetails();
       toast("Business details saved.");
+    }
+
+    function populateCalendarSettings() {
+      if (!state.profile) return;
+
+      const connected =
+        state.profile.calendar_provider === "google" &&
+        Boolean(state.profile.calendar_connected_at);
+
+      const badge = $("googleCalendarStatusBadge");
+      const statusText = $("googleCalendarStatusText");
+      const connectedAt = $("googleCalendarConnectedAt");
+      const connectBtn = $("connectGoogleCalendarBtn");
+
+      if (connected) {
+        badge.textContent = "Connected";
+        badge.className = "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700";
+        statusText.textContent = "Google Calendar connected";
+        connectBtn.textContent = "Reconnect Google Calendar";
+
+        const when = new Date(state.profile.calendar_connected_at);
+        connectedAt.textContent = Number.isNaN(when.getTime())
+          ? "Connection saved."
+          : `Connected ${new Intl.DateTimeFormat("en-GB", {
+              dateStyle: "medium",
+              timeStyle: "short",
+              timeZone: BUSINESS_TIME_ZONE
+            }).format(when)}.`;
+        connectedAt.classList.remove("hidden");
+      } else {
+        badge.textContent = "Not connected";
+        badge.className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
+        statusText.textContent = "Not connected";
+        connectedAt.textContent = "";
+        connectedAt.classList.add("hidden");
+        connectBtn.textContent = "Connect Google Calendar";
+      }
+    }
+
+    async function refreshGoogleCalendarConnection(showMessage = false) {
+      if (!state.profile) return false;
+
+      const btn = $("refreshGoogleCalendarBtn");
+      if (showMessage) setBusy(btn, true, "Checking…");
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", state.profile.id)
+        .single();
+
+      if (showMessage) setBusy(btn, false);
+
+      if (error) {
+        if (showMessage) toast(friendlyDbError(error, "check the Google Calendar connection"), "error");
+        return false;
+      }
+
+      state.profile = data;
+      populateCalendarSettings();
+
+      const connected =
+        state.profile.calendar_provider === "google" &&
+        Boolean(state.profile.calendar_connected_at);
+
+      if (showMessage) {
+        toast(
+          connected
+            ? "Google Calendar is connected."
+            : "Google Calendar is not connected yet. Finish the Google approval window, then check again.",
+          connected ? "success" : "info"
+        );
+      }
+
+      return connected;
+    }
+
+    async function connectGoogleCalendar() {
+      if (!state.user || !state.profile) {
+        return toast("Log in again before connecting Google Calendar.", "error");
+      }
+
+      // Open the window immediately so the browser does not block it as a popup
+      // while we wait for the Edge Function to create the secure Google URL.
+      const googleWindow = window.open(
+        "about:blank",
+        "moreleadsGoogleCalendar",
+        "width=680,height=780,resizable=yes,scrollbars=yes"
+      );
+
+      if (!googleWindow) {
+        return toast("Your browser blocked the Google sign-in window. Allow pop-ups for this page and try again.", "error");
+      }
+
+      googleWindow.document.write(
+        '<!doctype html><title>Connecting Google Calendar</title><body style="font-family:system-ui;padding:32px"><h2>Opening Google…</h2><p>Please wait while Moreleads starts the secure connection.</p></body>'
+      );
+      googleWindow.document.close();
+
+      const btn = $("connectGoogleCalendarBtn");
+      setBusy(btn, true, "Opening Google…");
+
+      try {
+        const { data, error } = await supabaseClient.functions.invoke("google-calendar-oauth", {
+          body: {}
+        });
+
+        if (error) throw error;
+        if (!data?.url) throw new Error(data?.error || "Google did not return a connection URL.");
+
+        googleWindow.location.replace(data.url);
+        $("googleCalendarHelpText").textContent =
+          "Complete the Google approval in the new window. When Google says the calendar is connected, return here and click Check connection.";
+        toast("Google sign-in opened in a new window.", "info");
+      } catch (err) {
+        try { googleWindow.close(); } catch (_) {}
+        toast(err?.message || "Unable to start the Google Calendar connection.", "error");
+      } finally {
+        setBusy(btn, false);
+        populateCalendarSettings();
+      }
     }
 
     function currentAppBaseUrl() {
