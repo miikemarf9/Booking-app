@@ -2887,11 +2887,19 @@
         return;
       }
 
-      const slots = buildSlots(
+      let slots = buildSlots(
         blkRes.data || [],
         bkgRes.data || [],
         Number(b.duration_minutes || 0)
       );
+
+      const googleFiltered = await filterSlotsAgainstGoogleCalendar(b.profile_id, b.service_id, slots);
+      if (googleFiltered.error) {
+        $("manageSlots").innerHTML = "";
+        $("manageSlotsMessage").textContent = "We couldn't check Google Calendar availability just now. Please try again.";
+        return;
+      }
+      slots = googleFiltered.slots;
 
       $("manageSlotsMessage").textContent = slots.length
         ? `${slots.length} time${slots.length === 1 ? "" : "s"} available`
@@ -3077,7 +3085,16 @@
       }
 
       state.publicBookingsReadable = !bkgRes.error;
-      const slots = buildSlots(blkRes.data || [], bkgRes.data || [], Number(state.selectedService.duration_minutes));
+      let slots = buildSlots(blkRes.data || [], bkgRes.data || [], Number(state.selectedService.duration_minutes));
+      const googleFiltered = await filterSlotsAgainstGoogleCalendar(state.publicProfile.id, state.selectedService.id, slots);
+
+      if (googleFiltered.error) {
+        $("publicSlots").innerHTML = "";
+        $("slotsMessage").textContent = "We couldn't check Google Calendar availability just now. Please try again.";
+        return;
+      }
+
+      slots = googleFiltered.slots;
 
       $("slotsMessage").textContent = slots.length
         ? `${slots.length} time${slots.length === 1 ? "" : "s"} available`
@@ -3139,6 +3156,34 @@
         if (concurrent >= capacity) return false;
       }
       return true;
+    }
+
+    async function filterSlotsAgainstGoogleCalendar(profileId, serviceId, slots) {
+      if (!slots.length) return { slots, error: false };
+
+      try {
+        const { data, error } = await publicClient.functions.invoke("google-calendar-busy", {
+          body: {
+            profile_id: profileId,
+            service_id: serviceId,
+            candidates: slots.map(slot => ({
+              start: slot.start.toISOString(),
+              end: slot.blockedEnd.toISOString()
+            }))
+          }
+        });
+
+        if (error || data?.error) {
+          console.error("Google Calendar availability error:", error || data?.error);
+          return { slots: [], error: true };
+        }
+
+        const blocked = new Set(data?.blocked_indices || []);
+        return { slots: slots.filter((_, idx) => !blocked.has(idx)), error: false };
+      } catch (err) {
+        console.error("Google Calendar availability error:", err);
+        return { slots: [], error: true };
+      }
     }
 
     function handlePublicSlotClick(e) {
@@ -3220,6 +3265,25 @@
       if (!checkErr && !hasCapacity(state.selectedSlot.start, state.selectedSlot.blockedEnd, state.selectedSlot.capacity, checkBkgs || [])) {
         setBusy(submitBtn, false);
         toast("That time has just been taken. Please choose another.", "error");
+        return await loadAvailableSlots();
+      }
+
+      const googleRecheck = await filterSlotsAgainstGoogleCalendar(
+        state.publicProfile.id,
+        state.selectedService.id,
+        [state.selectedSlot]
+      );
+
+      if (googleRecheck.error) {
+        setBusy(submitBtn, false);
+        return toast("We couldn't re-check Google Calendar availability. Please try again.", "error");
+      }
+
+      if (!googleRecheck.slots.length) {
+        setBusy(submitBtn, false);
+        state.selectedSlot = null;
+        updateSummary();
+        toast("That time is now blocked in the business calendar. Please choose another.", "error");
         return await loadAvailableSlots();
       }
 
