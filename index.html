@@ -2047,6 +2047,22 @@
       }
     }
 
+    async function syncBookingToGoogle(manageToken) {
+      try {
+        const { data, error } = await publicClient.functions.invoke("sync-booking-to-google", {
+          body: { manage_token: manageToken }
+        });
+
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+
+        return { ok: true, data };
+      } catch (err) {
+        console.error("Google Calendar sync error:", err);
+        return { ok: false, error: err };
+      }
+    }
+
     function switchTab(tabId) {
       document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabId));
       document.querySelectorAll(".dashboard-tab").forEach(el => el.classList.toggle("hidden", el.id !== `tab-${tabId}`));
@@ -3246,6 +3262,10 @@
       $("successEmailStatus").textContent = emailResult.ok
         ? "A confirmation email has been sent to you. The business has also been notified."
         : "Your booking is confirmed, but the confirmation email could not be sent. Please keep the private manage-booking links above.";
+
+      // Step 5B: create the matching Google Calendar event for the business.
+      // Calendar sync failure must never undo a successful customer booking.
+      await syncBookingToGoogle(created.manage_token);
 
       ["dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
       $("bookingSuccess").classList.remove("hidden");
