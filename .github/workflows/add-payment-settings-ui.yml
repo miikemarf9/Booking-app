@@ -1,0 +1,109 @@
+name: Add payment settings UI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/add-payment-settings-ui.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Patch MoreLeads payment settings UI
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text()
+
+          def replace_once(old, new, label):
+              global text
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, found {count}')
+              text = text.replace(old, new, 1)
+
+          # 1. Add payment controls to the service editor.
+          old = '''              </div>\n\n              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">\n                <label class="flex cursor-pointer items-center justify-between gap-4">\n                  <span>\n                    <span class="block text-sm font-bold text-slate-700">Run a promotional offer</span>'''
+          new = '''              </div>\n\n              <div id="srvPaymentCard" class="rounded-2xl border border-slate-200 bg-slate-50 p-4">\n                <div class="flex flex-wrap items-start justify-between gap-3">\n                  <div>\n                    <span class="block text-sm font-bold text-slate-700">Payment at booking</span>\n                    <span id="srvPaymentPlanNote" class="mt-0.5 block text-xs leading-5 text-slate-400">Loading your plan rules…</span>\n                  </div>\n                  <span id="srvPlanBadge" class="rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wide text-slate-600">Free</span>\n                </div>\n\n                <div class="mt-4">\n                  <label class="label" for="srvDepositType">Customer payment requirement</label>\n                  <select id="srvDepositType" class="field">\n                    <option value="none">No deposit — pay later</option>\n                    <option value="fixed">Fixed deposit</option>\n                    <option value="percentage">Percentage deposit</option>\n                    <option value="full">Full payment</option>\n                  </select>\n                </div>\n\n                <div id="srvDepositAmountWrap" class="mt-3 hidden">\n                  <label id="srvDepositAmountLabel" class="label" for="srvDepositAmount">Deposit amount (£)</label>\n                  <input id="srvDepositAmount" class="field" type="number" min="0" step="0.01" placeholder="20.00">\n                </div>\n\n                <div id="srvFreePlanFeeNote" class="mt-4 hidden rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs leading-5 text-blue-800">\n                  <strong>Free plan:</strong> services must be at least £10, customers pay the full appointment price online, and MoreLeads applies a 3% platform fee to the final booked value.\n                </div>\n              </div>\n\n              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">\n                <label class="flex cursor-pointer items-center justify-between gap-4">\n                  <span>\n                    <span class="block text-sm font-bold text-slate-700">Run a promotional offer</span>'''
+          replace_once(old, new, 'payment editor HTML')
+
+          # 2. Store subscription/plan state.
+          old = '''      profile: null,\n      services: [],'''
+          new = '''      profile: null,\n      subscription: null,\n      plan: null,\n      services: [],'''
+          replace_once(old, new, 'state fields')
+
+          # 3. Add payment UI helpers after the service-description helper.
+          old = '''    function getServiceDescriptionHtml() {\n      const editor = $("srvDescription");\n      if (!editor) return "";\n      if (!(editor.innerText || "").trim()) return "";\n      return sanitiseServiceDescription(editor.innerHTML);\n    }\n\n    function syncPromoFields() {'''
+          new = '''    function getServiceDescriptionHtml() {\n      const editor = $("srvDescription");\n      if (!editor) return "";\n      if (!(editor.innerText || "").trim()) return "";\n      return sanitiseServiceDescription(editor.innerHTML);\n    }\n\n    function currentPlanCode() {\n      return state.subscription?.plan_code || state.plan?.code || "free";\n    }\n\n    function syncPaymentFields() {\n      const select = $("srvDepositType");\n      if (!select) return;\n\n      const isFree = currentPlanCode() === "free";\n      const badge = $("srvPlanBadge");\n      const note = $("srvPaymentPlanNote");\n      const freeNote = $("srvFreePlanFeeNote");\n      const amountWrap = $("srvDepositAmountWrap");\n      const amountLabel = $("srvDepositAmountLabel");\n      const amountInput = $("srvDepositAmount");\n\n      badge.textContent = isFree ? "Free" : "Pro";\n      badge.className = isFree\n        ? "rounded-full bg-blue-100 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wide text-blue-700"\n        : "rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wide text-emerald-700";\n\n      if (isFree) {\n        select.value = "full";\n        select.disabled = true;\n        $("srvPrice").min = "10";\n        note.textContent = "Full online payment is required on Free so every booking contributes to the platform.";\n        freeNote.classList.remove("hidden");\n      } else {\n        select.disabled = false;\n        $("srvPrice").min = "0";\n        note.textContent = "Pro businesses can choose pay later, a deposit, or full payment.";\n        freeNote.classList.add("hidden");\n      }\n\n      const type = isFree ? "full" : select.value;\n      const needsAmount = type === "fixed" || type === "percentage";\n      amountWrap.classList.toggle("hidden", !needsAmount);\n      amountInput.required = needsAmount;\n\n      if (type === "percentage") {\n        amountLabel.textContent = "Deposit percentage (%)";\n        amountInput.placeholder = "20";\n        amountInput.max = "100";\n      } else if (type === "fixed") {\n        amountLabel.textContent = "Deposit amount (£)";\n        amountInput.placeholder = "20.00";\n        amountInput.removeAttribute("max");\n      } else {\n        amountInput.required = false;\n        amountInput.removeAttribute("max");\n      }\n    }\n\n    function paymentRequirementLabel(service) {\n      const type = service?.deposit_type || "none";\n      const amount = Number(service?.deposit_amount || 0);\n      if (type === "full") return "Full payment at booking";\n      if (type === "fixed") return `${money(amount)} deposit`;\n      if (type === "percentage") return `${amount % 1 === 0 ? amount.toFixed(0) : amount}% deposit`;\n      return "Pay at appointment";\n    }\n\n    function syncPromoFields() {'''
+          replace_once(old, new, 'payment helper functions')
+
+          # 4. Bind payment dropdown.
+          old = '''      $("srvDescription").addEventListener("input", updateDescriptionCount);\n      $("srvPromoEnabled").addEventListener("change", syncPromoFields);'''
+          new = '''      $("srvDescription").addEventListener("input", updateDescriptionCount);\n      $("srvDepositType").addEventListener("change", syncPaymentFields);\n      $("srvPromoEnabled").addEventListener("change", syncPromoFields);'''
+          replace_once(old, new, 'payment event binding')
+
+          # 5. Load subscription and plan with dashboard data.
+          old = '''      const [srvRes, blkRes, bkgRes] = await Promise.all([\n        supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),\n        supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),\n        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", pId).order("start_time", { ascending: true })\n      ]);\n\n      if (srvRes.error) throw srvRes.error;\n      if (blkRes.error) throw blkRes.error;\n\n      state.services = srvRes.data || [];\n      state.blocks = blkRes.data || [];\n      state.bookings = bkgRes.data || [];\n      state.bookingsError = bkgRes.error || null;'''
+          new = '''      const [srvRes, blkRes, bkgRes, subRes, planRes] = await Promise.all([\n        supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),\n        supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),\n        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", pId).order("start_time", { ascending: true }),\n        supabaseClient.from("business_subscriptions").select("*").eq("profile_id", pId).maybeSingle(),\n        supabaseClient.from("subscription_plans").select("*").eq("is_active", true)\n      ]);\n\n      if (srvRes.error) throw srvRes.error;\n      if (blkRes.error) throw blkRes.error;\n      if (subRes.error) throw subRes.error;\n      if (planRes.error) throw planRes.error;\n\n      state.services = srvRes.data || [];\n      state.blocks = blkRes.data || [];\n      state.bookings = bkgRes.data || [];\n      state.bookingsError = bkgRes.error || null;\n      state.subscription = subRes.data || { plan_code: "free", status: "active" };\n      state.plan = (planRes.data || []).find(p => p.code === state.subscription.plan_code)\n        || (planRes.data || []).find(p => p.code === "free")\n        || { code: "free", platform_fee_percent: 3, minimum_service_price: 10, requires_online_payment: true };'''
+          replace_once(old, new, 'dashboard plan loading')
+
+          # 6. Sync controls whenever dashboard renders.
+          old = '''      renderStats();\n      renderServices();'''
+          new = '''      renderStats();\n      syncPaymentFields();\n      renderServices();'''
+          replace_once(old, new, 'dashboard payment sync')
+
+          # 7. Show payment requirement on service cards.
+          old = '''            <p class="mt-2 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>\n            ${s.promotion_enabled ? `'''
+          new = '''            <p class="mt-2 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>\n            <div class="mt-2 inline-flex rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800">${escapeHtml(paymentRequirementLabel(s))}</div>\n            ${s.promotion_enabled ? `'''
+          replace_once(old, new, 'service payment badge')
+
+          # 8. Validate and save payment settings.
+          old = '''      const promoEnabled = $("srvPromoEnabled").checked;\n      const basePrice = Number($("srvPrice").value);\n      const promoValue = Number($("srvPromoValue").value || 0);'''
+          new = '''      const promoEnabled = $("srvPromoEnabled").checked;\n      const basePrice = Number($("srvPrice").value);\n      const isFreePlan = currentPlanCode() === "free";\n      const depositType = isFreePlan ? "full" : $("srvDepositType").value;\n      const rawDepositAmount = Number($("srvDepositAmount").value || 0);\n      const depositAmount = (depositType === "fixed" || depositType === "percentage") ? rawDepositAmount : null;\n      const promoValue = Number($("srvPromoValue").value || 0);'''
+          replace_once(old, new, 'save payment variables')
+
+          old = '''      const promoDays = promoDayNumbers();\n\n      if (promoEnabled) {'''
+          new = '''      const promoDays = promoDayNumbers();\n\n      if (!Number.isFinite(basePrice) || basePrice < 0) return toast("Enter a valid service price.", "error");\n      if (isFreePlan && basePrice < 10) return toast("Free plan services must cost at least £10.", "error");\n      if (!isFreePlan && depositType === "fixed" && (!(depositAmount > 0) || depositAmount > basePrice)) {\n        return toast("The fixed deposit must be greater than £0 and no more than the service price.", "error");\n      }\n      if (!isFreePlan && depositType === "percentage" && (!(depositAmount > 0) || depositAmount > 100)) {\n        return toast("The deposit percentage must be between 0 and 100%.", "error");\n      }\n\n      if (promoEnabled) {'''
+          replace_once(old, new, 'payment validation')
+
+          old = '''        if (promoType === "price" && (promoValue < 0 || promoValue >= basePrice)) return toast("The promotional price must be lower than the normal price.", "error");\n      }\n\n      const payload = {'''
+          new = '''        if (promoType === "price" && (promoValue < 0 || promoValue >= basePrice)) return toast("The promotional price must be lower than the normal price.", "error");\n\n        if (isFreePlan) {\n          let lowestPromoPrice = basePrice;\n          if (promoType === "percentage") lowestPromoPrice = basePrice * (1 - promoValue / 100);\n          else if (promoType === "fixed") lowestPromoPrice = basePrice - promoValue;\n          else if (promoType === "price") lowestPromoPrice = promoValue;\n          if (lowestPromoPrice < 10) return toast("On Free, a promotion cannot reduce the appointment below £10.", "error");\n        }\n      }\n\n      const payload = {'''
+          replace_once(old, new, 'free promo minimum validation')
+
+          old = '''        duration_minutes: Number($("srvDuration").value),\n        price: basePrice,\n        promotion_enabled: promoEnabled,'''
+          new = '''        duration_minutes: Number($("srvDuration").value),\n        price: basePrice,\n        deposit_type: depositType,\n        deposit_amount: depositAmount,\n        promotion_enabled: promoEnabled,'''
+          replace_once(old, new, 'payment payload')
+
+          # 9. Populate payment fields when editing.
+          old = '''        $("srvDuration").value = service.duration_minutes;\n        $("srvPrice").value = Number(service.price).toFixed(2);\n\n        $("srvPromoEnabled").checked = !!service.promotion_enabled;'''
+          new = '''        $("srvDuration").value = service.duration_minutes;\n        $("srvPrice").value = Number(service.price).toFixed(2);\n        $("srvDepositType").value = currentPlanCode() === "free" ? "full" : (service.deposit_type || "none");\n        $("srvDepositAmount").value = service.deposit_amount ?? "";\n        syncPaymentFields();\n\n        $("srvPromoEnabled").checked = !!service.promotion_enabled;'''
+          replace_once(old, new, 'edit payment fields')
+
+          # 10. Reset payment fields correctly for the active plan.
+          old = '''      $("srvDuration").value = "60";\n      $("serviceEditId").value = "";\n      $("srvPromoEnabled").checked = false;'''
+          new = '''      $("srvDuration").value = "60";\n      $("serviceEditId").value = "";\n      $("srvDepositType").value = currentPlanCode() === "free" ? "full" : "none";\n      $("srvDepositAmount").value = "";\n      syncPaymentFields();\n      $("srvPromoEnabled").checked = false;'''
+          replace_once(old, new, 'reset payment fields')
+
+          path.write_text(text)
+          PY
+
+      - name: Commit interface update
+        shell: bash
+        run: |
+          git config user.name "MoreLeads automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git diff --cached --check
+          git commit -m "Add plan-aware payment settings to services UI"
+          git push origin main
