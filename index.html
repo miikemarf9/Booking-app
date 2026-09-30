@@ -420,6 +420,35 @@
                 </div>
               </div>
 
+              <div id="srvPaymentCard" class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <span class="block text-sm font-bold text-slate-700">Payment at booking</span>
+                    <span id="srvPaymentPlanNote" class="mt-0.5 block text-xs leading-5 text-slate-400">Loading your plan rules…</span>
+                  </div>
+                  <span id="srvPlanBadge" class="rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wide text-slate-600">Free</span>
+                </div>
+
+                <div class="mt-4">
+                  <label class="label" for="srvDepositType">Customer payment requirement</label>
+                  <select id="srvDepositType" class="field">
+                    <option value="none">No deposit — pay later</option>
+                    <option value="fixed">Fixed deposit</option>
+                    <option value="percentage">Percentage deposit</option>
+                    <option value="full">Full payment</option>
+                  </select>
+                </div>
+
+                <div id="srvDepositAmountWrap" class="mt-3 hidden">
+                  <label id="srvDepositAmountLabel" class="label" for="srvDepositAmount">Deposit amount (£)</label>
+                  <input id="srvDepositAmount" class="field" type="number" min="0" step="0.01" placeholder="20.00">
+                </div>
+
+                <div id="srvFreePlanFeeNote" class="mt-4 hidden rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs leading-5 text-blue-800">
+                  <strong>Free plan:</strong> services must be at least £10, customers pay the full appointment price online, and MoreLeads applies a 3% platform fee to the final booked value.
+                </div>
+              </div>
+
               <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <label class="flex cursor-pointer items-center justify-between gap-4">
                   <span>
@@ -1024,6 +1053,8 @@
       authMode: "login",
       user: null,
       profile: null,
+      subscription: null,
+      plan: null,
       services: [],
       blocks: [],
       bookings: [],
@@ -1079,6 +1110,68 @@
       if (!editor) return "";
       if (!(editor.innerText || "").trim()) return "";
       return sanitiseServiceDescription(editor.innerHTML);
+    }
+
+    function currentPlanCode() {
+      return state.subscription?.plan_code || state.plan?.code || "free";
+    }
+
+    function syncPaymentFields() {
+      const select = $("srvDepositType");
+      if (!select) return;
+
+      const isFree = currentPlanCode() === "free";
+      const badge = $("srvPlanBadge");
+      const note = $("srvPaymentPlanNote");
+      const freeNote = $("srvFreePlanFeeNote");
+      const amountWrap = $("srvDepositAmountWrap");
+      const amountLabel = $("srvDepositAmountLabel");
+      const amountInput = $("srvDepositAmount");
+
+      badge.textContent = isFree ? "Free" : "Pro";
+      badge.className = isFree
+        ? "rounded-full bg-blue-100 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wide text-blue-700"
+        : "rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wide text-emerald-700";
+
+      if (isFree) {
+        select.value = "full";
+        select.disabled = true;
+        $("srvPrice").min = "10";
+        note.textContent = "Full online payment is required on Free so every booking contributes to the platform.";
+        freeNote.classList.remove("hidden");
+      } else {
+        select.disabled = false;
+        $("srvPrice").min = "0";
+        note.textContent = "Pro businesses can choose pay later, a deposit, or full payment.";
+        freeNote.classList.add("hidden");
+      }
+
+      const type = isFree ? "full" : select.value;
+      const needsAmount = type === "fixed" || type === "percentage";
+      amountWrap.classList.toggle("hidden", !needsAmount);
+      amountInput.required = needsAmount;
+
+      if (type === "percentage") {
+        amountLabel.textContent = "Deposit percentage (%)";
+        amountInput.placeholder = "20";
+        amountInput.max = "100";
+      } else if (type === "fixed") {
+        amountLabel.textContent = "Deposit amount (£)";
+        amountInput.placeholder = "20.00";
+        amountInput.removeAttribute("max");
+      } else {
+        amountInput.required = false;
+        amountInput.removeAttribute("max");
+      }
+    }
+
+    function paymentRequirementLabel(service) {
+      const type = service?.deposit_type || "none";
+      const amount = Number(service?.deposit_amount || 0);
+      if (type === "full") return "Full payment at booking";
+      if (type === "fixed") return `${money(amount)} deposit`;
+      if (type === "percentage") return `${amount % 1 === 0 ? amount.toFixed(0) : amount}% deposit`;
+      return "Pay at appointment";
     }
 
     function syncPromoFields() {
@@ -1506,6 +1599,7 @@
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
       $("servicesList").addEventListener("click", handleServiceListClick);
       $("srvDescription").addEventListener("input", updateDescriptionCount);
+      $("srvDepositType").addEventListener("change", syncPaymentFields);
       $("srvPromoEnabled").addEventListener("change", syncPromoFields);
       $("srvPromoType").addEventListener("change", syncPromoType);
       $("srvPromoNoEnd").addEventListener("change", syncPromoEnd);
@@ -1767,25 +1861,34 @@
 
     async function loadDashboardData() {
       const pId = state.profile.id;
-      const [srvRes, blkRes, bkgRes] = await Promise.all([
+      const [srvRes, blkRes, bkgRes, subRes, planRes] = await Promise.all([
         supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),
         supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),
-        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", pId).order("start_time", { ascending: true })
+        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", pId).order("start_time", { ascending: true }),
+        supabaseClient.from("business_subscriptions").select("*").eq("profile_id", pId).maybeSingle(),
+        supabaseClient.from("subscription_plans").select("*").eq("is_active", true)
       ]);
 
       if (srvRes.error) throw srvRes.error;
       if (blkRes.error) throw blkRes.error;
+      if (subRes.error) throw subRes.error;
+      if (planRes.error) throw planRes.error;
 
       state.services = srvRes.data || [];
       state.blocks = blkRes.data || [];
       state.bookings = bkgRes.data || [];
       state.bookingsError = bkgRes.error || null;
+      state.subscription = subRes.data || { plan_code: "free", status: "active" };
+      state.plan = (planRes.data || []).find(p => p.code === state.subscription.plan_code)
+        || (planRes.data || []).find(p => p.code === "free")
+        || { code: "free", platform_fee_percent: 3, minimum_service_price: 10, requires_online_payment: true };
 
       renderDashboard();
     }
 
     function renderDashboard() {
       renderStats();
+      syncPaymentFields();
       renderServices();
       renderAvailabilityServiceOptions();
       renderBlocks();
@@ -2109,6 +2212,7 @@
             <h3 class="truncate font-bold text-ink">${escapeHtml(s.title)}</h3>
             ${s.description ? `<div class="service-description mt-1.5 max-w-2xl text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</div>` : ""}
             <p class="mt-2 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>
+            <div class="mt-2 inline-flex rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800">${escapeHtml(paymentRequirementLabel(s))}</div>
             ${s.promotion_enabled ? `
               <div class="mt-2 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
                 <strong>${escapeHtml(promotionLabel(s))}</strong>
@@ -2135,11 +2239,24 @@
 
       const promoEnabled = $("srvPromoEnabled").checked;
       const basePrice = Number($("srvPrice").value);
+      const isFreePlan = currentPlanCode() === "free";
+      const depositType = isFreePlan ? "full" : $("srvDepositType").value;
+      const rawDepositAmount = Number($("srvDepositAmount").value || 0);
+      const depositAmount = (depositType === "fixed" || depositType === "percentage") ? rawDepositAmount : null;
       const promoValue = Number($("srvPromoValue").value || 0);
       const promoType = $("srvPromoType").value;
       const promoStart = $("srvPromoStart").value;
       const promoEnd = $("srvPromoNoEnd").checked ? null : ($("srvPromoEnd").value || null);
       const promoDays = promoDayNumbers();
+
+      if (!Number.isFinite(basePrice) || basePrice < 0) return toast("Enter a valid service price.", "error");
+      if (isFreePlan && basePrice < 10) return toast("Free plan services must cost at least £10.", "error");
+      if (!isFreePlan && depositType === "fixed" && (!(depositAmount > 0) || depositAmount > basePrice)) {
+        return toast("The fixed deposit must be greater than £0 and no more than the service price.", "error");
+      }
+      if (!isFreePlan && depositType === "percentage" && (!(depositAmount > 0) || depositAmount > 100)) {
+        return toast("The deposit percentage must be between 0 and 100%.", "error");
+      }
 
       if (promoEnabled) {
         if (!promoStart) return toast("Choose when the promotional offer starts.", "error");
@@ -2150,6 +2267,14 @@
         if (promoType === "percentage" && (promoValue <= 0 || promoValue > 100)) return toast("Percentage discounts must be between 0 and 100%.", "error");
         if (promoType === "fixed" && (promoValue <= 0 || promoValue > basePrice)) return toast("The fixed discount must be greater than £0 and no more than the normal price.", "error");
         if (promoType === "price" && (promoValue < 0 || promoValue >= basePrice)) return toast("The promotional price must be lower than the normal price.", "error");
+
+        if (isFreePlan) {
+          let lowestPromoPrice = basePrice;
+          if (promoType === "percentage") lowestPromoPrice = basePrice * (1 - promoValue / 100);
+          else if (promoType === "fixed") lowestPromoPrice = basePrice - promoValue;
+          else if (promoType === "price") lowestPromoPrice = promoValue;
+          if (lowestPromoPrice < 10) return toast("On Free, a promotion cannot reduce the appointment below £10.", "error");
+        }
       }
 
       const payload = {
@@ -2158,6 +2283,8 @@
         description: getServiceDescriptionHtml(),
         duration_minutes: Number($("srvDuration").value),
         price: basePrice,
+        deposit_type: depositType,
+        deposit_amount: depositAmount,
         promotion_enabled: promoEnabled,
         promotion_type: promoEnabled ? promoType : null,
         promotion_value: promoEnabled ? promoValue : null,
@@ -2207,6 +2334,9 @@
         updateDescriptionCount();
         $("srvDuration").value = service.duration_minutes;
         $("srvPrice").value = Number(service.price).toFixed(2);
+        $("srvDepositType").value = currentPlanCode() === "free" ? "full" : (service.deposit_type || "none");
+        $("srvDepositAmount").value = service.deposit_amount ?? "";
+        syncPaymentFields();
 
         $("srvPromoEnabled").checked = !!service.promotion_enabled;
         $("srvPromoType").value = service.promotion_type || "percentage";
@@ -2255,6 +2385,9 @@
       updateDescriptionCount();
       $("srvDuration").value = "60";
       $("serviceEditId").value = "";
+      $("srvDepositType").value = currentPlanCode() === "free" ? "full" : "none";
+      $("srvDepositAmount").value = "";
+      syncPaymentFields();
       $("srvPromoEnabled").checked = false;
       $("srvPromoType").value = "percentage";
       $("srvPromoValue").value = "";
