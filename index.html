@@ -2946,6 +2946,8 @@
         return toast(friendlyDbError(error, "reschedule this booking"), "error");
       }
 
+      await syncBookingToGoogle(state.manageToken);
+
       toast("Your booking has been rescheduled.");
       closeManageReschedule();
       await loadManagedBooking(state.manageToken);
@@ -2967,6 +2969,8 @@
       setBusy(btn, false);
 
       if (error) return toast(friendlyDbError(error, "cancel this booking"), "error");
+
+      await syncBookingToGoogle(state.manageToken);
 
       toast("Your booking has been cancelled.");
       await loadManagedBooking(state.manageToken);
