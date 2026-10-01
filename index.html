@@ -311,14 +311,10 @@
       <div class="mb-7 overflow-x-auto">
         <nav class="inline-flex min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" aria-label="Dashboard sections">
           <button class="nav-tab active rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="overview" type="button">Overview</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="availability" type="button">Availability</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="booking-rules" type="button">Booking rules</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Business details</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="reminders" type="button">Reminders</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="payments" type="button">Payments</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="calendar" type="button">Calendar</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Settings</button>
         </nav>
       </div>
 
@@ -552,6 +548,7 @@
 
       <!-- Availability Tab -->
       <section id="tab-availability" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
         <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
@@ -651,6 +648,7 @@
 
       <!-- Booking Rules Tab -->
       <section id="tab-booking-rules" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
         <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 8A</p>
@@ -779,8 +777,81 @@
         </article>
       </section>
 
-      <!-- Business Details Tab -->
+      <!-- Settings Hub -->
       <section id="tab-settings" class="dashboard-tab hidden">
+        <div class="mb-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Business setup</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Settings</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Your day-to-day dashboard stays simple. Open a section below only when you need to change how bookings work.</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="availability">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Availability</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Choose the dates and times customers can book.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="booking-rules">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Rules</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Booking rules</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Notice periods, booking windows, cancellations and rescheduling.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="business-details">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Business</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Business details</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Contact information and the details customers receive.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="reminders">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Messages</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Reminders</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Control appointment reminders and follow-up emails.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="payments">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Money</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Payments & plan</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Stripe, online payments and your Free or Pro plan.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
+          <div class="card border-dashed p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Coming next</p>
+            <h3 class="mt-1 text-lg font-bold text-ink">Booking questions</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Custom questions for each service will live here, without adding another top-level dashboard tab.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Business Details Tab -->
+      <section id="tab-business-details" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
         <div class="grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Email & contact details</p>
@@ -819,6 +890,7 @@
 
       <!-- Reminders Tab -->
       <section id="tab-reminders" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
         <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Automated customer messages</p>
@@ -884,6 +956,7 @@
 
       <!-- Payments Tab -->
       <section id="tab-payments" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
         <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Online payments</p>
@@ -3329,7 +3402,10 @@
     }
 
     function switchTab(tabId) {
-      document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabId));
+      const settingsChildren = new Set(["availability", "booking-rules", "business-details", "reminders", "payments"]);
+      const primaryTab = settingsChildren.has(tabId) ? "settings" : tabId;
+
+      document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === primaryTab));
       document.querySelectorAll(".dashboard-tab").forEach(el => el.classList.toggle("hidden", el.id !== `tab-${tabId}`));
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
