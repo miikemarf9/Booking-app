@@ -313,6 +313,7 @@
           <button class="nav-tab active rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="overview" type="button">Overview</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="calendar" type="button">Calendar</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="customers" type="button">Customers</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Settings</button>
         </nav>
@@ -322,11 +323,16 @@
 
       <!-- Overview Tab -->
       <section id="tab-overview" class="dashboard-tab space-y-6">
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <article class="card p-5">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Services</p>
             <p id="statServices" class="mt-2 text-3xl font-bold text-ink">0</p>
             <p class="mt-1 text-xs text-slate-500">available to customers</p>
+          </article>
+          <article class="card p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Customers</p>
+            <p id="statCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
+            <p class="mt-1 text-xs text-slate-500">unique customer profiles</p>
           </article>
           <article class="card p-5">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Open dates</p>
@@ -368,6 +374,105 @@
             </div>
             <button id="mobileOpenBookingPageBtn" type="button" class="btn btn-light mt-3 w-full sm:hidden">View booking page ↗</button>
           </article>
+        </div>
+      </section>
+
+      <!-- Customers Tab -->
+      <section id="tab-customers" class="dashboard-tab hidden">
+        <div class="space-y-6">
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total customers</p>
+              <p id="crmTotalCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">unique customer profiles</p>
+            </article>
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Returning</p>
+              <p id="crmReturningCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">customers with 2+ bookings</p>
+            </article>
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Seen recently</p>
+              <p id="crmRecentCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">appointments in the last 90 days</p>
+            </article>
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booked value</p>
+              <p id="crmBookedValue" class="mt-2 text-3xl font-bold text-ink">£0</p>
+              <p class="mt-1 text-xs text-slate-500">all non-cancelled customer bookings</p>
+            </article>
+          </div>
+
+          <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+            <article class="card p-5 sm:p-6">
+              <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 11</p>
+                  <h2 class="mt-1 text-xl font-bold text-ink">Customers</h2>
+                  <p class="mt-2 text-sm leading-6 text-slate-500">Every booking now builds one customer profile instead of treating repeat visits as separate people.</p>
+                </div>
+                <span id="customerCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 customers</span>
+              </div>
+
+              <div class="mt-5">
+                <label class="label" for="customerSearch">Search customers</label>
+                <input id="customerSearch" class="field" type="search" placeholder="Name, email or phone">
+              </div>
+
+              <div id="customersList" class="mt-5 max-h-[650px] space-y-2 overflow-y-auto pr-1"></div>
+            </article>
+
+            <article class="card p-5 sm:p-6">
+              <div id="customerProfileEmpty">
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer profile</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Choose a customer</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Select someone from the list to view their contact details, booking history, value and private business notes.</p>
+              </div>
+
+              <div id="customerProfile" class="hidden">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer profile</p>
+                    <h2 id="customerProfileName" class="mt-1 text-2xl font-bold text-ink">Customer</h2>
+                    <p id="customerProfileContact" class="mt-1 text-sm text-slate-500"></p>
+                  </div>
+                  <span id="customerProfileBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Customer</span>
+                </div>
+
+                <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div class="rounded-2xl bg-slate-50 p-4">
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Bookings</p>
+                    <p id="customerProfileBookings" class="mt-1 text-xl font-bold text-ink">0</p>
+                  </div>
+                  <div class="rounded-2xl bg-slate-50 p-4">
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booked value</p>
+                    <p id="customerProfileValue" class="mt-1 text-xl font-bold text-ink">£0</p>
+                  </div>
+                  <div class="rounded-2xl bg-slate-50 p-4">
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Last visit</p>
+                    <p id="customerProfileLastVisit" class="mt-1 text-sm font-bold text-ink">—</p>
+                  </div>
+                </div>
+
+                <div class="mt-6">
+                  <label class="label" for="customerNotes">Private notes</label>
+                  <textarea id="customerNotes" class="field min-h-28 resize-y" maxlength="10000" placeholder="Preferences, follow-up notes or anything useful for future appointments"></textarea>
+                  <p class="mt-1.5 text-xs leading-5 text-slate-400">Only the business can see these notes.</p>
+                  <button id="saveCustomerNotesBtn" class="btn btn-primary mt-3" type="button">Save notes</button>
+                </div>
+
+                <div class="mt-7 border-t border-slate-100 pt-6">
+                  <div class="flex items-center justify-between gap-3">
+                    <div>
+                      <p class="text-xs font-bold uppercase tracking-wider text-slate-400">History</p>
+                      <h3 class="mt-1 text-lg font-bold text-ink">Appointments</h3>
+                    </div>
+                  </div>
+                  <div id="customerHistory" class="mt-4 space-y-3"></div>
+                </div>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -1569,6 +1674,8 @@
       services: [],
       blocks: [],
       bookings: [],
+      customers: [],
+      selectedCustomerId: "",
       questions: [],
       timeOff: [],
       bookingsError: null,
@@ -2211,6 +2318,12 @@
 
       $("bookingFilter").addEventListener("change", renderBookings);
       $("bookingsList").addEventListener("click", handleBookingListClick);
+      $("customerSearch").addEventListener("input", renderCustomers);
+      $("customersList").addEventListener("click", e => {
+        const btn = e.target.closest("[data-customer-id]");
+        if (btn) selectCustomer(btn.dataset.customerId);
+      });
+      $("saveCustomerNotesBtn").addEventListener("click", saveCustomerNotes);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
       $("bookingRulesForm").addEventListener("submit", saveBookingRules);
       $("timeOffForm").addEventListener("submit", saveTimeOff);
@@ -2486,10 +2599,11 @@
 
     async function loadDashboardData() {
       const pId = state.profile.id;
-      const [srvRes, blkRes, bkgRes, qRes, timeOffRes, subRes, planRes] = await Promise.all([
+      const [srvRes, blkRes, bkgRes, customerRes, qRes, timeOffRes, subRes, planRes] = await Promise.all([
         supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),
         supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),
         supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", pId).order("start_time", { ascending: true }),
+        supabaseClient.from("customers").select("*").eq("profile_id", pId).order("updated_at", { ascending: false }),
         supabaseClient.from("booking_questions").select("*").eq("profile_id", pId).order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
         supabaseClient.from("time_off_blocks").select("*").eq("profile_id", pId).order("start_time", { ascending: true }),
         supabaseClient.from("business_subscriptions").select("*").eq("profile_id", pId).maybeSingle(),
@@ -2498,6 +2612,7 @@
 
       if (srvRes.error) throw srvRes.error;
       if (blkRes.error) throw blkRes.error;
+      if (customerRes.error) throw customerRes.error;
       if (qRes.error) throw qRes.error;
       if (timeOffRes.error) throw timeOffRes.error;
       if (subRes.error) throw subRes.error;
@@ -2506,6 +2621,7 @@
       state.services = srvRes.data || [];
       state.blocks = blkRes.data || [];
       state.bookings = bkgRes.data || [];
+      state.customers = customerRes.data || [];
       state.questions = qRes.data || [];
       state.timeOff = timeOffRes.data || [];
       state.bookingsError = bkgRes.error || null;
@@ -2526,6 +2642,7 @@
       renderTimeOff();
       renderBlocks();
       renderBookings();
+      renderCustomers();
       renderOverviewBookings();
       renderPlanSubscription();
       renderCalendarDashboard();
@@ -2546,6 +2663,7 @@
       const totalVal = upcoming.reduce((acc, b) => acc + Number(b.booked_price ?? b.services?.price ?? state.services.find(s => s.id === b.service_id)?.price ?? 0), 0);
 
       $("statServices").textContent = state.services.length;
+      $("statCustomers").textContent = state.customers.length;
       $("statDates").textContent = activeDates.size;
       $("statBookings").textContent = upcoming.length;
       $("statValue").textContent = money(totalVal);
@@ -2556,6 +2674,171 @@
       $("overviewBookings").innerHTML = upcoming.length
         ? upcoming.map(b => bookingCard(b)).join("")
         : emptyState("No upcoming bookings", "New customer appointments will appear here.");
+    }
+
+
+    function customerBookings(customer) {
+      const email = String(customer?.email || "").toLowerCase();
+      return state.bookings
+        .filter(b =>
+          (b.customer_id && b.customer_id === customer.id) ||
+          (!b.customer_id && String(b.customer_email || "").toLowerCase() === email)
+        )
+        .sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+    }
+
+    function customerMetrics(customer) {
+      const all = customerBookings(customer);
+      const active = all.filter(b => b.status !== "cancelled");
+      const past = active.filter(b => new Date(b.start_time).getTime() <= Date.now());
+      const value = active.reduce((sum, b) => sum + Number(
+        b.booked_price ?? b.services?.price ?? state.services.find(s => s.id === b.service_id)?.price ?? 0
+      ), 0);
+      const lastVisit = past.length ? past[0].start_time : null;
+
+      return {
+        all,
+        active,
+        bookingCount: active.length,
+        value,
+        lastVisit
+      };
+    }
+
+    function renderCustomers() {
+      if (!$("customersList")) return;
+
+      const query = String($("customerSearch")?.value || "").trim().toLowerCase();
+      const customers = [...state.customers]
+        .filter(customer => {
+          if (!query) return true;
+          return [customer.name, customer.email, customer.phone]
+            .some(value => String(value || "").toLowerCase().includes(query));
+        })
+        .sort((a, b) => {
+          const aBookings = customerBookings(a);
+          const bBookings = customerBookings(b);
+          const aLast = aBookings[0] ? new Date(aBookings[0].start_time).getTime() : new Date(a.updated_at || a.created_at).getTime();
+          const bLast = bBookings[0] ? new Date(bBookings[0].start_time).getTime() : new Date(b.updated_at || b.created_at).getTime();
+          return bLast - aLast;
+        });
+
+      const allMetrics = state.customers.map(customer => ({
+        customer,
+        metrics: customerMetrics(customer)
+      }));
+      const recentCutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+      const returning = allMetrics.filter(x => x.metrics.bookingCount >= 2).length;
+      const recent = allMetrics.filter(x => x.metrics.active.some(b => {
+        const t = new Date(b.start_time).getTime();
+        return t >= recentCutoff && t <= Date.now();
+      })).length;
+      const bookedValue = allMetrics.reduce((sum, x) => sum + x.metrics.value, 0);
+
+      $("crmTotalCustomers").textContent = state.customers.length;
+      $("crmReturningCustomers").textContent = returning;
+      $("crmRecentCustomers").textContent = recent;
+      $("crmBookedValue").textContent = money(bookedValue);
+      $("customerCountBadge").textContent = `${state.customers.length} customer${state.customers.length === 1 ? "" : "s"}`;
+
+      $("customersList").innerHTML = customers.length
+        ? customers.map(customer => {
+            const m = customerMetrics(customer);
+            const selected = state.selectedCustomerId === customer.id;
+            const last = m.lastVisit ? prettyDateTime(m.lastVisit) : "No completed visits yet";
+            return `
+              <button type="button" data-customer-id="${customer.id}" class="w-full rounded-2xl border p-4 text-left transition ${selected ? "border-brand-300 bg-brand-50" : "border-slate-200 hover:border-brand-200 hover:bg-slate-50"}">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <h3 class="truncate font-bold text-ink">${escapeHtml(customer.name)}</h3>
+                    <p class="mt-1 truncate text-xs text-slate-500">${escapeHtml(customer.email)}${customer.phone ? " · " + escapeHtml(customer.phone) : ""}</p>
+                  </div>
+                  <span class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">${m.bookingCount} booking${m.bookingCount === 1 ? "" : "s"}</span>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                  <span><strong class="text-slate-700">${money(m.value)}</strong> booked</span>
+                  <span>${escapeHtml(last)}</span>
+                </div>
+              </button>
+            `;
+          }).join("")
+        : emptyState(query ? "No matching customers" : "No customers yet", query
+            ? "Try a different name, email or phone number."
+            : "Customer profiles are created automatically when bookings are made.");
+
+      renderCustomerProfile();
+    }
+
+    function renderCustomerProfile() {
+      const customer = state.customers.find(c => c.id === state.selectedCustomerId);
+      $("customerProfileEmpty").classList.toggle("hidden", Boolean(customer));
+      $("customerProfile").classList.toggle("hidden", !customer);
+      if (!customer) return;
+
+      const m = customerMetrics(customer);
+      $("customerProfileName").textContent = customer.name;
+      $("customerProfileContact").textContent = [customer.email, customer.phone].filter(Boolean).join(" · ");
+      $("customerProfileBadge").textContent = m.bookingCount >= 2 ? "Returning customer" : "Customer";
+      $("customerProfileBadge").className = m.bookingCount >= 2
+        ? "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
+        : "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500";
+      $("customerProfileBookings").textContent = m.bookingCount;
+      $("customerProfileValue").textContent = money(m.value);
+      $("customerProfileLastVisit").textContent = m.lastVisit ? prettyDate(m.lastVisit) : "—";
+      $("customerNotes").value = customer.notes || "";
+
+      $("customerHistory").innerHTML = m.all.length
+        ? m.all.map(b => {
+            const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
+            const cancelled = b.status === "cancelled";
+            return `
+              <div class="rounded-2xl border border-slate-200 p-4 ${cancelled ? "bg-slate-50 opacity-70" : ""}">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-bold text-ink">${escapeHtml(srv.title || "Service")}</p>
+                    <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-bold text-slate-700">${money(b.booked_price ?? srv.price ?? 0)}</p>
+                    <p class="mt-1 text-[.68rem] font-bold uppercase tracking-wider ${cancelled ? "text-slate-400" : "text-emerald-600"}">${cancelled ? "Cancelled" : "Booked"}</p>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : emptyState("No booking history", "This customer does not have any bookings yet.");
+    }
+
+    function selectCustomer(customerId) {
+      if (!state.customers.some(c => c.id === customerId)) return;
+      state.selectedCustomerId = customerId;
+      renderCustomers();
+    }
+
+    async function saveCustomerNotes() {
+      const customer = state.customers.find(c => c.id === state.selectedCustomerId);
+      if (!customer) return;
+
+      const btn = $("saveCustomerNotesBtn");
+      setBusy(btn, true, "Saving…");
+
+      const { data, error } = await supabaseClient
+        .from("customers")
+        .update({
+          notes: $("customerNotes").value.trim(),
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", customer.id)
+        .eq("profile_id", state.profile.id)
+        .select("*")
+        .single();
+
+      setBusy(btn, false);
+      if (error) return toast(friendlyDbError(error, "save customer notes"), "error");
+
+      state.customers = state.customers.map(c => c.id === data.id ? data : c);
+      renderCustomers();
+      toast("Customer notes saved.");
     }
 
     function syncReminderFields() {
@@ -4726,6 +5009,7 @@
       state.bookings = res.data || [];
       state.bookingsError = res.error || null;
       renderBookings();
+      renderCustomers();
       renderOverviewBookings();
       renderStats();
       renderCalendarDashboard();
