@@ -313,6 +313,7 @@
           <button class="nav-tab active rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="overview" type="button">Overview</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="availability" type="button">Availability</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="booking-rules" type="button">Booking rules</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Business details</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="reminders" type="button">Reminders</button>
@@ -644,6 +645,70 @@
               </label>
             </div>
             <div id="blocksList" class="mt-5 space-y-3"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Booking Rules Tab -->
+      <section id="tab-booking-rules" class="dashboard-tab hidden">
+        <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 8A</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Booking window</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Control how soon customers can book and how far into the future your booking page accepts appointments.</p>
+
+            <form id="bookingRulesForm" class="mt-6 space-y-5">
+              <div>
+                <label class="label" for="minimumNoticeHours">Minimum notice</label>
+                <select id="minimumNoticeHours" class="field">
+                  <option value="0">No minimum notice</option>
+                  <option value="1">1 hour</option>
+                  <option value="2">2 hours</option>
+                  <option value="4">4 hours</option>
+                  <option value="6">6 hours</option>
+                  <option value="12">12 hours</option>
+                  <option value="24">24 hours</option>
+                  <option value="48">48 hours</option>
+                  <option value="72">72 hours</option>
+                  <option value="168">1 week</option>
+                </select>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Appointments inside this window will not be shown to customers.</p>
+              </div>
+
+              <div>
+                <label class="label" for="maximumBookingDays">Bookable in advance</label>
+                <select id="maximumBookingDays" class="field">
+                  <option value="7">7 days</option>
+                  <option value="14">14 days</option>
+                  <option value="30">30 days</option>
+                  <option value="60">60 days</option>
+                  <option value="90">90 days</option>
+                  <option value="180">6 months</option>
+                  <option value="365">1 year</option>
+                </select>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Customers cannot select an appointment date beyond this window.</p>
+              </div>
+
+              <button id="bookingRulesSubmitBtn" class="btn btn-primary w-full sm:w-auto" type="submit">Save booking rules</button>
+            </form>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer experience</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">What these rules do</h2>
+            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Stop last-minute bookings</strong>
+                <span id="minimumNoticeSummary">Customers can currently book without a minimum notice period.</span>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Limit future availability</strong>
+                <span id="maximumBookingSummary">Customers can currently book up to 90 days ahead.</span>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+                These limits are enforced both on the booking page and again when the booking is created, so hidden or expired times cannot be booked by bypassing the interface.
+              </div>
+            </div>
           </article>
         </div>
       </section>
@@ -1847,6 +1912,7 @@
       $("bookingFilter").addEventListener("change", renderBookings);
       $("bookingsList").addEventListener("click", handleBookingListClick);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
+      $("bookingRulesForm").addEventListener("submit", saveBookingRules);
       $("reminderSettingsForm").addEventListener("submit", saveReminderSettings);
       $("followupEnabled").addEventListener("change", syncReminderFields);
       $("connectGoogleCalendarBtn").addEventListener("click", connectGoogleCalendar);
@@ -2092,6 +2158,7 @@
         $("dashboardBusinessName").textContent = state.profile.business_name;
         $("publicBookingUrl").value = buildPublicUrl(state.profile.id);
         populateBusinessDetails();
+        populateBookingRules();
         populateReminderSettings();
         populateCalendarSettings();
         populateStripePayments();
@@ -2208,6 +2275,76 @@
       state.profile = data;
       populateReminderSettings();
       toast("Reminder settings saved.");
+    }
+
+
+    function bookingRuleSummaryText() {
+      const minHours = Number(state.profile?.minimum_notice_hours || 0);
+      const maxDays = Number(state.profile?.maximum_booking_days || 90);
+
+      if ($("minimumNoticeSummary")) {
+        $("minimumNoticeSummary").textContent = minHours
+          ? `Customers must book at least ${minHours < 24 ? minHours + " hour" + (minHours === 1 ? "" : "s") : (minHours / 24) + " day" + (minHours === 24 ? "" : "s")} before the appointment.`
+          : "Customers can currently book without a minimum notice period.";
+      }
+
+      if ($("maximumBookingSummary")) {
+        $("maximumBookingSummary").textContent = `Customers can currently book up to ${maxDays} day${maxDays === 1 ? "" : "s"} ahead.`;
+      }
+    }
+
+    function populateBookingRules() {
+      if (!state.profile) return;
+      const minHours = String(state.profile.minimum_notice_hours ?? 0);
+      const maxDays = String(state.profile.maximum_booking_days ?? 90);
+
+      if (![...$("minimumNoticeHours").options].some(o => o.value === minHours)) {
+        const opt = new Option(`${minHours} hours`, minHours);
+        $("minimumNoticeHours").add(opt);
+      }
+      if (![...$("maximumBookingDays").options].some(o => o.value === maxDays)) {
+        const opt = new Option(`${maxDays} days`, maxDays);
+        $("maximumBookingDays").add(opt);
+      }
+
+      $("minimumNoticeHours").value = minHours;
+      $("maximumBookingDays").value = maxDays;
+      bookingRuleSummaryText();
+    }
+
+    async function saveBookingRules(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const minHours = Number($("minimumNoticeHours").value);
+      const maxDays = Number($("maximumBookingDays").value);
+
+      if (!Number.isInteger(minHours) || minHours < 0 || minHours > 8760) {
+        return toast("Choose a valid minimum notice period.", "error");
+      }
+      if (!Number.isInteger(maxDays) || maxDays < 1 || maxDays > 730) {
+        return toast("Choose a valid maximum booking window.", "error");
+      }
+
+      const btn = $("bookingRulesSubmitBtn");
+      setBusy(btn, true, "Saving…");
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .update({
+          minimum_notice_hours: minHours,
+          maximum_booking_days: maxDays
+        })
+        .eq("id", state.profile.id)
+        .select("*")
+        .single();
+
+      setBusy(btn, false);
+      if (error) return toast(friendlyDbError(error, "save booking rules"), "error");
+
+      state.profile = data;
+      populateBookingRules();
+      toast("Booking rules saved.");
     }
 
     function populateBusinessDetails() {
@@ -4076,7 +4213,7 @@
     async function loadPublicBookingPage(profileId) {
       showOnly("loadingView");
       try {
-        const { data: prof, error: pErr } = await publicClient.from("profiles").select("id, business_name, is_approved").eq("id", profileId).eq("is_approved", true).maybeSingle();
+        const { data: prof, error: pErr } = await publicClient.from("profiles").select("id, business_name, is_approved, minimum_notice_hours, maximum_booking_days").eq("id", profileId).eq("is_approved", true).maybeSingle();
         if (pErr) throw pErr;
         if (!prof) throw new Error("This booking page is not available. The business may still be awaiting approval.");
 
@@ -4088,6 +4225,10 @@
 
         $("publicBusinessName").textContent = prof.business_name;
         document.title = `Book with ${prof.business_name}`;
+
+        const maxDate = addDaysToDateKey(todayKey(), Number(prof.maximum_booking_days || 90));
+        $("publicDate").min = todayKey();
+        $("publicDate").max = maxDate;
 
         renderPublicServices();
         showOnly("publicBookingView");
@@ -4156,6 +4297,14 @@
       updateSummary();
 
       if (state.selectedDate && state.selectedService) {
+        const maxDate = addDaysToDateKey(todayKey(), Number(state.publicProfile?.maximum_booking_days || 90));
+        if (state.selectedDate < todayKey() || state.selectedDate > maxDate) {
+          $("publicSlots").innerHTML = "";
+          $("slotsMessage").textContent = "That date is outside this business's booking window.";
+          deactivateStep("timeStep");
+          return;
+        }
+
         activateStep("timeStep");
         $("slotsMessage").innerHTML = '<span class="inline-flex items-center gap-2"><span class="spinner !h-4 !w-4 !border-2"></span>Checking availability…</span>';
         $("publicSlots").innerHTML = "";
@@ -4204,7 +4353,8 @@
     function buildSlots(blocks, existingBookings, durationMins) {
       const slotMap = new Map();
       const durationMs = 60 * durationMins * 1000;
-      const leadTimeCutoff = Date.now() + 300000;
+      const minimumNoticeHours = Number(state.publicProfile?.minimum_notice_hours || 0);
+      const leadTimeCutoff = Date.now() + (minimumNoticeHours * 60 * 60 * 1000);
 
       blocks.forEach(block => {
         const bStart = londonDate(block.block_date, block.start_time);
