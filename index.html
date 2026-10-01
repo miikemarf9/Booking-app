@@ -809,8 +809,60 @@
               </div>
               <div class="rounded-2xl border border-slate-200 p-4">
                 <strong class="block text-slate-700">MoreLeads keeps its platform fee</strong>
-                <span>On Free, the current platform fee is 3% of the booked value.</span>
+                <span>Free is 3% per booking. Pro removes the MoreLeads transaction fee.</span>
               </div>
+            </div>
+          </article>
+
+          <article class="card p-5 sm:p-6 lg:col-span-2">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">MoreLeads plan</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Free or Pro</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Upgrade when the 3% Free-plan fee starts costing more than the monthly subscription.</p>
+              </div>
+              <span id="planStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Free</span>
+            </div>
+
+            <div class="mt-6 grid gap-4 md:grid-cols-2">
+              <div class="rounded-2xl border border-slate-200 p-5">
+                <div class="flex items-end justify-between gap-3">
+                  <strong class="text-lg text-ink">Free</strong>
+                  <span class="text-sm font-bold text-slate-500">£0/month</span>
+                </div>
+                <div class="mt-4 space-y-2 text-sm leading-6 text-slate-500">
+                  <p>3% MoreLeads fee on each booking</p>
+                  <p>Minimum service price £10</p>
+                  <p>Full online payment required</p>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-brand-200 bg-brand-50 p-5">
+                <div class="flex items-end justify-between gap-3">
+                  <strong class="text-lg text-ink">Pro</strong>
+                  <span class="text-sm font-bold text-brand-700">£14.99/month</span>
+                </div>
+                <div class="mt-4 space-y-2 text-sm leading-6 text-slate-600">
+                  <p><strong class="text-slate-800">0% MoreLeads transaction fee</strong></p>
+                  <p>Pay later, fixed deposit, percentage deposit or full payment</p>
+                  <p>No MoreLeads minimum service price</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Current subscription</p>
+                  <p id="planStatusText" class="mt-1 font-bold text-ink">Free plan</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button id="upgradeProBtn" class="btn btn-primary" type="button">Upgrade to Pro – £14.99/month</button>
+                  <button id="manageProBtn" class="btn btn-light hidden" type="button">Manage subscription</button>
+                  <button id="refreshPlanBtn" class="btn btn-light" type="button">Check plan</button>
+                </div>
+              </div>
+              <p id="planStatusHelp" class="mt-3 text-xs leading-5 text-slate-500">You are currently on Free. Pro removes the 3% MoreLeads fee.</p>
             </div>
           </article>
         </div>
@@ -1649,6 +1701,8 @@
       const paymentState = params.get("payment") || "";
       const sessionId = params.get("session_id") || "";
       const stripeReturn = params.get("stripe") || "";
+      const subscriptionState = params.get("subscription") || "";
+      const proSessionId = params.get("pro_session_id") || "";
 
       $("blkDate").min = todayKey();
       $("blkRepeatUntil").min = todayKey();
@@ -1675,7 +1729,9 @@
       const { data, error } = await supabaseClient.auth.getUser();
       if (!error && data?.user) {
         await loadOwner(data.user);
-        if (stripeReturn) {
+        if (subscriptionState) {
+          await handleProSubscriptionReturn(subscriptionState, proSessionId);
+        } else if (stripeReturn) {
           switchTab("payments");
           await refreshStripePayments(false);
         }
@@ -1745,6 +1801,9 @@
       $("refreshGoogleCalendarBtn").addEventListener("click", () => refreshGoogleCalendarConnection(true));
       $("connectStripeBtn").addEventListener("click", connectStripePayments);
       $("refreshStripeBtn").addEventListener("click", () => refreshStripePayments(true));
+      $("upgradeProBtn").addEventListener("click", startProUpgrade);
+      $("manageProBtn").addEventListener("click", manageProSubscription);
+      $("refreshPlanBtn").addEventListener("click", () => refreshProSubscription(true));
 
       $("publicServices").addEventListener("click", handlePublicServiceClick);
       $("publicDate").addEventListener("change", handlePublicDateChange);
@@ -2001,6 +2060,7 @@
       renderBlocks();
       renderBookings();
       renderOverviewBookings();
+      renderPlanSubscription();
 
       const warnEl = $("dashboardDataWarning");
       if (state.bookingsError) {
@@ -2211,6 +2271,173 @@
       } catch (err) {
         setBusy(btn, false);
         toast(err?.message || "Could not start Stripe setup.", "error");
+      }
+    }
+
+
+    function renderPlanSubscription() {
+      const row = state.subscription || { plan_code: "free", status: "active" };
+      const isPro = row.plan_code === "pro";
+      const status = String(row.status || "active");
+      const badge = $("planStatusBadge");
+      const text = $("planStatusText");
+      const help = $("planStatusHelp");
+      const upgradeBtn = $("upgradeProBtn");
+      const manageBtn = $("manageProBtn");
+
+      if (!badge || !text || !help || !upgradeBtn || !manageBtn) return;
+
+      if (isPro) {
+        badge.textContent = status === "past_due" ? "Payment issue" : "Pro";
+        badge.className = status === "past_due"
+          ? "rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700"
+          : "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700";
+        text.textContent = row.cancel_at_period_end ? "Pro — cancels at period end" : "Pro plan active";
+
+        if (status === "past_due") {
+          help.textContent = "Stripe is retrying a failed subscription payment. Open Manage subscription to update the payment method.";
+        } else if (row.cancel_at_period_end && row.current_period_end) {
+          const end = new Date(row.current_period_end);
+          help.textContent = Number.isNaN(end.getTime())
+            ? "Pro remains active until the end of the current billing period."
+            : `Pro remains active until ${new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(end)}.`;
+        } else {
+          help.textContent = "0% MoreLeads transaction fee is active. Flexible booking payment options are unlocked.";
+        }
+
+        upgradeBtn.classList.add("hidden");
+        manageBtn.classList.remove("hidden");
+      } else {
+        badge.textContent = "Free";
+        badge.className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
+        text.textContent = "Free plan";
+        help.textContent = "You are currently on Free. Pro removes the 3% MoreLeads fee.";
+        upgradeBtn.classList.remove("hidden");
+        manageBtn.classList.toggle("hidden", !row.stripe_customer_id);
+      }
+
+      syncPaymentFields();
+    }
+
+    async function refreshProSubscription(showMessage = false) {
+      const btn = $("refreshPlanBtn");
+      if (showMessage) setBusy(btn, true, "Checking…");
+
+      try {
+        const { data, error } = await supabaseClient.functions.invoke("pro-subscription", {
+          body: { action: "status" }
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+
+        await loadDashboardData();
+
+        if (showMessage) {
+          toast(
+            state.subscription?.plan_code === "pro" ? "Pro is active." : "Your account is on Free.",
+            state.subscription?.plan_code === "pro" ? "success" : "info"
+          );
+        }
+        return state.subscription;
+      } catch (err) {
+        if (showMessage) toast(err?.message || "Could not check your subscription.", "error");
+        return null;
+      } finally {
+        if (showMessage) setBusy(btn, false);
+      }
+    }
+
+    async function startProUpgrade() {
+      if (!state.user || !state.profile) return toast("Log in again before upgrading.", "error");
+
+      const btn = $("upgradeProBtn");
+      setBusy(btn, true, "Opening Stripe…");
+
+      try {
+        const { data, error } = await supabaseClient.functions.invoke("pro-subscription", {
+          body: {
+            action: "checkout",
+            return_url: currentAppBaseUrl()
+          }
+        });
+
+        if (error) throw error;
+        if (data?.error) {
+          if (data?.already_pro) {
+            await refreshProSubscription(false);
+            return toast("Pro is already active on this business.", "info");
+          }
+          throw new Error(data.error);
+        }
+        if (!data?.url) throw new Error("Stripe did not return a subscription checkout link.");
+
+        window.location.assign(data.url);
+      } catch (err) {
+        setBusy(btn, false);
+        toast(err?.message || "Could not start the Pro upgrade.", "error");
+      }
+    }
+
+    async function manageProSubscription() {
+      if (!state.user || !state.profile) return toast("Log in again before managing your subscription.", "error");
+
+      const btn = $("manageProBtn");
+      setBusy(btn, true, "Opening Stripe…");
+
+      try {
+        const { data, error } = await supabaseClient.functions.invoke("pro-subscription", {
+          body: {
+            action: "portal",
+            return_url: currentAppBaseUrl()
+          }
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        if (!data?.url) throw new Error("Stripe did not return a subscription management link.");
+        window.location.assign(data.url);
+      } catch (err) {
+        setBusy(btn, false);
+        toast(err?.message || "Could not open subscription management.", "error");
+      }
+    }
+
+    async function handleProSubscriptionReturn(subscriptionState, sessionId) {
+      switchTab("payments");
+
+      if (subscriptionState === "cancelled") {
+        toast("Pro upgrade cancelled. Your Free plan is unchanged.", "info");
+        return;
+      }
+
+      if (subscriptionState === "portal_return") {
+        await refreshProSubscription(false);
+        toast("Subscription details refreshed.", "success");
+        return;
+      }
+
+      if (subscriptionState !== "success") return;
+
+      try {
+        const { data, error } = await supabaseClient.functions.invoke("pro-subscription", {
+          body: {
+            action: "confirm",
+            session_id: sessionId
+          }
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+
+        await loadDashboardData();
+        switchTab("payments");
+        toast("MoreLeads Pro is now active.", "success");
+      } catch (err) {
+        await refreshProSubscription(false);
+        toast(
+          state.subscription?.plan_code === "pro"
+            ? "MoreLeads Pro is active."
+            : (err?.message || "Stripe is still confirming your Pro subscription."),
+          state.subscription?.plan_code === "pro" ? "success" : "info"
+        );
       }
     }
 
