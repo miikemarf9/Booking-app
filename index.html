@@ -797,6 +797,17 @@
             </div>
           </button>
 
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="time-off">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Time off</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Block holidays, days off or a few hours without changing your normal availability.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
           <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="booking-rules">
             <div class="flex items-start justify-between gap-4">
               <div>
@@ -851,6 +862,82 @@
               <span class="text-xl text-slate-300">→</span>
             </div>
           </button>
+        </div>
+      </section>
+
+      <!-- Time Off Tab -->
+      <section id="tab-time-off" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+
+        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 10</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Add time off</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Block a full day, several days, or just part of a day. Your normal availability stays intact underneath.</p>
+
+            <form id="timeOffForm" class="mt-6 space-y-4">
+              <div>
+                <label class="label" for="timeOffMode">Block</label>
+                <select id="timeOffMode" class="field">
+                  <option value="all_day">Full day or date range</option>
+                  <option value="hours">Specific hours</option>
+                </select>
+              </div>
+
+              <div id="timeOffAllDayFields" class="space-y-4">
+                <div>
+                  <label class="label" for="timeOffStartDate">First day off</label>
+                  <input id="timeOffStartDate" class="field" type="date" required>
+                </div>
+                <div>
+                  <label class="label" for="timeOffEndDate">Last day off</label>
+                  <input id="timeOffEndDate" class="field" type="date" required>
+                  <p class="mt-1.5 text-xs leading-5 text-slate-400">Use the same date for a single full day.</p>
+                </div>
+              </div>
+
+              <div id="timeOffHoursFields" class="hidden space-y-4">
+                <div>
+                  <label class="label" for="timeOffDate">Date</label>
+                  <input id="timeOffDate" class="field" type="date">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="label" for="timeOffStartTime">From</label>
+                    <input id="timeOffStartTime" class="field" type="time" step="300">
+                  </div>
+                  <div>
+                    <label class="label" for="timeOffEndTime">Until</label>
+                    <input id="timeOffEndTime" class="field" type="time" step="300">
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="label" for="timeOffReason">Reason <span class="font-normal text-slate-400">(optional)</span></label>
+                <input id="timeOffReason" class="field" type="text" maxlength="300" placeholder="e.g. Holiday">
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">For the business dashboard only. Customers will simply see those times as unavailable.</p>
+              </div>
+
+              <button id="timeOffSubmitBtn" class="btn btn-primary w-full sm:w-auto" type="submit">Block this time</button>
+            </form>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Unavailable</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Upcoming time off</h2>
+              </div>
+              <span id="timeOffCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 blocks</span>
+            </div>
+
+            <div id="timeOffList" class="mt-5 space-y-3"></div>
+
+            <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+              Adding time off never deletes your normal availability. Remove the time-off block later and the underlying bookable times become available again automatically.
+            </div>
+          </article>
         </div>
       </section>
 
@@ -1483,6 +1570,7 @@
       blocks: [],
       bookings: [],
       questions: [],
+      timeOff: [],
       bookingsError: null,
       publicProfile: null,
       publicServices: [],
@@ -2027,6 +2115,18 @@
       renderPromoExcludedDates();
       syncPromoFields();
       syncBookingQuestionFields();
+
+      const timeOffToday = todayKey();
+      $("timeOffStartDate").min = timeOffToday;
+      $("timeOffEndDate").min = timeOffToday;
+      $("timeOffDate").min = timeOffToday;
+      $("timeOffStartDate").value = timeOffToday;
+      $("timeOffEndDate").value = timeOffToday;
+      $("timeOffDate").value = timeOffToday;
+      $("timeOffStartTime").value = "09:00";
+      $("timeOffEndTime").value = "17:00";
+      syncTimeOffMode();
+
       updateFreePlanFeePreview();
       bindEvents();
 
@@ -2113,6 +2213,15 @@
       $("bookingsList").addEventListener("click", handleBookingListClick);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
       $("bookingRulesForm").addEventListener("submit", saveBookingRules);
+      $("timeOffForm").addEventListener("submit", saveTimeOff);
+      $("timeOffMode").addEventListener("change", syncTimeOffMode);
+      $("timeOffList").addEventListener("click", handleTimeOffListClick);
+      $("timeOffStartDate").addEventListener("change", () => {
+        if (!$("timeOffEndDate").value || $("timeOffEndDate").value < $("timeOffStartDate").value) {
+          $("timeOffEndDate").value = $("timeOffStartDate").value;
+        }
+        $("timeOffEndDate").min = $("timeOffStartDate").value || todayKey();
+      });
       $("bookingQuestionForm").addEventListener("submit", saveBookingQuestion);
       $("bookingQuestionCancelBtn").addEventListener("click", resetBookingQuestionForm);
       $("bookingQuestionType").addEventListener("change", syncBookingQuestionFields);
@@ -2377,11 +2486,12 @@
 
     async function loadDashboardData() {
       const pId = state.profile.id;
-      const [srvRes, blkRes, bkgRes, qRes, subRes, planRes] = await Promise.all([
+      const [srvRes, blkRes, bkgRes, qRes, timeOffRes, subRes, planRes] = await Promise.all([
         supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),
         supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),
         supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", pId).order("start_time", { ascending: true }),
         supabaseClient.from("booking_questions").select("*").eq("profile_id", pId).order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
+        supabaseClient.from("time_off_blocks").select("*").eq("profile_id", pId).order("start_time", { ascending: true }),
         supabaseClient.from("business_subscriptions").select("*").eq("profile_id", pId).maybeSingle(),
         supabaseClient.from("subscription_plans").select("*").eq("is_active", true)
       ]);
@@ -2389,6 +2499,7 @@
       if (srvRes.error) throw srvRes.error;
       if (blkRes.error) throw blkRes.error;
       if (qRes.error) throw qRes.error;
+      if (timeOffRes.error) throw timeOffRes.error;
       if (subRes.error) throw subRes.error;
       if (planRes.error) throw planRes.error;
 
@@ -2396,6 +2507,7 @@
       state.blocks = blkRes.data || [];
       state.bookings = bkgRes.data || [];
       state.questions = qRes.data || [];
+      state.timeOff = timeOffRes.data || [];
       state.bookingsError = bkgRes.error || null;
       state.subscription = subRes.data || { plan_code: "free", status: "active" };
       state.plan = (planRes.data || []).find(p => p.code === state.subscription.plan_code)
@@ -2411,6 +2523,7 @@
       renderServices();
       renderAvailabilityServiceOptions();
       renderBookingQuestions();
+      renderTimeOff();
       renderBlocks();
       renderBookings();
       renderOverviewBookings();
@@ -2486,6 +2599,180 @@
     }
 
 
+
+
+    function syncTimeOffMode() {
+      const allDay = $("timeOffMode")?.value !== "hours";
+      $("timeOffAllDayFields")?.classList.toggle("hidden", !allDay);
+      $("timeOffHoursFields")?.classList.toggle("hidden", allDay);
+
+      if ($("timeOffStartDate")) $("timeOffStartDate").required = allDay;
+      if ($("timeOffEndDate")) $("timeOffEndDate").required = allDay;
+      if ($("timeOffDate")) $("timeOffDate").required = !allDay;
+      if ($("timeOffStartTime")) $("timeOffStartTime").required = !allDay;
+      if ($("timeOffEndTime")) $("timeOffEndTime").required = !allDay;
+    }
+
+    function timeOffDateKey(iso) {
+      return new Date(iso).toLocaleDateString("en-CA", { timeZone: BUSINESS_TIME_ZONE });
+    }
+
+    function timeOffLabel(block) {
+      const start = new Date(block.start_time);
+      const end = new Date(block.end_time);
+
+      if (block.is_all_day) {
+        const first = timeOffDateKey(block.start_time);
+        const last = new Date(end.getTime() - 1000).toLocaleDateString("en-CA", { timeZone: BUSINESS_TIME_ZONE });
+        return first === last ? prettyDate(first) : `${prettyDate(first)} – ${prettyDate(last)}`;
+      }
+
+      return `${prettyDate(timeOffDateKey(block.start_time))} · ${prettyTime(start)}–${prettyTime(end)}`;
+    }
+
+    function renderTimeOff() {
+      if (!$("timeOffList")) return;
+
+      const now = Date.now();
+      const upcoming = [...state.timeOff]
+        .filter(block => new Date(block.end_time).getTime() >= now)
+        .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+
+      $("timeOffCount").textContent = `${upcoming.length} block${upcoming.length === 1 ? "" : "s"}`;
+
+      $("timeOffList").innerHTML = upcoming.length
+        ? upcoming.map(block => `
+            <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="rounded-full bg-rose-50 px-2.5 py-1 text-[.68rem] font-bold text-rose-700">${block.is_all_day ? "Full day" : "Hours blocked"}</span>
+                  ${block.reason ? `<span class="truncate text-xs font-semibold text-slate-500">${escapeHtml(block.reason)}</span>` : ""}
+                </div>
+                <p class="mt-2 font-bold text-ink">${escapeHtml(timeOffLabel(block))}</p>
+              </div>
+              <button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button>
+            </div>
+          `).join("")
+        : emptyState("No upcoming time off", "Add a holiday, day off or blocked period using the form.");
+    }
+
+    async function saveTimeOff(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const allDay = $("timeOffMode").value !== "hours";
+      let start;
+      let end;
+
+      if (allDay) {
+        const startDate = $("timeOffStartDate").value;
+        const endDate = $("timeOffEndDate").value;
+        if (!startDate || !endDate) return toast("Choose the first and last day off.", "error");
+        if (endDate < startDate) return toast("The last day off cannot be before the first day.", "error");
+
+        start = londonDate(startDate, "00:00");
+        end = londonDate(addDaysToDateKey(endDate, 1), "00:00");
+      } else {
+        const date = $("timeOffDate").value;
+        const startTime = $("timeOffStartTime").value;
+        const endTime = $("timeOffEndTime").value;
+        if (!date || !startTime || !endTime) return toast("Choose the date, start time and end time.", "error");
+
+        start = londonDate(date, startTime);
+        end = londonDate(date, endTime);
+        if (end <= start) return toast("The finish time must be after the start time.", "error");
+      }
+
+      const overlappingBookings = state.bookings.filter(b =>
+        b.status !== "cancelled" &&
+        new Date(b.start_time).getTime() < end.getTime() &&
+        new Date(b.end_time).getTime() > start.getTime()
+      );
+
+      if (overlappingBookings.length) {
+        const proceed = window.confirm(
+          `There ${overlappingBookings.length === 1 ? "is" : "are"} ${overlappingBookings.length} existing booking${overlappingBookings.length === 1 ? "" : "s"} during this time. Adding time off will stop new bookings, but it will not cancel existing appointments. Continue?`
+        );
+        if (!proceed) return;
+      }
+
+      const btn = $("timeOffSubmitBtn");
+      setBusy(btn, true, "Blocking…");
+
+      const { error } = await supabaseClient.from("time_off_blocks").insert({
+        profile_id: state.profile.id,
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+        reason: $("timeOffReason").value.trim() || null,
+        is_all_day: allDay
+      });
+
+      setBusy(btn, false);
+      if (error) return toast(friendlyDbError(error, "add time off"), "error");
+
+      toast("Time off added.");
+      $("timeOffForm").reset();
+      $("timeOffMode").value = "all_day";
+      const today = todayKey();
+      $("timeOffStartDate").value = today;
+      $("timeOffEndDate").value = today;
+      $("timeOffDate").value = today;
+      $("timeOffStartTime").value = "09:00";
+      $("timeOffEndTime").value = "17:00";
+      syncTimeOffMode();
+      await refreshTimeOff();
+    }
+
+    async function refreshTimeOff() {
+      const { data, error } = await supabaseClient
+        .from("time_off_blocks")
+        .select("*")
+        .eq("profile_id", state.profile.id)
+        .order("start_time", { ascending: true });
+
+      if (error) return toast(friendlyDbError(error, "refresh time off"), "error");
+      state.timeOff = data || [];
+      renderTimeOff();
+      renderCalendarDashboard();
+    }
+
+    async function handleTimeOffListClick(e) {
+      const btn = e.target.closest('[data-time-off-action="delete"]');
+      if (!btn) return;
+
+      const block = state.timeOff.find(item => item.id === btn.dataset.id);
+      if (!block) return;
+
+      if (!window.confirm(`Remove time off for ${timeOffLabel(block)}? The underlying availability will become bookable again.`)) return;
+
+      const { error } = await supabaseClient
+        .from("time_off_blocks")
+        .delete()
+        .eq("id", block.id)
+        .eq("profile_id", state.profile.id);
+
+      if (error) return toast(friendlyDbError(error, "remove time off"), "error");
+
+      toast("Time off removed.");
+      await refreshTimeOff();
+    }
+
+    function calendarTimeOffForDate(dateKey) {
+      const start = londonDate(dateKey, "00:00").getTime();
+      const end = londonDate(addDaysToDateKey(dateKey, 1), "00:00").getTime();
+      return state.timeOff.filter(block =>
+        new Date(block.start_time).getTime() < end &&
+        new Date(block.end_time).getTime() > start
+      );
+    }
+
+    function filterSlotsAgainstTimeOff(slots, timeOffBlocks) {
+      if (!Array.isArray(timeOffBlocks) || !timeOffBlocks.length) return slots;
+      return slots.filter(slot => !timeOffBlocks.some(block =>
+        new Date(block.start_time).getTime() < slot.blockedEnd.getTime() &&
+        new Date(block.end_time).getTime() > slot.start.getTime()
+      ));
+    }
 
     function syncBookingQuestionFields() {
       const isSelect = $("bookingQuestionType")?.value === "select";
@@ -3150,6 +3437,7 @@
         const dateKey = d.toISOString().slice(0, 10);
         const bookings = calendarBookingsForDate(dateKey);
         const blocks = calendarBlocksForDate(dateKey);
+        const timeOff = calendarTimeOffForDate(dateKey);
         const isToday = dateKey === today;
         const selected = state.calendarSelectedDate === dateKey;
 
@@ -3181,6 +3469,15 @@
             }).join("")
           : '<p class="text-xs text-slate-400">No availability</p>';
 
+        const timeOffHtml = timeOff.length
+          ? timeOff.map(block => `
+              <button type="button" data-calendar-date="${dateKey}" class="w-full rounded-xl border border-rose-100 bg-rose-50 p-2.5 text-left transition hover:bg-rose-100">
+                <p class="text-[.68rem] font-bold text-rose-800">${block.is_all_day ? "All day" : escapeHtml(prettyTime(new Date(block.start_time)) + "–" + prettyTime(new Date(block.end_time)))}</p>
+                <p class="mt-0.5 truncate text-[.66rem] text-rose-700">${escapeHtml(block.reason || "Time off")}</p>
+              </button>
+            `).join("")
+          : '<p class="text-xs text-slate-400">No time off</p>';
+
         cols.push(`
           <div class="min-h-[420px] border-r border-slate-200 ${selected ? "bg-brand-50/30" : ""}">
             <button type="button" data-calendar-date="${dateKey}" class="sticky top-0 z-10 w-full border-b border-slate-200 bg-white px-3 py-3 text-center hover:bg-slate-50">
@@ -3195,6 +3492,10 @@
               <div class="border-t border-slate-100 pt-3">
                 <p class="mb-2 text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Availability</p>
                 <div class="space-y-2">${availabilityHtml}</div>
+              </div>
+              <div class="border-t border-slate-100 pt-3">
+                <p class="mb-2 text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Time off</p>
+                <div class="space-y-2">${timeOffHtml}</div>
               </div>
             </div>
           </div>
@@ -3263,6 +3564,7 @@
         const inMonth = d.getUTCMonth() === month && d.getUTCFullYear() === year;
         const bookings = calendarBookingsForDate(dateKey);
         const blocks = calendarBlocksForDate(dateKey);
+        const timeOff = calendarTimeOffForDate(dateKey);
         const selected = state.calendarSelectedDate === dateKey;
         const isToday = dateKey === today;
         const isPast = dateKey < today;
@@ -3296,6 +3598,13 @@
             })()
           : "";
 
+        const timeOffPreview = timeOff.length
+          ? `<div class="flex items-center gap-1.5 px-1 pt-1 text-[.66rem] font-semibold text-rose-700">
+              <span class="h-2 w-2 shrink-0 rounded-full bg-rose-500"></span>
+              <span class="truncate">${timeOff.some(t => t.is_all_day) ? "Time off" : "Time off · " + timeOff.length}</span>
+            </div>`
+          : "";
+
         cells.push(`
           <button
             type="button"
@@ -3310,6 +3619,7 @@
               ${bookingPreview}
               ${moreBookings}
               ${availability}
+              ${timeOffPreview}
             </div>
           </button>
         `);
@@ -3676,7 +3986,7 @@
     }
 
     function switchTab(tabId) {
-      const settingsChildren = new Set(["availability", "booking-rules", "booking-questions", "business-details", "reminders", "payments"]);
+      const settingsChildren = new Set(["availability", "time-off", "booking-rules", "booking-questions", "business-details", "reminders", "payments"]);
       const primaryTab = settingsChildren.has(tabId) ? "settings" : tabId;
 
       document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === primaryTab));
@@ -4576,7 +4886,7 @@
       const startIso = londonDate(dateKey, "00:00").toISOString();
       const endIso = new Date(londonDate(dateKey, "00:00").getTime() + 93600000).toISOString();
 
-      const [blkRes, bkgRes] = await Promise.all([
+      const [blkRes, bkgRes, timeOffRes] = await Promise.all([
         publicClient
           .from("schedule_blocks")
           .select("*")
@@ -4591,11 +4901,21 @@
           .eq("profile_id", b.profile_id)
           .eq("status", "confirmed")
           .lt("start_time", endIso)
-          .gt("end_time", startIso)
+          .gt("end_time", startIso),
+        publicClient.rpc("public_get_time_off", {
+          p_profile_id: b.profile_id,
+          p_range_start: startIso,
+          p_range_end: endIso
+        })
       ]);
 
       if (blkRes.error) {
         $("manageSlotsMessage").textContent = friendlyDbError(blkRes.error, "load availability");
+        return;
+      }
+
+      if (timeOffRes.error) {
+        $("manageSlotsMessage").textContent = "We couldn't check business time off just now. Please try again.";
         return;
       }
 
@@ -4604,6 +4924,7 @@
         bkgRes.data || [],
         Number(b.duration_minutes || 0)
       );
+      slots = filterSlotsAgainstTimeOff(slots, timeOffRes.data || []);
 
       const googleFiltered = await filterSlotsAgainstGoogleCalendar(b.profile_id, b.service_id, slots);
       if (googleFiltered.error) {
@@ -4669,6 +4990,10 @@
           closeManageReschedule();
           await loadManagedBooking(state.manageToken);
           return;
+        }
+        if (rawMessage.includes("time off")) {
+          toast("That time has just become unavailable. Please choose another appointment time.", "error");
+          return await loadManageAvailableSlots();
         }
         return toast(friendlyDbError(error, "reschedule this booking"), "error");
       }
@@ -4886,9 +5211,14 @@
       const startIso = londonDate(state.selectedDate, "00:00").toISOString();
       const endIso = new Date(londonDate(state.selectedDate, "00:00").getTime() + 93600000).toISOString();
 
-      const [blkRes, bkgRes] = await Promise.all([
+      const [blkRes, bkgRes, timeOffRes] = await Promise.all([
         publicClient.from("schedule_blocks").select("*").eq("profile_id", state.publicProfile.id).eq("service_id", state.selectedService.id).eq("block_date", state.selectedDate).eq("is_active", true).order("start_time"),
-        publicClient.from("bookings").select("start_time, end_time, status").eq("profile_id", state.publicProfile.id).eq("status", "confirmed").lt("start_time", endIso).gt("end_time", startIso)
+        publicClient.from("bookings").select("start_time, end_time, status").eq("profile_id", state.publicProfile.id).eq("status", "confirmed").lt("start_time", endIso).gt("end_time", startIso),
+        publicClient.rpc("public_get_time_off", {
+          p_profile_id: state.publicProfile.id,
+          p_range_start: startIso,
+          p_range_end: endIso
+        })
       ]);
 
       if (blkRes.error) {
@@ -4896,7 +5226,14 @@
       }
 
       state.publicBookingsReadable = !bkgRes.error;
+      if (timeOffRes.error) {
+        $("publicSlots").innerHTML = "";
+        $("slotsMessage").textContent = "We couldn't check business time off just now. Please try again.";
+        return;
+      }
+
       let slots = buildSlots(blkRes.data || [], bkgRes.data || [], Number(state.selectedService.duration_minutes));
+      slots = filterSlotsAgainstTimeOff(slots, timeOffRes.data || []);
       const googleFiltered = await filterSlotsAgainstGoogleCalendar(state.publicProfile.id, state.selectedService.id, slots);
 
       if (googleFiltered.error) {
@@ -5121,6 +5458,13 @@
           state.selectedSlot = null;
           updateSummary();
           toast("That appointment time has just been taken. Please choose another available time.", "error");
+          return await loadAvailableSlots();
+        }
+
+        if (String(error?.message || "").toLowerCase().includes("time off")) {
+          state.selectedSlot = null;
+          updateSummary();
+          toast("That time has just become unavailable. Please choose another appointment time.", "error");
           return await loadAvailableSlots();
         }
 
