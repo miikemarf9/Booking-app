@@ -2552,18 +2552,30 @@
         const bookingPreview = bookings.slice(0, 2).map(b => {
           const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
           return `
-            <div class="truncate rounded-lg bg-brand-50 px-2 py-1 text-[.68rem] font-semibold text-brand-700">
-              ${escapeHtml(prettyTime(new Date(b.start_time)))} · ${escapeHtml(srv.title || b.customer_name || "Booking")}
+            <div class="truncate rounded-lg border border-brand-200 bg-brand-100 px-2 py-1.5 text-[.68rem] font-bold text-brand-800 shadow-sm">
+              ${escapeHtml(prettyTime(new Date(b.start_time)))} · ${escapeHtml(b.customer_name || srv.title || "Booking")}
             </div>
           `;
         }).join("");
 
         const moreBookings = bookings.length > 2
-          ? `<div class="px-1 text-[.66rem] font-semibold text-brand-600">+${bookings.length - 2} more</div>`
+          ? `<div class="px-1 text-[.66rem] font-bold text-brand-700">+${bookings.length - 2} more booking${bookings.length - 2 === 1 ? "" : "s"}</div>`
           : "";
 
         const availability = blocks.length
-          ? `<div class="truncate rounded-lg bg-emerald-50 px-2 py-1 text-[.68rem] font-semibold text-emerald-700">${blocks.length} availability block${blocks.length === 1 ? "" : "s"}</div>`
+          ? (() => {
+              const first = blocks[0];
+              const last = blocks[blocks.length - 1];
+              const range = blocks.length === 1
+                ? `${cleanTime(first.start_time)}–${cleanTime(first.end_time)}`
+                : `${cleanTime(first.start_time)}–${cleanTime(last.end_time)}`;
+              return `
+                <div class="flex items-center gap-1.5 px-1 pt-1 text-[.66rem] font-semibold text-emerald-700">
+                  <span class="h-2 w-2 shrink-0 rounded-full bg-emerald-500"></span>
+                  <span class="truncate">${range}</span>
+                </div>
+              `;
+            })()
           : "";
 
         cells.push(`
