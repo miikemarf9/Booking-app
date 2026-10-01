@@ -4307,12 +4307,12 @@
 
     function activateDetails() {
       activateStep("detailsStep");
-      ["customerName", "customerEmail", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = false);
+      ["customerName", "customerEmail", "customerPhone", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = false);
     }
 
     function deactivateDetails() {
       deactivateStep("detailsStep");
-      ["customerName", "customerEmail", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = true);
+      ["customerName", "customerEmail", "customerPhone", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = true);
     }
 
     function updateSummary() {
