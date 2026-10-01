@@ -841,11 +841,83 @@
             </div>
           </button>
 
-          <div class="card border-dashed p-5">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Coming next</p>
-            <h3 class="mt-1 text-lg font-bold text-ink">Booking questions</h3>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Custom questions for each service will live here, without adding another top-level dashboard tab.</p>
-          </div>
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="booking-questions">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer form</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Booking questions</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Ask service-specific questions and choose which answers are required.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Booking Questions Tab -->
+      <section id="tab-booking-questions" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+
+        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 9</p>
+            <h2 id="bookingQuestionFormHeading" class="mt-1 text-xl font-bold text-ink">Add a booking question</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Questions are attached to a service and appear after the customer chooses an appointment time.</p>
+
+            <form id="bookingQuestionForm" class="mt-6 space-y-4">
+              <input id="bookingQuestionEditId" type="hidden">
+
+              <div>
+                <label class="label" for="bookingQuestionService">Service</label>
+                <select id="bookingQuestionService" class="field" required></select>
+              </div>
+
+              <div>
+                <label class="label" for="bookingQuestionLabel">Question</label>
+                <input id="bookingQuestionLabel" class="field" type="text" maxlength="300" required placeholder="e.g. Is there anything we should know before your appointment?">
+              </div>
+
+              <div>
+                <label class="label" for="bookingQuestionType">Answer type</label>
+                <select id="bookingQuestionType" class="field">
+                  <option value="short_text">Short answer</option>
+                  <option value="long_text">Long answer</option>
+                  <option value="select">Dropdown choices</option>
+                  <option value="yes_no">Yes / No</option>
+                </select>
+              </div>
+
+              <div id="bookingQuestionOptionsWrap" class="hidden">
+                <label class="label" for="bookingQuestionOptions">Dropdown choices</label>
+                <textarea id="bookingQuestionOptions" class="field min-h-28 resize-y" maxlength="2000" placeholder="One option per line"></textarea>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Enter one choice per line. Up to 20 choices.</p>
+              </div>
+
+              <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
+                <input id="bookingQuestionRequired" class="mt-1 h-5 w-5 accent-slate-900" type="checkbox">
+                <span>
+                  <span class="block font-bold text-ink">Required answer</span>
+                  <span class="mt-1 block text-sm leading-5 text-slate-500">The customer must answer this before they can book.</span>
+                </span>
+              </label>
+
+              <div class="flex flex-wrap gap-2">
+                <button id="bookingQuestionSubmitBtn" class="btn btn-primary" type="submit">Add question</button>
+                <button id="bookingQuestionCancelBtn" class="btn btn-light hidden" type="button">Cancel edit</button>
+              </div>
+            </form>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer form</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Your booking questions</h2>
+              </div>
+              <span id="bookingQuestionCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 questions</span>
+            </div>
+            <div id="bookingQuestionsList" class="mt-5 space-y-3"></div>
+          </article>
         </div>
       </section>
 
@@ -1230,6 +1302,10 @@
                 <label class="label" for="customerPhone">Phone number</label>
                 <input id="customerPhone" class="field" type="tel" required maxlength="40" autocomplete="tel" inputmode="tel" placeholder="e.g. 07123 456789" disabled>
               </div>
+              <div id="customQuestionsWrap" class="sm:col-span-2 hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">A few more details</p>
+                <div id="customQuestions" class="mt-4 space-y-4"></div>
+              </div>
               <label class="sm:col-span-2 flex items-start gap-2.5 text-xs leading-5 text-slate-500">
                 <input id="bookingConsent" class="mt-1 rounded border-slate-300 text-brand-600" type="checkbox" required disabled>
                 <span>I confirm these appointment details are correct and agree that the business may contact me about this booking.</span>
@@ -1406,9 +1482,11 @@
       services: [],
       blocks: [],
       bookings: [],
+      questions: [],
       bookingsError: null,
       publicProfile: null,
       publicServices: [],
+      publicQuestions: [],
       selectedService: null,
       selectedDate: "",
       selectedSlot: null,
@@ -1948,6 +2026,7 @@
       $("manageDateInput").min = todayKey();
       renderPromoExcludedDates();
       syncPromoFields();
+      syncBookingQuestionFields();
       updateFreePlanFeePreview();
       bindEvents();
 
@@ -2034,6 +2113,10 @@
       $("bookingsList").addEventListener("click", handleBookingListClick);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
       $("bookingRulesForm").addEventListener("submit", saveBookingRules);
+      $("bookingQuestionForm").addEventListener("submit", saveBookingQuestion);
+      $("bookingQuestionCancelBtn").addEventListener("click", resetBookingQuestionForm);
+      $("bookingQuestionType").addEventListener("change", syncBookingQuestionFields);
+      $("bookingQuestionsList").addEventListener("click", handleBookingQuestionListClick);
       $("reminderSettingsForm").addEventListener("submit", saveReminderSettings);
       $("followupEnabled").addEventListener("change", syncReminderFields);
       $("connectGoogleCalendarBtn").addEventListener("click", connectGoogleCalendar);
@@ -2294,22 +2377,25 @@
 
     async function loadDashboardData() {
       const pId = state.profile.id;
-      const [srvRes, blkRes, bkgRes, subRes, planRes] = await Promise.all([
+      const [srvRes, blkRes, bkgRes, qRes, subRes, planRes] = await Promise.all([
         supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),
         supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),
-        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", pId).order("start_time", { ascending: true }),
+        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", pId).order("start_time", { ascending: true }),
+        supabaseClient.from("booking_questions").select("*").eq("profile_id", pId).order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
         supabaseClient.from("business_subscriptions").select("*").eq("profile_id", pId).maybeSingle(),
         supabaseClient.from("subscription_plans").select("*").eq("is_active", true)
       ]);
 
       if (srvRes.error) throw srvRes.error;
       if (blkRes.error) throw blkRes.error;
+      if (qRes.error) throw qRes.error;
       if (subRes.error) throw subRes.error;
       if (planRes.error) throw planRes.error;
 
       state.services = srvRes.data || [];
       state.blocks = blkRes.data || [];
       state.bookings = bkgRes.data || [];
+      state.questions = qRes.data || [];
       state.bookingsError = bkgRes.error || null;
       state.subscription = subRes.data || { plan_code: "free", status: "active" };
       state.plan = (planRes.data || []).find(p => p.code === state.subscription.plan_code)
@@ -2324,6 +2410,7 @@
       syncPaymentFields();
       renderServices();
       renderAvailabilityServiceOptions();
+      renderBookingQuestions();
       renderBlocks();
       renderBookings();
       renderOverviewBookings();
@@ -2398,6 +2485,193 @@
       toast("Reminder settings saved.");
     }
 
+
+
+    function syncBookingQuestionFields() {
+      const isSelect = $("bookingQuestionType")?.value === "select";
+      $("bookingQuestionOptionsWrap")?.classList.toggle("hidden", !isSelect);
+      if ($("bookingQuestionOptions")) $("bookingQuestionOptions").required = isSelect;
+    }
+
+    function renderBookingQuestionServiceOptions() {
+      const select = $("bookingQuestionService");
+      if (!select) return;
+
+      const current = select.value;
+      select.innerHTML = state.services.length
+        ? state.services.map(s => `<option value="${s.id}">${escapeHtml(s.title)}</option>`).join("")
+        : '<option value="">Add a service first</option>';
+      select.disabled = !state.services.length;
+
+      if (state.services.some(s => s.id === current)) select.value = current;
+    }
+
+    function questionTypeLabel(type) {
+      if (type === "long_text") return "Long answer";
+      if (type === "select") return "Dropdown";
+      if (type === "yes_no") return "Yes / No";
+      return "Short answer";
+    }
+
+    function renderBookingQuestions() {
+      renderBookingQuestionServiceOptions();
+      if (!$("bookingQuestionsList")) return;
+
+      const questions = [...state.questions].sort((a, b) =>
+        Number(a.sort_order || 0) - Number(b.sort_order || 0) ||
+        new Date(a.created_at) - new Date(b.created_at)
+      );
+
+      $("bookingQuestionCount").textContent = `${questions.length} question${questions.length === 1 ? "" : "s"}`;
+
+      $("bookingQuestionsList").innerHTML = questions.length
+        ? questions.map(q => {
+            const service = state.services.find(s => s.id === q.service_id);
+            const options = Array.isArray(q.options) ? q.options : [];
+            return `
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="rounded-full bg-brand-50 px-2.5 py-1 text-[.68rem] font-bold text-brand-700">${escapeHtml(service?.title || "Service")}</span>
+                      <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500">${escapeHtml(questionTypeLabel(q.question_type))}</span>
+                      ${q.is_required ? '<span class="rounded-full bg-amber-50 px-2.5 py-1 text-[.68rem] font-bold text-amber-700">Required</span>' : ""}
+                    </div>
+                    <h3 class="mt-2 font-bold text-ink">${escapeHtml(q.label)}</h3>
+                    ${q.question_type === "select" && options.length
+                      ? `<p class="mt-1 text-xs text-slate-500">${options.map(escapeHtml).join(" · ")}</p>`
+                      : ""}
+                  </div>
+                  <div class="flex shrink-0 gap-2">
+                    <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-question-action="edit" data-id="${q.id}">Edit</button>
+                    <button class="btn !px-3 !py-2 text-sm bg-red-50 text-red-700 hover:bg-red-100" type="button" data-question-action="delete" data-id="${q.id}">Delete</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : emptyState("No booking questions yet", state.services.length
+            ? "Add a question for one of your services."
+            : "Add a service first, then you can create booking questions.");
+    }
+
+    function resetBookingQuestionForm() {
+      $("bookingQuestionForm").reset();
+      $("bookingQuestionEditId").value = "";
+      $("bookingQuestionFormHeading").textContent = "Add a booking question";
+      $("bookingQuestionSubmitBtn").textContent = "Add question";
+      $("bookingQuestionCancelBtn").classList.add("hidden");
+      renderBookingQuestionServiceOptions();
+      syncBookingQuestionFields();
+    }
+
+    async function saveBookingQuestion(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const editId = $("bookingQuestionEditId").value;
+      const serviceId = $("bookingQuestionService").value;
+      const label = $("bookingQuestionLabel").value.trim();
+      const type = $("bookingQuestionType").value;
+      const required = $("bookingQuestionRequired").checked;
+
+      if (!serviceId || !state.services.some(s => s.id === serviceId)) {
+        return toast("Choose a service first.", "error");
+      }
+      if (!label) return toast("Enter the question you want to ask.", "error");
+
+      let options = [];
+      if (type === "select") {
+        options = $("bookingQuestionOptions").value
+          .split("\n")
+          .map(v => v.trim())
+          .filter(Boolean);
+        options = [...new Set(options)];
+        if (options.length < 2) return toast("Add at least two dropdown choices.", "error");
+        if (options.length > 20) return toast("Please use no more than 20 dropdown choices.", "error");
+      }
+
+      const existing = editId ? state.questions.find(q => q.id === editId) : null;
+      const serviceQuestions = state.questions.filter(q => q.service_id === serviceId && q.id !== editId);
+      const payload = {
+        profile_id: state.profile.id,
+        service_id: serviceId,
+        label,
+        question_type: type,
+        is_required: required,
+        options,
+        is_active: true,
+        sort_order: existing?.sort_order ?? serviceQuestions.length
+      };
+
+      const btn = $("bookingQuestionSubmitBtn");
+      setBusy(btn, true, editId ? "Saving…" : "Adding…");
+
+      const query = editId
+        ? supabaseClient.from("booking_questions").update(payload).eq("id", editId).eq("profile_id", state.profile.id)
+        : supabaseClient.from("booking_questions").insert(payload);
+
+      const { error } = await query;
+      setBusy(btn, false);
+
+      if (error) return toast(friendlyDbError(error, "save this booking question"), "error");
+
+      toast(editId ? "Booking question updated." : "Booking question added.");
+      resetBookingQuestionForm();
+      await refreshBookingQuestions();
+    }
+
+    async function refreshBookingQuestions() {
+      const { data, error } = await supabaseClient
+        .from("booking_questions")
+        .select("*")
+        .eq("profile_id", state.profile.id)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true });
+
+      if (error) return toast(friendlyDbError(error, "refresh booking questions"), "error");
+      state.questions = data || [];
+      renderBookingQuestions();
+    }
+
+    async function handleBookingQuestionListClick(e) {
+      const btn = e.target.closest("[data-question-action]");
+      if (!btn) return;
+
+      const question = state.questions.find(q => q.id === btn.dataset.id);
+      if (!question) return;
+
+      if (btn.dataset.questionAction === "edit") {
+        $("bookingQuestionEditId").value = question.id;
+        $("bookingQuestionService").value = question.service_id;
+        $("bookingQuestionLabel").value = question.label;
+        $("bookingQuestionType").value = question.question_type;
+        $("bookingQuestionRequired").checked = Boolean(question.is_required);
+        $("bookingQuestionOptions").value = Array.isArray(question.options) ? question.options.join("\n") : "";
+        $("bookingQuestionFormHeading").textContent = "Edit booking question";
+        $("bookingQuestionSubmitBtn").textContent = "Save question";
+        $("bookingQuestionCancelBtn").classList.remove("hidden");
+        syncBookingQuestionFields();
+        $("bookingQuestionForm").scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      if (btn.dataset.questionAction === "delete") {
+        if (!window.confirm(`Delete “${question.label}”? Existing booking answers will be kept in past bookings.`)) return;
+
+        const { error } = await supabaseClient
+          .from("booking_questions")
+          .delete()
+          .eq("id", question.id)
+          .eq("profile_id", state.profile.id);
+
+        if (error) return toast(friendlyDbError(error, "delete this booking question"), "error");
+
+        toast("Booking question deleted.");
+        if ($("bookingQuestionEditId").value === question.id) resetBookingQuestionForm();
+        await refreshBookingQuestions();
+      }
+    }
 
     function bookingRuleSummaryText() {
       const minHours = Number(state.profile?.minimum_notice_hours || 0);
@@ -3402,7 +3676,7 @@
     }
 
     function switchTab(tabId) {
-      const settingsChildren = new Set(["availability", "booking-rules", "business-details", "reminders", "payments"]);
+      const settingsChildren = new Set(["availability", "booking-rules", "booking-questions", "business-details", "reminders", "payments"]);
       const primaryTab = settingsChildren.has(tabId) ? "settings" : tabId;
 
       document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === primaryTab));
@@ -4090,7 +4364,20 @@
               <span class="text-xs font-semibold text-brand-600">${escapeHtml(srv.title || "Service")}</span>
               ${cancelled ? '<span class="rounded-full bg-slate-200 px-2 py-0.5 text-[.68rem] font-bold text-slate-600">Cancelled</span>' : ""}
             </div>
-            <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}${b.booked_price != null ? ` · <strong class="text-slate-700">${money(b.booked_price)}</strong>` : ""}</p>
+            <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}${b.customer_phone ? ` · ${escapeHtml(b.customer_phone)}` : ""}${b.booked_price != null ? ` · <strong class="text-slate-700">${money(b.booked_price)}</strong>` : ""}</p>
+            ${Array.isArray(b.booking_answers) && b.booking_answers.length ? `
+              <details class="mt-3">
+                <summary class="cursor-pointer text-xs font-bold text-brand-600">Booking answers (${b.booking_answers.length})</summary>
+                <div class="mt-2 space-y-2 rounded-xl bg-slate-50 p-3">
+                  ${[...b.booking_answers].sort((a, z) => Number(a.sort_order || 0) - Number(z.sort_order || 0)).map(a => `
+                    <div>
+                      <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">${escapeHtml(a.question_label)}</p>
+                      <p class="mt-0.5 text-sm text-slate-700">${escapeHtml(a.answer_text)}</p>
+                    </div>
+                  `).join("")}
+                </div>
+              </details>
+            ` : ""}
           </div>
           ${allowCancel && !cancelled ? `<button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-booking-action="delete" data-id="${b.id}">Cancel booking</button>` : ""}
         </div>
@@ -4125,7 +4412,7 @@
     }
 
     async function refreshBookings() {
-      const res = await supabaseClient.from("bookings").select("*, services(title, duration_minutes, price)").eq("profile_id", state.profile.id).order("start_time");
+      const res = await supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", state.profile.id).order("start_time");
       state.bookings = res.data || [];
       state.bookingsError = res.error || null;
       renderBookings();
@@ -4423,11 +4710,16 @@
         if (pErr) throw pErr;
         if (!prof) throw new Error("This booking page is not available. The business may still be awaiting approval.");
 
-        const { data: srvs, error: sErr } = await publicClient.from("services").select("*").eq("profile_id", profileId).order("created_at");
+        const [{ data: srvs, error: sErr }, { data: questions, error: qErr }] = await Promise.all([
+          publicClient.from("services").select("*").eq("profile_id", profileId).order("created_at"),
+          publicClient.from("booking_questions").select("*").eq("profile_id", profileId).eq("is_active", true).order("sort_order").order("created_at")
+        ]);
         if (sErr) throw sErr;
+        if (qErr) throw qErr;
 
         state.publicProfile = prof;
         state.publicServices = srvs || [];
+        state.publicQuestions = questions || [];
 
         $("publicBusinessName").textContent = prof.business_name;
         document.title = `Book with ${prof.business_name}`;
@@ -4470,6 +4762,77 @@
       `).join("") : emptyState("No services available", "This business has not published any bookable services yet.");
     }
 
+
+    function selectedPublicQuestions() {
+      if (!state.selectedService) return [];
+      return state.publicQuestions
+        .filter(q => q.service_id === state.selectedService.id && q.is_active !== false)
+        .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0) || new Date(a.created_at) - new Date(b.created_at));
+    }
+
+    function renderPublicQuestions() {
+      const wrap = $("customQuestionsWrap");
+      const container = $("customQuestions");
+      if (!wrap || !container) return;
+
+      const questions = selectedPublicQuestions();
+      wrap.classList.toggle("hidden", !questions.length);
+
+      container.innerHTML = questions.map(q => {
+        const requiredMark = q.is_required ? ' <span class="text-red-500">*</span>' : "";
+        const common = `class="field custom-question-input" data-booking-question-id="${q.id}" ${q.is_required ? "required" : ""} maxlength="4000" disabled`;
+
+        if (q.question_type === "long_text") {
+          return `
+            <div>
+              <label class="label" for="question-${q.id}">${escapeHtml(q.label)}${requiredMark}</label>
+              <textarea id="question-${q.id}" ${common} rows="4" placeholder="Type your answer"></textarea>
+            </div>
+          `;
+        }
+
+        if (q.question_type === "select") {
+          const options = Array.isArray(q.options) ? q.options : [];
+          return `
+            <div>
+              <label class="label" for="question-${q.id}">${escapeHtml(q.label)}${requiredMark}</label>
+              <select id="question-${q.id}" class="field custom-question-input" data-booking-question-id="${q.id}" ${q.is_required ? "required" : ""} disabled>
+                <option value="">Choose an option</option>
+                ${options.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join("")}
+              </select>
+            </div>
+          `;
+        }
+
+        if (q.question_type === "yes_no") {
+          return `
+            <div>
+              <label class="label" for="question-${q.id}">${escapeHtml(q.label)}${requiredMark}</label>
+              <select id="question-${q.id}" class="field custom-question-input" data-booking-question-id="${q.id}" ${q.is_required ? "required" : ""} disabled>
+                <option value="">Choose an answer</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          `;
+        }
+
+        return `
+          <div>
+            <label class="label" for="question-${q.id}">${escapeHtml(q.label)}${requiredMark}</label>
+            <input id="question-${q.id}" type="text" ${common} placeholder="Type your answer">
+          </div>
+        `;
+      }).join("");
+    }
+
+    function publicQuestionAnswers() {
+      return [...document.querySelectorAll(".custom-question-input")].map(input => ({
+        question_id: input.dataset.bookingQuestionId,
+        answer: String(input.value || "").trim()
+      }));
+    }
+
     function handlePublicServiceClick(e) {
       const btn = e.target.closest("[data-service-id]");
       if (!btn) return;
@@ -4477,6 +4840,7 @@
       state.selectedService = state.publicServices.find(s => s.id === btn.dataset.serviceId) || null;
       state.selectedDate = "";
       state.selectedSlot = null;
+      renderPublicQuestions();
 
       document.querySelectorAll(".service-choice").forEach(el => el.classList.toggle("selected", el.dataset.serviceId === btn.dataset.serviceId));
 
@@ -4664,11 +5028,13 @@
     function activateDetails() {
       activateStep("detailsStep");
       ["customerName", "customerEmail", "customerPhone", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = false);
+      document.querySelectorAll(".custom-question-input").forEach(el => el.disabled = false);
     }
 
     function deactivateDetails() {
       deactivateStep("detailsStep");
       ["customerName", "customerEmail", "customerPhone", "bookingConsent", "confirmBookingBtn"].forEach(id => $(id).disabled = true);
+      document.querySelectorAll(".custom-question-input").forEach(el => el.disabled = true);
     }
 
     function updateSummary() {
@@ -4741,7 +5107,8 @@
         p_customer_name: $("customerName").value.trim(),
         p_customer_email: $("customerEmail").value.trim().toLowerCase(),
         p_customer_phone: $("customerPhone").value.trim(),
-        p_start_time: state.selectedSlot.start.toISOString()
+        p_start_time: state.selectedSlot.start.toISOString(),
+        p_answers: publicQuestionAnswers()
       });
       setBusy(submitBtn, false);
 
@@ -4823,6 +5190,9 @@
       state.selectedSlot = null;
 
       $("customerBookingForm").reset();
+      state.publicQuestions = state.publicQuestions || [];
+      $("customQuestions").innerHTML = "";
+      $("customQuestionsWrap").classList.add("hidden");
       $("publicDate").value = "";
       $("publicDate").disabled = true;
 
