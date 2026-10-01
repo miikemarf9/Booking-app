@@ -316,6 +316,7 @@
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Business details</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="reminders" type="button">Reminders</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="payments" type="button">Payments</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="calendar" type="button">Calendar</button>
         </nav>
       </div>
@@ -764,6 +765,52 @@
             </div>
             <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-500">
               This reminder engine is structured so SMS and WhatsApp can be added later without changing the booking model.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Payments Tab -->
+      <section id="tab-payments" class="dashboard-tab hidden">
+        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Online payments</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Stripe payments</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Connect Stripe so customers can pay securely when they book. Customers pay exactly the price you set; MoreLeads deducts the platform fee from your proceeds.</p>
+
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Payment status</p>
+                  <p id="stripeStatusText" class="mt-1 font-bold text-ink">Not connected</p>
+                </div>
+                <span id="stripeStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Not connected</span>
+              </div>
+              <p id="stripeStatusHelp" class="mt-3 text-xs leading-5 text-slate-500">Connect your Stripe account before customers can complete paid bookings.</p>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-2">
+              <button id="connectStripeBtn" class="btn btn-primary" type="button">Connect Stripe</button>
+              <button id="refreshStripeBtn" class="btn btn-light" type="button">Check connection</button>
+            </div>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">How money moves</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Simple for the customer</h2>
+            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Customer pays your advertised price</strong>
+                <span>No MoreLeads surcharge is added at checkout.</span>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Stripe processes the payment</strong>
+                <span>Stripe's processing fee is handled against the connected business account.</span>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">MoreLeads keeps its platform fee</strong>
+                <span>On Free, the current platform fee is 3% of the booked value.</span>
+              </div>
             </div>
           </article>
         </div>
@@ -1564,11 +1611,44 @@
       </div>`;
     }
 
+    async function handlePaymentReturn(paymentState, manageToken, sessionId = "") {
+      state.manageToken = manageToken;
+
+      if (paymentState === "cancelled") {
+        try {
+          await publicClient.rpc("public_cancel_booking", { p_manage_token: manageToken });
+        } catch (_) {}
+        await loadManagedBooking(manageToken);
+        toast("Payment was cancelled. The appointment has been released.", "info");
+        return;
+      }
+
+      if (paymentState === "success") {
+        showOnly("loadingView");
+        try {
+          const { data, error } = await publicClient.functions.invoke("confirm-stripe-checkout", {
+            body: { manage_token: manageToken, session_id: sessionId }
+          });
+          if (error) throw error;
+          if (data?.error) throw new Error(data.error);
+
+          await loadManagedBooking(manageToken);
+          toast("Payment received. Your booking is confirmed.", "success");
+        } catch (err) {
+          await loadManagedBooking(manageToken);
+          toast("Your payment was submitted. If confirmation is still processing, your email will follow shortly.", "info");
+        }
+      }
+    }
+
     async function init() {
       const params = new URLSearchParams(window.location.search);
       const manageToken = params.get("manage");
       const manageAction = params.get("action") || "";
       const businessId = params.get("business");
+      const paymentState = params.get("payment") || "";
+      const sessionId = params.get("session_id") || "";
+      const stripeReturn = params.get("stripe") || "";
 
       $("blkDate").min = todayKey();
       $("blkRepeatUntil").min = todayKey();
@@ -1578,6 +1658,10 @@
       syncPromoFields();
       updateFreePlanFeePreview();
       bindEvents();
+
+      if (paymentState && manageToken) {
+        return await handlePaymentReturn(paymentState, manageToken, sessionId);
+      }
 
       if (manageToken) {
         state.manageToken = manageToken;
@@ -1591,6 +1675,10 @@
       const { data, error } = await supabaseClient.auth.getUser();
       if (!error && data?.user) {
         await loadOwner(data.user);
+        if (stripeReturn) {
+          switchTab("payments");
+          await refreshStripePayments(false);
+        }
       } else {
         showOnly("authView");
       }
@@ -1655,6 +1743,8 @@
       $("followupEnabled").addEventListener("change", syncReminderFields);
       $("connectGoogleCalendarBtn").addEventListener("click", connectGoogleCalendar);
       $("refreshGoogleCalendarBtn").addEventListener("click", () => refreshGoogleCalendarConnection(true));
+      $("connectStripeBtn").addEventListener("click", connectStripePayments);
+      $("refreshStripeBtn").addEventListener("click", () => refreshStripePayments(true));
 
       $("publicServices").addEventListener("click", handlePublicServiceClick);
       $("publicDate").addEventListener("change", handlePublicDateChange);
@@ -1866,6 +1956,7 @@
         populateBusinessDetails();
         populateReminderSettings();
         populateCalendarSettings();
+        populateStripePayments();
 
         await loadDashboardData();
         showOnly("dashboardView");
@@ -2018,6 +2109,109 @@
       state.profile = data;
       populateBusinessDetails();
       toast("Business details saved.");
+    }
+
+    function populateStripePayments() {
+      if (!state.profile) return;
+
+      const linked = Boolean(state.profile.stripe_connect_id);
+      const badge = $("stripeStatusBadge");
+      const text = $("stripeStatusText");
+      const help = $("stripeStatusHelp");
+      const connectBtn = $("connectStripeBtn");
+
+      if (linked) {
+        badge.textContent = "Linked";
+        badge.className = "rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700";
+        text.textContent = "Stripe account linked";
+        help.textContent = "Click Check connection to confirm Stripe has enabled this business for live payments.";
+        connectBtn.textContent = "Continue Stripe setup";
+      } else {
+        badge.textContent = "Not connected";
+        badge.className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
+        text.textContent = "Not connected";
+        help.textContent = "Connect Stripe before customers can complete paid bookings.";
+        connectBtn.textContent = "Connect Stripe";
+      }
+    }
+
+    async function refreshStripePayments(showMessage = false) {
+      const btn = $("refreshStripeBtn");
+      if (showMessage) setBusy(btn, true, "Checking…");
+
+      try {
+        const { data, error } = await supabaseClient.functions.invoke("stripe-connect", {
+          body: { action: "status" }
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+
+        const ready = Boolean(data?.connected && data?.charges_enabled);
+        const badge = $("stripeStatusBadge");
+        const text = $("stripeStatusText");
+        const help = $("stripeStatusHelp");
+        const connectBtn = $("connectStripeBtn");
+
+        if (ready) {
+          badge.textContent = "Ready";
+          badge.className = "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700";
+          text.textContent = "Ready to take payments";
+          help.textContent = "Customers can now be sent to secure Stripe Checkout when payment is required.";
+          connectBtn.textContent = "Manage Stripe setup";
+        } else if (data?.connected) {
+          badge.textContent = "Setup required";
+          badge.className = "rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700";
+          text.textContent = "Finish Stripe setup";
+          help.textContent = "Stripe is linked, but live card payments are not enabled yet.";
+          connectBtn.textContent = "Continue Stripe setup";
+        } else {
+          populateStripePayments();
+        }
+
+        if (showMessage) {
+          toast(ready ? "Stripe is ready to take payments." : "Stripe setup still needs to be completed.", ready ? "success" : "info");
+        }
+        return ready;
+      } catch (err) {
+        if (showMessage) toast(err?.message || "Could not check Stripe.", "error");
+        return false;
+      } finally {
+        if (showMessage) setBusy(btn, false);
+      }
+    }
+
+    async function connectStripePayments() {
+      if (!state.user || !state.profile) {
+        return toast("Log in again before connecting Stripe.", "error");
+      }
+
+      const btn = $("connectStripeBtn");
+      setBusy(btn, true, "Opening Stripe…");
+
+      try {
+        const base = currentAppBaseUrl();
+        const returnUrl = new URL(base);
+        returnUrl.searchParams.set("stripe", "return");
+        const refreshUrl = new URL(base);
+        refreshUrl.searchParams.set("stripe", "refresh");
+
+        const { data, error } = await supabaseClient.functions.invoke("stripe-connect", {
+          body: {
+            action: "onboard",
+            return_url: returnUrl.toString(),
+            refresh_url: refreshUrl.toString()
+          }
+        });
+
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        if (!data?.url) throw new Error("Stripe did not return an onboarding link.");
+
+        window.location.assign(data.url);
+      } catch (err) {
+        setBusy(btn, false);
+        toast(err?.message || "Could not start Stripe setup.", "error");
+      }
     }
 
     function populateCalendarSettings() {
@@ -3207,6 +3401,9 @@
 
       $("publicDate").disabled = false;
       $("publicDate").value = "";
+      $("confirmBookingBtn").textContent = state.selectedService?.deposit_type === "none"
+        ? "Confirm booking"
+        : "Continue to secure payment";
 
       activateStep("dateStep");
       deactivateStep("timeStep");
@@ -3481,24 +3678,52 @@
       const summaryText = `${state.selectedService.title} with ${state.publicProfile.business_name} on ${prettyDateTime(created.start_time || state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
       $("successSummary").textContent = summaryText;
 
-      $("successRescheduleLink").href = buildManageUrl(created.manage_token, "reschedule");
-      $("successCancelLink").href = buildManageUrl(created.manage_token, "cancel");
-      $("successManageActions").classList.remove("hidden");
-      $("successManageNote").classList.remove("hidden");
-      $("successEmailStatus").textContent = "Sending confirmation email…";
+      setBusy(submitBtn, true, "Opening secure payment…");
 
-      const emailResult = await sendBookingConfirmationEmail(created.manage_token);
-      $("successEmailStatus").textContent = emailResult.ok
-        ? "A confirmation email has been sent to you. The business has also been notified."
-        : "Your booking is confirmed, but the confirmation email could not be sent. Please keep the private manage-booking links above.";
+      try {
+        const { data: checkout, error: checkoutError } = await publicClient.functions.invoke("create-stripe-checkout", {
+          body: {
+            manage_token: created.manage_token,
+            app_url: currentAppBaseUrl()
+          }
+        });
 
-      // Step 5B: create the matching Google Calendar event for the business.
-      // Calendar sync failure must never undo a successful customer booking.
-      await syncBookingToGoogle(created.manage_token);
+        if (checkoutError) throw checkoutError;
+        if (checkout?.error) throw new Error(checkout.error);
 
-      ["dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
-      $("bookingSuccess").classList.remove("hidden");
-      $("bookingSuccess").scrollIntoView({ behavior: "smooth", block: "center" });
+        if (checkout?.checkout_url) {
+          window.location.assign(checkout.checkout_url);
+          return;
+        }
+
+        $("successRescheduleLink").href = buildManageUrl(created.manage_token, "reschedule");
+        $("successCancelLink").href = buildManageUrl(created.manage_token, "cancel");
+        $("successManageActions").classList.remove("hidden");
+        $("successManageNote").classList.remove("hidden");
+        $("successEmailStatus").textContent = "Sending confirmation email…";
+
+        const emailResult = await sendBookingConfirmationEmail(created.manage_token);
+        $("successEmailStatus").textContent = emailResult.ok
+          ? "A confirmation email has been sent to you. The business has also been notified."
+          : "Your booking is confirmed, but the confirmation email could not be sent. Please keep the private manage-booking links above.";
+
+        await syncBookingToGoogle(created.manage_token);
+
+        ["dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
+        $("bookingSuccess").classList.remove("hidden");
+        $("bookingSuccess").scrollIntoView({ behavior: "smooth", block: "center" });
+      } catch (err) {
+        try {
+          await publicClient.rpc("public_cancel_booking", { p_manage_token: created.manage_token });
+        } catch (_) {}
+
+        toast(
+          err?.message || "Secure payment could not be opened. The appointment has not been kept.",
+          "error"
+        );
+      } finally {
+        setBusy(submitBtn, false);
+      }
     }
 
     function resetPublicJourney() {
