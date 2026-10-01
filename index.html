@@ -1041,6 +1041,10 @@
                 <label class="label" for="customerEmail">Email address</label>
                 <input id="customerEmail" class="field" type="email" required maxlength="200" autocomplete="email" placeholder="you@example.com" disabled>
               </div>
+              <div class="sm:col-span-2">
+                <label class="label" for="customerPhone">Phone number</label>
+                <input id="customerPhone" class="field" type="tel" required maxlength="40" autocomplete="tel" inputmode="tel" placeholder="e.g. 07123 456789" disabled>
+              </div>
               <label class="sm:col-span-2 flex items-start gap-2.5 text-xs leading-5 text-slate-500">
                 <input id="bookingConsent" class="mt-1 rounded border-slate-300 text-brand-600" type="checkbox" required disabled>
                 <span>I confirm these appointment details are correct and agree that the business may contact me about this booking.</span>
@@ -4380,6 +4384,7 @@
         p_service_id: state.selectedService.id,
         p_customer_name: $("customerName").value.trim(),
         p_customer_email: $("customerEmail").value.trim().toLowerCase(),
+        p_customer_phone: $("customerPhone").value.trim(),
         p_start_time: state.selectedSlot.start.toISOString()
       });
       setBusy(submitBtn, false);
