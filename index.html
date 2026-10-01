@@ -3681,21 +3681,6 @@
 
       const existing = editId ? state.questions.find(q => q.id === editId) : null;
       const serviceQuestions = state.questions.filter(q => q.service_id === serviceId && q.id !== editId);
-      if (isFreePlan && flexibleStaffEnabled) {
-        let lowestPrice = basePrice;
-        if (promoEnabled) {
-          if (promoType === "percentage") lowestPrice = basePrice * (1 - promoValue / 100);
-          else if (promoType === "fixed") lowestPrice = basePrice - promoValue;
-          else if (promoType === "price") lowestPrice = promoValue;
-        }
-        lowestPrice = flexibleDiscountType === "fixed"
-          ? lowestPrice - flexibleDiscountValue
-          : lowestPrice * (1 - flexibleDiscountValue / 100);
-        if (lowestPrice < 10) {
-          return toast("On Free, the flexible-team discount cannot reduce the appointment below £10.", "error");
-        }
-      }
-
       const payload = {
         profile_id: state.profile.id,
         service_id: serviceId,
@@ -5147,6 +5132,21 @@
           else if (promoType === "fixed") lowestPromoPrice = basePrice - promoValue;
           else if (promoType === "price") lowestPromoPrice = promoValue;
           if (lowestPromoPrice < 10) return toast("On Free, a promotion cannot reduce the appointment below £10.", "error");
+        }
+      }
+
+      if (isFreePlan && flexibleStaffEnabled) {
+        let lowestPrice = basePrice;
+        if (promoEnabled) {
+          if (promoType === "percentage") lowestPrice = basePrice * (1 - promoValue / 100);
+          else if (promoType === "fixed") lowestPrice = basePrice - promoValue;
+          else if (promoType === "price") lowestPrice = promoValue;
+        }
+        lowestPrice = flexibleDiscountType === "fixed"
+          ? lowestPrice - flexibleDiscountValue
+          : lowestPrice * (1 - flexibleDiscountValue / 100);
+        if (lowestPrice < 10) {
+          return toast("On Free, the flexible-team discount cannot reduce the appointment below £10.", "error");
         }
       }
 
