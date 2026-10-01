@@ -444,8 +444,22 @@
                   <input id="srvDepositAmount" class="field" type="number" min="0" step="0.01" placeholder="20.00">
                 </div>
 
-                <div id="srvFreePlanFeeNote" class="mt-4 hidden rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs leading-5 text-blue-800">
-                  <strong>Free plan:</strong> services must be at least £10, customers pay the full appointment price online, and MoreLeads applies a 3% platform fee to the final booked value.
+                <div id="srvFreePlanFeeNote" class="mt-4 hidden rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-xs leading-5 text-blue-800">
+                  <strong>Free plan:</strong> services must be at least £10 and customers pay the exact price you set. MoreLeads deducts a 3% platform fee from your proceeds.
+                  <div class="mt-3 grid gap-1.5 rounded-lg bg-white/70 p-3 text-slate-700">
+                    <div class="flex items-center justify-between gap-3">
+                      <span>Customer pays</span>
+                      <strong id="srvFeeCustomerPays">£0.00</strong>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                      <span>MoreLeads platform fee (3%)</span>
+                      <strong id="srvFeePlatform">£0.00</strong>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 border-t border-blue-100 pt-1.5">
+                      <span>You receive before payment-processing fees</span>
+                      <strong id="srvFeeBusinessReceives">£0.00</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1562,6 +1576,7 @@
       $("manageDateInput").min = todayKey();
       renderPromoExcludedDates();
       syncPromoFields();
+      updateFreePlanFeePreview();
       bindEvents();
 
       if (manageToken) {
@@ -1599,6 +1614,7 @@
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
       $("servicesList").addEventListener("click", handleServiceListClick);
       $("srvDescription").addEventListener("input", updateDescriptionCount);
+      $("srvPrice").addEventListener("input", updateFreePlanFeePreview);
       $("srvDepositType").addEventListener("change", syncPaymentFields);
       $("srvPromoEnabled").addEventListener("change", syncPromoFields);
       $("srvPromoType").addEventListener("change", syncPromoType);
@@ -2204,6 +2220,16 @@
       }
     }
 
+    function updateFreePlanFeePreview() {
+      const customerPays = Math.max(0, Number($("srvPrice")?.value || 0));
+      const fee = customerPays * 0.03;
+      const businessReceives = Math.max(0, customerPays - fee);
+
+      if ($("srvFeeCustomerPays")) $("srvFeeCustomerPays").textContent = money(customerPays);
+      if ($("srvFeePlatform")) $("srvFeePlatform").textContent = money(fee);
+      if ($("srvFeeBusinessReceives")) $("srvFeeBusinessReceives").textContent = money(businessReceives);
+    }
+
     function renderServices() {
       $("serviceCountBadge").textContent = `${state.services.length} service${state.services.length === 1 ? "" : "s"}`;
       $("servicesList").innerHTML = state.services.length ? state.services.map(s => `
@@ -2334,6 +2360,7 @@
         updateDescriptionCount();
         $("srvDuration").value = service.duration_minutes;
         $("srvPrice").value = Number(service.price).toFixed(2);
+        updateFreePlanFeePreview();
         $("srvDepositType").value = currentPlanCode() === "free" ? "full" : (service.deposit_type || "none");
         $("srvDepositAmount").value = service.deposit_amount ?? "";
         syncPaymentFields();
@@ -2384,6 +2411,7 @@
       $("srvDescription").innerHTML = "";
       updateDescriptionCount();
       $("srvDuration").value = "60";
+      updateFreePlanFeePreview();
       $("serviceEditId").value = "";
       $("srvDepositType").value = currentPlanCode() === "free" ? "full" : "none";
       $("srvDepositAmount").value = "";
