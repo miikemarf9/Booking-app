@@ -869,12 +869,64 @@
       </section>
 
       <!-- Calendar Tab -->
-      <section id="tab-calendar" class="dashboard-tab hidden">
-        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+      <section id="tab-calendar" class="dashboard-tab hidden space-y-6">
+        <article class="card overflow-hidden">
+          <div class="border-b border-slate-200 px-5 py-5 sm:px-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 7</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Booking calendar</h2>
+                <p class="mt-1 text-sm text-slate-500">See bookings and published availability together in one calendar.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="calendarPrevBtn" class="btn btn-light !px-3" type="button" aria-label="Previous month">←</button>
+                <button id="calendarTodayBtn" class="btn btn-light" type="button">Today</button>
+                <button id="calendarNextBtn" class="btn btn-light !px-3" type="button" aria-label="Next month">→</button>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
+              <h3 id="calendarMonthLabel" class="text-lg font-bold text-ink">Month</h3>
+              <div class="flex flex-wrap gap-3 text-xs font-semibold text-slate-500">
+                <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span>Booking</span>
+                <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Availability</span>
+                <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>Past</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <div class="min-w-[720px]">
+              <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[.68rem] font-bold uppercase tracking-wider text-slate-400">
+                <div class="px-2 py-3">Mon</div>
+                <div class="px-2 py-3">Tue</div>
+                <div class="px-2 py-3">Wed</div>
+                <div class="px-2 py-3">Thu</div>
+                <div class="px-2 py-3">Fri</div>
+                <div class="px-2 py-3">Sat</div>
+                <div class="px-2 py-3">Sun</div>
+              </div>
+              <div id="bookingCalendarGrid" class="grid grid-cols-7"></div>
+            </div>
+          </div>
+        </article>
+
+        <div class="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
           <article class="card p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Calendar integration</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Google Calendar</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Connect the Google Calendar you use for your business. Moreleads will keep the secure Google tokens on the server rather than in this browser.</p>
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Selected day</p>
+                <h2 id="calendarSelectedDate" class="mt-1 text-xl font-bold text-ink">Choose a date</h2>
+              </div>
+              <button id="calendarAddAvailabilityBtn" class="btn btn-light hidden" type="button">Add availability</button>
+            </div>
+            <div id="calendarDayDetails" class="mt-5"></div>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Google Calendar</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">External calendar sync</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Your MoreLeads calendar works independently. Connect Google Calendar as an extra layer to avoid clashes and keep confirmed bookings synced.</p>
 
             <div id="googleCalendarStatusBox" class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
               <div class="flex flex-wrap items-center justify-between gap-3">
@@ -892,27 +944,7 @@
               <button id="refreshGoogleCalendarBtn" class="btn btn-light" type="button">Check connection</button>
             </div>
 
-            <p id="googleCalendarHelpText" class="mt-3 text-xs leading-5 text-slate-500">Click Connect Google Calendar. A new Google window will open so you can approve access. When Google confirms the connection, return here and click Check connection.</p>
-          </article>
-
-          <article class="card p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 5</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">What this connection unlocks</h2>
-            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Avoid clashes</strong>
-                <span>Google busy periods can be used to stop customers selecting times when you are already occupied.</span>
-              </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Add new bookings</strong>
-                <span>Confirmed Moreleads appointments can be written into your Google Calendar automatically.</span>
-              </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Keep changes in sync</strong>
-                <span>Reschedules and cancellations can update the matching Google event instead of creating duplicates.</span>
-              </div>
-            </div>
-            <p class="mt-4 text-xs leading-5 text-slate-400">For this test we are only proving that your Google account can connect securely. The actual busy-time and event syncing comes immediately after the connection succeeds.</p>
+            <p id="googleCalendarHelpText" class="mt-3 text-xs leading-5 text-slate-500">Google busy times can prevent double-booking, while confirmed MoreLeads appointments are synced to your calendar.</p>
           </article>
         </div>
       </section>
@@ -1180,7 +1212,9 @@
       publicBookingsReadable: true,
       manageToken: "",
       manageBooking: null,
-      manageSelectedSlot: null
+      manageSelectedSlot: null,
+      calendarCursor: new Date(),
+      calendarSelectedDate: ""
     };
 
     const $ = id => document.getElementById(id);
@@ -1799,6 +1833,14 @@
       $("followupEnabled").addEventListener("change", syncReminderFields);
       $("connectGoogleCalendarBtn").addEventListener("click", connectGoogleCalendar);
       $("refreshGoogleCalendarBtn").addEventListener("click", () => refreshGoogleCalendarConnection(true));
+      $("calendarPrevBtn").addEventListener("click", () => moveCalendarMonth(-1));
+      $("calendarTodayBtn").addEventListener("click", calendarGoToday);
+      $("calendarNextBtn").addEventListener("click", () => moveCalendarMonth(1));
+      $("calendarAddAvailabilityBtn").addEventListener("click", calendarAddAvailability);
+      $("bookingCalendarGrid").addEventListener("click", e => {
+        const day = e.target.closest("[data-calendar-date]");
+        if (day) selectCalendarDate(day.dataset.calendarDate);
+      });
       $("connectStripeBtn").addEventListener("click", connectStripePayments);
       $("refreshStripeBtn").addEventListener("click", () => refreshStripePayments(true));
       $("upgradeProBtn").addEventListener("click", startProUpgrade);
@@ -2061,6 +2103,7 @@
       renderBookings();
       renderOverviewBookings();
       renderPlanSubscription();
+      renderCalendarDashboard();
 
       const warnEl = $("dashboardDataWarning");
       if (state.bookingsError) {
@@ -2439,6 +2482,218 @@
           state.subscription?.plan_code === "pro" ? "success" : "info"
         );
       }
+    }
+
+
+    function calendarDateKey(date) {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: BUSINESS_TIME_ZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(date);
+    }
+
+    function calendarMonthStart(date) {
+      return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1, 12, 0, 0));
+    }
+
+    function calendarAddMonths(date, amount) {
+      return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + amount, 1, 12, 0, 0));
+    }
+
+    function calendarBookingsForDate(dateKey) {
+      return state.bookings
+        .filter(b => b.status !== "cancelled" && calendarDateKey(new Date(b.start_time)) === dateKey)
+        .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    }
+
+    function calendarBlocksForDate(dateKey) {
+      return state.blocks
+        .filter(b => b.is_active && b.block_date === dateKey)
+        .sort((a, b) => cleanTime(a.start_time).localeCompare(cleanTime(b.start_time)));
+    }
+
+    function renderCalendarDashboard() {
+      const grid = $("bookingCalendarGrid");
+      if (!grid) return;
+
+      const cursor = state.calendarCursor instanceof Date && !Number.isNaN(state.calendarCursor.getTime())
+        ? state.calendarCursor
+        : new Date();
+      const monthStart = calendarMonthStart(cursor);
+      const year = monthStart.getUTCFullYear();
+      const month = monthStart.getUTCMonth();
+
+      $("calendarMonthLabel").textContent = new Intl.DateTimeFormat("en-GB", {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC"
+      }).format(monthStart);
+
+      const firstWeekday = (monthStart.getUTCDay() + 6) % 7;
+      const gridStart = new Date(monthStart);
+      gridStart.setUTCDate(gridStart.getUTCDate() - firstWeekday);
+
+      const today = todayKey();
+      const cells = [];
+
+      for (let i = 0; i < 42; i++) {
+        const d = new Date(gridStart);
+        d.setUTCDate(gridStart.getUTCDate() + i);
+        const dateKey = d.toISOString().slice(0, 10);
+        const inMonth = d.getUTCMonth() === month && d.getUTCFullYear() === year;
+        const bookings = calendarBookingsForDate(dateKey);
+        const blocks = calendarBlocksForDate(dateKey);
+        const selected = state.calendarSelectedDate === dateKey;
+        const isToday = dateKey === today;
+        const isPast = dateKey < today;
+
+        const bookingPreview = bookings.slice(0, 2).map(b => {
+          const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
+          return `
+            <div class="truncate rounded-lg bg-brand-50 px-2 py-1 text-[.68rem] font-semibold text-brand-700">
+              ${escapeHtml(prettyTime(new Date(b.start_time)))} · ${escapeHtml(srv.title || b.customer_name || "Booking")}
+            </div>
+          `;
+        }).join("");
+
+        const moreBookings = bookings.length > 2
+          ? `<div class="px-1 text-[.66rem] font-semibold text-brand-600">+${bookings.length - 2} more</div>`
+          : "";
+
+        const availability = blocks.length
+          ? `<div class="truncate rounded-lg bg-emerald-50 px-2 py-1 text-[.68rem] font-semibold text-emerald-700">${blocks.length} availability block${blocks.length === 1 ? "" : "s"}</div>`
+          : "";
+
+        cells.push(`
+          <button
+            type="button"
+            data-calendar-date="${dateKey}"
+            class="min-h-[118px] border-b border-r border-slate-200 p-2 text-left align-top transition hover:bg-slate-50 ${!inMonth ? "bg-slate-50/70 text-slate-300" : ""} ${selected ? "ring-2 ring-inset ring-brand-500" : ""} ${isPast && inMonth ? "bg-slate-50/40" : ""}"
+          >
+            <div class="mb-2 flex items-center justify-between gap-2">
+              <span class="${isToday ? "grid h-7 w-7 place-items-center rounded-full bg-brand-600 font-bold text-white" : "text-sm font-bold " + (inMonth ? "text-slate-700" : "text-slate-300")}">${d.getUTCDate()}</span>
+              ${bookings.length ? `<span class="rounded-full bg-brand-100 px-2 py-0.5 text-[.64rem] font-bold text-brand-700">${bookings.length}</span>` : ""}
+            </div>
+            <div class="space-y-1">
+              ${bookingPreview}
+              ${moreBookings}
+              ${availability}
+            </div>
+          </button>
+        `);
+      }
+
+      grid.innerHTML = cells.join("");
+
+      if (!state.calendarSelectedDate) {
+        const candidate = today.slice(0, 7) === monthStart.toISOString().slice(0, 7)
+          ? today
+          : monthStart.toISOString().slice(0, 10);
+        state.calendarSelectedDate = candidate;
+      }
+
+      renderCalendarDayDetails();
+    }
+
+    function renderCalendarDayDetails() {
+      const dateKey = state.calendarSelectedDate;
+      const container = $("calendarDayDetails");
+      const heading = $("calendarSelectedDate");
+      const addBtn = $("calendarAddAvailabilityBtn");
+      if (!container || !heading || !addBtn) return;
+
+      if (!dateKey) {
+        heading.textContent = "Choose a date";
+        container.innerHTML = emptyState("No date selected", "Choose a date in the calendar above.");
+        addBtn.classList.add("hidden");
+        return;
+      }
+
+      heading.textContent = prettyDate(dateKey);
+      addBtn.classList.toggle("hidden", dateKey < todayKey());
+
+      const bookings = calendarBookingsForDate(dateKey);
+      const blocks = calendarBlocksForDate(dateKey);
+
+      const bookingHtml = bookings.length
+        ? bookings.map(b => {
+            const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
+            const end = b.end_time ? new Date(b.end_time) : new Date(new Date(b.start_time).getTime() + Number(srv.duration_minutes || 0) * 60000);
+            return `
+              <div class="rounded-2xl border border-brand-100 bg-brand-50 p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-bold text-ink">${escapeHtml(prettyTime(new Date(b.start_time)))}–${escapeHtml(prettyTime(end))}</p>
+                    <p class="mt-1 text-sm font-semibold text-brand-700">${escapeHtml(srv.title || "Appointment")}</p>
+                    <p class="mt-1 text-sm text-slate-600">${escapeHtml(b.customer_name || "Customer")}${b.customer_email ? ` · ${escapeHtml(b.customer_email)}` : ""}</p>
+                  </div>
+                  <span class="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand-700">${money(b.booked_price ?? srv.price ?? 0)}</span>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : '<p class="text-sm text-slate-500">No bookings on this date.</p>';
+
+      const availabilityHtml = blocks.length
+        ? blocks.map(b => {
+            const srv = state.services.find(s => s.id === b.service_id);
+            return `
+              <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2.5">
+                <div>
+                  <span class="font-semibold text-emerald-800">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}</span>
+                  <span class="ml-2 text-sm text-emerald-700">${escapeHtml(srv?.title || "Availability")}</span>
+                </div>
+                ${Number(b.buffer_minutes || 0) ? `<span class="text-xs font-semibold text-emerald-700">${Number(b.buffer_minutes)} min buffer</span>` : ""}
+              </div>
+            `;
+          }).join("")
+        : '<p class="text-sm text-slate-500">No published availability on this date.</p>';
+
+      container.innerHTML = `
+        <div>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Bookings</h3>
+          <div class="mt-3 space-y-3">${bookingHtml}</div>
+        </div>
+        <div class="mt-6 border-t border-slate-200 pt-5">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Published availability</h3>
+          <div class="mt-3 space-y-2">${availabilityHtml}</div>
+        </div>
+      `;
+    }
+
+    function selectCalendarDate(dateKey) {
+      state.calendarSelectedDate = dateKey;
+      const [year, month] = dateKey.split("-").map(Number);
+      const cursorMonth = state.calendarCursor.getUTCMonth() + 1;
+      const cursorYear = state.calendarCursor.getUTCFullYear();
+      if (year !== cursorYear || month !== cursorMonth) {
+        state.calendarCursor = new Date(Date.UTC(year, month - 1, 1, 12));
+      }
+      renderCalendarDashboard();
+    }
+
+    function moveCalendarMonth(amount) {
+      state.calendarCursor = calendarAddMonths(calendarMonthStart(state.calendarCursor), amount);
+      state.calendarSelectedDate = "";
+      renderCalendarDashboard();
+    }
+
+    function calendarGoToday() {
+      const now = new Date();
+      state.calendarCursor = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1, 12));
+      state.calendarSelectedDate = todayKey();
+      renderCalendarDashboard();
+    }
+
+    function calendarAddAvailability() {
+      if (!state.calendarSelectedDate) return;
+      switchTab("availability");
+      $("blkDate").value = state.calendarSelectedDate;
+      $("blkRepeatUntil").min = state.calendarSelectedDate;
+      $("blockForm").scrollIntoView({ behavior: "smooth", block: "start" });
+      $("blkService").focus();
     }
 
     function populateCalendarSettings() {
@@ -3128,6 +3383,7 @@
       if (error) return toast(friendlyDbError(error, "refresh availability"), "error");
       state.blocks = data || [];
       renderBlocks();
+      renderCalendarDashboard();
       renderStats();
     }
 
@@ -3329,6 +3585,7 @@
       renderBookings();
       renderOverviewBookings();
       renderStats();
+      renderCalendarDashboard();
     }
 
     async function handleBookingListClick(e) {
