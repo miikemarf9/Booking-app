@@ -689,6 +689,45 @@
                 <p class="mt-1.5 text-xs leading-5 text-slate-400">Customers cannot select an appointment date beyond this window.</p>
               </div>
 
+
+              <div class="border-t border-slate-200 pt-5">
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Changes & cancellations</p>
+              </div>
+
+              <div>
+                <label class="label" for="cancellationCutoffHours">Cancellation cutoff</label>
+                <select id="cancellationCutoffHours" class="field">
+                  <option value="0">Allow cancellation anytime before appointment</option>
+                  <option value="1">1 hour before</option>
+                  <option value="2">2 hours before</option>
+                  <option value="4">4 hours before</option>
+                  <option value="6">6 hours before</option>
+                  <option value="12">12 hours before</option>
+                  <option value="24">24 hours before</option>
+                  <option value="48">48 hours before</option>
+                  <option value="72">72 hours before</option>
+                  <option value="168">1 week before</option>
+                </select>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Inside this window customers can no longer cancel through their private booking link.</p>
+              </div>
+
+              <div>
+                <label class="label" for="rescheduleCutoffHours">Reschedule cutoff</label>
+                <select id="rescheduleCutoffHours" class="field">
+                  <option value="0">Allow rescheduling anytime before appointment</option>
+                  <option value="1">1 hour before</option>
+                  <option value="2">2 hours before</option>
+                  <option value="4">4 hours before</option>
+                  <option value="6">6 hours before</option>
+                  <option value="12">12 hours before</option>
+                  <option value="24">24 hours before</option>
+                  <option value="48">48 hours before</option>
+                  <option value="72">72 hours before</option>
+                  <option value="168">1 week before</option>
+                </select>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Inside this window customers can no longer move the appointment themselves.</p>
+              </div>
+
               <button id="bookingRulesSubmitBtn" class="btn btn-primary w-full sm:w-auto" type="submit">Save booking rules</button>
             </form>
           </article>
@@ -705,8 +744,16 @@
                 <strong class="block text-slate-700">Limit future availability</strong>
                 <span id="maximumBookingSummary">Customers can currently book up to 90 days ahead.</span>
               </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Cancellation cutoff</strong>
+                <span id="cancellationCutoffSummary">Customers can currently cancel up to 24 hours before.</span>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <strong class="block text-slate-700">Reschedule cutoff</strong>
+                <span id="rescheduleCutoffSummary">Customers can currently reschedule up to 24 hours before.</span>
+              </div>
               <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-                These limits are enforced both on the booking page and again when the booking is created, so hidden or expired times cannot be booked by bypassing the interface.
+                These limits are enforced both in the interface and again in the database, so they cannot be bypassed by editing the page.
               </div>
             </div>
           </article>
@@ -1223,6 +1270,7 @@
         <article id="manageActionsCard" class="card p-5 sm:p-6">
           <h2 class="text-lg font-bold text-ink">Manage this appointment</h2>
           <p class="mt-1 text-sm leading-6 text-slate-500">You can move the appointment to another available time or cancel it. No account is required.</p>
+          <p id="manageCutoffNotice" class="mt-3 hidden rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-800"></p>
           <div class="mt-5 flex flex-wrap gap-2">
             <button id="manageRescheduleBtn" class="btn btn-primary" type="button">Reschedule</button>
             <button id="manageCancelBtn" class="btn btn-light" type="button">Cancel booking</button>
@@ -2291,6 +2339,18 @@
       if ($("maximumBookingSummary")) {
         $("maximumBookingSummary").textContent = `Customers can currently book up to ${maxDays} day${maxDays === 1 ? "" : "s"} ahead.`;
       }
+
+      const cancelHours = Number(state.profile?.cancellation_cutoff_hours ?? 24);
+      const rescheduleHours = Number(state.profile?.reschedule_cutoff_hours ?? 24);
+      const cutoffText = (hours, action) => {
+        if (!hours) return `Customers can ${action} anytime before the appointment.`;
+        if (hours < 24) return `Customers can ${action} up to ${hours} hour${hours === 1 ? "" : "s"} before.`;
+        const days = hours / 24;
+        return `Customers can ${action} up to ${days} day${days === 1 ? "" : "s"} before.`;
+      };
+
+      if ($("cancellationCutoffSummary")) $("cancellationCutoffSummary").textContent = cutoffText(cancelHours, "cancel");
+      if ($("rescheduleCutoffSummary")) $("rescheduleCutoffSummary").textContent = cutoffText(rescheduleHours, "reschedule");
     }
 
     function populateBookingRules() {
@@ -2309,6 +2369,19 @@
 
       $("minimumNoticeHours").value = minHours;
       $("maximumBookingDays").value = maxDays;
+
+      const cancelHours = String(state.profile.cancellation_cutoff_hours ?? 24);
+      const rescheduleHours = String(state.profile.reschedule_cutoff_hours ?? 24);
+
+      if (![...$("cancellationCutoffHours").options].some(o => o.value === cancelHours)) {
+        $("cancellationCutoffHours").add(new Option(`${cancelHours} hours before`, cancelHours));
+      }
+      if (![...$("rescheduleCutoffHours").options].some(o => o.value === rescheduleHours)) {
+        $("rescheduleCutoffHours").add(new Option(`${rescheduleHours} hours before`, rescheduleHours));
+      }
+
+      $("cancellationCutoffHours").value = cancelHours;
+      $("rescheduleCutoffHours").value = rescheduleHours;
       bookingRuleSummaryText();
     }
 
@@ -2318,12 +2391,20 @@
 
       const minHours = Number($("minimumNoticeHours").value);
       const maxDays = Number($("maximumBookingDays").value);
+      const cancellationCutoffHours = Number($("cancellationCutoffHours").value);
+      const rescheduleCutoffHours = Number($("rescheduleCutoffHours").value);
 
       if (!Number.isInteger(minHours) || minHours < 0 || minHours > 8760) {
         return toast("Choose a valid minimum notice period.", "error");
       }
       if (!Number.isInteger(maxDays) || maxDays < 1 || maxDays > 730) {
         return toast("Choose a valid maximum booking window.", "error");
+      }
+      if (!Number.isInteger(cancellationCutoffHours) || cancellationCutoffHours < 0 || cancellationCutoffHours > 8760) {
+        return toast("Choose a valid cancellation cutoff.", "error");
+      }
+      if (!Number.isInteger(rescheduleCutoffHours) || rescheduleCutoffHours < 0 || rescheduleCutoffHours > 8760) {
+        return toast("Choose a valid reschedule cutoff.", "error");
       }
 
       const btn = $("bookingRulesSubmitBtn");
@@ -2333,7 +2414,9 @@
         .from("profiles")
         .update({
           minimum_notice_hours: minHours,
-          maximum_booking_days: maxDays
+          maximum_booking_days: maxDays,
+          cancellation_cutoff_hours: cancellationCutoffHours,
+          reschedule_cutoff_hours: rescheduleCutoffHours
         })
         .eq("id", state.profile.id)
         .select("*")
@@ -3988,7 +4071,15 @@
         .eq("id", booking.id)
         .eq("profile_id", state.profile.id);
 
-      if (error) return toast(friendlyDbError(error, "cancel this booking"), "error");
+      if (error) {
+        const msg = String(error?.message || "").toLowerCase();
+        if (msg.includes("cancellation cutoff")) {
+          toast("This appointment is now inside the business's cancellation cutoff.", "error");
+          await loadManagedBooking(state.manageToken);
+          return;
+        }
+        return toast(friendlyDbError(error, "cancel this booking"), "error");
+      }
 
       toast("Booking cancelled.");
       await refreshBookings();
@@ -4020,6 +4111,10 @@
 
       state.manageBooking = booking;
       state.manageSelectedSlot = null;
+      state.publicProfile = {
+        minimum_notice_hours: Number(booking.minimum_notice_hours || 0),
+        maximum_booking_days: Number(booking.maximum_booking_days || 90)
+      };
       renderManagedBooking();
 
       $("manageContent").classList.remove("hidden");
@@ -4051,14 +4146,42 @@
       $("manageActionsCard").classList.toggle("hidden", cancelled);
       $("manageCancelledMessage").classList.toggle("hidden", !cancelled);
 
+      if (!cancelled) {
+        const startMs = new Date(b.start_time).getTime();
+        const nowMs = Date.now();
+        const cancelCutoff = Number(b.cancellation_cutoff_hours || 0) * 3600000;
+        const rescheduleCutoff = Number(b.reschedule_cutoff_hours || 0) * 3600000;
+        const canCancel = !cancelCutoff || nowMs <= startMs - cancelCutoff;
+        const canReschedule = !rescheduleCutoff || nowMs <= startMs - rescheduleCutoff;
+
+        $("manageCancelBtn").disabled = !canCancel;
+        $("manageRescheduleBtn").disabled = !canReschedule;
+        $("manageCancelBtn").classList.toggle("opacity-50", !canCancel);
+        $("manageRescheduleBtn").classList.toggle("opacity-50", !canReschedule);
+
+        const notice = $("manageCutoffNotice");
+        const blocked = [];
+        if (!canReschedule) blocked.push("rescheduling");
+        if (!canCancel) blocked.push("cancellation");
+        if (blocked.length) {
+          notice.textContent = `This appointment is now inside the business's ${blocked.join(" and ")} cutoff.`;
+          notice.classList.remove("hidden");
+        } else {
+          notice.textContent = "";
+          notice.classList.add("hidden");
+        }
+      }
+
       if (cancelled) closeManageReschedule();
     }
 
     function openManageReschedule() {
-      if (!state.manageBooking || state.manageBooking.booking_status !== "confirmed") return;
+      if (!state.manageBooking || state.manageBooking.booking_status !== "confirmed" || $("manageRescheduleBtn").disabled) return;
       state.manageSelectedSlot = null;
       $("manageReschedulePanel").classList.remove("hidden");
       $("manageDateInput").value = "";
+      $("manageDateInput").min = todayKey();
+      $("manageDateInput").max = addDaysToDateKey(todayKey(), Number(state.manageBooking.maximum_booking_days || 90));
       $("manageSlots").innerHTML = "";
       $("manageSlotsMessage").textContent = "Choose a date to see available times.";
       $("manageRescheduleConfirm").classList.add("hidden");
@@ -4172,10 +4295,17 @@
       setBusy(btn, false);
 
       if (error) {
-        const overlap = String(error?.code || "") === "23P01" || String(error?.message || "").toLowerCase().includes("bookings_no_time_overlap");
+        const rawMessage = String(error?.message || "").toLowerCase();
+        const overlap = String(error?.code || "") === "23P01" || rawMessage.includes("bookings_no_time_overlap");
         if (overlap) {
           toast("That time has just been taken. Please choose another available time.", "error");
           return await loadManageAvailableSlots();
+        }
+        if (rawMessage.includes("reschedule cutoff")) {
+          toast("This appointment is now inside the business's reschedule cutoff.", "error");
+          closeManageReschedule();
+          await loadManagedBooking(state.manageToken);
+          return;
         }
         return toast(friendlyDbError(error, "reschedule this booking"), "error");
       }
