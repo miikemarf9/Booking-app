@@ -175,6 +175,7 @@
       box-shadow: 0 2px 9px rgba(23, 32, 51, .08);
     }
     .service-choice.selected,
+    .staff-choice.selected,
     .slot-choice.selected {
       border-color: #1687d9;
       background: #eef8ff;
@@ -737,6 +738,14 @@
               </div>
 
               <div>
+                <label class="label" for="blkStaff">Team member</label>
+                <select id="blkStaff" class="field">
+                  <option value="">Business-wide / no team member</option>
+                </select>
+                <p id="blkStaffHelp" class="mt-1.5 text-xs leading-5 text-slate-400">If this service has assigned team members, choose whose availability you are adding.</p>
+              </div>
+
+              <div>
                 <label class="label" for="blkDate">First date</label>
                 <input id="blkDate" class="field" type="date" required>
               </div>
@@ -957,6 +966,17 @@
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="team">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">People</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Team</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Add staff, assign services and give each person their own availability.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
           <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="availability">
             <div class="flex items-start justify-between gap-4">
               <div>
@@ -1047,6 +1067,66 @@
         </div>
       </section>
 
+      <!-- Team Tab -->
+      <section id="tab-team" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+
+        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Team member</p>
+            <h2 id="staffFormHeading" class="mt-1 text-xl font-bold text-ink">Add a team member</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Create the people customers can book with and choose which services each person provides.</p>
+
+            <form id="staffForm" class="mt-6 space-y-4">
+              <input id="staffEditId" type="hidden">
+
+              <div>
+                <label class="label" for="staffName">Name</label>
+                <input id="staffName" class="field" type="text" maxlength="120" required placeholder="e.g. Sarah">
+              </div>
+
+              <div>
+                <label class="label" for="staffJobTitle">Job title <span class="font-normal text-slate-400">(optional)</span></label>
+                <input id="staffJobTitle" class="field" type="text" maxlength="120" placeholder="e.g. Senior Stylist">
+              </div>
+
+              <div>
+                <label class="label" for="staffBio">Short bio <span class="font-normal text-slate-400">(optional)</span></label>
+                <textarea id="staffBio" class="field min-h-24 resize-y" maxlength="1000" placeholder="A short introduction customers can see when choosing who to book with."></textarea>
+              </div>
+
+              <div>
+                <label class="label" for="staffPhoto">Photo <span class="font-normal text-slate-400">(optional)</span></label>
+                <input id="staffPhoto" class="field" type="file" accept="image/png,image/jpeg,image/webp">
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">PNG, JPG or WebP. Maximum 2 MB.</p>
+              </div>
+
+              <div>
+                <p class="label">Services</p>
+                <div id="staffServiceChoices" class="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4"></div>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Only assigned services will offer this person to customers.</p>
+              </div>
+
+              <div class="flex gap-2">
+                <button id="staffSubmitBtn" class="btn btn-primary flex-1" type="submit">Add team member</button>
+                <button id="staffCancelEditBtn" class="btn btn-light hidden" type="button">Cancel</button>
+              </div>
+            </form>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Your team</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Team members</h2>
+              </div>
+              <span id="staffCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 people</span>
+            </div>
+            <div id="staffList" class="mt-5 space-y-3"></div>
+          </article>
+        </div>
+      </section>
+
       <!-- Time Off Tab -->
       <section id="tab-time-off" class="dashboard-tab hidden">
         <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
@@ -1057,6 +1137,14 @@
             <p class="mt-2 text-sm leading-6 text-slate-500">Block a full day, several days, or just part of a day. Your normal availability stays intact underneath.</p>
 
             <form id="timeOffForm" class="mt-6 space-y-4">
+              <div>
+                <label class="label" for="timeOffStaff">Applies to</label>
+                <select id="timeOffStaff" class="field">
+                  <option value="">Whole business</option>
+                </select>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Choose a person to block only their diary, or leave this as Whole business.</p>
+              </div>
+
               <div>
                 <label class="label" for="timeOffMode">Block</label>
                 <select id="timeOffMode" class="field">
@@ -1483,6 +1571,9 @@
             <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
               <h3 id="calendarMonthLabel" class="text-lg font-bold text-ink">Month</h3>
               <div class="flex flex-wrap items-center gap-3">
+                <select id="calendarStaffFilter" class="field !w-auto min-w-40 !py-2 text-xs">
+                  <option value="all">All team members</option>
+                </select>
                 <div class="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
                   <button id="calendarMonthViewBtn" class="rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm" type="button">Month</button>
                   <button id="calendarWeekViewBtn" class="rounded-lg px-3 py-1.5 text-slate-500" type="button">Week</button>
@@ -1599,10 +1690,21 @@
             <div id="publicServices" class="mt-5 grid gap-3 sm:grid-cols-2"></div>
           </article>
 
+          <article id="staffStep" class="card hidden p-5 sm:p-7">
+            <div class="flex items-center gap-3">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white">2</span>
+              <div>
+                <h2 class="font-bold text-ink">Choose a team member</h2>
+                <p class="text-xs text-slate-500">Pick someone specific or choose any available team member.</p>
+              </div>
+            </div>
+            <div id="publicStaffChoices" class="mt-5 grid gap-3 sm:grid-cols-2"></div>
+          </article>
+
           <!-- Step 2 -->
           <article id="dateStep" class="card p-5 opacity-50 sm:p-7">
             <div class="flex items-center gap-3">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">2</span>
+              <span id="dateStepNumber" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">2</span>
               <div>
                 <h2 class="font-bold text-ink">Choose a date</h2>
                 <p class="text-xs text-slate-500">Select a date to see available times.</p>
@@ -1617,7 +1719,7 @@
           <!-- Step 3 -->
           <article id="timeStep" class="card p-5 opacity-50 sm:p-7">
             <div class="flex items-center gap-3">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">3</span>
+              <span id="timeStepNumber" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">3</span>
               <div>
                 <h2 class="font-bold text-ink">Choose a time</h2>
                 <p class="text-xs text-slate-500">Only currently available times are shown.</p>
@@ -1630,7 +1732,7 @@
           <!-- Step 4 -->
           <article id="detailsStep" class="card p-5 opacity-50 sm:p-7">
             <div class="flex items-center gap-3">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">4</span>
+              <span id="detailsStepNumber" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">4</span>
               <div>
                 <h2 class="font-bold text-ink">Your details</h2>
                 <p class="text-xs text-slate-500">We’ll use these details for your appointment.</p>
@@ -1695,6 +1797,10 @@
                 <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Service</dt>
                 <dd id="summaryService" class="mt-1 font-bold text-slate-700">Not selected</dd>
               </div>
+              <div id="summaryStaffRow" class="hidden py-3">
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Team member</dt>
+                <dd id="summaryStaff" class="mt-1 font-bold text-slate-700">Not selected</dd>
+              </div>
               <div class="py-3">
                 <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Date</dt>
                 <dd id="summaryDate" class="mt-1 font-bold text-slate-700">Not selected</dd>
@@ -1751,6 +1857,10 @@
             <div class="flex items-start justify-between gap-4 py-3 first:pt-0">
               <dt class="font-semibold text-slate-400">Customer</dt>
               <dd id="manageCustomerName" class="text-right font-bold text-slate-700">—</dd>
+            </div>
+            <div id="manageStaffRow" class="hidden flex items-start justify-between gap-4 py-3">
+              <dt class="font-semibold text-slate-400">Team member</dt>
+              <dd id="manageStaffName" class="text-right font-bold text-slate-700">—</dd>
             </div>
             <div class="flex items-start justify-between gap-4 py-3">
               <dt class="font-semibold text-slate-400">Date</dt>
@@ -1831,6 +1941,8 @@
       subscription: null,
       plan: null,
       services: [],
+      staff: [],
+      serviceStaff: [],
       blocks: [],
       bookings: [],
       customers: [],
@@ -1841,7 +1953,10 @@
       publicProfile: null,
       publicServices: [],
       publicQuestions: [],
+      publicStaff: [],
+      publicServiceStaff: [],
       selectedService: null,
+      selectedStaffChoice: null,
       selectedDate: "",
       selectedSlot: null,
       publicBookingsReadable: true,
@@ -2392,6 +2507,8 @@
       $("timeOffStartTime").value = "09:00";
       $("timeOffEndTime").value = "17:00";
       syncTimeOffMode();
+      populateTimeOffStaffOptions();
+      populateCalendarStaffFilter();
 
       updateFreePlanFeePreview();
       bindEvents();
@@ -2439,6 +2556,9 @@
 
       $("serviceForm").addEventListener("submit", saveService);
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
+      $("staffForm").addEventListener("submit", saveStaff);
+      $("staffCancelEditBtn").addEventListener("click", resetStaffForm);
+      $("staffList").addEventListener("click", handleStaffListClick);
       $("servicesList").addEventListener("click", handleServiceListClick);
       $("srvDescription").addEventListener("input", updateDescriptionCount);
       $("srvPrice").addEventListener("input", updateFreePlanFeePreview);
@@ -2468,7 +2588,10 @@
       $("showPastBlocks").addEventListener("change", renderBlocks);
       $("blkRecurrence").addEventListener("change", syncRecurrenceUI);
       $("blkUseRepeatUntil").addEventListener("change", syncRepeatUntilUI);
-      $("blkService").addEventListener("change", updateCalculatedEnd);
+      $("blkService").addEventListener("change", () => {
+        populateAvailabilityStaffOptions();
+        updateCalculatedEnd();
+      });
       $("blkStart").addEventListener("change", updateCalculatedEnd);
       $("blkDate").addEventListener("change", () => {
         $("blkRepeatUntil").min = $("blkDate").value || todayKey();
@@ -2524,6 +2647,7 @@
       $("calendarNextBtn").addEventListener("click", () => moveCalendarMonth(1));
       $("calendarMonthViewBtn").addEventListener("click", () => setCalendarView("month"));
       $("calendarWeekViewBtn").addEventListener("click", () => setCalendarView("week"));
+      $("calendarStaffFilter").addEventListener("change", renderCalendarDashboard);
       $("bookingCalendarWeekGrid").addEventListener("click", e => {
         const day = e.target.closest("[data-calendar-date]");
         if (day) selectCalendarDate(day.dataset.calendarDate);
@@ -2553,6 +2677,7 @@
       $("refreshPlanBtn").addEventListener("click", () => refreshProSubscription(true));
 
       $("publicServices").addEventListener("click", handlePublicServiceClick);
+      $("publicStaffChoices").addEventListener("click", handlePublicStaffClick);
       $("publicDate").addEventListener("change", handlePublicDateChange);
       $("publicSlots").addEventListener("click", handlePublicSlotClick);
       $("customerBookingForm").addEventListener("submit", submitCustomerBooking);
@@ -2775,10 +2900,12 @@
 
     async function loadDashboardData() {
       const pId = state.profile.id;
-      const [srvRes, blkRes, bkgRes, customerRes, qRes, timeOffRes, subRes, planRes] = await Promise.all([
+      const [srvRes, staffRes, serviceStaffRes, blkRes, bkgRes, customerRes, qRes, timeOffRes, subRes, planRes] = await Promise.all([
         supabaseClient.from("services").select("*").eq("profile_id", pId).order("created_at", { ascending: true }),
+        supabaseClient.from("staff_members").select("*").eq("profile_id", pId).order("sort_order").order("created_at"),
+        supabaseClient.from("service_staff").select("*").eq("profile_id", pId),
         supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),
-        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", pId).order("start_time", { ascending: true }),
+        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), staff_members(name, job_title, photo_url), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", pId).order("start_time", { ascending: true }),
         supabaseClient.from("customers").select("*").eq("profile_id", pId).order("updated_at", { ascending: false }),
         supabaseClient.from("booking_questions").select("*").eq("profile_id", pId).order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
         supabaseClient.from("time_off_blocks").select("*").eq("profile_id", pId).order("start_time", { ascending: true }),
@@ -2787,6 +2914,8 @@
       ]);
 
       if (srvRes.error) throw srvRes.error;
+      if (staffRes.error) throw staffRes.error;
+      if (serviceStaffRes.error) throw serviceStaffRes.error;
       if (blkRes.error) throw blkRes.error;
       if (customerRes.error) throw customerRes.error;
       if (qRes.error) throw qRes.error;
@@ -2795,6 +2924,8 @@
       if (planRes.error) throw planRes.error;
 
       state.services = srvRes.data || [];
+      state.staff = staffRes.data || [];
+      state.serviceStaff = serviceStaffRes.data || [];
       state.blocks = blkRes.data || [];
       state.bookings = bkgRes.data || [];
       state.customers = customerRes.data || [];
@@ -2813,7 +2944,10 @@
       renderStats();
       syncPaymentFields();
       renderServices();
+      renderStaff();
       renderAvailabilityServiceOptions();
+      populateTimeOffStaffOptions();
+      populateCalendarStaffFilter();
       renderBookingQuestions();
       renderTimeOff();
       renderBlocks();
@@ -2949,7 +3083,7 @@
       }
 
       if (recipients.length > 100) {
-        return toast("This beta can send to up to 100 customers at once. Narrow the customer group first.", "error");
+        return toast("You can send to up to 100 customers at once. Narrow the customer group first.", "error");
       }
 
       const subject = $("marketingSubject").value.trim();
@@ -3223,18 +3357,22 @@
       $("timeOffCount").textContent = `${upcoming.length} block${upcoming.length === 1 ? "" : "s"}`;
 
       $("timeOffList").innerHTML = upcoming.length
-        ? upcoming.map(block => `
+        ? upcoming.map(block => {
+            const member = state.staff.find(item => item.id === block.staff_id);
+            return `
             <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="rounded-full bg-rose-50 px-2.5 py-1 text-[.68rem] font-bold text-rose-700">${block.is_all_day ? "Full day" : "Hours blocked"}</span>
+                  <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">${member ? escapeHtml(member.name) : "Whole business"}</span>
                   ${block.reason ? `<span class="truncate text-xs font-semibold text-slate-500">${escapeHtml(block.reason)}</span>` : ""}
                 </div>
                 <p class="mt-2 font-bold text-ink">${escapeHtml(timeOffLabel(block))}</p>
               </div>
               <button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button>
             </div>
-          `).join("")
+          `;
+          }).join("")
         : emptyState("No upcoming time off", "Add a holiday, day off or blocked period using the form.");
     }
 
@@ -3243,6 +3381,7 @@
       if (!state.profile) return;
 
       const allDay = $("timeOffMode").value !== "hours";
+      const staffId = $("timeOffStaff").value || null;
       let start;
       let end;
 
@@ -3267,6 +3406,7 @@
 
       const overlappingBookings = state.bookings.filter(b =>
         b.status !== "cancelled" &&
+        (!staffId || b.staff_id === staffId) &&
         new Date(b.start_time).getTime() < end.getTime() &&
         new Date(b.end_time).getTime() > start.getTime()
       );
@@ -3283,6 +3423,7 @@
 
       const { error } = await supabaseClient.from("time_off_blocks").insert({
         profile_id: state.profile.id,
+        staff_id: staffId,
         start_time: start.toISOString(),
         end_time: end.toISOString(),
         reason: $("timeOffReason").value.trim() || null,
@@ -3295,6 +3436,7 @@
       toast("Time off added.");
       $("timeOffForm").reset();
       $("timeOffMode").value = "all_day";
+      populateTimeOffStaffOptions();
       const today = todayKey();
       $("timeOffStartDate").value = today;
       $("timeOffEndDate").value = today;
@@ -3343,6 +3485,7 @@
       const start = londonDate(dateKey, "00:00").getTime();
       const end = londonDate(addDaysToDateKey(dateKey, 1), "00:00").getTime();
       return state.timeOff.filter(block =>
+        calendarStaffMatches(block.staff_id) &&
         new Date(block.start_time).getTime() < end &&
         new Date(block.end_time).getTime() > start
       );
@@ -4175,15 +4318,22 @@
       return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + amount, 1, 12, 0, 0));
     }
 
+    function calendarStaffMatches(staffId) {
+      const filter = $("calendarStaffFilter")?.value || "all";
+      if (filter === "all") return true;
+      if (filter === "none") return !staffId;
+      return staffId === filter;
+    }
+
     function calendarBookingsForDate(dateKey) {
       return state.bookings
-        .filter(b => b.status !== "cancelled" && calendarDateKey(new Date(b.start_time)) === dateKey)
+        .filter(b => b.status !== "cancelled" && calendarStaffMatches(b.staff_id) && calendarDateKey(new Date(b.start_time)) === dateKey)
         .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
     }
 
     function calendarBlocksForDate(dateKey) {
       return state.blocks
-        .filter(b => b.is_active && b.block_date === dateKey)
+        .filter(b => b.is_active && calendarStaffMatches(b.staff_id) && b.block_date === dateKey)
         .sort((a, b) => cleanTime(a.start_time).localeCompare(cleanTime(b.start_time)));
     }
 
@@ -4233,7 +4383,7 @@
                 <button type="button" data-calendar-date="${dateKey}" class="w-full rounded-xl border border-brand-200 bg-brand-100 p-3 text-left shadow-sm transition hover:bg-brand-50">
                   <p class="text-xs font-black text-brand-800">${escapeHtml(prettyTime(new Date(b.start_time)))}–${escapeHtml(prettyTime(endTime))}</p>
                   <p class="mt-1 truncate text-xs font-bold text-ink">${escapeHtml(b.customer_name || "Customer")}</p>
-                  <p class="mt-0.5 truncate text-[.68rem] text-brand-700">${escapeHtml(srv.title || "Appointment")}</p>
+                  <p class="mt-0.5 truncate text-[.68rem] text-brand-700">${escapeHtml(srv.title || "Appointment")}${b.staff_id ? " · " + escapeHtml(staffName(b.staff_id)) : ""}</p>
                 </button>
               `;
             }).join("")
@@ -4245,7 +4395,7 @@
               return `
                 <button type="button" data-calendar-date="${dateKey}" class="w-full rounded-xl border border-emerald-100 bg-emerald-50 p-2.5 text-left transition hover:bg-emerald-100">
                   <p class="text-[.68rem] font-bold text-emerald-800">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}</p>
-                  <p class="mt-0.5 truncate text-[.66rem] text-emerald-700">${escapeHtml(srv?.title || "Availability")}</p>
+                  <p class="mt-0.5 truncate text-[.66rem] text-emerald-700">${escapeHtml(srv?.title || "Availability")}${b.staff_id ? " · " + escapeHtml(staffName(b.staff_id)) : ""}</p>
                 </button>
               `;
             }).join("")
@@ -4430,7 +4580,7 @@
             return `
               <div class="rounded-xl bg-brand-50 px-3 py-2">
                 <p class="text-xs font-bold text-brand-800">${escapeHtml(prettyTime(new Date(b.start_time)))} · ${escapeHtml(b.customer_name || "Customer")}</p>
-                <p class="mt-0.5 truncate text-[.68rem] text-brand-700">${escapeHtml(srv.title || "Appointment")}</p>
+                <p class="mt-0.5 truncate text-[.68rem] text-brand-700">${escapeHtml(srv.title || "Appointment")}${b.staff_id ? " · " + escapeHtml(staffName(b.staff_id)) : ""}</p>
               </div>
             `;
           }).join("")
@@ -4529,7 +4679,7 @@
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p class="font-bold text-ink">${escapeHtml(prettyTime(new Date(b.start_time)))}–${escapeHtml(prettyTime(end))}</p>
-                    <p class="mt-1 text-sm font-semibold text-brand-700">${escapeHtml(srv.title || "Appointment")}</p>
+                    <p class="mt-1 text-sm font-semibold text-brand-700">${escapeHtml(srv.title || "Appointment")}${b.staff_id ? " · " + escapeHtml(staffName(b.staff_id)) : ""}</p>
                     <p class="mt-1 text-sm text-slate-600">${escapeHtml(b.customer_name || "Customer")}${b.customer_email ? ` · ${escapeHtml(b.customer_email)}` : ""}</p>
                   </div>
                   <span class="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand-700">${money(b.booked_price ?? srv.price ?? 0)}</span>
@@ -4546,7 +4696,7 @@
               <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2.5">
                 <div>
                   <span class="font-semibold text-emerald-800">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}</span>
-                  <span class="ml-2 text-sm text-emerald-700">${escapeHtml(srv?.title || "Availability")}</span>
+                  <span class="ml-2 text-sm text-emerald-700">${escapeHtml(srv?.title || "Availability")}${b.staff_id ? " · " + escapeHtml(staffName(b.staff_id)) : ""}</span>
                 </div>
                 ${Number(b.buffer_minutes || 0) ? `<span class="text-xs font-semibold text-emerald-700">${Number(b.buffer_minutes)} min buffer</span>` : ""}
               </div>
@@ -4768,7 +4918,7 @@
     }
 
     function switchTab(tabId) {
-      const settingsChildren = new Set(["availability", "time-off", "booking-rules", "booking-questions", "branding", "business-details", "reminders", "payments"]);
+      const settingsChildren = new Set(["team", "availability", "time-off", "booking-rules", "booking-questions", "branding", "business-details", "reminders", "payments"]);
       const primaryTab = settingsChildren.has(tabId) ? "settings" : tabId;
 
       document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === primaryTab));
@@ -5019,6 +5169,256 @@
       $("serviceCancelEditBtn").classList.add("hidden");
     }
 
+    function staffForService(serviceId, activeOnly = true) {
+      const ids = new Set(
+        state.serviceStaff
+          .filter(link => link.service_id === serviceId)
+          .map(link => link.staff_id)
+      );
+      return state.staff
+        .filter(member => ids.has(member.id) && (!activeOnly || member.is_active))
+        .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0) || String(a.name).localeCompare(String(b.name)));
+    }
+
+    function staffName(staffId) {
+      return state.staff.find(member => member.id === staffId)?.name || "";
+    }
+
+    function renderStaffServiceChoices(selectedIds = null) {
+      const box = $("staffServiceChoices");
+      if (!box) return;
+      const selected = selectedIds || new Set();
+      box.innerHTML = state.services.length
+        ? state.services.map(service => `
+            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+              <input class="staff-service-choice h-4 w-4 accent-slate-900" type="checkbox" value="${service.id}" ${selected.has(service.id) ? "checked" : ""}>
+              <span class="text-sm font-semibold text-slate-700">${escapeHtml(service.title)}</span>
+            </label>
+          `).join("")
+        : '<p class="text-sm text-slate-500">Add a service first, then assign it to team members.</p>';
+    }
+
+    function renderStaff() {
+      if (!$("staffList")) return;
+      $("staffCountBadge").textContent = `${state.staff.length} ${state.staff.length === 1 ? "person" : "people"}`;
+      renderStaffServiceChoices();
+
+      $("staffList").innerHTML = state.staff.length
+        ? state.staff.map(member => {
+            const serviceNames = state.serviceStaff
+              .filter(link => link.staff_id === member.id)
+              .map(link => state.services.find(s => s.id === link.service_id)?.title)
+              .filter(Boolean);
+            return `
+              <div class="rounded-2xl border ${member.is_active ? "border-slate-200" : "border-slate-200 bg-slate-50 opacity-65"} p-4">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="flex min-w-0 gap-3">
+                    <div class="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-brand-50 font-black text-brand-700">
+                      ${member.photo_url
+                        ? `<img src="${escapeHtml(member.photo_url)}" alt="" class="h-full w-full object-cover">`
+                        : escapeHtml(String(member.name || "?").slice(0,1).toUpperCase())}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <h3 class="font-bold text-ink">${escapeHtml(member.name)}</h3>
+                        <span class="rounded-full px-2 py-0.5 text-[.68rem] font-bold ${member.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}">${member.is_active ? "Active" : "Inactive"}</span>
+                      </div>
+                      ${member.job_title ? `<p class="mt-1 text-sm font-semibold text-slate-600">${escapeHtml(member.job_title)}</p>` : ""}
+                      ${member.bio ? `<p class="mt-1 max-w-xl text-sm leading-5 text-slate-500">${escapeHtml(member.bio)}</p>` : ""}
+                      <p class="mt-2 text-xs text-slate-500">${serviceNames.length ? escapeHtml(serviceNames.join(" · ")) : "No services assigned yet"}</p>
+                    </div>
+                  </div>
+                  <div class="flex shrink-0 gap-2">
+                    <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-staff-action="edit" data-id="${member.id}">Edit</button>
+                    <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-staff-action="toggle" data-id="${member.id}">${member.is_active ? "Deactivate" : "Activate"}</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : emptyState("No team members yet", "Add the first person who customers can book with.");
+    }
+
+    function resetStaffForm() {
+      $("staffForm").reset();
+      $("staffEditId").value = "";
+      $("staffFormHeading").textContent = "Add a team member";
+      $("staffSubmitBtn").textContent = "Add team member";
+      $("staffCancelEditBtn").classList.add("hidden");
+      renderStaffServiceChoices();
+    }
+
+    async function saveStaff(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const editId = $("staffEditId").value;
+      const name = $("staffName").value.trim();
+      const photo = $("staffPhoto").files?.[0] || null;
+      const selectedServiceIds = [...document.querySelectorAll(".staff-service-choice:checked")].map(el => el.value);
+
+      if (!name) return toast("Enter the team member's name.", "error");
+      if (photo && photo.size > 2 * 1024 * 1024) return toast("The photo must be 2 MB or smaller.", "error");
+      if (photo && !["image/png","image/jpeg","image/webp"].includes(photo.type)) return toast("Use a PNG, JPG or WebP photo.", "error");
+
+      const existing = editId ? state.staff.find(member => member.id === editId) : null;
+      const btn = $("staffSubmitBtn");
+      setBusy(btn, true, editId ? "Saving…" : "Adding…");
+
+      let newPhotoPath = null;
+      let photoUrl = existing?.photo_url || null;
+      try {
+        if (photo) {
+          const ext = photo.type === "image/png" ? "png" : photo.type === "image/webp" ? "webp" : "jpg";
+          newPhotoPath = `${state.profile.id}/staff-${Date.now()}-${crypto.randomUUID()}.${ext}`;
+          const { error: uploadError } = await supabaseClient.storage.from("staff-photos").upload(newPhotoPath, photo, {
+            contentType: photo.type,
+            upsert: false
+          });
+          if (uploadError) throw uploadError;
+          photoUrl = supabaseClient.storage.from("staff-photos").getPublicUrl(newPhotoPath).data?.publicUrl || null;
+        }
+
+        const payload = {
+          profile_id: state.profile.id,
+          name,
+          job_title: $("staffJobTitle").value.trim() || null,
+          bio: $("staffBio").value.trim() || null,
+          photo_url: photoUrl,
+          photo_path: newPhotoPath || existing?.photo_path || null,
+          is_active: existing ? existing.is_active : true,
+          updated_at: new Date().toISOString()
+        };
+
+        const { data: saved, error } = editId
+          ? await supabaseClient.from("staff_members").update(payload).eq("id", editId).eq("profile_id", state.profile.id).select("*").single()
+          : await supabaseClient.from("staff_members").insert(payload).select("*").single();
+        if (error) throw error;
+
+        const staffId = saved.id;
+        const { error: deleteLinksError } = await supabaseClient.from("service_staff").delete().eq("profile_id", state.profile.id).eq("staff_id", staffId);
+        if (deleteLinksError) throw deleteLinksError;
+
+        if (selectedServiceIds.length) {
+          const { error: insertLinksError } = await supabaseClient.from("service_staff").insert(
+            selectedServiceIds.map(serviceId => ({
+              profile_id: state.profile.id,
+              service_id: serviceId,
+              staff_id: staffId
+            }))
+          );
+          if (insertLinksError) throw insertLinksError;
+        }
+
+        if (newPhotoPath && existing?.photo_path && existing.photo_path !== newPhotoPath) {
+          await supabaseClient.storage.from("staff-photos").remove([existing.photo_path]);
+        }
+
+        toast(editId ? "Team member updated." : "Team member added.");
+        resetStaffForm();
+        await refreshStaff();
+      } catch (err) {
+        if (newPhotoPath && newPhotoPath !== existing?.photo_path) {
+          await supabaseClient.storage.from("staff-photos").remove([newPhotoPath]);
+        }
+        toast(friendlyDbError(err, "save this team member"), "error");
+      } finally {
+        setBusy(btn, false);
+      }
+    }
+
+    async function refreshStaff() {
+      const [staffRes, linksRes] = await Promise.all([
+        supabaseClient.from("staff_members").select("*").eq("profile_id", state.profile.id).order("sort_order").order("created_at"),
+        supabaseClient.from("service_staff").select("*").eq("profile_id", state.profile.id)
+      ]);
+      if (staffRes.error) return toast(friendlyDbError(staffRes.error, "refresh team members"), "error");
+      if (linksRes.error) return toast(friendlyDbError(linksRes.error, "refresh service assignments"), "error");
+
+      state.staff = staffRes.data || [];
+      state.serviceStaff = linksRes.data || [];
+      renderStaff();
+      renderAvailabilityServiceOptions();
+      populateTimeOffStaffOptions();
+      populateCalendarStaffFilter();
+      renderCalendarDashboard();
+    }
+
+    async function handleStaffListClick(e) {
+      const btn = e.target.closest("[data-staff-action]");
+      if (!btn) return;
+      const member = state.staff.find(item => item.id === btn.dataset.id);
+      if (!member) return;
+
+      if (btn.dataset.staffAction === "edit") {
+        $("staffEditId").value = member.id;
+        $("staffName").value = member.name || "";
+        $("staffJobTitle").value = member.job_title || "";
+        $("staffBio").value = member.bio || "";
+        $("staffPhoto").value = "";
+        const selected = new Set(state.serviceStaff.filter(link => link.staff_id === member.id).map(link => link.service_id));
+        renderStaffServiceChoices(selected);
+        $("staffFormHeading").textContent = "Edit team member";
+        $("staffSubmitBtn").textContent = "Save changes";
+        $("staffCancelEditBtn").classList.remove("hidden");
+        $("staffForm").scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      if (btn.dataset.staffAction === "toggle") {
+        const { error } = await supabaseClient
+          .from("staff_members")
+          .update({ is_active: !member.is_active, updated_at: new Date().toISOString() })
+          .eq("id", member.id)
+          .eq("profile_id", state.profile.id);
+        if (error) return toast(friendlyDbError(error, "update this team member"), "error");
+        toast(member.is_active ? "Team member deactivated." : "Team member activated.");
+        await refreshStaff();
+      }
+    }
+
+    function populateAvailabilityStaffOptions() {
+      const serviceId = $("blkService")?.value || "";
+      const select = $("blkStaff");
+      if (!select) return;
+
+      const assigned = staffForService(serviceId);
+      const current = select.value;
+      if (!assigned.length) {
+        select.innerHTML = '<option value="">Business-wide / no team member</option>';
+        select.value = "";
+        select.disabled = true;
+        $("blkStaffHelp").textContent = "No active team members are assigned to this service, so availability applies to the business.";
+      } else {
+        select.disabled = false;
+        select.innerHTML = '<option value="">Choose a team member…</option>' + assigned.map(member =>
+          `<option value="${member.id}">${escapeHtml(member.name)}${member.job_title ? " · " + escapeHtml(member.job_title) : ""}</option>`
+        ).join("");
+        if (assigned.some(member => member.id === current)) select.value = current;
+        $("blkStaffHelp").textContent = "This service has team members assigned, so availability must be linked to one person.";
+      }
+    }
+
+    function populateTimeOffStaffOptions() {
+      const select = $("timeOffStaff");
+      if (!select) return;
+      const current = select.value;
+      select.innerHTML = '<option value="">Whole business</option>' + state.staff
+        .filter(member => member.is_active)
+        .map(member => `<option value="${member.id}">${escapeHtml(member.name)}</option>`)
+        .join("");
+      if (state.staff.some(member => member.id === current && member.is_active)) select.value = current;
+    }
+
+    function populateCalendarStaffFilter() {
+      const select = $("calendarStaffFilter");
+      if (!select) return;
+      const current = select.value || "all";
+      select.innerHTML = '<option value="all">All team members</option><option value="none">Business-wide / unassigned</option>' +
+        state.staff.map(member => `<option value="${member.id}">${escapeHtml(member.name)}</option>`).join("");
+      if ([...select.options].some(option => option.value === current)) select.value = current;
+    }
+
     function renderAvailabilityServiceOptions() {
       const select = $("blkService");
       if (!select) return;
@@ -5038,6 +5438,7 @@
       ).join("");
 
       if (state.services.some(s => s.id === current)) select.value = current;
+      populateAvailabilityStaffOptions();
       updateCalculatedEnd();
     }
 
@@ -5155,6 +5556,7 @@
 
       $("blocksList").innerHTML = list.length ? list.map(b => {
         const service = state.services.find(s => s.id === b.service_id);
+        const member = state.staff.find(s => s.id === b.staff_id);
         const buffer = Number(b.buffer_minutes || 0);
         return `
         <div class="flex flex-col gap-3 rounded-2xl border ${b.is_active ? "border-slate-200" : "border-slate-200 bg-slate-50 opacity-65"} p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -5166,6 +5568,7 @@
               </span>
             </div>
             <p class="mt-1 text-sm font-semibold text-slate-700">${escapeHtml(service?.title || "No service linked")}</p>
+            <p class="mt-1 text-xs font-semibold text-brand-600">${member ? escapeHtml(member.name) : "Business-wide"}</p>
             <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}${buffer ? ` · ${buffer} min between customers` : ""}</p>
             ${b.recurrence_group ? '<p class="mt-1 text-xs font-semibold text-indigo-600">Part of a recurring series</p>' : ''}
           </div>
@@ -5194,6 +5597,7 @@
 
       const editId = $("blockEditId").value;
       const serviceId = $("blkService").value;
+      const staffId = $("blkStaff").value || null;
       const blockDate = $("blkDate").value;
       const startTime = cleanTime($("blkStart").value);
       const bufferMinutes = Number($("blkBuffer").value || 0);
@@ -5205,6 +5609,9 @@
         : (useRepeatUntil ? $("blkRepeatUntil").value : defaultRepeatUntil(blockDate));
 
       if (!serviceId || !service) return toast("Choose a service first.", "error");
+      const assignedStaff = staffForService(serviceId);
+      if (assignedStaff.length && !staffId) return toast("Choose which team member this availability belongs to.", "error");
+      if (staffId && !assignedStaff.some(member => member.id === staffId)) return toast("That team member is not assigned to this service.", "error");
 
       const endTime = addMinutesToTime(startTime, Number(service.duration_minutes));
       if (!endTime) return toast("This appointment would run into the next day. Choose an earlier start time.", "error");
@@ -5235,6 +5642,7 @@
         state.blocks.some(b =>
           b.id !== editId &&
           b.service_id === serviceId &&
+          (b.staff_id || null) === staffId &&
           b.block_date === date &&
           startTime < cleanTime(b.end_time) &&
           endTime > cleanTime(b.start_time)
@@ -5251,6 +5659,7 @@
       const basePayload = {
         profile_id: state.profile.id,
         service_id: serviceId,
+        staff_id: staffId,
         start_time: startTime,
         end_time: endTime,
         buffer_minutes: bufferMinutes,
@@ -5313,6 +5722,8 @@
       if (action === "edit") {
         $("blockEditId").value = block.id;
         $("blkService").value = block.service_id || "";
+        populateAvailabilityStaffOptions();
+        $("blkStaff").value = block.staff_id || "";
         $("blkDate").value = block.block_date;
         $("blkStart").value = cleanTime(block.start_time);
         $("blkBuffer").value = String(Number(block.buffer_minutes || 0));
@@ -5447,6 +5858,7 @@
 
     function bookingCard(b, allowCancel = false) {
       const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
+      const member = b.staff_members || state.staff.find(s => s.id === b.staff_id) || null;
       const cancelled = b.status === "cancelled";
       return `
         <div class="flex flex-col gap-3 rounded-2xl border ${cancelled ? "border-slate-200 bg-slate-50 opacity-75" : "border-slate-200"} p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -5454,6 +5866,7 @@
             <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
               <h3 class="font-bold text-ink">${escapeHtml(b.customer_name)}</h3>
               <span class="text-xs font-semibold text-brand-600">${escapeHtml(srv.title || "Service")}</span>
+              ${member ? `<span class="rounded-full bg-violet-50 px-2 py-0.5 text-[.68rem] font-bold text-violet-700">${escapeHtml(member.name)}</span>` : ""}
               ${cancelled ? '<span class="rounded-full bg-slate-200 px-2 py-0.5 text-[.68rem] font-bold text-slate-600">Cancelled</span>' : ""}
             </div>
             <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}${b.customer_phone ? ` · ${escapeHtml(b.customer_phone)}` : ""}${b.booked_price != null ? ` · <strong class="text-slate-700">${money(b.booked_price)}</strong>` : ""}</p>
@@ -5504,7 +5917,7 @@
     }
 
     async function refreshBookings() {
-      const res = await supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", state.profile.id).order("start_time");
+      const res = await supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), staff_members(name, job_title, photo_url), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", state.profile.id).order("start_time");
       state.bookings = res.data || [];
       state.bookingsError = res.error || null;
       renderBookings();
@@ -5590,6 +6003,8 @@
       $("manageBusinessName").textContent = b.business_name || "Your booking";
       $("manageServiceName").textContent = b.service_title || "Appointment";
       $("manageCustomerName").textContent = b.customer_name || "Customer";
+      $("manageStaffRow").classList.toggle("hidden", !b.staff_name);
+      $("manageStaffName").textContent = b.staff_name || "—";
       $("manageDate").textContent = prettyDate(new Date(b.start_time).toLocaleDateString("en-CA", { timeZone: BUSINESS_TIME_ZONE }));
       $("manageTime").textContent = `${prettyTime(new Date(b.start_time))}–${prettyTime(new Date(new Date(b.start_time).getTime() + Number(b.duration_minutes || 0) * 60000))}`;
       $("managePrice").textContent = money(b.booked_price || 0);
@@ -5669,24 +6084,31 @@
       const startIso = londonDate(dateKey, "00:00").toISOString();
       const endIso = new Date(londonDate(dateKey, "00:00").getTime() + 93600000).toISOString();
 
+      let blockQuery = publicClient
+        .from("schedule_blocks")
+        .select("*")
+        .eq("profile_id", b.profile_id)
+        .eq("service_id", b.service_id)
+        .eq("block_date", dateKey)
+        .eq("is_active", true)
+        .order("start_time");
+      blockQuery = b.staff_id ? blockQuery.eq("staff_id", b.staff_id) : blockQuery.is("staff_id", null);
+
+      let bookingQuery = publicClient
+        .from("bookings")
+        .select("start_time, end_time, status, staff_id")
+        .eq("profile_id", b.profile_id)
+        .eq("status", "confirmed")
+        .lt("start_time", endIso)
+        .gt("end_time", startIso);
+      bookingQuery = b.staff_id ? bookingQuery.eq("staff_id", b.staff_id) : bookingQuery.is("staff_id", null);
+
       const [blkRes, bkgRes, timeOffRes] = await Promise.all([
-        publicClient
-          .from("schedule_blocks")
-          .select("*")
-          .eq("profile_id", b.profile_id)
-          .eq("service_id", b.service_id)
-          .eq("block_date", dateKey)
-          .eq("is_active", true)
-          .order("start_time"),
-        publicClient
-          .from("bookings")
-          .select("start_time, end_time, status")
-          .eq("profile_id", b.profile_id)
-          .eq("status", "confirmed")
-          .lt("start_time", endIso)
-          .gt("end_time", startIso),
-        publicClient.rpc("public_get_time_off", {
+        blockQuery,
+        bookingQuery,
+        publicClient.rpc("public_get_time_off_for_staff", {
           p_profile_id: b.profile_id,
+          p_staff_id: b.staff_id || null,
           p_range_start: startIso,
           p_range_end: endIso
         })
@@ -5705,17 +6127,20 @@
       let slots = buildSlots(
         blkRes.data || [],
         bkgRes.data || [],
-        Number(b.duration_minutes || 0)
+        Number(b.duration_minutes || 0),
+        b.staff_id || null
       );
       slots = filterSlotsAgainstTimeOff(slots, timeOffRes.data || []);
 
-      const googleFiltered = await filterSlotsAgainstGoogleCalendar(b.profile_id, b.service_id, slots);
-      if (googleFiltered.error) {
-        $("manageSlots").innerHTML = "";
-        $("manageSlotsMessage").textContent = "We couldn't check Google Calendar availability just now. Please try again.";
-        return;
+      if (!b.staff_id) {
+        const googleFiltered = await filterSlotsAgainstGoogleCalendar(b.profile_id, b.service_id, slots);
+        if (googleFiltered.error) {
+          $("manageSlots").innerHTML = "";
+          $("manageSlotsMessage").textContent = "We couldn't check Google Calendar availability just now. Please try again.";
+          return;
+        }
+        slots = googleFiltered.slots;
       }
-      slots = googleFiltered.slots;
 
       $("manageSlotsMessage").textContent = slots.length
         ? `${slots.length} time${slots.length === 1 ? "" : "s"} available`
@@ -5818,16 +6243,28 @@
         if (pErr) throw pErr;
         if (!prof) throw new Error("This booking page is not available. The business may still be awaiting approval.");
 
-        const [{ data: srvs, error: sErr }, { data: questions, error: qErr }] = await Promise.all([
+        const [
+          { data: srvs, error: sErr },
+          { data: questions, error: qErr },
+          { data: staff, error: staffErr },
+          { data: serviceStaff, error: serviceStaffErr }
+        ] = await Promise.all([
           publicClient.from("services").select("*").eq("profile_id", profileId).order("created_at"),
-          publicClient.from("booking_questions").select("*").eq("profile_id", profileId).eq("is_active", true).order("sort_order").order("created_at")
+          publicClient.from("booking_questions").select("*").eq("profile_id", profileId).eq("is_active", true).order("sort_order").order("created_at"),
+          publicClient.from("staff_members").select("id,profile_id,name,job_title,bio,photo_url,is_active,sort_order").eq("profile_id", profileId).eq("is_active", true).order("sort_order").order("created_at"),
+          publicClient.from("service_staff").select("service_id,staff_id").eq("profile_id", profileId)
         ]);
         if (sErr) throw sErr;
         if (qErr) throw qErr;
+        if (staffErr) throw staffErr;
+        if (serviceStaffErr) throw serviceStaffErr;
 
         state.publicProfile = prof;
+        state.selectedStaffChoice = null;
         state.publicServices = srvs || [];
         state.publicQuestions = questions || [];
+        state.publicStaff = staff || [];
+        state.publicServiceStaff = serviceStaff || [];
 
         $("publicBusinessName").textContent = prof.business_name;
         applyPublicBranding();
@@ -5942,18 +6379,96 @@
       }));
     }
 
+    function publicStaffForService(serviceId) {
+      const ids = new Set(state.publicServiceStaff.filter(link => link.service_id === serviceId).map(link => link.staff_id));
+      return state.publicStaff.filter(member => ids.has(member.id));
+    }
+
+    function updatePublicStepNumbers(hasStaff) {
+      $("dateStepNumber").textContent = hasStaff ? "3" : "2";
+      $("timeStepNumber").textContent = hasStaff ? "4" : "3";
+      $("detailsStepNumber").textContent = hasStaff ? "5" : "4";
+    }
+
+    function renderPublicStaffChoices() {
+      const members = state.selectedService ? publicStaffForService(state.selectedService.id) : [];
+      const step = $("staffStep");
+      const list = $("publicStaffChoices");
+      const hasStaff = members.length > 0;
+
+      updatePublicStepNumbers(hasStaff);
+      step.classList.toggle("hidden", !hasStaff);
+
+      if (!hasStaff) {
+        state.selectedStaffChoice = null;
+        list.innerHTML = "";
+        return false;
+      }
+
+      list.innerHTML = `
+        <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="any">
+          <span class="block font-bold text-ink">Any available team member</span>
+          <span class="mt-1 block text-sm text-slate-500">Show the earliest times across the whole team.</span>
+        </button>
+      ` + members.map(member => `
+        <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="${member.id}">
+          <span class="flex items-start gap-3">
+            <span class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-brand-50 font-black text-brand-700">
+              ${member.photo_url ? `<img src="${escapeHtml(member.photo_url)}" alt="" class="h-full w-full object-cover">` : escapeHtml(String(member.name).slice(0,1).toUpperCase())}
+            </span>
+            <span class="min-w-0">
+              <span class="block font-bold text-ink">${escapeHtml(member.name)}</span>
+              ${member.job_title ? `<span class="mt-0.5 block text-xs font-semibold text-brand-600">${escapeHtml(member.job_title)}</span>` : ""}
+              ${member.bio ? `<span class="mt-1 block text-sm leading-5 text-slate-500">${escapeHtml(member.bio)}</span>` : ""}
+            </span>
+          </span>
+        </button>
+      `).join("");
+      return true;
+    }
+
+    function handlePublicStaffClick(e) {
+      const btn = e.target.closest("[data-staff-choice]");
+      if (!btn) return;
+
+      state.selectedStaffChoice = btn.dataset.staffChoice;
+      state.selectedDate = "";
+      state.selectedSlot = null;
+      document.querySelectorAll(".staff-choice").forEach(el => el.classList.toggle("selected", el === btn));
+
+      $("publicDate").disabled = false;
+      $("publicDate").value = "";
+      if (hasStaff) {
+        deactivateStep("dateStep");
+      } else {
+        activateStep("dateStep");
+      }
+      deactivateStep("timeStep");
+      deactivateDetails();
+      $("publicSlots").innerHTML = "";
+      $("slotsMessage").textContent = "Choose a date to see available times.";
+      updateSummary();
+    }
+
+    function selectedPublicStaffName() {
+      const staffId = state.selectedSlot?.staffId || (state.selectedStaffChoice && state.selectedStaffChoice !== "any" ? state.selectedStaffChoice : null);
+      return state.publicStaff.find(member => member.id === staffId)?.name || "";
+    }
+
     function handlePublicServiceClick(e) {
       const btn = e.target.closest("[data-service-id]");
       if (!btn) return;
 
       state.selectedService = state.publicServices.find(s => s.id === btn.dataset.serviceId) || null;
+      state.selectedStaffChoice = null;
       state.selectedDate = "";
       state.selectedSlot = null;
       renderPublicQuestions();
+      const hasStaff = renderPublicStaffChoices();
 
       document.querySelectorAll(".service-choice").forEach(el => el.classList.toggle("selected", el.dataset.serviceId === btn.dataset.serviceId));
 
-      $("publicDate").disabled = false;
+      $("publicDate").disabled = hasStaff;
       $("publicDate").value = "";
       $("confirmBookingBtn").textContent = state.selectedService?.deposit_type === "none"
         ? "Confirm booking"
@@ -5991,57 +6506,111 @@
       }
     }
 
-    async function loadAvailableSlots() {
-      const startIso = londonDate(state.selectedDate, "00:00").toISOString();
-      const endIso = new Date(londonDate(state.selectedDate, "00:00").getTime() + 93600000).toISOString();
-
+    async function loadStaffSlotsForDate(staffId, dateKey, startIso, endIso) {
       const [blkRes, bkgRes, timeOffRes] = await Promise.all([
-        publicClient.from("schedule_blocks").select("*").eq("profile_id", state.publicProfile.id).eq("service_id", state.selectedService.id).eq("block_date", state.selectedDate).eq("is_active", true).order("start_time"),
-        publicClient.from("bookings").select("start_time, end_time, status").eq("profile_id", state.publicProfile.id).eq("status", "confirmed").lt("start_time", endIso).gt("end_time", startIso),
-        publicClient.rpc("public_get_time_off", {
+        publicClient.from("schedule_blocks").select("*")
+          .eq("profile_id", state.publicProfile.id)
+          .eq("service_id", state.selectedService.id)
+          .eq("staff_id", staffId)
+          .eq("block_date", dateKey)
+          .eq("is_active", true)
+          .order("start_time"),
+        publicClient.from("bookings").select("start_time,end_time,status,staff_id")
+          .eq("profile_id", state.publicProfile.id)
+          .eq("staff_id", staffId)
+          .eq("status", "confirmed")
+          .lt("start_time", endIso)
+          .gt("end_time", startIso),
+        publicClient.rpc("public_get_time_off_for_staff", {
           p_profile_id: state.publicProfile.id,
+          p_staff_id: staffId,
           p_range_start: startIso,
           p_range_end: endIso
         })
       ]);
 
-      if (blkRes.error) {
-        return $("slotsMessage").textContent = friendlyDbError(blkRes.error, "load availability");
-      }
+      if (blkRes.error) throw blkRes.error;
+      if (bkgRes.error) throw bkgRes.error;
+      if (timeOffRes.error) throw timeOffRes.error;
 
-      state.publicBookingsReadable = !bkgRes.error;
-      if (timeOffRes.error) {
-        $("publicSlots").innerHTML = "";
-        $("slotsMessage").textContent = "We couldn't check business time off just now. Please try again.";
-        return;
-      }
-
-      let slots = buildSlots(blkRes.data || [], bkgRes.data || [], Number(state.selectedService.duration_minutes));
-      slots = filterSlotsAgainstTimeOff(slots, timeOffRes.data || []);
-      const googleFiltered = await filterSlotsAgainstGoogleCalendar(state.publicProfile.id, state.selectedService.id, slots);
-
-      if (googleFiltered.error) {
-        $("publicSlots").innerHTML = "";
-        $("slotsMessage").textContent = "We couldn't check Google Calendar availability just now. Please try again.";
-        return;
-      }
-
-      slots = googleFiltered.slots;
-
-      $("slotsMessage").textContent = slots.length
-        ? `${slots.length} time${slots.length === 1 ? "" : "s"} available`
-        : "No times are available for this service on this date.";
-
-      $("publicSlots").innerHTML = slots.map((slot, idx) => `
-        <button type="button" class="slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-slot-index="${idx}">
-          ${escapeHtml(prettyTime(slot.start))}
-        </button>
-      `).join("");
-
-      $("publicSlots")._slots = slots;
+      let slots = buildSlots(blkRes.data || [], bkgRes.data || [], Number(state.selectedService.duration_minutes), staffId);
+      return filterSlotsAgainstTimeOff(slots, timeOffRes.data || []);
     }
 
-    function buildSlots(blocks, existingBookings, durationMins) {
+    async function loadAvailableSlots() {
+      const startIso = londonDate(state.selectedDate, "00:00").toISOString();
+      const endIso = new Date(londonDate(state.selectedDate, "00:00").getTime() + 93600000).toISOString();
+      const assigned = publicStaffForService(state.selectedService.id);
+
+      try {
+        let slots = [];
+
+        if (assigned.length) {
+          const targets = state.selectedStaffChoice === "any"
+            ? assigned
+            : assigned.filter(member => member.id === state.selectedStaffChoice);
+
+          if (!targets.length) {
+            $("publicSlots").innerHTML = "";
+            $("slotsMessage").textContent = "Choose a team member first.";
+            return;
+          }
+
+          const groups = await Promise.all(targets.map(member =>
+            loadStaffSlotsForDate(member.id, state.selectedDate, startIso, endIso)
+          ));
+          slots = groups.flat().sort((a,b) => a.start - b.start || String(a.staffId).localeCompare(String(b.staffId)));
+          state.publicBookingsReadable = true;
+        } else {
+          const [blkRes, bkgRes, timeOffRes] = await Promise.all([
+            publicClient.from("schedule_blocks").select("*").eq("profile_id", state.publicProfile.id).eq("service_id", state.selectedService.id).is("staff_id", null).eq("block_date", state.selectedDate).eq("is_active", true).order("start_time"),
+            publicClient.from("bookings").select("start_time,end_time,status,staff_id").eq("profile_id", state.publicProfile.id).is("staff_id", null).eq("status", "confirmed").lt("start_time", endIso).gt("end_time", startIso),
+            publicClient.rpc("public_get_time_off_for_staff", {
+              p_profile_id: state.publicProfile.id,
+              p_staff_id: null,
+              p_range_start: startIso,
+              p_range_end: endIso
+            })
+          ]);
+
+          if (blkRes.error) throw blkRes.error;
+          state.publicBookingsReadable = !bkgRes.error;
+          if (timeOffRes.error) throw timeOffRes.error;
+
+          slots = buildSlots(blkRes.data || [], bkgRes.data || [], Number(state.selectedService.duration_minutes), null);
+          slots = filterSlotsAgainstTimeOff(slots, timeOffRes.data || []);
+
+          const googleFiltered = await filterSlotsAgainstGoogleCalendar(state.publicProfile.id, state.selectedService.id, slots);
+          if (googleFiltered.error) {
+            $("publicSlots").innerHTML = "";
+            $("slotsMessage").textContent = "We couldn't check Google Calendar availability just now. Please try again.";
+            return;
+          }
+          slots = googleFiltered.slots;
+        }
+
+        $("slotsMessage").textContent = slots.length
+          ? `${slots.length} time${slots.length === 1 ? "" : "s"} available`
+          : "No times are available for this service on this date.";
+
+        $("publicSlots").innerHTML = slots.map((slot, idx) => {
+          const member = slot.staffId ? state.publicStaff.find(item => item.id === slot.staffId) : null;
+          return `
+            <button type="button" class="slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-slot-index="${idx}">
+              <span class="block">${escapeHtml(prettyTime(slot.start))}</span>
+              ${state.selectedStaffChoice === "any" && member ? `<span class="mt-0.5 block truncate text-[.65rem] font-semibold text-slate-400">${escapeHtml(member.name)}</span>` : ""}
+            </button>
+          `;
+        }).join("");
+
+        $("publicSlots")._slots = slots;
+      } catch (err) {
+        $("publicSlots").innerHTML = "";
+        $("slotsMessage").textContent = friendlyDbError(err, "load availability");
+      }
+    }
+
+    function buildSlots(blocks, existingBookings, durationMins, staffId = null) {
       const slotMap = new Map();
       const durationMs = 60 * durationMins * 1000;
       const minimumNoticeHours = Number(state.publicProfile?.minimum_notice_hours || 0);
@@ -6068,7 +6637,8 @@
                 end: appointmentEnd,
                 blockedEnd,
                 capacity: maxCap,
-                bufferMinutes: Number(block.buffer_minutes || 0)
+                bufferMinutes: Number(block.buffer_minutes || 0),
+                staffId
               });
             }
           }
@@ -6176,6 +6746,9 @@
         $("summaryPrice").textContent = money(state.selectedService.price);
       }
 
+      const selectedStaff = selectedPublicStaffName();
+      $("summaryStaffRow").classList.toggle("hidden", !publicStaffForService(state.selectedService?.id || "").length);
+      $("summaryStaff").textContent = selectedStaff || (state.selectedStaffChoice === "any" ? "Any available" : "Not selected");
       $("summaryDate").textContent = state.selectedDate ? prettyDate(state.selectedDate) : "Not selected";
       $("summaryTime").textContent = state.selectedSlot ? `${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}` : "Not selected";
     }
@@ -6189,13 +6762,17 @@
       const submitBtn = $("confirmBookingBtn");
       setBusy(submitBtn, true, "Confirming…");
 
-      const { data: checkBkgs, error: checkErr } = await publicClient
+      let bookingCheck = publicClient
         .from("bookings")
-        .select("start_time, end_time, status")
+        .select("start_time, end_time, status, staff_id")
         .eq("profile_id", state.publicProfile.id)
         .eq("status", "confirmed")
         .lt("start_time", state.selectedSlot.blockedEnd.toISOString())
         .gt("end_time", state.selectedSlot.start.toISOString());
+      bookingCheck = state.selectedSlot.staffId
+        ? bookingCheck.eq("staff_id", state.selectedSlot.staffId)
+        : bookingCheck.is("staff_id", null);
+      const { data: checkBkgs, error: checkErr } = await bookingCheck;
 
       if (!checkErr && !hasCapacity(state.selectedSlot.start, state.selectedSlot.blockedEnd, state.selectedSlot.capacity, checkBkgs || [])) {
         setBusy(submitBtn, false);
@@ -6203,23 +6780,25 @@
         return await loadAvailableSlots();
       }
 
-      const googleRecheck = await filterSlotsAgainstGoogleCalendar(
-        state.publicProfile.id,
-        state.selectedService.id,
-        [state.selectedSlot]
-      );
+      if (!state.selectedSlot.staffId) {
+        const googleRecheck = await filterSlotsAgainstGoogleCalendar(
+          state.publicProfile.id,
+          state.selectedService.id,
+          [state.selectedSlot]
+        );
 
-      if (googleRecheck.error) {
-        setBusy(submitBtn, false);
-        return toast("We couldn't re-check Google Calendar availability. Please try again.", "error");
-      }
+        if (googleRecheck.error) {
+          setBusy(submitBtn, false);
+          return toast("We couldn't re-check Google Calendar availability. Please try again.", "error");
+        }
 
-      if (!googleRecheck.slots.length) {
-        setBusy(submitBtn, false);
-        state.selectedSlot = null;
-        updateSummary();
-        toast("That time is now blocked in the business calendar. Please choose another.", "error");
-        return await loadAvailableSlots();
+        if (!googleRecheck.slots.length) {
+          setBusy(submitBtn, false);
+          state.selectedSlot = null;
+          updateSummary();
+          toast("That time is now blocked in the business calendar. Please choose another.", "error");
+          return await loadAvailableSlots();
+        }
       }
 
       const { data, error } = await publicClient.rpc("public_create_booking", {
@@ -6230,7 +6809,8 @@
         p_customer_phone: $("customerPhone").value.trim(),
         p_start_time: state.selectedSlot.start.toISOString(),
         p_answers: publicQuestionAnswers(),
-        p_marketing_opt_in: $("marketingOptIn").checked
+        p_marketing_opt_in: $("marketingOptIn").checked,
+        p_staff_id: state.selectedSlot.staffId || null
       });
       setBusy(submitBtn, false);
 
@@ -6262,7 +6842,8 @@
       }
 
       const finalPrice = Number(created.booked_price ?? promotionForDate(state.selectedService, state.selectedDate).price);
-      const summaryText = `${state.selectedService.title} with ${state.publicProfile.business_name} on ${prettyDateTime(created.start_time || state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
+      const bookedStaffName = selectedPublicStaffName();
+      const summaryText = `${state.selectedService.title}${bookedStaffName ? " with " + bookedStaffName : ""} at ${state.publicProfile.business_name} on ${prettyDateTime(created.start_time || state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
       $("successSummary").textContent = summaryText;
 
       setBusy(submitBtn, true, "Opening secure payment…");
@@ -6296,7 +6877,7 @@
 
         await syncBookingToGoogle(created.manage_token);
 
-        ["dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
+        ["staffStep", "dateStep", "timeStep", "detailsStep"].forEach(id => $(id).classList.add("hidden"));
         $("bookingSuccess").classList.remove("hidden");
         $("bookingSuccess").scrollIntoView({ behavior: "smooth", block: "center" });
       } catch (err) {
@@ -6315,6 +6896,7 @@
 
     function resetPublicJourney() {
       state.selectedService = null;
+      state.selectedStaffChoice = null;
       state.selectedDate = "";
       state.selectedSlot = null;
 
@@ -6325,7 +6907,10 @@
       $("publicDate").value = "";
       $("publicDate").disabled = true;
 
-      document.querySelectorAll(".service-choice, .slot-choice").forEach(el => el.classList.remove("selected"));
+      document.querySelectorAll(".service-choice, .staff-choice, .slot-choice").forEach(el => el.classList.remove("selected"));
+      $("staffStep").classList.add("hidden");
+      $("publicStaffChoices").innerHTML = "";
+      updatePublicStepNumbers(false);
 
       ["dateStep", "timeStep", "detailsStep"].forEach(id => {
         $(id).classList.remove("hidden");
