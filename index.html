@@ -698,6 +698,36 @@
                 </div>
               </div>
 
+              <div class="rounded-2xl border border-violet-200 bg-violet-50/60 p-4">
+                <label class="flex cursor-pointer items-center justify-between gap-4">
+                  <span>
+                    <span class="block text-sm font-bold text-slate-700">Flexible team booking</span>
+                    <span class="mt-0.5 block text-xs leading-5 text-slate-500">Let customers book any qualified team member. MoreLeads automatically assigns the least-booked available person.</span>
+                  </span>
+                  <input id="srvFlexibleStaffEnabled" type="checkbox" class="h-4 w-4 rounded border-slate-300">
+                </label>
+
+                <div id="srvFlexibleStaffFields" class="mt-4 hidden space-y-4 border-t border-violet-200 pt-4">
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label class="label" for="srvFlexibleDiscountType">Customer incentive</label>
+                      <select id="srvFlexibleDiscountType" class="field">
+                        <option value="percentage">Percentage off</option>
+                        <option value="fixed">Fixed amount off</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label id="srvFlexibleDiscountValueLabel" class="label" for="srvFlexibleDiscountValue">Discount (%)</label>
+                      <input id="srvFlexibleDiscountValue" class="field" type="number" min="0" max="100" step="0.01" value="10">
+                    </div>
+                  </div>
+                  <div class="rounded-xl bg-white/75 p-3 text-xs leading-5 text-slate-600">
+                    <strong>How assignment works:</strong> only team members assigned to this service, available at that exact time and not already booked are considered. The person with the fewest upcoming bookings is assigned automatically. You can change the assigned person later from Bookings.
+                  </div>
+                  <p class="text-xs leading-5 text-slate-500">If a scheduled promotional offer also applies, this flexible-team discount is applied afterwards.</p>
+                </div>
+              </div>
+
               <div class="flex gap-2">
                 <button id="serviceSubmitBtn" class="btn btn-primary flex-1" type="submit">Add service</button>
                 <button id="serviceCancelEditBtn" class="btn btn-light hidden" type="button">Cancel</button>
@@ -2072,6 +2102,43 @@
       return "Pay at appointment";
     }
 
+    function syncFlexibleStaffFields() {
+      const enabled = Boolean($("srvFlexibleStaffEnabled")?.checked);
+      $("srvFlexibleStaffFields")?.classList.toggle("hidden", !enabled);
+
+      const type = $("srvFlexibleDiscountType")?.value || "percentage";
+      const label = $("srvFlexibleDiscountValueLabel");
+      const input = $("srvFlexibleDiscountValue");
+      if (!label || !input) return;
+
+      if (type === "fixed") {
+        label.textContent = "Discount amount (£)";
+        input.placeholder = "5.00";
+        input.removeAttribute("max");
+      } else {
+        label.textContent = "Discount (%)";
+        input.placeholder = "10";
+        input.max = "100";
+      }
+    }
+
+    function flexibleStaffDiscountLabel(service) {
+      if (!service?.flexible_staff_enabled) return "";
+      const value = Number(service.flexible_staff_discount_value || 0);
+      if (service.flexible_staff_discount_type === "fixed") return `${money(value)} off`;
+      return `${value % 1 === 0 ? value.toFixed(0) : value}% off`;
+    }
+
+    function flexibleStaffPrice(service, price) {
+      const original = Math.max(0, Number(price || 0));
+      if (!service?.flexible_staff_enabled) return original;
+      const value = Number(service.flexible_staff_discount_value || 0);
+      let result = original;
+      if (service.flexible_staff_discount_type === "fixed") result = original - value;
+      else result = original * (1 - value / 100);
+      return Math.max(0, Math.round((result + Number.EPSILON) * 100) / 100);
+    }
+
     function syncPromoFields() {
       const enabled = $("srvPromoEnabled").checked;
       $("srvPromoFields").classList.toggle("hidden", !enabled);
@@ -2495,6 +2562,7 @@
       $("manageDateInput").min = todayKey();
       renderPromoExcludedDates();
       syncPromoFields();
+      syncFlexibleStaffFields();
       syncBookingQuestionFields();
 
       const timeOffToday = todayKey();
@@ -2564,6 +2632,8 @@
       $("srvPrice").addEventListener("input", updateFreePlanFeePreview);
       $("srvDepositType").addEventListener("change", syncPaymentFields);
       $("srvPromoEnabled").addEventListener("change", syncPromoFields);
+      $("srvFlexibleStaffEnabled").addEventListener("change", syncFlexibleStaffFields);
+      $("srvFlexibleDiscountType").addEventListener("change", syncFlexibleStaffFields);
       $("srvPromoType").addEventListener("change", syncPromoType);
       $("srvPromoNoEnd").addEventListener("change", syncPromoEnd);
       $("srvPromoAddExcludeBtn").addEventListener("click", addPromoExcludedDate);
@@ -3611,6 +3681,21 @@
 
       const existing = editId ? state.questions.find(q => q.id === editId) : null;
       const serviceQuestions = state.questions.filter(q => q.service_id === serviceId && q.id !== editId);
+      if (isFreePlan && flexibleStaffEnabled) {
+        let lowestPrice = basePrice;
+        if (promoEnabled) {
+          if (promoType === "percentage") lowestPrice = basePrice * (1 - promoValue / 100);
+          else if (promoType === "fixed") lowestPrice = basePrice - promoValue;
+          else if (promoType === "price") lowestPrice = promoValue;
+        }
+        lowestPrice = flexibleDiscountType === "fixed"
+          ? lowestPrice - flexibleDiscountValue
+          : lowestPrice * (1 - flexibleDiscountValue / 100);
+        if (lowestPrice < 10) {
+          return toast("On Free, the flexible-team discount cannot reduce the appointment below £10.", "error");
+        }
+      }
+
       const payload = {
         profile_id: state.profile.id,
         service_id: serviceId,
@@ -4989,6 +5074,11 @@
                 <span class="text-emerald-700">${escapeHtml(promotionScheduleText(s))}</span>
               </div>
             ` : ""}
+            ${s.flexible_staff_enabled ? `
+              <div class="mt-2 inline-flex rounded-xl bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-800">
+                Flexible team booking · ${escapeHtml(flexibleStaffDiscountLabel(s))}
+              </div>
+            ` : ""}
           </div>
           <div class="flex shrink-0 gap-2">
             <button class="btn btn-light !px-3 !py-2" type="button" data-service-action="edit" data-id="${s.id}">Edit</button>
@@ -5008,6 +5098,9 @@
       }
 
       const promoEnabled = $("srvPromoEnabled").checked;
+      const flexibleStaffEnabled = $("srvFlexibleStaffEnabled").checked;
+      const flexibleDiscountType = $("srvFlexibleDiscountType").value;
+      const flexibleDiscountValue = Number($("srvFlexibleDiscountValue").value || 0);
       const basePrice = Number($("srvPrice").value);
       const isFreePlan = currentPlanCode() === "free";
       const depositType = isFreePlan ? "full" : $("srvDepositType").value;
@@ -5026,6 +5119,16 @@
       }
       if (!isFreePlan && depositType === "percentage" && (!(depositAmount > 0) || depositAmount > 100)) {
         return toast("The deposit percentage must be between 0 and 100%.", "error");
+      }
+
+      if (flexibleStaffEnabled) {
+        if (!(flexibleDiscountValue > 0)) return toast("Enter a flexible-team discount greater than 0.", "error");
+        if (flexibleDiscountType === "percentage" && flexibleDiscountValue > 100) {
+          return toast("The flexible-team percentage discount cannot exceed 100%.", "error");
+        }
+        if (flexibleDiscountType === "fixed" && flexibleDiscountValue > basePrice) {
+          return toast("The flexible-team fixed discount cannot exceed the normal service price.", "error");
+        }
       }
 
       if (promoEnabled) {
@@ -5061,7 +5164,10 @@
         promotion_start_date: promoEnabled ? promoStart : null,
         promotion_end_date: promoEnabled ? promoEnd : null,
         promotion_days: promoEnabled ? promoDays : [0, 1, 2, 3, 4, 5, 6],
-        promotion_excluded_dates: promoEnabled ? servicePromoExcludedDates : []
+        promotion_excluded_dates: promoEnabled ? servicePromoExcludedDates : [],
+        flexible_staff_enabled: flexibleStaffEnabled,
+        flexible_staff_discount_type: flexibleDiscountType,
+        flexible_staff_discount_value: flexibleStaffEnabled ? flexibleDiscountValue : 10
       };
 
       const btn = $("serviceSubmitBtn");
@@ -5133,6 +5239,11 @@
         renderPromoExcludedDates();
         syncPromoFields();
 
+        $("srvFlexibleStaffEnabled").checked = !!service.flexible_staff_enabled;
+        $("srvFlexibleDiscountType").value = service.flexible_staff_discount_type || "percentage";
+        $("srvFlexibleDiscountValue").value = service.flexible_staff_discount_value ?? 10;
+        syncFlexibleStaffFields();
+
         $("serviceFormHeading").textContent = "Edit service";
         $("serviceSubmitBtn").textContent = "Save changes";
         $("serviceCancelEditBtn").classList.remove("hidden");
@@ -5174,6 +5285,10 @@
       servicePromoExcludedDates = [];
       renderPromoExcludedDates();
       syncPromoFields();
+      $("srvFlexibleStaffEnabled").checked = false;
+      $("srvFlexibleDiscountType").value = "percentage";
+      $("srvFlexibleDiscountValue").value = "10";
+      syncFlexibleStaffFields();
       $("serviceFormHeading").textContent = "Add a service";
       $("serviceSubmitBtn").textContent = "Add service";
       $("serviceCancelEditBtn").classList.add("hidden");
@@ -5877,9 +5992,23 @@
               <h3 class="font-bold text-ink">${escapeHtml(b.customer_name)}</h3>
               <span class="text-xs font-semibold text-brand-600">${escapeHtml(srv.title || "Service")}</span>
               ${member ? `<span class="rounded-full bg-violet-50 px-2 py-0.5 text-[.68rem] font-bold text-violet-700">${escapeHtml(member.name)}</span>` : ""}
+              ${b.flexible_staff_booking ? `<span class="rounded-full bg-violet-100 px-2 py-0.5 text-[.68rem] font-bold text-violet-800">Flexible team${b.staff_assigned_automatically ? " · auto assigned" : ""}</span>` : ""}
               ${cancelled ? '<span class="rounded-full bg-slate-200 px-2 py-0.5 text-[.68rem] font-bold text-slate-600">Cancelled</span>' : ""}
             </div>
             <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))} · ${escapeHtml(b.customer_email)}${b.customer_phone ? ` · ${escapeHtml(b.customer_phone)}` : ""}${b.booked_price != null ? ` · <strong class="text-slate-700">${money(b.booked_price)}</strong>` : ""}</p>
+            ${!cancelled && staffForService(b.service_id).length ? `
+              <details class="mt-3 rounded-xl bg-violet-50/60 p-3">
+                <summary class="cursor-pointer text-xs font-bold text-violet-700">Change team member</summary>
+                <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <select class="field !py-2 text-sm" data-reassign-select="${b.id}">
+                    ${staffForService(b.service_id).map(person => `
+                      <option value="${person.id}" ${person.id === b.staff_id ? "selected" : ""}>${escapeHtml(person.name)}${person.job_title ? " · " + escapeHtml(person.job_title) : ""}</option>
+                    `).join("")}
+                  </select>
+                  <button class="btn btn-light shrink-0 !px-3 !py-2 text-sm" type="button" data-booking-action="reassign" data-id="${b.id}">Reassign</button>
+                </div>
+              </details>
+            ` : ""}
             ${Array.isArray(b.booking_answers) && b.booking_answers.length ? `
               <details class="mt-3">
                 <summary class="cursor-pointer text-xs font-bold text-brand-600">Booking answers (${b.booking_answers.length})</summary>
@@ -5938,32 +6067,60 @@
     }
 
     async function handleBookingListClick(e) {
-      const cancelBtn = e.target.closest('[data-booking-action="delete"]');
-      if (!cancelBtn) return;
+      const actionBtn = e.target.closest("[data-booking-action]");
+      if (!actionBtn) return;
 
-      const booking = state.bookings.find(b => b.id === cancelBtn.dataset.id);
-      if (!booking || !window.confirm(`Cancel the booking for ${booking.customer_name}? The appointment time will become available again.`)) return;
+      const booking = state.bookings.find(b => b.id === actionBtn.dataset.id);
+      if (!booking) return;
 
-      const { error } = await supabaseClient
-        .from("bookings")
-        .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
-        .eq("id", booking.id)
-        .eq("profile_id", state.profile.id);
+      if (actionBtn.dataset.bookingAction === "reassign") {
+        const select = $("bookingsList").querySelector(`[data-reassign-select="${booking.id}"]`);
+        const newStaffId = select?.value || "";
+        if (!newStaffId) return toast("Choose a team member first.", "error");
+        if (newStaffId === booking.staff_id) return toast("This booking is already assigned to that team member.", "info");
 
-      if (error) {
-        const msg = String(error?.message || "").toLowerCase();
-        if (msg.includes("cancellation cutoff")) {
-          toast("This appointment is now inside the business's cancellation cutoff.", "error");
-          await loadManagedBooking(state.manageToken);
-          return;
-        }
-        return toast(friendlyDbError(error, "cancel this booking"), "error");
+        setBusy(actionBtn, true, "Assigning…");
+        const { error } = await supabaseClient.rpc("owner_reassign_booking", {
+          p_booking_id: booking.id,
+          p_staff_id: newStaffId
+        });
+        setBusy(actionBtn, false);
+
+        if (error) return toast(friendlyDbError(error, "reassign this booking"), "error");
+
+        try {
+          await supabaseClient.functions.invoke("sync-booking-to-google", {
+            body: { manage_token: booking.manage_token }
+          });
+        } catch {}
+
+        toast("Team member reassigned.");
+        await refreshBookings();
+        return;
       }
 
-      toast("Booking cancelled.");
-      await refreshBookings();
-    }
+      if (actionBtn.dataset.bookingAction === "delete") {
+        if (!window.confirm(`Cancel the booking for ${booking.customer_name}? The appointment time will become available again.`)) return;
 
+        const { error } = await supabaseClient
+          .from("bookings")
+          .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
+          .eq("id", booking.id)
+          .eq("profile_id", state.profile.id);
+
+        if (error) {
+          const msg = String(error?.message || "").toLowerCase();
+          if (msg.includes("cancellation cutoff")) {
+            toast("This appointment is now inside the business's cancellation cutoff.", "error");
+            return;
+          }
+          return toast(friendlyDbError(error, "cancel this booking"), "error");
+        }
+
+        toast("Booking cancelled.");
+        await refreshBookings();
+      }
+    }
 
     async function loadManagedBooking(token, requestedAction = "") {
       showOnly("manageBookingView");
@@ -6310,6 +6467,11 @@
               ${escapeHtml(promotionLabel(s))} on eligible dates
             </span>
           ` : ""}
+          ${s.flexible_staff_enabled ? `
+            <span class="mt-2 inline-flex rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">
+              Any team member · ${escapeHtml(flexibleStaffDiscountLabel(s))}
+            </span>
+          ` : ""}
           <span class="mt-3 flex items-center justify-between gap-3 text-sm">
             <span class="text-slate-500">${Number(s.duration_minutes)} minutes</span>
             <span>${publicPriceHtml(s)}</span>
@@ -6415,12 +6577,24 @@
         return false;
       }
 
-      list.innerHTML = `
-        <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="any">
-          <span class="block font-bold text-ink">Any available team member</span>
-          <span class="mt-1 block text-sm text-slate-500">Show the earliest times across the whole team.</span>
-        </button>
-      ` + members.map(member => `
+      const anyChoice = state.selectedService?.flexible_staff_enabled
+        ? `
+          <button type="button" class="staff-choice rounded-2xl border border-violet-200 bg-violet-50/50 p-4 text-left transition hover:border-violet-400" data-staff-choice="flexible">
+            <span class="flex items-center justify-between gap-3">
+              <span class="block font-bold text-ink">Book any available team member</span>
+              <span class="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700">${escapeHtml(flexibleStaffDiscountLabel(state.selectedService))}</span>
+            </span>
+            <span class="mt-1 block text-sm text-slate-500">You choose the time. We automatically assign the least-booked available team member.</span>
+          </button>
+        `
+        : `
+          <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="any">
+            <span class="block font-bold text-ink">Any available team member</span>
+            <span class="mt-1 block text-sm text-slate-500">Show the earliest times across the whole team.</span>
+          </button>
+        `;
+
+      list.innerHTML = anyChoice + members.map(member => `
         <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="${member.id}">
           <span class="flex items-start gap-3">
             <span class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-brand-50 font-black text-brand-700">
@@ -6448,11 +6622,7 @@
 
       $("publicDate").disabled = false;
       $("publicDate").value = "";
-      if (hasStaff) {
-        deactivateStep("dateStep");
-      } else {
-        activateStep("dateStep");
-      }
+      activateStep("dateStep");
       deactivateStep("timeStep");
       deactivateDetails();
       $("publicSlots").innerHTML = "";
@@ -6461,7 +6631,7 @@
     }
 
     function selectedPublicStaffName() {
-      const staffId = state.selectedSlot?.staffId || (state.selectedStaffChoice && state.selectedStaffChoice !== "any" ? state.selectedStaffChoice : null);
+      const staffId = state.selectedSlot?.staffId || (state.selectedStaffChoice && !["any","flexible"].includes(state.selectedStaffChoice) ? state.selectedStaffChoice : null);
       return state.publicStaff.find(member => member.id === staffId)?.name || "";
     }
 
@@ -6573,7 +6743,27 @@
           const groups = await Promise.all(targets.map(member =>
             loadStaffSlotsForDate(member.id, state.selectedDate, startIso, endIso)
           ));
-          slots = groups.flat().sort((a,b) => a.start - b.start || String(a.staffId).localeCompare(String(b.staffId)));
+
+          if (state.selectedStaffChoice === "flexible") {
+            const byTime = new Map();
+            groups.flat().forEach(slot => {
+              const key = slot.start.getTime();
+              if (!byTime.has(key)) {
+                byTime.set(key, {
+                  start: slot.start,
+                  end: slot.end,
+                  blockedEnd: slot.end,
+                  capacity: 1,
+                  bufferMinutes: 0,
+                  staffId: null,
+                  flexible: true
+                });
+              }
+            });
+            slots = [...byTime.values()].sort((a,b) => a.start - b.start);
+          } else {
+            slots = groups.flat().sort((a,b) => a.start - b.start || String(a.staffId).localeCompare(String(b.staffId)));
+          }
           state.publicBookingsReadable = true;
         } else {
           const [blkRes, bkgRes, timeOffRes] = await Promise.all([
@@ -6747,22 +6937,36 @@
 
       if (!state.selectedService) {
         $("summaryPrice").textContent = "—";
-      } else if (state.selectedDate) {
-        const promo = promotionForDate(state.selectedService, state.selectedDate);
-        $("summaryPrice").innerHTML = promo.active
-          ? `<span class="flex flex-col items-end leading-tight">
-              <span class="text-sm font-semibold text-slate-400 line-through">${money(promo.basePrice)}</span>
-              <span>${money(promo.price)}</span>
-              <span class="mt-1 text-[.68rem] font-bold uppercase tracking-wide text-emerald-600">${escapeHtml(promo.label)}</span>
-            </span>`
-          : money(promo.basePrice);
       } else {
-        $("summaryPrice").textContent = money(state.selectedService.price);
+        const promo = state.selectedDate
+          ? promotionForDate(state.selectedService, state.selectedDate)
+          : { active: false, basePrice: Number(state.selectedService.price || 0), price: Number(state.selectedService.price || 0), label: "" };
+        const flexible = state.selectedStaffChoice === "flexible" && state.selectedService.flexible_staff_enabled;
+        const finalPrice = flexible ? flexibleStaffPrice(state.selectedService, promo.price) : promo.price;
+        const discounted = finalPrice < promo.basePrice;
+
+        if (discounted) {
+          const labels = [];
+          if (promo.active) labels.push(promo.label);
+          if (flexible) labels.push(`Flexible team ${flexibleStaffDiscountLabel(state.selectedService)}`);
+          $("summaryPrice").innerHTML = `
+            <span class="flex flex-col items-end leading-tight">
+              <span class="text-sm font-semibold text-slate-400 line-through">${money(promo.basePrice)}</span>
+              <span>${money(finalPrice)}</span>
+              <span class="mt-1 text-[.68rem] font-bold uppercase tracking-wide text-emerald-600">${escapeHtml(labels.join(" + "))}</span>
+            </span>
+          `;
+        } else {
+          $("summaryPrice").textContent = money(finalPrice);
+        }
       }
 
+      const hasStaff = publicStaffForService(state.selectedService?.id || "").length > 0;
       const selectedStaff = selectedPublicStaffName();
-      $("summaryStaffRow").classList.toggle("hidden", !publicStaffForService(state.selectedService?.id || "").length);
-      $("summaryStaff").textContent = selectedStaff || (state.selectedStaffChoice === "any" ? "Any available" : "Not selected");
+      $("summaryStaffRow").classList.toggle("hidden", !hasStaff);
+      $("summaryStaff").textContent = state.selectedStaffChoice === "flexible"
+        ? "Assigned automatically after booking"
+        : (selectedStaff || (state.selectedStaffChoice === "any" ? "Any available" : "Not selected"));
       $("summaryDate").textContent = state.selectedDate ? prettyDate(state.selectedDate) : "Not selected";
       $("summaryTime").textContent = state.selectedSlot ? `${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}` : "Not selected";
     }
@@ -6776,25 +6980,29 @@
       const submitBtn = $("confirmBookingBtn");
       setBusy(submitBtn, true, "Confirming…");
 
-      let bookingCheck = publicClient
-        .from("bookings")
-        .select("start_time, end_time, status, staff_id")
-        .eq("profile_id", state.publicProfile.id)
-        .eq("status", "confirmed")
-        .lt("start_time", state.selectedSlot.blockedEnd.toISOString())
-        .gt("end_time", state.selectedSlot.start.toISOString());
-      bookingCheck = state.selectedSlot.staffId
-        ? bookingCheck.eq("staff_id", state.selectedSlot.staffId)
-        : bookingCheck.is("staff_id", null);
-      const { data: checkBkgs, error: checkErr } = await bookingCheck;
+      const flexibleTeamBooking = state.selectedStaffChoice === "flexible";
 
-      if (!checkErr && !hasCapacity(state.selectedSlot.start, state.selectedSlot.blockedEnd, state.selectedSlot.capacity, checkBkgs || [])) {
-        setBusy(submitBtn, false);
-        toast("That time has just been taken. Please choose another.", "error");
-        return await loadAvailableSlots();
+      if (!flexibleTeamBooking) {
+        let bookingCheck = publicClient
+          .from("bookings")
+          .select("start_time, end_time, status, staff_id")
+          .eq("profile_id", state.publicProfile.id)
+          .eq("status", "confirmed")
+          .lt("start_time", state.selectedSlot.blockedEnd.toISOString())
+          .gt("end_time", state.selectedSlot.start.toISOString());
+        bookingCheck = state.selectedSlot.staffId
+          ? bookingCheck.eq("staff_id", state.selectedSlot.staffId)
+          : bookingCheck.is("staff_id", null);
+        const { data: checkBkgs, error: checkErr } = await bookingCheck;
+
+        if (!checkErr && !hasCapacity(state.selectedSlot.start, state.selectedSlot.blockedEnd, state.selectedSlot.capacity, checkBkgs || [])) {
+          setBusy(submitBtn, false);
+          toast("That time has just been taken. Please choose another.", "error");
+          return await loadAvailableSlots();
+        }
       }
 
-      if (!state.selectedSlot.staffId) {
+      if (!flexibleTeamBooking && !state.selectedSlot.staffId) {
         const googleRecheck = await filterSlotsAgainstGoogleCalendar(
           state.publicProfile.id,
           state.selectedService.id,
@@ -6824,7 +7032,8 @@
         p_start_time: state.selectedSlot.start.toISOString(),
         p_answers: publicQuestionAnswers(),
         p_marketing_opt_in: $("marketingOptIn").checked,
-        p_staff_id: state.selectedSlot.staffId || null
+        p_staff_id: flexibleTeamBooking ? null : (state.selectedSlot.staffId || null),
+        p_flexible_staff: flexibleTeamBooking
       });
       setBusy(submitBtn, false);
 
@@ -6837,6 +7046,13 @@
           state.selectedSlot = null;
           updateSummary();
           toast("That appointment time has just been taken. Please choose another available time.", "error");
+          return await loadAvailableSlots();
+        }
+
+        if (String(error?.message || "").toLowerCase().includes("no team member is available")) {
+          state.selectedSlot = null;
+          updateSummary();
+          toast("That flexible-team time has just been taken. Please choose another available time.", "error");
           return await loadAvailableSlots();
         }
 
@@ -6856,7 +7072,7 @@
       }
 
       const finalPrice = Number(created.booked_price ?? promotionForDate(state.selectedService, state.selectedDate).price);
-      const bookedStaffName = selectedPublicStaffName();
+      const bookedStaffName = created.staff_name || selectedPublicStaffName();
       const summaryText = `${state.selectedService.title}${bookedStaffName ? " with " + bookedStaffName : ""} at ${state.publicProfile.business_name} on ${prettyDateTime(created.start_time || state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
       $("successSummary").textContent = summaryText;
 
