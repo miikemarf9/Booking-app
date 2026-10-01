@@ -193,6 +193,23 @@
         transform: rotate(360deg);
       }
     }
+    #publicBookingView {
+      --customer-brand: #0872bd;
+      --customer-brand-soft: #eef8ff;
+      --customer-brand-border: #1687d9;
+      --customer-brand-dark: #075b98;
+    }
+    #publicBookingView .bg-brand-600 { background-color: var(--customer-brand) !important; }
+    #publicBookingView .text-brand-600 { color: var(--customer-brand) !important; }
+    #publicBookingView .text-brand-700 { color: var(--customer-brand-dark) !important; }
+    #publicBookingView .border-brand-500 { border-color: var(--customer-brand-border) !important; }
+    #publicBookingView .service-choice.selected,
+    #publicBookingView .slot-choice.selected {
+      border-color: var(--customer-brand-border) !important;
+      background: var(--customer-brand-soft) !important;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--customer-brand) 14%, transparent) !important;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         scroll-behavior: auto !important;
@@ -973,6 +990,17 @@
             </div>
           </button>
 
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="branding">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Appearance</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Branding</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Add your logo, brand colour and a custom introduction to the booking page.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
           <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="business-details">
             <div class="flex items-start justify-between gap-4">
               <div>
@@ -1156,6 +1184,78 @@
               <span id="bookingQuestionCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 questions</span>
             </div>
             <div id="bookingQuestionsList" class="mt-5 space-y-3"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Branding Tab -->
+      <section id="tab-branding" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+
+        <div class="grid gap-6 lg:grid-cols-[.85fr_1.15fr]">
+          <article class="card h-fit p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking page</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Business branding</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Make the customer booking page feel like your business rather than a generic scheduler.</p>
+
+            <form id="brandingForm" class="mt-6 space-y-4">
+              <div>
+                <label class="label" for="brandingLogo">Business logo</label>
+                <input id="brandingLogo" class="field" type="file" accept="image/png,image/jpeg,image/webp">
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">PNG, JPG or WebP. Maximum 2 MB.</p>
+              </div>
+
+              <div id="brandingLogoCurrentWrap" class="hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Current logo</p>
+                <div class="mt-3 flex items-center justify-between gap-4">
+                  <img id="brandingLogoPreview" class="max-h-16 max-w-[180px] object-contain" alt="Business logo preview">
+                  <button id="removeBrandLogoBtn" class="btn btn-light !px-3 !py-2 text-sm" type="button">Remove logo</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="label" for="brandingColour">Brand colour</label>
+                <div class="flex items-center gap-3">
+                  <input id="brandingColour" class="h-12 w-16 cursor-pointer rounded-xl border border-slate-200 bg-white p-1" type="color" value="#0872bd">
+                  <input id="brandingColourText" class="field" type="text" maxlength="7" value="#0872bd" placeholder="#0872bd">
+                </div>
+              </div>
+
+              <div>
+                <label class="label" for="bookingPageTitle">Booking page heading <span class="font-normal text-slate-400">(optional)</span></label>
+                <input id="bookingPageTitle" class="field" type="text" maxlength="120" placeholder="e.g. Book your appointment">
+              </div>
+
+              <div>
+                <label class="label" for="bookingPageIntro">Short introduction <span class="font-normal text-slate-400">(optional)</span></label>
+                <textarea id="bookingPageIntro" class="field min-h-28 resize-y" maxlength="600" placeholder="A short welcome message customers will see before choosing a service."></textarea>
+              </div>
+
+              <button id="brandingSubmitBtn" class="btn btn-primary w-full sm:w-auto" type="submit">Save branding</button>
+            </form>
+          </article>
+
+          <article class="card overflow-hidden">
+            <div id="brandingPreviewHeader" class="p-6 text-white">
+              <div class="flex items-center gap-4">
+                <div id="brandingPreviewLogoWrap" class="hidden h-14 w-20 items-center justify-center rounded-xl bg-white/95 p-2">
+                  <img id="brandingPreviewLogo" class="max-h-full max-w-full object-contain" alt="">
+                </div>
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-[.16em] text-white/75">Online booking</p>
+                  <h3 id="brandingPreviewBusinessName" class="mt-1 text-xl font-bold">Business</h3>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <h3 id="brandingPreviewTitle" class="text-2xl font-bold text-ink">Book with us</h3>
+              <p id="brandingPreviewIntro" class="mt-2 text-sm leading-6 text-slate-500">Choose a service and an appointment time that suits you.</p>
+              <div class="mt-6 rounded-2xl border border-slate-200 p-4">
+                <p class="font-bold text-ink">Example service</p>
+                <p class="mt-1 text-sm text-slate-500">60 minutes</p>
+                <button id="brandingPreviewButton" class="mt-4 rounded-xl px-4 py-2 text-sm font-bold text-white" type="button" disabled>Choose</button>
+              </div>
+            </div>
           </article>
         </div>
       </section>
@@ -1463,9 +1563,14 @@
   <section id="publicBookingView" class="hidden min-h-screen">
     <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur">
       <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-        <div class="min-w-0">
-          <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Online booking</p>
-          <h1 id="publicBusinessName" class="truncate text-lg font-bold text-ink">Business</h1>
+        <div class="flex min-w-0 items-center gap-3">
+          <div id="publicBrandLogoWrap" class="hidden h-12 w-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5">
+            <img id="publicBrandLogo" class="max-h-full max-w-full object-contain" alt="">
+          </div>
+          <div class="min-w-0">
+            <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Online booking</p>
+            <h1 id="publicBusinessName" class="truncate text-lg font-bold text-ink">Business</h1>
+          </div>
         </div>
         <div class="text-right">
           <p class="text-xs font-bold text-slate-600">Europe/London</p>
@@ -1476,6 +1581,10 @@
 
     <main class="mx-auto max-w-5xl px-4 py-7 sm:px-6 lg:py-10" aria-labelledby="publicBusinessName">
       <div id="publicError" class="card hidden p-8 text-center sm:p-10"></div>
+      <div id="publicBrandIntroCard" class="card mb-5 hidden p-5 sm:p-7">
+        <h2 id="publicBrandTitle" class="text-2xl font-bold text-ink"></h2>
+        <p id="publicBrandIntro" class="mt-2 max-w-2xl text-sm leading-6 text-slate-500"></p>
+      </div>
       <div id="bookingJourney" class="grid gap-6 lg:grid-cols-[1.35fr_.65fr]">
         <div class="space-y-5">
           <!-- Step 1 -->
@@ -2378,6 +2487,20 @@
       });
       $("saveCustomerNotesBtn").addEventListener("click", saveCustomerNotes);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
+      $("brandingForm").addEventListener("submit", saveBranding);
+      $("removeBrandLogoBtn").addEventListener("click", removeBrandLogo);
+      $("brandingColour").addEventListener("input", () => {
+        $("brandingColourText").value = $("brandingColour").value;
+        renderBrandingPreview();
+      });
+      $("brandingColourText").addEventListener("input", () => {
+        const colour = normaliseBrandColour($("brandingColourText").value);
+        if (colour) $("brandingColour").value = colour;
+        renderBrandingPreview();
+      });
+      $("bookingPageTitle").addEventListener("input", renderBrandingPreview);
+      $("bookingPageIntro").addEventListener("input", renderBrandingPreview);
+      $("brandingLogo").addEventListener("change", renderBrandingPreview);
       $("bookingRulesForm").addEventListener("submit", saveBookingRules);
       $("timeOffForm").addEventListener("submit", saveTimeOff);
       $("timeOffMode").addEventListener("change", syncTimeOffMode);
@@ -2698,6 +2821,7 @@
       renderCustomers();
       renderOverviewBookings();
       renderPlanSubscription();
+      populateBranding();
       renderCalendarDashboard();
 
       const warnEl = $("dashboardDataWarning");
@@ -3520,6 +3644,206 @@
       state.profile = data;
       populateBookingRules();
       toast("Booking rules saved.");
+    }
+
+
+    function normaliseBrandColour(value) {
+      const colour = String(value || "").trim();
+      return /^#[0-9a-fA-F]{6}$/.test(colour) ? colour.toLowerCase() : "";
+    }
+
+    function colourMixWithWhite(hex, amount = 0.9) {
+      const clean = normaliseBrandColour(hex) || "#0872bd";
+      const rgb = [1, 3, 5].map(i => parseInt(clean.slice(i, i + 2), 16));
+      const mixed = rgb.map(v => Math.round(v * (1 - amount) + 255 * amount));
+      return "#" + mixed.map(v => v.toString(16).padStart(2, "0")).join("");
+    }
+
+    function darkenBrandColour(hex, factor = 0.78) {
+      const clean = normaliseBrandColour(hex) || "#0872bd";
+      const rgb = [1, 3, 5].map(i => parseInt(clean.slice(i, i + 2), 16));
+      return "#" + rgb.map(v => Math.max(0, Math.round(v * factor)).toString(16).padStart(2, "0")).join("");
+    }
+
+    function populateBranding() {
+      if (!state.profile || !$("brandingColour")) return;
+
+      const colour = normaliseBrandColour(state.profile.brand_colour) || "#0872bd";
+      $("brandingColour").value = colour;
+      $("brandingColourText").value = colour;
+      $("bookingPageTitle").value = state.profile.booking_page_title || "";
+      $("bookingPageIntro").value = state.profile.booking_page_intro || "";
+
+      const hasLogo = Boolean(state.profile.brand_logo_url);
+      $("brandingLogoCurrentWrap").classList.toggle("hidden", !hasLogo);
+      if (hasLogo) $("brandingLogoPreview").src = state.profile.brand_logo_url;
+
+      renderBrandingPreview();
+    }
+
+    function renderBrandingPreview() {
+      if (!$("brandingPreviewHeader")) return;
+
+      const colour = normaliseBrandColour($("brandingColourText")?.value) || "#0872bd";
+      $("brandingPreviewHeader").style.background = colour;
+      $("brandingPreviewButton").style.background = colour;
+      $("brandingPreviewBusinessName").textContent = state.profile?.business_name || "Business";
+
+      const title = $("bookingPageTitle")?.value.trim() || "Book with us";
+      const intro = $("bookingPageIntro")?.value.trim() || "Choose a service and an appointment time that suits you.";
+      $("brandingPreviewTitle").textContent = title;
+      $("brandingPreviewIntro").textContent = intro;
+
+      const previewFile = $("brandingLogo")?.files?.[0];
+      const currentUrl = state.profile?.brand_logo_url || "";
+      const wrap = $("brandingPreviewLogoWrap");
+      const img = $("brandingPreviewLogo");
+
+      if (previewFile) {
+        const url = URL.createObjectURL(previewFile);
+        img.src = url;
+        wrap.classList.remove("hidden");
+        wrap.classList.add("flex");
+        img.onload = () => URL.revokeObjectURL(url);
+      } else if (currentUrl) {
+        img.src = currentUrl;
+        wrap.classList.remove("hidden");
+        wrap.classList.add("flex");
+      } else {
+        wrap.classList.add("hidden");
+        wrap.classList.remove("flex");
+        img.removeAttribute("src");
+      }
+    }
+
+    async function saveBranding(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const colour = normaliseBrandColour($("brandingColourText").value);
+      if (!colour) return toast("Enter a valid six-digit brand colour such as #0872bd.", "error");
+
+      const logoFile = $("brandingLogo").files?.[0] || null;
+      if (logoFile && logoFile.size > 2 * 1024 * 1024) {
+        return toast("The logo must be 2 MB or smaller.", "error");
+      }
+      if (logoFile && !["image/png", "image/jpeg", "image/webp"].includes(logoFile.type)) {
+        return toast("Use a PNG, JPG or WebP logo.", "error");
+      }
+
+      const btn = $("brandingSubmitBtn");
+      setBusy(btn, true, "Saving…");
+
+      let newLogoPath = null;
+      let newLogoUrl = state.profile.brand_logo_url || null;
+
+      try {
+        if (logoFile) {
+          const extension = logoFile.type === "image/png" ? "png" : logoFile.type === "image/webp" ? "webp" : "jpg";
+          newLogoPath = `${state.profile.id}/logo-${Date.now()}.${extension}`;
+
+          const { error: uploadError } = await supabaseClient.storage
+            .from("business-branding")
+            .upload(newLogoPath, logoFile, { contentType: logoFile.type, upsert: false });
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicUrlData } = supabaseClient.storage
+            .from("business-branding")
+            .getPublicUrl(newLogoPath);
+
+          newLogoUrl = publicUrlData?.publicUrl || null;
+          if (!newLogoUrl) throw new Error("The uploaded logo URL could not be created.");
+        }
+
+        const oldLogoPath = state.profile.brand_logo_path || null;
+        const { data, error } = await supabaseClient
+          .from("profiles")
+          .update({
+            brand_colour: colour,
+            brand_logo_url: newLogoUrl,
+            brand_logo_path: newLogoPath || oldLogoPath,
+            booking_page_title: $("bookingPageTitle").value.trim() || null,
+            booking_page_intro: $("bookingPageIntro").value.trim() || null,
+            branding_updated_at: new Date().toISOString()
+          })
+          .eq("id", state.profile.id)
+          .select("*")
+          .single();
+
+        if (error) throw error;
+
+        if (newLogoPath && oldLogoPath && oldLogoPath !== newLogoPath) {
+          await supabaseClient.storage.from("business-branding").remove([oldLogoPath]);
+        }
+
+        state.profile = data;
+        $("brandingLogo").value = "";
+        populateBranding();
+        toast("Branding saved.");
+      } catch (err) {
+        if (newLogoPath && newLogoPath !== state.profile.brand_logo_path) {
+          await supabaseClient.storage.from("business-branding").remove([newLogoPath]);
+        }
+        toast(friendlyDbError(err, "save branding"), "error");
+      } finally {
+        setBusy(btn, false);
+      }
+    }
+
+    async function removeBrandLogo() {
+      if (!state.profile?.brand_logo_url) return;
+      if (!window.confirm("Remove the current business logo from the booking page?")) return;
+
+      const oldPath = state.profile.brand_logo_path || null;
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .update({
+          brand_logo_url: null,
+          brand_logo_path: null,
+          branding_updated_at: new Date().toISOString()
+        })
+        .eq("id", state.profile.id)
+        .select("*")
+        .single();
+
+      if (error) return toast(friendlyDbError(error, "remove the logo"), "error");
+
+      if (oldPath) await supabaseClient.storage.from("business-branding").remove([oldPath]);
+      state.profile = data;
+      populateBranding();
+      toast("Logo removed.");
+    }
+
+    function applyPublicBranding() {
+      const profile = state.publicProfile;
+      if (!profile) return;
+
+      const colour = normaliseBrandColour(profile.brand_colour) || "#0872bd";
+      const publicView = $("publicBookingView");
+      publicView.style.setProperty("--customer-brand", colour);
+      publicView.style.setProperty("--customer-brand-border", colour);
+      publicView.style.setProperty("--customer-brand-dark", darkenBrandColour(colour));
+      publicView.style.setProperty("--customer-brand-soft", colourMixWithWhite(colour, 0.9));
+
+      const hasLogo = Boolean(profile.brand_logo_url);
+      $("publicBrandLogoWrap").classList.toggle("hidden", !hasLogo);
+      $("publicBrandLogoWrap").classList.toggle("flex", hasLogo);
+      if (hasLogo) {
+        $("publicBrandLogo").src = profile.brand_logo_url;
+        $("publicBrandLogo").alt = `${profile.business_name} logo`;
+      } else {
+        $("publicBrandLogo").removeAttribute("src");
+      }
+
+      const title = String(profile.booking_page_title || "").trim();
+      const intro = String(profile.booking_page_intro || "").trim();
+      const showIntroCard = Boolean(title || intro);
+
+      $("publicBrandIntroCard").classList.toggle("hidden", !showIntroCard);
+      $("publicBrandTitle").textContent = title || `Book with ${profile.business_name}`;
+      $("publicBrandIntro").textContent = intro || "";
+      $("publicBrandIntro").classList.toggle("hidden", !intro);
     }
 
     function populateBusinessDetails() {
@@ -4444,7 +4768,7 @@
     }
 
     function switchTab(tabId) {
-      const settingsChildren = new Set(["availability", "time-off", "booking-rules", "booking-questions", "business-details", "reminders", "payments"]);
+      const settingsChildren = new Set(["availability", "time-off", "booking-rules", "booking-questions", "branding", "business-details", "reminders", "payments"]);
       const primaryTab = settingsChildren.has(tabId) ? "settings" : tabId;
 
       document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === primaryTab));
@@ -5490,7 +5814,7 @@
     async function loadPublicBookingPage(profileId) {
       showOnly("loadingView");
       try {
-        const { data: prof, error: pErr } = await publicClient.from("profiles").select("id, business_name, is_approved, minimum_notice_hours, maximum_booking_days").eq("id", profileId).eq("is_approved", true).maybeSingle();
+        const { data: prof, error: pErr } = await publicClient.from("profiles").select("id, business_name, is_approved, minimum_notice_hours, maximum_booking_days, brand_colour, brand_logo_url, booking_page_title, booking_page_intro").eq("id", profileId).eq("is_approved", true).maybeSingle();
         if (pErr) throw pErr;
         if (!prof) throw new Error("This booking page is not available. The business may still be awaiting approval.");
 
@@ -5506,6 +5830,7 @@
         state.publicQuestions = questions || [];
 
         $("publicBusinessName").textContent = prof.business_name;
+        applyPublicBranding();
         document.title = `Book with ${prof.business_name}`;
 
         const maxDate = addDaysToDateKey(todayKey(), Number(prof.maximum_booking_days || 90));
