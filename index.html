@@ -3484,11 +3484,17 @@
     function calendarTimeOffForDate(dateKey) {
       const start = londonDate(dateKey, "00:00").getTime();
       const end = londonDate(addDaysToDateKey(dateKey, 1), "00:00").getTime();
-      return state.timeOff.filter(block =>
-        calendarStaffMatches(block.staff_id) &&
-        new Date(block.start_time).getTime() < end &&
-        new Date(block.end_time).getTime() > start
-      );
+      const filter = $("calendarStaffFilter")?.value || "all";
+      return state.timeOff.filter(block => {
+        const staffMatch = filter === "all"
+          ? true
+          : filter === "none"
+            ? !block.staff_id
+            : (!block.staff_id || block.staff_id === filter);
+        return staffMatch &&
+          new Date(block.start_time).getTime() < end &&
+          new Date(block.end_time).getTime() > start;
+      });
     }
 
     function filterSlotsAgainstTimeOff(slots, timeOffBlocks) {
@@ -4405,7 +4411,7 @@
           ? timeOff.map(block => `
               <button type="button" data-calendar-date="${dateKey}" class="w-full rounded-xl border border-rose-100 bg-rose-50 p-2.5 text-left transition hover:bg-rose-100">
                 <p class="text-[.68rem] font-bold text-rose-800">${block.is_all_day ? "All day" : escapeHtml(prettyTime(new Date(block.start_time)) + "–" + prettyTime(new Date(block.end_time)))}</p>
-                <p class="mt-0.5 truncate text-[.66rem] text-rose-700">${escapeHtml(block.reason || "Time off")}</p>
+                <p class="mt-0.5 truncate text-[.66rem] text-rose-700">${escapeHtml(block.reason || "Time off")}${block.staff_id ? " · " + escapeHtml(staffName(block.staff_id)) : " · Whole business"}</p>
               </button>
             `).join("")
           : '<p class="text-xs text-slate-400">No time off</p>';
@@ -5080,7 +5086,11 @@
       if (error) return toast(friendlyDbError(error, "refresh services"), "error");
       state.services = data || [];
       renderServices();
+      renderStaff();
       renderAvailabilityServiceOptions();
+      populateTimeOffStaffOptions();
+      populateCalendarStaffFilter();
+      populateCustomerServiceFilter();
       renderStats();
     }
 
@@ -6474,7 +6484,11 @@
         ? "Confirm booking"
         : "Continue to secure payment";
 
-      activateStep("dateStep");
+      if (hasStaff) {
+        deactivateStep("dateStep");
+      } else {
+        activateStep("dateStep");
+      }
       deactivateStep("timeStep");
       deactivateDetails();
 
