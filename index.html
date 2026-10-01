@@ -887,15 +887,21 @@
 
             <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
               <h3 id="calendarMonthLabel" class="text-lg font-bold text-ink">Month</h3>
-              <div class="flex flex-wrap gap-3 text-xs font-semibold text-slate-500">
-                <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span>Booking</span>
-                <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Availability</span>
-                <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>Past</span>
+              <div class="flex flex-wrap items-center gap-3">
+                <div class="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+                  <button id="calendarMonthViewBtn" class="rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm" type="button">Month</button>
+                  <button id="calendarWeekViewBtn" class="rounded-lg px-3 py-1.5 text-slate-500" type="button">Week</button>
+                </div>
+                <div class="flex flex-wrap gap-3 text-xs font-semibold text-slate-500">
+                  <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span>Booking</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Availability</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>Past</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="overflow-x-auto">
+          <div id="calendarMonthView" class="overflow-x-auto">
             <div class="min-w-[720px]">
               <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[.68rem] font-bold uppercase tracking-wider text-slate-400">
                 <div class="px-2 py-3">Mon</div>
@@ -911,6 +917,10 @@
                 <div id="calendarHoverCard" class="pointer-events-none fixed z-50 hidden w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl"></div>
               </div>
             </div>
+          </div>
+
+          <div id="calendarWeekView" class="hidden overflow-x-auto">
+            <div id="bookingCalendarWeekGrid" class="min-w-[900px] grid grid-cols-7"></div>
           </div>
         </article>
 
@@ -1217,7 +1227,8 @@
       manageBooking: null,
       manageSelectedSlot: null,
       calendarCursor: new Date(),
-      calendarSelectedDate: ""
+      calendarSelectedDate: "",
+      calendarView: "month"
     };
 
     const $ = id => document.getElementById(id);
@@ -1839,6 +1850,12 @@
       $("calendarPrevBtn").addEventListener("click", () => moveCalendarMonth(-1));
       $("calendarTodayBtn").addEventListener("click", calendarGoToday);
       $("calendarNextBtn").addEventListener("click", () => moveCalendarMonth(1));
+      $("calendarMonthViewBtn").addEventListener("click", () => setCalendarView("month"));
+      $("calendarWeekViewBtn").addEventListener("click", () => setCalendarView("week"));
+      $("bookingCalendarWeekGrid").addEventListener("click", e => {
+        const day = e.target.closest("[data-calendar-date]");
+        if (day) selectCalendarDate(day.dataset.calendarDate);
+      });
       $("calendarAddAvailabilityBtn").addEventListener("click", calendarAddAvailability);
       $("bookingCalendarGrid").addEventListener("click", e => {
         const day = e.target.closest("[data-calendar-date]");
@@ -2530,9 +2547,123 @@
         .sort((a, b) => cleanTime(a.start_time).localeCompare(cleanTime(b.start_time)));
     }
 
+
+    function calendarWeekStart(date) {
+      const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 12));
+      const day = (d.getUTCDay() + 6) % 7;
+      d.setUTCDate(d.getUTCDate() - day);
+      return d;
+    }
+
+    function renderCalendarWeekDashboard() {
+      const grid = $("bookingCalendarWeekGrid");
+      if (!grid) return;
+
+      const cursor = state.calendarCursor instanceof Date && !Number.isNaN(state.calendarCursor.getTime())
+        ? state.calendarCursor
+        : new Date();
+
+      const start = calendarWeekStart(cursor);
+      const end = new Date(start);
+      end.setUTCDate(end.getUTCDate() + 6);
+
+      const fmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+      $("calendarMonthLabel").textContent = `${fmt.format(start)} – ${fmt.format(end)} ${end.getUTCFullYear()}`;
+
+      const today = todayKey();
+      const cols = [];
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setUTCDate(start.getUTCDate() + i);
+        const dateKey = d.toISOString().slice(0, 10);
+        const bookings = calendarBookingsForDate(dateKey);
+        const blocks = calendarBlocksForDate(dateKey);
+        const isToday = dateKey === today;
+        const selected = state.calendarSelectedDate === dateKey;
+
+        const bookingHtml = bookings.length
+          ? bookings.map(b => {
+              const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
+              const endTime = b.end_time
+                ? new Date(b.end_time)
+                : new Date(new Date(b.start_time).getTime() + Number(srv.duration_minutes || 0) * 60000);
+              return `
+                <button type="button" data-calendar-date="${dateKey}" class="w-full rounded-xl border border-brand-200 bg-brand-100 p-3 text-left shadow-sm transition hover:bg-brand-50">
+                  <p class="text-xs font-black text-brand-800">${escapeHtml(prettyTime(new Date(b.start_time)))}–${escapeHtml(prettyTime(endTime))}</p>
+                  <p class="mt-1 truncate text-xs font-bold text-ink">${escapeHtml(b.customer_name || "Customer")}</p>
+                  <p class="mt-0.5 truncate text-[.68rem] text-brand-700">${escapeHtml(srv.title || "Appointment")}</p>
+                </button>
+              `;
+            }).join("")
+          : '<p class="text-xs text-slate-400">No bookings</p>';
+
+        const availabilityHtml = blocks.length
+          ? blocks.map(b => {
+              const srv = state.services.find(s => s.id === b.service_id);
+              return `
+                <button type="button" data-calendar-date="${dateKey}" class="w-full rounded-xl border border-emerald-100 bg-emerald-50 p-2.5 text-left transition hover:bg-emerald-100">
+                  <p class="text-[.68rem] font-bold text-emerald-800">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}</p>
+                  <p class="mt-0.5 truncate text-[.66rem] text-emerald-700">${escapeHtml(srv?.title || "Availability")}</p>
+                </button>
+              `;
+            }).join("")
+          : '<p class="text-xs text-slate-400">No availability</p>';
+
+        cols.push(`
+          <div class="min-h-[420px] border-r border-slate-200 ${selected ? "bg-brand-50/30" : ""}">
+            <button type="button" data-calendar-date="${dateKey}" class="sticky top-0 z-10 w-full border-b border-slate-200 bg-white px-3 py-3 text-center hover:bg-slate-50">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">${new Intl.DateTimeFormat("en-GB",{weekday:"short",timeZone:"UTC"}).format(d)}</p>
+              <span class="mt-1 inline-grid h-8 w-8 place-items-center rounded-full text-sm font-bold ${isToday ? "bg-brand-600 text-white" : "text-slate-700"}">${d.getUTCDate()}</span>
+            </button>
+            <div class="space-y-4 p-3">
+              <div>
+                <p class="mb-2 text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Bookings</p>
+                <div class="space-y-2">${bookingHtml}</div>
+              </div>
+              <div class="border-t border-slate-100 pt-3">
+                <p class="mb-2 text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Availability</p>
+                <div class="space-y-2">${availabilityHtml}</div>
+              </div>
+            </div>
+          </div>
+        `);
+      }
+
+      grid.innerHTML = cols.join("");
+      if (!state.calendarSelectedDate) state.calendarSelectedDate = today >= start.toISOString().slice(0,10) && today <= end.toISOString().slice(0,10)
+        ? today
+        : start.toISOString().slice(0,10);
+      renderCalendarDayDetails();
+    }
+
+    function setCalendarView(view) {
+      state.calendarView = view === "week" ? "week" : "month";
+
+      $("calendarMonthView").classList.toggle("hidden", state.calendarView !== "month");
+      $("calendarWeekView").classList.toggle("hidden", state.calendarView !== "week");
+
+      $("calendarMonthViewBtn").className = state.calendarView === "month"
+        ? "rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm"
+        : "rounded-lg px-3 py-1.5 text-slate-500";
+      $("calendarWeekViewBtn").className = state.calendarView === "week"
+        ? "rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm"
+        : "rounded-lg px-3 py-1.5 text-slate-500";
+
+      renderCalendarDashboard();
+    }
+
     function renderCalendarDashboard() {
       const grid = $("bookingCalendarGrid");
       if (!grid) return;
+
+      $("calendarMonthView").classList.toggle("hidden", state.calendarView !== "month");
+      $("calendarWeekView").classList.toggle("hidden", state.calendarView !== "week");
+
+      if (state.calendarView === "week") {
+        renderCalendarWeekDashboard();
+        return;
+      }
 
       const cursor = state.calendarCursor instanceof Date && !Number.isNaN(state.calendarCursor.getTime())
         ? state.calendarCursor
@@ -2784,14 +2915,20 @@
     }
 
     function moveCalendarMonth(amount) {
-      state.calendarCursor = calendarAddMonths(calendarMonthStart(state.calendarCursor), amount);
+      if (state.calendarView === "week") {
+        const d = new Date(state.calendarCursor);
+        d.setUTCDate(d.getUTCDate() + (amount * 7));
+        state.calendarCursor = d;
+      } else {
+        state.calendarCursor = calendarAddMonths(calendarMonthStart(state.calendarCursor), amount);
+      }
       state.calendarSelectedDate = "";
       renderCalendarDashboard();
     }
 
     function calendarGoToday() {
       const now = new Date();
-      state.calendarCursor = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1, 12));
+      state.calendarCursor = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12));
       state.calendarSelectedDate = todayKey();
       renderCalendarDashboard();
     }
