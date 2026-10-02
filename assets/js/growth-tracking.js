@@ -78,6 +78,9 @@ function allowBookingAnalytics() {
 }
 
 function declineBookingAnalytics() {
+  if (bookingFunnelState.profileId && typeof clearAcquisitionTouch === "function") {
+    clearAcquisitionTouch(bookingFunnelState.profileId);
+  }
   setAnalyticsConsentState("denied");
   bookingFunnelState.enabled = false;
   showAnalyticsConsentBanner(false);
