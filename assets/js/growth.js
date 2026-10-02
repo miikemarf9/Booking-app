@@ -377,6 +377,10 @@ async function loadGrowthAnalytics(showToast = false) {
     tasks.push(loadGrowthPlanner());
   }
 
+  if (typeof loadGa4Integration === "function") {
+    tasks.push(loadGa4Integration(false));
+  }
+
   await Promise.all(tasks);
   if (showToast) toast("Growth refreshed.");
 }
