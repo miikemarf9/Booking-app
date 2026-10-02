@@ -135,10 +135,16 @@
       border-radius: 1.25rem;
       box-shadow: 0 12px 35px rgba(23, 32, 51, .055);
     }
-    .nav-tab.active {
+    .nav-tab.active,
+    .subnav-tab.active {
       background: white;
       color: #172033;
       box-shadow: 0 2px 9px rgba(23, 32, 51, .08);
+    }
+    .area-tab.active {
+      background: white;
+      color: #172033;
+      box-shadow: 0 2px 9px rgba(23, 32, 51, .16);
     }
     .service-choice.selected,
     .staff-choice.selected,
