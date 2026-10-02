@@ -1,3 +1,5 @@
+"use strict";
+
 function calendarDateKey(date) {
       return new Intl.DateTimeFormat("en-CA", {
         timeZone: BUSINESS_TIME_ZONE,
