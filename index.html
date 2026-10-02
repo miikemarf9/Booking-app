@@ -463,6 +463,69 @@
           <article class="card p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM analytics</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Customer performance</h2>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">See whether customers are returning, what they are worth, how often they come back and which services create the strongest repeat behaviour.</p>
+              </div>
+              <span id="crmAnalyticsPeriod" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">All-time customer data</span>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Repeat booking rate</p>
+                <p id="crmRepeatRate" class="mt-1 text-2xl font-bold text-ink">—</p>
+                <p id="crmRepeatRateDetail" class="mt-1 text-xs text-slate-500">No completed customers yet</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Average customer value</p>
+                <p id="crmAverageCustomerValue" class="mt-1 text-2xl font-bold text-ink">£0</p>
+                <p class="mt-1 text-xs text-slate-500">non-cancelled booked value per customer</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Typical return cycle</p>
+                <p id="crmTypicalReturnCycle" class="mt-1 text-2xl font-bold text-ink">—</p>
+                <p id="crmTypicalReturnDetail" class="mt-1 text-xs text-slate-500">Needs repeat customer history</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">New this month</p>
+                <p id="crmNewThisMonth" class="mt-1 text-2xl font-bold text-ink">0</p>
+                <p id="crmNewThisMonthDetail" class="mt-1 text-xs text-slate-500">first completed appointment this month</p>
+              </div>
+              <button id="crmNoFutureBookingBtn" class="rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-slate-100" type="button">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">No future booking</p>
+                <p id="crmNoFutureBookingRate" class="mt-1 text-2xl font-bold text-ink">—</p>
+                <p id="crmNoFutureBookingDetail" class="mt-1 text-xs text-slate-500">customers with history but nothing ahead</p>
+              </button>
+              <button id="crmLapsedCustomersBtn" class="rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-slate-100" type="button">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Lapsed customers</p>
+                <p id="crmLapsedCustomers" class="mt-1 text-2xl font-bold text-ink">0</p>
+                <p class="mt-1 text-xs text-slate-500">personal return pattern suggests they are lost</p>
+              </button>
+            </div>
+
+            <div class="mt-6 grid gap-5 xl:grid-cols-[.72fr_1.28fr]">
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Customer health</p>
+                <h3 class="mt-1 font-bold text-ink">Retention status</h3>
+                <div id="crmHealthBreakdown" class="mt-4 space-y-3"></div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Service retention</p>
+                    <h3 class="mt-1 font-bold text-ink">What brings customers back?</h3>
+                  </div>
+                  <span class="text-xs text-slate-400">Completed appointments only</span>
+                </div>
+                <div id="crmServiceRetention" class="mt-4"></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM automation</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Automatic retention</h2>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Let Grab&Book contact customers when their own booking pattern suggests they are due back or drifting away.</p>
