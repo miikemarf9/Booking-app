@@ -8,7 +8,7 @@
   const control = demo.querySelector(".gb-demo-control");
   const caption = demo.querySelector(".gb-demo-caption");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const captions = ["A booking lands straight in your diary.", "The booking becomes part of Amelia’s story.", "Connect customer value to a recorded source."];
+  const captions = ["Less booking admin. More time for your customers.", "Use customer history to encourage the next visit.", "Focus your marketing using recorded customer value."];
   let step = 0;
   let timer = null;
   let playing = false;
@@ -16,8 +16,8 @@
   let visible = false;
 
   function updateControl() {
-    control.textContent = playing ? "Pause Ⅱ" : started ? "Replay ↻" : "Play demo ▶";
-    control.setAttribute("aria-label", playing ? "Pause product walkthrough" : "Replay product walkthrough");
+    control.textContent = playing ? "Pause Ⅱ" : started ? "Resume ▶" : "Play demo ▶";
+    control.setAttribute("aria-label", playing ? "Pause product walkthrough" : "Play product walkthrough");
   }
   function stop() {
     clearTimeout(timer);
@@ -38,20 +38,20 @@
       panels[index].classList.add("gb-panel-enter");
     }
     caption.textContent = captions[index];
+    demo.dataset.activeStep = String(index);
   }
   function schedule() {
     clearTimeout(timer);
     timer = setTimeout(() => {
       if (document.hidden || !visible || reduced.matches) return stop();
-      if (step === tabs.length - 1) return stop();
-      show(step + 1);
+      show((step + 1) % tabs.length);
       schedule();
-    }, 3800);
+    }, 5500);
   }
   function play() {
     stop();
+    if (!started) show(0);
     started = true;
-    show(0);
     // Reduced motion users keep manual, instantaneous tab navigation.
     if (!reduced.matches) {
       playing = true;
@@ -78,12 +78,6 @@
   control.addEventListener("click", () => playing ? stop() : play());
   demo.addEventListener("focusin", event => {
     if (event.target !== control) stop();
-  });
-  document.getElementById("gb-watch-demo")?.addEventListener("click", event => {
-    event.preventDefault();
-    demo.scrollIntoView({ behavior: reduced.matches ? "instant" : "smooth", block: "center" });
-    tabs[0].focus({ preventScroll: true });
-    play();
   });
   document.addEventListener("visibilitychange", () => { if (document.hidden) stop(); });
   reduced.addEventListener("change", () => { if (reduced.matches) { stop(); show(step, false); } });

@@ -107,3 +107,52 @@
 @media(min-width:1024px){#landingView>header nav[aria-label="Product navigation"]{display:flex!important}}
 @media(max-width:420px){#landingView>header img{width:118px}}
 @media(max-width:479px){.gb-hero h1{font-size:clamp(30px,9.2vw,43px)}.gb-hero-inner{padding-top:29px}.gb-hero-layout{gap:25px}}
+/* Three connected product surfaces, with physical depth rather than a tilted outline. */
+.gb-demo-wrap:before{display:none}
+.gb-demo-wrap{perspective:1600px;padding-bottom:0}
+.gb-demo-intro{margin-bottom:22px}
+.gb-demo-window{transform:rotateY(-5deg) rotateX(2deg);transform-origin:center;box-shadow:1px 1px 0 #fff,3px 4px 0 #d4e0eb,6px 8px 0 #c4d4e2,12px 18px 22px -12px #294f6b45,22px 40px 65px -25px #294f6b55;border-radius:13px}
+.gb-demo-stage{height:400px;min-height:400px}
+.gb-panel-heading{margin-bottom:17px}
+.gb-panel-heading .gb-panel-purpose{font-size:11px;font-weight:400;line-height:1.65;letter-spacing:0;color:#617286;margin:8px 0 0;max-width:410px}
+.gb-panel-insight{font-size:11px;line-height:1.7}
+.gb-panel-insight strong{display:block;font-weight:750}
+.gb-booking-notice{margin-top:19px}
+.gb-booking-notice p{font-size:11px;line-height:1.7}
+.gb-demo-footer{min-height:65px}
+.gb-demo-caption{max-width:360px;line-height:1.6}
+.gb-connected-cards{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px -9px 0 15px;transform-style:preserve-3d}
+.gb-connected-card{padding:15px 17px;background:#fff;border:1px solid #dce5ed;border-radius:11px;box-shadow:1px 2px 0 #e0e8ef,3px 5px 0 #d1dce5,8px 16px 25px -10px #284b682b;transform:rotateY(-5deg) rotateX(3deg)}
+.gb-connected-label{font-size:9px;letter-spacing:.1em;font-weight:800;color:#7a65a6}
+.gb-connected-card strong{display:block;font-size:11px;line-height:1.5;margin:5px 0 13px;font-weight:700}
+.gb-connected-detail{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:650}
+.gb-connected-detail small{display:block;color:#6c7c8d;font-size:9px;font-weight:400;margin-top:4px}
+.gb-mini-avatar{display:grid;place-items:center;background:#f0eafb;color:#7d60b3;width:29px;height:29px;border-radius:8px;font-size:10px}
+.gb-connected-growth .gb-connected-label{color:#0872bd}
+.gb-mini-bars{display:flex;align-items:flex-end;gap:3px;width:29px;height:29px;padding:4px 0}
+.gb-mini-bars i{display:block;width:7px;background:#1687d9;border-radius:2px 2px 0 0;height:40%}
+.gb-mini-bars i:nth-child(2){height:70%}.gb-mini-bars i:nth-child(3){height:100%}
+.gb-demo-wrap[data-active-step="1"] .gb-connected-crm{border-color:#bcabe0;background:#fcfaff}
+.gb-demo-wrap[data-active-step="2"] .gb-connected-growth{border-color:#9bcdec;background:#f6fbff}
+.gb-demo-disclaimer{margin-top:22px}
+.gb-hero-inner{padding-top:48px}
+.gb-hero-benefits{margin-top:35px}
+@media(prefers-reduced-motion:no-preference){
+ .gb-panel-enter .gb-customer-stats>div{animation:gb-panel-in .6s .45s both}
+ .gb-panel-enter .gb-customer-stats>div:nth-child(2){animation-delay:.7s}
+ .gb-panel-enter .gb-customer-history{animation:gb-panel-in .65s .95s both}
+ .gb-panel-enter .gb-panel-insight{animation:gb-panel-in .65s 1.25s both}
+ .gb-panel-enter .gb-source-card{animation:gb-panel-in .55s .2s both}
+ .gb-panel-enter .gb-value-chart span{animation-duration:1.2s;animation-delay:.5s}
+ .gb-panel-enter .gb-value-chart>div:nth-child(2) span{animation-delay:.7s}
+ .gb-panel-enter .gb-value-chart>div:nth-child(3) span{animation-delay:.9s}
+ .gb-panel-enter .gb-value-chart>div:nth-child(4) span{animation-delay:1.1s}
+}
+@media(max-width:1099px){.gb-demo-stage{height:425px;min-height:425px}.gb-connected-card{padding:12px}.gb-connected-cards{gap:10px;margin-left:5px;margin-right:0}}
+@media(max-width:899px){.gb-demo-window{transform:rotateY(-3deg) rotateX(1deg)}.gb-demo-stage{height:400px;min-height:400px}.gb-hero-inner{padding-top:35px}.gb-connected-cards{margin-top:20px}}
+@media(max-width:479px){.gb-demo-stage{height:425px;min-height:425px}.gb-demo-window{transform:none;box-shadow:2px 3px 0 #dce6ef,4px 6px 0 #cbd9e5,8px 18px 35px -12px #294f6b3b}.gb-connected-card{padding:12px 10px;transform:none}.gb-connected-card strong{font-size:10px;min-height:30px}.gb-connected-detail{font-size:9px;gap:6px}.gb-connected-detail small{font-size:8px;line-height:1.5}.gb-mini-avatar,.gb-mini-bars{flex-shrink:0;width:22px}.gb-demo-caption{font-size:10px}.gb-panel-heading .gb-panel-purpose{font-size:11px}.gb-hero-actions{margin-top:24px}.gb-hero-inner{padding-top:29px}}
+@media(max-width:359px){.gb-demo-stage{height:485px;min-height:485px}.gb-panel-heading h2{font-size:16px}.gb-booking-notice{padding:10px}.gb-booking-notice p{font-size:10px}.gb-connected-cards{gap:8px}.gb-connected-detail{flex-wrap:wrap}.gb-connected-card strong{min-height:45px}}
+/* Reserve equal space for the longest slide, including its inner padding. */
+.gb-demo-stage{height:435px;min-height:435px}
+@media(max-width:479px){.gb-demo-stage{height:450px;min-height:450px}}
+@media(max-width:359px){.gb-demo-stage{height:500px;min-height:500px}}
