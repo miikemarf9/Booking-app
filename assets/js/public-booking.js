@@ -1,5 +1,29 @@
 "use strict";
 
+function applyCustomerBookingPrefill() {
+      const key = new URLSearchParams(window.location.search).get("prefill") || "";
+      if (!key) return;
+
+      const storageKey = `gb-booking-prefill-${key}`;
+      let payload = null;
+
+      try {
+        const raw = localStorage.getItem(storageKey);
+        localStorage.removeItem(storageKey);
+        if (raw) payload = JSON.parse(raw);
+      } catch (err) {
+        console.error("Booking prefill read error:", err);
+        return;
+      }
+
+      if (!payload || Date.now() - Number(payload.createdAt || 0) > 15 * 60 * 1000) return;
+
+      $("customerName").value = String(payload.name || "").slice(0, 120);
+      $("customerEmail").value = String(payload.email || "").slice(0, 180);
+      $("customerPhone").value = String(payload.phone || "").slice(0, 60);
+      $("marketingOptIn").checked = Boolean(payload.marketingOptIn);
+    }
+
 async function loadPublicBookingPage(profileId) {
       showOnly("loadingView");
       try {
@@ -39,6 +63,7 @@ async function loadPublicBookingPage(profileId) {
         $("publicDate").max = maxDate;
 
         renderPublicServices();
+        applyCustomerBookingPrefill();
         showOnly("publicBookingView");
       } catch (err) {
         showOnly("publicBookingView");
