@@ -2254,3 +2254,14 @@
         min-height:auto;
       }
     }
+
+/* Public website navigation uses its own responsive class: the app's .hidden
+   utility is intentionally !important for loading/auth/booking view safety. */
+.site-desktop-nav { display:none; }
+@media (min-width:1024px) {
+  .site-desktop-nav { display:flex; }
+}
+@media (max-width:420px) {
+  #landingView > header img,
+  .product-site-header img { width:118px; }
+}
