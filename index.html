@@ -533,6 +533,94 @@
             </div>
           </div>
 
+          <div id="ga4IntegrationCard" class="mt-6 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Google Analytics 4</p>
+                  <span id="ga4StatusBadge" class="rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">Not connected</span>
+                </div>
+                <h4 id="ga4StatusTitle" class="mt-2 text-lg font-bold text-ink">Connect your website analytics</h4>
+                <p id="ga4StatusHelp" class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">Connect GA4 to bring real website users, sessions, acquisition sources, landing pages, engagement and device data into Growth.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button id="ga4ConnectBtn" class="btn btn-primary" type="button">Connect Google Analytics</button>
+                <button id="ga4RefreshBtn" class="btn btn-light" type="button">Check connection</button>
+                <button id="ga4DisconnectBtn" class="btn btn-light hidden" type="button">Disconnect</button>
+              </div>
+            </div>
+
+            <div id="ga4PropertySetup" class="mt-5 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm font-bold text-amber-950">Choose the GA4 property to use</p>
+              <p class="mt-1 text-xs leading-5 text-amber-900">Grab&Book will only read analytics from the property you select.</p>
+              <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+                <select id="ga4PropertySelect" class="field flex-1">
+                  <option value="">Loading properties…</option>
+                </select>
+                <button id="ga4SavePropertyBtn" class="btn btn-primary" type="button">Use this property</button>
+              </div>
+            </div>
+
+            <div id="ga4ReportWrap" class="mt-5 hidden">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p id="ga4PropertyName" class="text-sm font-bold text-ink">GA4 property</p>
+                  <p id="ga4PropertyMeta" class="mt-1 text-xs text-slate-400">Last 30 days</p>
+                </div>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Live GA4 data</span>
+              </div>
+
+              <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Active users</p>
+                  <p id="ga4ActiveUsers" class="mt-1 text-2xl font-bold text-ink">0</p>
+                </div>
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">New users</p>
+                  <p id="ga4NewUsers" class="mt-1 text-2xl font-bold text-ink">0</p>
+                </div>
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Sessions</p>
+                  <p id="ga4Sessions" class="mt-1 text-2xl font-bold text-ink">0</p>
+                </div>
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Engagement rate</p>
+                  <p id="ga4EngagementRate" class="mt-1 text-2xl font-bold text-ink">—</p>
+                </div>
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Page views</p>
+                  <p id="ga4Views" class="mt-1 text-2xl font-bold text-ink">0</p>
+                </div>
+              </div>
+
+              <div class="mt-5 grid gap-5 xl:grid-cols-2">
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-sm font-bold text-ink">Traffic source / medium</p>
+                  <p class="mt-1 text-xs text-slate-400">Where GA4 sessions came from.</p>
+                  <div id="ga4SourcesTable" class="mt-3 overflow-x-auto"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-sm font-bold text-ink">Landing pages</p>
+                  <p class="mt-1 text-xs text-slate-400">The first page visitors saw in each session.</p>
+                  <div id="ga4LandingTable" class="mt-3 overflow-x-auto"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-sm font-bold text-ink">Devices</p>
+                  <p class="mt-1 text-xs text-slate-400">Desktop, mobile and tablet traffic.</p>
+                  <div id="ga4DevicesTable" class="mt-3 overflow-x-auto"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-sm font-bold text-ink">Available demographics</p>
+                  <p class="mt-1 text-xs leading-5 text-slate-400">GA4 may threshold or omit age/gender data depending on consent, Google Signals and audience size.</p>
+                  <div id="ga4Demographics" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div class="rounded-2xl bg-slate-50 p-4">
               <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Tracked visits</p>
@@ -2798,6 +2886,7 @@
   <script src="assets/js/acquisition.js"></script>
   <script src="assets/js/growth-tracking.js"></script>
   <script src="assets/js/growth.js"></script>
+  <script src="assets/js/ga4.js"></script>
   <script src="assets/js/growth-import.js"></script>
   <script src="assets/js/growth-planner.js"></script>
   <script src="assets/js/customers.js"></script>
