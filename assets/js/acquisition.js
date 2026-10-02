@@ -1,6 +1,7 @@
 "use strict";
 
 const ACQUISITION_STORAGE_VERSION = "v1";
+const acquisitionRuntimeStore = new Map();
 
 function acquisitionStorageKey(profileId) {
   return "gb-acquisition-" + ACQUISITION_STORAGE_VERSION + ":" + profileId;
@@ -172,13 +173,17 @@ function captureAcquisitionTouch(profileId) {
   }
 
   const key = acquisitionStorageKey(profileId);
-  let stored = null;
+  let stored = acquisitionRuntimeStore.get(key) || null;
+  let consentGranted = false;
 
   try {
-    const raw = localStorage.getItem(key);
-    if (raw) stored = JSON.parse(raw);
+    consentGranted = localStorage.getItem("gb_analytics_consent") === "granted";
+    if (!stored && consentGranted) {
+      const raw = localStorage.getItem(key);
+      if (raw) stored = JSON.parse(raw);
+    }
   } catch (err) {
-    console.error("Attribution storage read error:", err);
+    console.error("Attribution consent/storage read error:", err);
   }
 
   const firstTouch = cleanAcquisitionTouch(stored && stored.first_touch) || current;
@@ -189,10 +194,14 @@ function captureAcquisitionTouch(profileId) {
     last_seen_at: new Date().toISOString()
   };
 
-  try {
-    localStorage.setItem(key, JSON.stringify(record));
-  } catch (err) {
-    console.error("Attribution storage write error:", err);
+  acquisitionRuntimeStore.set(key, record);
+
+  if (consentGranted) {
+    try {
+      localStorage.setItem(key, JSON.stringify(record));
+    } catch (err) {
+      console.error("Attribution storage write error:", err);
+    }
   }
 
   return { firstTouch: firstTouch, lastTouch: current };
@@ -207,17 +216,27 @@ function getAcquisitionPayload(profileId) {
   }
 
   const key = acquisitionStorageKey(profileId);
+  const runtime = acquisitionRuntimeStore.get(key);
+  if (runtime) {
+    return {
+      firstTouch: cleanAcquisitionTouch(runtime.first_touch),
+      lastTouch: cleanAcquisitionTouch(runtime.last_touch) || current
+    };
+  }
+
   try {
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const stored = JSON.parse(raw);
-      return {
-        firstTouch: cleanAcquisitionTouch(stored.first_touch),
-        lastTouch: cleanAcquisitionTouch(stored.last_touch) || current
-      };
+    if (localStorage.getItem("gb_analytics_consent") === "granted") {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const stored = JSON.parse(raw);
+        return {
+          firstTouch: cleanAcquisitionTouch(stored.first_touch),
+          lastTouch: cleanAcquisitionTouch(stored.last_touch) || current
+        };
+      }
     }
   } catch (err) {
-    console.error("Attribution storage read error:", err);
+    console.error("Attribution consent/storage read error:", err);
   }
 
   return { firstTouch: current, lastTouch: current };
