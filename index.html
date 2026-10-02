@@ -463,6 +463,44 @@
           <article class="card p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM automation</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Automatic retention</h2>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Let Grab&Book contact customers when their own booking pattern suggests they are due back or drifting away.</p>
+              </div>
+              <span id="crmAutomationStatus" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Off</span>
+            </div>
+
+            <form id="crmAutomationForm" class="mt-5 grid gap-4 lg:grid-cols-2">
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <span>
+                  <span class="block font-bold text-ink">Automatic rebooking reminders</span>
+                  <span class="mt-1 block text-sm leading-5 text-slate-500">Send one email when a regular customer reaches their normal return point and has nothing booked.</span>
+                </span>
+                <input id="crmAutoRebooking" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+              </label>
+
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <span>
+                  <span class="block font-bold text-ink">Automatic win-back emails</span>
+                  <span class="mt-1 block text-sm leading-5 text-slate-500">Contact customers who move well beyond their normal booking rhythm with no future appointment.</span>
+                </span>
+                <input id="crmAutoWinback" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+              </label>
+
+              <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500 lg:col-span-2">
+                <strong class="text-slate-700">Built-in safeguards:</strong> only marketing-opted-in customers are eligible; Grab&Book needs at least 3 completed appointments to establish a personal pattern; each automation is sent once per booking cycle; and automated CRM emails have a 21-day cooldown.
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3 lg:col-span-2">
+                <button id="crmAutomationSaveBtn" class="btn btn-primary" type="submit">Save automation settings</button>
+                <span id="crmAutomationLastRun" class="text-xs text-slate-500">Not run yet</span>
+              </div>
+            </form>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer communications</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Email customers</h2>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Filter your customer list, then email the customers in that group who have explicitly opted in to marketing.</p>
