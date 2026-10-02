@@ -1430,6 +1430,12 @@
       .book-hero-preview.book-preview-playing .book-live-status::before {
         animation:book-live-ping .72s ease .88s 2;
       }
+      .book-hero-preview.book-preview-complete .book-preview-topbar,
+      .book-hero-preview.book-preview-complete .product-metric,
+      .book-hero-preview.book-preview-complete .book-diary-item {
+        opacity:1;
+        transform:none;
+      }
 
       .book-product-page .book-reveal {
         opacity:0;
