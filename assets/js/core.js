@@ -752,6 +752,13 @@
       $("customerEmailBtn").addEventListener("click", emailSelectedCustomer);
       $("customerCallBtn").addEventListener("click", callSelectedCustomer);
       $("customerOfferBtn").addEventListener("click", sendOfferToSelectedCustomer);
+      $("customerRetentionActionBtn").addEventListener("click", sendRetentionMessage);
+      $("customerRetentionBookBtn").addEventListener("click", bookSelectedCustomer);
+      $("crmRetentionAttentionBtn").addEventListener("click", () => {
+        $("customerFilter").value = "retention_attention";
+        syncCustomerFilters();
+        $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
       $("clearMarketingTargetBtn").addEventListener("click", clearMarketingTarget);
       $("saveCustomerNotesBtn").addEventListener("click", saveCustomerNotes);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
