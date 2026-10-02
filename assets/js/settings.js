@@ -1,3 +1,5 @@
+"use strict";
+
 function syncReminderFields() {
       $("followupTimingWrap").classList.toggle("hidden", !$("followupEnabled").checked);
     }
