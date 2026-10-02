@@ -581,6 +581,7 @@
                       <option value="opted_in">Marketing opted in</option>
                       <option value="service">Previous customers of a service</option>
                       <option value="tag">Customer tag</option>
+                      <option value="archived">Archived customers</option>
                     </optgroup>
                     <optgroup label="Smart groups">
                       <option value="new">New customers</option>
@@ -641,10 +642,16 @@
             <article class="card p-5 sm:p-6">
               <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                                    <h2 class="mt-1 text-xl font-bold text-ink">Customers</h2>
+                  <h2 class="mt-1 text-xl font-bold text-ink">Customers</h2>
                   <p class="mt-2 text-sm leading-6 text-slate-500">Every booking now builds one customer profile instead of treating repeat visits as separate people.</p>
                 </div>
-                <span id="customerCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 customers</span>
+                <div class="flex flex-wrap items-center gap-2">
+                  <button id="addCustomerBtn" class="btn btn-primary" type="button">Add customer</button>
+                  <button id="importCustomersBtn" class="btn btn-light" type="button">Import CSV</button>
+                  <button id="exportCustomersBtn" class="btn btn-light" type="button">Export CSV</button>
+                  <span id="customerCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 customers</span>
+                  <input id="customerCsvInput" class="hidden" type="file" accept=".csv,text/csv">
+                </div>
               </div>
 
               <div class="mt-5">
@@ -678,6 +685,9 @@
                   <button id="customerEmailBtn" class="btn btn-light" type="button">Email</button>
                   <button id="customerCallBtn" class="btn btn-light" type="button">Call</button>
                   <button id="customerOfferBtn" class="btn btn-light" type="button">Send offer</button>
+                  <button id="customerEditBtn" class="btn btn-light" type="button">Edit details</button>
+                  <button id="customerMergeBtn" class="btn btn-light" type="button">Merge duplicate</button>
+                  <button id="customerArchiveBtn" class="btn btn-light" type="button">Archive</button>
                 </div>
 
                 <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -1958,6 +1968,75 @@
       </section>
     </div>
   </section>
+
+  <div id="customerEditorModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div class="card max-h-[90vh] w-full max-w-xl overflow-y-auto p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer management</p>
+          <h2 id="customerEditorTitle" class="mt-1 text-xl font-bold text-ink">Add customer</h2>
+          <p id="customerEditorHelp" class="mt-1 text-sm text-slate-500">Create a customer profile without making a booking.</p>
+        </div>
+        <button id="customerEditorCloseBtn" class="text-xl font-bold text-slate-400 hover:text-slate-700" type="button" aria-label="Close">×</button>
+      </div>
+      <form id="customerEditorForm" class="mt-6 space-y-4">
+        <div>
+          <label class="label" for="customerEditorName">Name</label>
+          <input id="customerEditorName" class="field" type="text" maxlength="200" required>
+        </div>
+        <div>
+          <label class="label" for="customerEditorEmail">Email</label>
+          <input id="customerEditorEmail" class="field" type="email" maxlength="200" required>
+        </div>
+        <div>
+          <label class="label" for="customerEditorPhone">Phone</label>
+          <input id="customerEditorPhone" class="field" type="tel" maxlength="100">
+        </div>
+        <div>
+          <label class="label" for="customerEditorTags">Tags</label>
+          <input id="customerEditorTags" class="field" type="text" maxlength="500" placeholder="VIP, Bridal, Monthly">
+          <p class="mt-1 text-xs text-slate-400">Separate tags with commas. Maximum 20.</p>
+        </div>
+        <div>
+          <label class="label" for="customerEditorNotes">Private notes</label>
+          <textarea id="customerEditorNotes" class="field min-h-28 resize-y" maxlength="10000"></textarea>
+        </div>
+        <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+          Manually added and imported customers start with <strong class="text-slate-700">marketing emails off</strong>. Marketing consent is not assumed.
+        </div>
+        <div class="flex flex-wrap justify-end gap-2">
+          <button id="customerEditorCancelBtn" class="btn btn-light" type="button">Cancel</button>
+          <button id="customerEditorSaveBtn" class="btn btn-primary" type="submit">Save customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="customerMergeModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div class="card w-full max-w-lg p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Duplicate management</p>
+          <h2 class="mt-1 text-xl font-bold text-ink">Merge customer profiles</h2>
+          <p id="customerMergeKeepText" class="mt-1 text-sm text-slate-500"></p>
+        </div>
+        <button id="customerMergeCloseBtn" class="text-xl font-bold text-slate-400 hover:text-slate-700" type="button" aria-label="Close">×</button>
+      </div>
+      <form id="customerMergeForm" class="mt-6 space-y-4">
+        <div>
+          <label class="label" for="customerMergeSource">Duplicate profile to merge into this customer</label>
+          <select id="customerMergeSource" class="field" required></select>
+        </div>
+        <div class="rounded-2xl bg-amber-50 p-4 text-xs leading-5 text-amber-900">
+          Booking history, tags, notes and activity are moved to the customer you keep. The duplicate is then removed. Marketing consent stays with the kept profile.
+        </div>
+        <div class="flex flex-wrap justify-end gap-2">
+          <button id="customerMergeCancelBtn" class="btn btn-light" type="button">Cancel</button>
+          <button id="customerMergeSubmitBtn" class="btn btn-primary" type="submit">Merge profiles</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Public Booking View -->
   <section id="publicBookingView" class="hidden min-h-screen bg-[#f7f9fc]">
