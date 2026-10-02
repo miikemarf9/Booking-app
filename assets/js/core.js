@@ -760,6 +760,16 @@
         syncCustomerFilters();
         $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
+      $("crmNoFutureBookingBtn").addEventListener("click", () => {
+        $("customerFilter").value = "no_future";
+        syncCustomerFilters();
+        $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      $("crmLapsedCustomersBtn").addEventListener("click", () => {
+        $("customerFilter").value = "lapsed";
+        syncCustomerFilters();
+        $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
       $("clearMarketingTargetBtn").addEventListener("click", clearMarketingTarget);
       $("saveCustomerNotesBtn").addEventListener("click", saveCustomerNotes);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
