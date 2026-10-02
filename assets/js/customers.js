@@ -752,6 +752,46 @@ function customerBookings(customer) {
       renderCustomerProfile();
     }
 
+    function customerAcquisitionDetail(touch, recordedAt) {
+      if (!touch || typeof touch !== "object") return "No acquisition data captured yet.";
+
+      const parts = [];
+      if (touch.campaign) parts.push("Campaign: " + touch.campaign);
+      if (touch.term) parts.push("Term: " + touch.term);
+      if (touch.device) parts.push(String(touch.device).charAt(0).toUpperCase() + String(touch.device).slice(1));
+
+      if (touch.referrer) {
+        try {
+          parts.push("From: " + new URL(touch.referrer).hostname.replace(/^www\./, ""));
+        } catch {
+          parts.push("Referral");
+        }
+      } else if (touch.landing_path) {
+        parts.push("Landing: " + touch.landing_path);
+      }
+
+      if (recordedAt) parts.push(prettyDateTime(recordedAt));
+      return parts.join(" · ") || "Source captured";
+    }
+
+    function renderCustomerAcquisition(customer) {
+      const first = customer.acquisition_first_touch;
+      const last = customer.acquisition_last_touch;
+      const firstLabel = first && typeof acquisitionSourceLabel === "function" ? acquisitionSourceLabel(first) : "Unknown";
+      const lastLabel = last && typeof acquisitionSourceLabel === "function" ? acquisitionSourceLabel(last) : "Unknown";
+
+      $("customerAcquisitionFirst").textContent = firstLabel;
+      $("customerAcquisitionLast").textContent = lastLabel;
+      $("customerAcquisitionFirstDetail").textContent = customerAcquisitionDetail(first, customer.acquisition_first_at);
+      $("customerAcquisitionLastDetail").textContent = customerAcquisitionDetail(last, customer.acquisition_last_at);
+
+      const badgeLabel = last ? lastLabel : firstLabel;
+      $("customerAcquisitionBadge").textContent = badgeLabel;
+      $("customerAcquisitionBadge").className = (first || last)
+        ? "rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700"
+        : "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500";
+    }
+
     function renderCustomerProfile() {
       const customer = state.customers.find(c => c.id === state.selectedCustomerId);
       $("customerProfileEmpty").classList.toggle("hidden", Boolean(customer));
@@ -790,6 +830,7 @@ function customerBookings(customer) {
       $("customerProfileDaysSince").textContent = m.daysSinceLastVisit === null
         ? "No past appointments"
         : (m.daysSinceLastVisit === 0 ? "Today" : `${m.daysSinceLastVisit} day${m.daysSinceLastVisit === 1 ? "" : "s"}`);
+      renderCustomerAcquisition(customer);
       renderCustomerRetention(customer, m);
       const tags = customerTags(customer);
       $("customerTagsList").innerHTML = tags.length
@@ -1142,6 +1183,7 @@ function customerBookings(customer) {
 
       const url = new URL(buildPublicUrl(state.profile.id));
       url.searchParams.set("prefill", key);
+      url.searchParams.set("internal_booking", "1");
       window.open(url.toString(), "_blank", "noopener");
     }
 
