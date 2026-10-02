@@ -33,7 +33,7 @@
   </script>
   <link rel="stylesheet" href="assets/css/app.css">
 </head>
-<body class="product-site-shell min-h-screen text-slate-800 font-sans">
+<body class="product-site-shell contact-product-page min-h-screen text-slate-800 font-sans">
 <a href="#main-content" class="skip-link">Skip to main content</a><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
   <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
     <a href="/" class="flex shrink-0 items-center" aria-label="Grab&Book home">
@@ -66,18 +66,18 @@
   <section class="product-page-hero">
     <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
       <div class="grid items-start gap-10 lg:grid-cols-[.85fr_1.15fr]">
-        <div class="max-w-xl">
-          <span class="product-kicker">Contact Grab&Book</span>
-          <h1 class="mt-6 text-4xl font-black leading-[1.04] tracking-[-.04em] text-ink sm:text-5xl">A SaaS company you can actually contact.</h1>
-          <p class="mt-6 text-base leading-8 text-slate-600 sm:text-lg">Whether you're deciding if Grab&Book fits your business, need help with the product, or simply have a question, send it directly to us.</p>
-          <div class="mt-8 space-y-3">
-            <div class="contact-principle"><span>01</span><div><strong>No support maze</strong><p>You do not have to search a help centre before you're allowed to ask a question.</p></div></div>
-            <div class="contact-principle"><span>02</span><div><strong>Give us the context once</strong><p>Tell us what you're trying to do and the form gives us the information needed to understand it.</p></div></div>
-            <div class="contact-principle"><span>03</span><div><strong>Product feedback is welcome</strong><p>Questions, friction and feature ideas are useful signals for how Grab&Book should improve.</p></div></div>
+        <div class="contact-hero-copy max-w-xl">
+          <span class="product-kicker contact-hero-item">Contact Grab&Book</span>
+          <h1 class="contact-hero-item mt-6 text-4xl font-black leading-[1.04] tracking-[-.04em] text-ink sm:text-5xl">A SaaS company you can actually contact.</h1>
+          <p class="contact-hero-item mt-6 text-base leading-8 text-slate-600 sm:text-lg">Whether you're deciding if Grab&Book fits your business, need help with the product, or simply have a question, send it directly to us.</p>
+          <div class="contact-principles mt-8 space-y-3">
+            <div class="contact-principle contact-principle-item"><span>01</span><div><strong>No support maze</strong><p>You do not have to search a help centre before you're allowed to ask a question.</p></div></div>
+            <div class="contact-principle contact-principle-item"><span>02</span><div><strong>Give us the context once</strong><p>Tell us what you're trying to do and the form gives us the information needed to understand it.</p></div></div>
+            <div class="contact-principle contact-principle-item"><span>03</span><div><strong>Product feedback is welcome</strong><p>Questions, friction and feature ideas are useful signals for how Grab&Book should improve.</p></div></div>
           </div>
         </div>
 
-        <div class="product-ui-frame p-5 sm:p-7">
+        <div id="contactFormCard" class="product-ui-frame contact-reveal p-5 sm:p-7">
           <div>
             <p class="product-ui-eyebrow">Send a message</p>
             <h2 class="mt-2 text-2xl font-black text-ink">What can we help with?</h2>
@@ -119,7 +119,7 @@
               Please don't send passwords, card details or other sensitive credentials through this form.
             </div>
 
-            <button type="submit" class="btn btn-primary w-full sm:w-auto">Send message</button>
+            <button id="contactSubmitBtn" type="submit" class="btn btn-primary w-full sm:w-auto"><span class="contact-submit-label">Send message</span><span class="contact-submit-spinner hidden" aria-hidden="true"></span></button>
           </form>
         </div>
       </div>
@@ -128,7 +128,7 @@
 
   <section class="border-y border-slate-100 bg-white py-14 sm:py-18">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-4 md:grid-cols-3">
+      <div class="contact-stagger grid gap-4 md:grid-cols-3">
         <article class="product-feature"><span>Sales</span><h3>Is Grab&Book right for me?</h3><p>Ask about features, pricing, workflows or whether the platform fits the way your business takes bookings.</p></article>
         <article class="product-feature"><span>Support</span><h3>Something isn't working?</h3><p>Describe what you expected, what happened instead and the area of Grab&Book you were using.</p></article>
         <article class="product-feature"><span>Product</span><h3>Have an idea?</h3><p>Tell us what would save you time or give you a clearer view of your business. Useful feedback belongs close to the product.</p></article>
@@ -151,5 +151,6 @@
       <a class="hover:text-brand-600" href="/contact" data-cta="contact">Contact</a>
     </nav>
   </div>
-</footer>  <script src="assets/js/marketing-site.js" defer></script>
+</footer>  <script src="assets/js/contact-page.js" defer></script>
+  <script src="assets/js/marketing-site.js" defer></script>
 </body></html>
