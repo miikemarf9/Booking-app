@@ -48,6 +48,7 @@ async function loadPublicBookingPage(profileId) {
         if (serviceStaffErr) throw serviceStaffErr;
 
         state.publicProfile = prof;
+        if (typeof captureAcquisitionTouch === "function") captureAcquisitionTouch(profileId);
         state.selectedStaffChoice = null;
         state.publicServices = srvs || [];
         state.publicQuestions = questions || [];
@@ -711,7 +712,11 @@ async function loadPublicBookingPage(profileId) {
         }
       }
 
-      const { data, error } = await publicClient.rpc("public_create_booking", {
+      const acquisition = typeof getAcquisitionPayload === "function"
+        ? getAcquisitionPayload(state.publicProfile.id)
+        : { firstTouch: null, lastTouch: null };
+
+      const { data, error } = await publicClient.rpc("public_create_booking_v2", {
         p_profile_id: state.publicProfile.id,
         p_service_id: state.selectedService.id,
         p_customer_name: $("customerName").value.trim(),
@@ -721,7 +726,9 @@ async function loadPublicBookingPage(profileId) {
         p_answers: publicQuestionAnswers(),
         p_marketing_opt_in: $("marketingOptIn").checked,
         p_staff_id: flexibleTeamBooking ? null : (state.selectedSlot.staffId || null),
-        p_flexible_staff: flexibleTeamBooking
+        p_flexible_staff: flexibleTeamBooking,
+        p_acquisition_first_touch: acquisition.firstTouch,
+        p_acquisition_last_touch: acquisition.lastTouch
       });
       setBusy(submitBtn, false);
 
