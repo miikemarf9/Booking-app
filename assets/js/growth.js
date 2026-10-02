@@ -64,6 +64,9 @@ function renderGrowthChannelSummary(rows) {
 
   $("growthChannelCards").innerHTML = channels.map(function (channel) {
     const conversion = channel.conversion == null ? 0 : Math.max(0, Math.min(100, channel.conversion));
+    if (typeof registerGrowthPlannerChannel === "function") {
+      registerGrowthPlannerChannel(channel.key, channel.label);
+    }
     return (
       '<article class="rounded-2xl border border-slate-200 bg-white p-4">' +
         '<div class="flex items-start justify-between gap-3">' +
@@ -105,6 +108,9 @@ function renderGrowthChannelSummary(rows) {
             '<span>Avg booking value</span>' +
             '<span class="font-semibold text-slate-600">' + (channel.averageValue == null ? "—" : money(channel.averageValue)) + '</span>' +
           '</div>' +
+        '</div>' +
+        '<div class="mt-4 border-t border-slate-100 pt-3">' +
+          '<button class="text-xs font-bold text-brand-600 hover:underline" type="button" data-planner-channel="' + escapeHtml(channel.key) + '" data-planner-label="' + escapeHtml(channel.label) + '">+ Add note / plan</button>' +
         '</div>' +
       '</article>'
     );
@@ -176,6 +182,10 @@ async function loadGrowthAnalytics(showToast = false) {
 
   if (typeof loadGrowthImportHistory === "function") {
     tasks.push(loadGrowthImportHistory());
+  }
+
+  if (typeof loadGrowthPlanner === "function") {
+    tasks.push(loadGrowthPlanner());
   }
 
   await Promise.all(tasks);
