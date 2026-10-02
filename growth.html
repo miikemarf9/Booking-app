@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Growth analytics connecting acquisition channels, website data, bookings, customer value, Search Console, Google Ads and Meta for service businesses.">
+  <link rel="icon" type="image/svg+xml" href="grabandbook-icon.svg">
+  <title>Growth | Grab&Book</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          ink: "#172033",
+          brand: { 50:"#eef8ff",100:"#d9efff",500:"#1687d9",600:"#0872bd",700:"#075b98" },
+          coral:"#ff765d"
+        },
+        boxShadow: { soft:"0 18px 50px rgba(23,32,51,.08)" }
+      }}
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="product-site-shell min-h-screen text-slate-800 font-sans"><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+    <a href="index.html" class="flex shrink-0 items-center" aria-label="Grab&Book home">
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="block h-8 w-auto sm:h-10">
+    </a>
+    <nav class="hidden items-center gap-6 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
+      <a class="product-nav-link" href="book.html">Book</a>
+      <a class="product-nav-link" href="crm.html">CRM</a>
+      <a class="text-brand-700" href="growth.html">Growth</a>
+      <a class="product-nav-link" href="index.html#pricing">Pricing</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="index.html?auth=login" class="btn btn-light">Log in</a>
+      <a href="index.html?auth=register" class="btn btn-primary">Start free</a>
+    </div>
+  </div>
+  <nav class="product-mobile-nav border-t border-slate-100 px-4 py-2 lg:hidden" aria-label="Mobile product navigation">
+    <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto">
+      <a class="" href="book.html">Book</a>
+      <a class="" href="crm.html">CRM</a>
+      <a class="active" href="growth.html">Growth</a>
+      <a href="index.html#pricing">Pricing</a>
+    </div>
+  </nav>
+</header>
+<main>
+  <section class="product-page-hero overflow-hidden">
+    <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[.88fr_1.12fr] lg:px-8 lg:py-24">
+      <div>
+        <span class="product-kicker">Grab&Book · Growth</span>
+        <h1 class="mt-6 text-4xl font-black leading-[1.03] tracking-[-.04em] text-ink sm:text-5xl lg:text-6xl">See what creates bookings — not just clicks.</h1>
+        <p class="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">Connect acquisition data to the booking journey, new customers, booked value and repeat behaviour so marketing can be judged closer to the outcome that matters.</p>
+        <div class="mt-8 flex flex-wrap gap-3"><a href="index.html?auth=register" class="btn btn-primary !px-6 !py-3.5 text-base">Start free</a><a href="#growth-details" class="btn btn-light !px-6 !py-3.5 text-base">Explore the data ↓</a></div>
+      </div>
+
+      <div class="product-ui-frame">
+        <div class="product-ui-topbar"><div><p class="product-ui-eyebrow">Growth overview</p><p class="font-black text-ink">Last 30 days</p></div><span class="product-status">Acquisition tracking active</span></div>
+        <div class="grid grid-cols-2 gap-3 bg-slate-50/80 p-4 sm:grid-cols-4 sm:p-5">
+          <div class="product-metric"><span>Tracked visits</span><strong>1,248</strong><small>consented journeys</small></div>
+          <div class="product-metric"><span>Bookings</span><strong>232</strong><small>completed journeys</small></div>
+          <div class="product-metric"><span>Conversion</span><strong>18.6%</strong><small>visit → booking</small></div>
+          <div class="product-metric"><span>Booked value</span><strong>£8.4k</strong><small>tracked bookings</small></div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div class="mb-3 flex items-center justify-between"><p class="text-sm font-black text-ink">Channels</p><span class="text-[.68rem] font-bold uppercase text-slate-400">Demo data</span></div>
+          <div class="overflow-hidden rounded-2xl border border-slate-100">
+            <div class="product-data-row product-data-head"><span>Channel</span><span>Visits</span><span>Conv.</span><span>Value</span></div>
+            <div class="product-data-row"><strong>Google</strong><span>392</span><span>21.4%</span><strong>£3,420</strong></div>
+            <div class="product-data-row"><strong>Instagram</strong><span>281</span><span>17.1%</span><strong>£1,960</strong></div>
+            <div class="product-data-row"><strong>Direct</strong><span>256</span><span>24.2%</span><strong>£2,410</strong></div>
+            <div class="product-data-row"><strong>Referral</strong><span>121</span><span>14.9%</span><strong>£610</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="growth-details" class="bg-white py-16 sm:py-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl"><p class="product-section-label">From traffic to customer value</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Keep platform metrics and first-party outcomes in the same conversation.</h2><p class="mt-4 text-base leading-7 text-slate-500">Grab&Book deliberately keeps external platform reporting distinct from first-party booking attribution, then gives you one place to compare the signals without pretending every system measures the same thing.</p></div>
+      <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <article class="product-feature"><span>01</span><h3>Acquisition channels</h3><p>Compare tracked visits, completed bookings, booking conversion, new customers and booked value by channel.</p></article>
+        <article class="product-feature"><span>02</span><h3>Customer quality</h3><p>Look beyond first-booking revenue into repeat rate, customer value and longer-term cohort behaviour.</p></article>
+        <article class="product-feature"><span>03</span><h3>Booking funnel</h3><p>Understand consented journeys from booking-page visit through service selection and completed booking.</p></article>
+        <article class="product-feature"><span>04</span><h3>Website & SEO data</h3><p>Bring GA4 and Google Search Console metrics into the same Growth workspace as booking outcomes.</p></article>
+        <article class="product-feature"><span>05</span><h3>Paid media</h3><p>Connect Google Ads and Meta reporting, keeping spend/click metrics separate from first-party booking attribution.</p></article>
+        <article class="product-feature"><span>06</span><h3>Planner & opportunities</h3><p>Store channel notes, ideas, tasks and goals alongside review prompts generated from the data available.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-slate-100 bg-slate-50/75 py-16 sm:py-24">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
+      <div class="product-ui-frame">
+        <div class="product-ui-topbar"><div><p class="product-ui-eyebrow">Customer quality</p><p class="font-black text-ink">Which channels create stronger customers?</p></div><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">30-day view</span></div>
+        <div class="p-4 sm:p-5">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-brand-100 bg-brand-50/55 p-4"><div class="flex items-center justify-between"><strong class="text-ink">Google</strong><span class="text-xs font-bold text-brand-700">84 new customers</span></div><div class="mt-4 grid grid-cols-3 gap-2 text-xs"><span class="rounded-xl bg-white p-2 text-slate-500"><b class="block text-lg text-ink">42%</b>Repeat</span><span class="rounded-xl bg-white p-2 text-slate-500"><b class="block text-lg text-ink">£182</b>Avg value</span><span class="rounded-xl bg-white p-2 text-slate-500"><b class="block text-lg text-ink">3.1×</b>LTV:CAC</span></div></div>
+            <div class="rounded-2xl border border-violet-100 bg-violet-50/55 p-4"><div class="flex items-center justify-between"><strong class="text-ink">Instagram</strong><span class="text-xs font-bold text-violet-700">48 new customers</span></div><div class="mt-4 grid grid-cols-3 gap-2 text-xs"><span class="rounded-xl bg-white p-2 text-slate-500"><b class="block text-lg text-ink">51%</b>Repeat</span><span class="rounded-xl bg-white p-2 text-slate-500"><b class="block text-lg text-ink">£214</b>Avg value</span><span class="rounded-xl bg-white p-2 text-slate-500"><b class="block text-lg text-ink">—</b>LTV:CAC</span></div></div>
+          </div>
+          <div class="mt-4 rounded-2xl border border-slate-100 p-4"><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Why this matters</p><p class="mt-2 text-sm leading-6 text-slate-600">A channel can look weaker on first-booking conversion but create customers who return more often. Growth is designed to make that trade-off visible.</p></div>
+          <p class="mt-4 text-[.68rem] text-slate-400">Illustrative demo data. LTV:CAC is only available where cost and sufficiently mature customer data exist.</p>
+        </div>
+      </div>
+
+      <div class="max-w-xl lg:justify-self-end"><p class="product-section-label">Deeper than acquisition</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">A cheap booking is not always a valuable customer.</h2><p class="mt-5 text-base leading-7 text-slate-500">Growth is structured to help you compare channels on what happens after acquisition as well as before it. That means new-customer volume can sit alongside repeat behaviour and customer value.</p><div class="mt-7 space-y-3"><div class="product-point"><strong>First + last touch</strong><span>Retain source, medium, campaign, referral and device attribution through the booking journey.</span></div><div class="product-point"><strong>30 / 60 / 90-day value</strong><span>Use matured customer cohorts when enough time has passed for repeat behaviour to be meaningful.</span></div><div class="product-point"><strong>No invented precision</strong><span>Unmatched or unavailable data remains unassigned rather than being inferred.</span></div></div></div>
+    </div>
+  </section>
+
+  <section class="bg-white py-16 sm:py-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-3xl text-center"><p class="product-section-label">Connected sources</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Bring the marketing view closer to the booking outcome.</h2><p class="mt-4 text-base leading-7 text-slate-500">Connections are designed to add context without overwriting the first-party booking record.</p></div>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="product-integration"><strong>Google Analytics 4</strong><span>Users, sessions, acquisition, landing pages, engagement and device data.</span></div>
+        <div class="product-integration"><strong>Search Console</strong><span>Clicks, impressions, CTR, average position, queries and landing pages.</span></div>
+        <div class="product-integration"><strong>Google Ads</strong><span>Spend, clicks, CPC, campaigns and ad groups alongside booking outcomes.</span></div>
+        <div class="product-integration"><strong>Meta</strong><span>Paid campaign reporting plus Facebook Page and Instagram professional-account insights.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-ink py-16 text-white sm:py-20">
+    <div class="mx-auto max-w-5xl px-4 text-center sm:px-6">
+      <p class="text-xs font-black uppercase tracking-[.18em] text-brand-100">One connected customer journey</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] sm:text-4xl">Book tells you what happened. CRM tells you who it happened with. Growth helps explain where it came from.</h2><p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300">That connection is the core of Grab&Book.</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3"><a href="book.html" class="btn border border-white/15 bg-white/5 text-white hover:bg-white/10">Explore Book</a><a href="crm.html" class="btn border border-white/15 bg-white/5 text-white hover:bg-white/10">Explore CRM</a><a href="index.html?auth=register" class="btn bg-white text-brand-700 hover:bg-brand-50">Start free</a></div>
+    </div>
+  </section>
+</main><footer class="border-t border-slate-100 bg-white">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_auto] md:items-end lg:px-8">
+    <div>
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="h-8 w-auto max-w-[160px]">
+      <p class="mt-4 max-w-md text-sm leading-6 text-slate-400">Booking, CRM and growth tools for service businesses that want a clearer view of the customer journey.</p>
+    </div>
+    <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-slate-500">
+      <a class="hover:text-brand-600" href="index.html">Home</a>
+      <a class="hover:text-brand-600" href="book.html">Book</a>
+      <a class="hover:text-brand-600" href="crm.html">CRM</a>
+      <a class="hover:text-brand-600" href="growth.html">Growth</a>
+      <a class="hover:text-brand-600" href="index.html#pricing">Pricing</a>
+    </nav>
+  </div>
+</footer></body></html>
