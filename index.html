@@ -354,21 +354,49 @@
         </div>
         <div class="flex items-center gap-2">
           <button id="openBookingPageBtn" type="button" class="btn btn-primary hidden sm:inline-flex">View booking page ↗</button>
+          <button id="dashboardSettingsBtn" type="button" class="btn btn-light" data-go-tab="settings">Settings</button>
           <button id="logoutBtn" type="button" class="btn btn-light">Log out</button>
         </div>
       </div>
     </header>
 
     <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
-      <div class="mb-7 overflow-x-auto">
-        <nav class="inline-flex min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" aria-label="Dashboard sections">
-          <button class="nav-tab active rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="overview" type="button">Overview</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="calendar" type="button">Diary</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="customers" type="button">Customers</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="availability" type="button">Availability</button>
-          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Settings</button>
-        </nav>
+      <div class="mb-7 space-y-3">
+        <div class="overflow-x-auto">
+          <nav class="inline-flex min-w-max gap-1 rounded-2xl bg-slate-900 p-1" aria-label="Grab&Book product areas">
+            <button class="area-tab active rounded-xl px-5 py-2.5 text-sm font-bold text-slate-300" data-area="home" data-default-tab="overview" type="button">Home</button>
+            <button class="area-tab rounded-xl px-5 py-2.5 text-sm font-bold text-slate-300" data-area="booking" data-default-tab="calendar" type="button">Booking</button>
+            <button class="area-tab rounded-xl px-5 py-2.5 text-sm font-bold text-slate-300" data-area="crm" data-default-tab="customers" type="button">CRM</button>
+            <button class="area-tab rounded-xl px-5 py-2.5 text-sm font-bold text-slate-300" data-area="growth" data-default-tab="growth" type="button">Growth</button>
+          </nav>
+        </div>
+
+        <div id="dashboardSubnavWrap" class="overflow-x-auto">
+          <nav class="dashboard-subnav inline-flex min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="home" aria-label="Home navigation">
+            <button class="subnav-tab active rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-tab="overview" type="button">Overview</button>
+          </nav>
+
+          <nav class="dashboard-subnav hidden min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="booking" aria-label="Booking navigation">
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-tab="calendar" type="button">Diary</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-tab="services" type="button">Services</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-tab="availability" type="button">Availability</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-tab="payments" type="button">Payments</button>
+          </nav>
+
+          <nav class="dashboard-subnav hidden min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="crm" aria-label="CRM navigation">
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-customers-section" type="button">Customers</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-retention-section" type="button">Retention</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-campaigns-section" type="button">Campaigns</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-analytics-section" type="button">Analytics</button>
+          </nav>
+
+          <nav class="dashboard-subnav hidden min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="growth" aria-label="Growth navigation">
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-overview-section" type="button">Overview</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-channels-section" type="button">Channels</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-journey-section" type="button">Journey</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-opportunities-section" type="button">Opportunities</button>
+          </nav>
+        </div>
       </div>
 
       <div id="dashboardDataWarning" class="mb-6 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"></div>
@@ -429,6 +457,62 @@
         </div>
       </section>
 
+      <!-- Growth Tab -->
+      <section id="tab-growth" class="dashboard-tab hidden space-y-6">
+        <div id="growth-overview-section" class="scroll-mt-32">
+          <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Growth</p>
+              <h2 class="mt-1 text-2xl font-bold text-ink">Acquire more valuable customers</h2>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Understand where customers come from, what turns traffic into bookings and which channels create the strongest long-term customer value.</p>
+            </div>
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Acquisition tracking active</span>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Foundation</p>
+              <p class="mt-2 text-xl font-bold text-ink">First + last touch</p>
+              <p class="mt-2 text-sm leading-6 text-slate-500">Bookings can now retain source, medium, campaign, referral and device attribution.</p>
+            </article>
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Customer link</p>
+              <p class="mt-2 text-xl font-bold text-ink">CRM connected</p>
+              <p class="mt-2 text-sm leading-6 text-slate-500">Acquisition source can follow a customer beyond their first booking into retention and value analysis.</p>
+            </article>
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Internal bookings</p>
+              <p class="mt-2 text-xl font-bold text-ink">Kept separate</p>
+              <p class="mt-2 text-sm leading-6 text-slate-500">Staff-assisted bookings do not overwrite genuine marketing attribution.</p>
+            </article>
+            <article class="card p-5">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Next layer</p>
+              <p class="mt-2 text-xl font-bold text-ink">Booking journey</p>
+              <p class="mt-2 text-sm leading-6 text-slate-500">Funnel tracking will show where visitors progress or drop out before completing a booking.</p>
+            </article>
+          </div>
+        </div>
+
+        <article id="growth-channels-section" class="card scroll-mt-32 p-5 sm:p-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Channels</p>
+          <h3 class="mt-1 text-xl font-bold text-ink">Compare where customers come from</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">Google Organic, Google Ads, Instagram, Facebook, Direct and referrals will appear here on the same commercial metrics as we build the Growth layer.</p>
+          <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">Channel comparison is the next Growth data view. The attribution foundation required for it is already active.</div>
+        </article>
+
+        <article id="growth-journey-section" class="card scroll-mt-32 p-5 sm:p-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Journey</p>
+          <h3 class="mt-1 text-xl font-bold text-ink">Traffic → booking → customer</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">This will show the booking funnel from page visit through service, date, slot, details, payment and completed booking.</p>
+        </article>
+
+        <article id="growth-opportunities-section" class="card scroll-mt-32 p-5 sm:p-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Opportunities</p>
+          <h3 class="mt-1 text-xl font-bold text-ink">Know what deserves attention</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">As channel and funnel data builds up, Grab&Book will surface useful acquisition opportunities rather than leaving owners to interpret raw analytics alone.</p>
+        </article>
+      </section>
+
       <!-- Customers Tab -->
       <section id="tab-customers" class="dashboard-tab hidden">
         <div class="space-y-6">
@@ -460,7 +544,7 @@
             </button>
           </div>
 
-          <article class="card p-5 sm:p-6">
+          <article id="crm-analytics-section" class="card scroll-mt-32 p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM analytics</p>
@@ -523,7 +607,7 @@
             </div>
           </article>
 
-          <article class="card p-5 sm:p-6">
+          <article id="crm-retention-section" class="card scroll-mt-32 p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM automation</p>
@@ -561,7 +645,7 @@
             </form>
           </article>
 
-          <article class="card p-5 sm:p-6">
+          <article id="crm-campaigns-section" class="card scroll-mt-32 p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer communications</p>
@@ -638,7 +722,7 @@
             </div>
           </article>
 
-          <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+          <div id="crm-customers-section" class="grid scroll-mt-32 gap-6 lg:grid-cols-[.9fr_1.1fr]">
             <article class="card p-5 sm:p-6">
               <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
