@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Moreleads booking dashboard and customer appointment booking.">
-  <title>Moreleads Booking Portal</title>
+  <meta name="description" content="MoreLeads helps service businesses take online bookings, accept payments, manage teams and bring customers back.">
+  <title>MoreLeads | Booking software that helps service businesses grow</title>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -211,6 +211,129 @@
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--customer-brand) 14%, transparent) !important;
     }
 
+
+    .landing-shell {
+      background:
+        radial-gradient(circle at 12% 2%, rgba(22, 135, 217, .13), transparent 30rem),
+        radial-gradient(circle at 88% 8%, rgba(255, 118, 93, .10), transparent 28rem),
+        linear-gradient(180deg, #fbfdff 0%, #f7f9fc 55%, #ffffff 100%);
+    }
+    .landing-grid {
+      background-image:
+        linear-gradient(rgba(23, 32, 51, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 32, 51, .035) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+    .landing-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      border: 1px solid #d9efff;
+      border-radius: 999px;
+      padding: .48rem .75rem;
+      background: rgba(255,255,255,.82);
+      color: #075b98;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .landing-kicker::before {
+      content: "";
+      width: .48rem;
+      height: .48rem;
+      border-radius: 999px;
+      background: #1687d9;
+      box-shadow: 0 0 0 4px rgba(22,135,217,.10);
+    }
+    .feature-icon {
+      display: grid;
+      width: 2.65rem;
+      height: 2.65rem;
+      place-items: center;
+      border-radius: .9rem;
+      background: #eef8ff;
+      color: #0872bd;
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+    .booking-hero {
+      background:
+        radial-gradient(circle at 90% 10%, color-mix(in srgb, var(--customer-brand) 11%, transparent), transparent 18rem),
+        linear-gradient(135deg, #ffffff 0%, #fbfdff 100%);
+    }
+    .booking-step {
+      scroll-margin-top: 7.25rem;
+      transition: opacity .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .booking-step.opacity-50 {
+      opacity: .58;
+    }
+    .booking-step:not(.opacity-50) {
+      border-color: #dfe6ef;
+    }
+    .booking-step:not(.opacity-50):focus-within {
+      border-color: var(--customer-brand-border);
+      box-shadow: 0 14px 40px color-mix(in srgb, var(--customer-brand) 8%, transparent);
+    }
+    .progress-step {
+      display: inline-flex;
+      min-width: max-content;
+      align-items: center;
+      gap: .45rem;
+      border: 1px solid #e5eaf1;
+      border-radius: 999px;
+      padding: .5rem .7rem;
+      background: #fff;
+      color: #8a94a6;
+      font-size: .72rem;
+      font-weight: 800;
+      transition: .15s;
+    }
+    .progress-step .progress-dot {
+      display: grid;
+      width: 1.35rem;
+      height: 1.35rem;
+      place-items: center;
+      border-radius: 999px;
+      background: #eef1f5;
+      color: #7a8496;
+      font-size: .62rem;
+      font-weight: 900;
+    }
+    .progress-step[data-status="current"] {
+      border-color: var(--customer-brand-border);
+      background: var(--customer-brand-soft);
+      color: var(--customer-brand-dark);
+    }
+    .progress-step[data-status="current"] .progress-dot,
+    .progress-step[data-status="complete"] .progress-dot {
+      background: var(--customer-brand);
+      color: #fff;
+    }
+    .progress-step[data-status="complete"] {
+      border-color: color-mix(in srgb, var(--customer-brand) 28%, #e5eaf1);
+      color: #526074;
+    }
+    .service-choice,
+    .staff-choice,
+    .slot-choice {
+      cursor: pointer;
+    }
+    #publicBookingView .service-choice:hover,
+    #publicBookingView .staff-choice:hover,
+    #publicBookingView .slot-choice:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 9px 24px rgba(23,32,51,.07);
+    }
+    #publicBookingView .slot-choice {
+      min-height: 2.85rem;
+      font-weight: 800;
+    }
+    .booking-summary-card {
+      box-shadow: 0 18px 50px rgba(23, 32, 51, .08);
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         scroll-behavior: auto !important;
@@ -230,6 +353,230 @@
       <div class="spinner mx-auto mb-4" aria-hidden="true"></div>
       <p class="text-sm font-semibold text-slate-500">Loading booking portal…</p>
     </div>
+  </section>
+
+
+  <!-- Product Landing View -->
+  <section id="landingView" class="landing-shell hidden min-h-screen">
+    <header class="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-xl">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-4 sm:px-6 lg:px-8">
+        <a href="#" class="flex items-center gap-3" aria-label="MoreLeads home">
+          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-600 font-black text-white shadow-sm">M</div>
+          <div>
+            <p class="font-black leading-none text-ink">MoreLeads</p>
+            <p class="mt-1 text-[.62rem] font-bold uppercase tracking-[.18em] text-slate-400">Bookings</p>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-7 text-sm font-bold text-slate-500 md:flex" aria-label="Product navigation">
+          <a class="hover:text-ink" href="#how-it-works">How it works</a>
+          <a class="hover:text-ink" href="#features">Features</a>
+          <a class="hover:text-ink" href="#pricing">Pricing</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <button id="landingLoginBtn" type="button" class="btn btn-light">Log in</button>
+          <button id="landingStartBtn" type="button" class="btn btn-primary">Start free</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="landing-grid overflow-hidden">
+        <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.02fr_.98fr] lg:px-8 lg:py-28">
+          <div>
+            <span class="landing-kicker">Built for service businesses</span>
+            <h1 class="mt-6 max-w-3xl text-4xl font-black leading-[1.04] tracking-[-.035em] text-ink sm:text-5xl lg:text-6xl">
+              Fill your diary. Get paid. Bring customers back.
+            </h1>
+            <p class="mt-6 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+              Online booking, payments, team scheduling and customer follow-up in one simple system — built for salons, aesthetics, barbers, therapists and local service businesses.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <button id="landingHeroStartBtn" type="button" class="btn btn-primary !px-6 !py-3.5 text-base">Start free</button>
+              <a href="#how-it-works" class="btn btn-light !px-6 !py-3.5 text-base">See how it works ↓</a>
+            </div>
+            <div class="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-slate-500">
+              <span class="inline-flex items-center gap-2"><span class="text-emerald-500">✓</span> Online bookings</span>
+              <span class="inline-flex items-center gap-2"><span class="text-emerald-500">✓</span> Payments & deposits</span>
+              <span class="inline-flex items-center gap-2"><span class="text-emerald-500">✓</span> Customer CRM</span>
+              <span class="inline-flex items-center gap-2"><span class="text-emerald-500">✓</span> Team scheduling</span>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="absolute -inset-8 -z-10 rounded-[3rem] bg-brand-500/10 blur-3xl"></div>
+            <div class="overflow-hidden rounded-[1.65rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(23,32,51,.14)]">
+              <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-xs font-black text-white">M</div>
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Business dashboard</p>
+                    <p class="font-bold text-ink">Friday at a glance</p>
+                  </div>
+                </div>
+                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Live</span>
+              </div>
+              <div class="grid gap-4 bg-slate-50/70 p-5 sm:grid-cols-3">
+                <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booked today</p>
+                  <p class="mt-2 text-2xl font-black text-ink">£620</p>
+                  <p class="mt-1 text-xs text-emerald-600">8 appointments</p>
+                </div>
+                <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Customers</p>
+                  <p class="mt-2 text-2xl font-black text-ink">184</p>
+                  <p class="mt-1 text-xs text-slate-500">in your CRM</p>
+                </div>
+                <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Next slot</p>
+                  <p class="mt-2 text-2xl font-black text-ink">14:30</p>
+                  <p class="mt-1 text-xs text-slate-500">45 min available</p>
+                </div>
+              </div>
+              <div class="p-5">
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Coming up</p>
+                    <h2 class="mt-1 text-lg font-black text-ink">Today's appointments</h2>
+                  </div>
+                  <span class="text-xs font-bold text-slate-400">Europe/London</span>
+                </div>
+                <div class="mt-4 space-y-3">
+                  <div class="flex items-center justify-between rounded-2xl border border-slate-100 p-4">
+                    <div class="flex items-center gap-3">
+                      <span class="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-sm font-black text-brand-700">10:00</span>
+                      <div><p class="font-bold text-ink">Consultation</p><p class="text-xs text-slate-500">Alex · 45 min</p></div>
+                    </div>
+                    <span class="text-sm font-black text-ink">£50</span>
+                  </div>
+                  <div class="flex items-center justify-between rounded-2xl border border-slate-100 p-4">
+                    <div class="flex items-center gap-3">
+                      <span class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-sm font-black text-violet-700">11:30</span>
+                      <div><p class="font-bold text-ink">Premium treatment</p><p class="text-xs text-slate-500">Sam · 60 min</p></div>
+                    </div>
+                    <span class="text-sm font-black text-ink">£120</span>
+                  </div>
+                  <div class="rounded-2xl border border-dashed border-brand-200 bg-brand-50/60 p-4">
+                    <p class="text-xs font-bold uppercase tracking-wider text-brand-700">Smart diary</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-700">Customers only see genuinely available times. No back-and-forth messages.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" class="bg-white py-20 sm:py-24">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="max-w-2xl">
+            <p class="text-xs font-black uppercase tracking-[.18em] text-brand-600">One connected system</p>
+            <h2 class="mt-3 text-3xl font-black tracking-[-.025em] text-ink sm:text-4xl">From first booking to repeat customer.</h2>
+            <p class="mt-4 text-base leading-7 text-slate-500">MoreLeads handles the customer journey around your diary, not just the appointment itself.</p>
+          </div>
+          <div class="mt-12 grid gap-5 md:grid-cols-3">
+            <article class="card p-6 sm:p-7">
+              <span class="text-sm font-black text-brand-600">01</span>
+              <h3 class="mt-5 text-xl font-black text-ink">Get booked</h3>
+              <p class="mt-3 text-sm leading-6 text-slate-500">Give customers a branded booking page with your services, staff, live availability and booking questions.</p>
+            </article>
+            <article class="card p-6 sm:p-7">
+              <span class="text-sm font-black text-brand-600">02</span>
+              <h3 class="mt-5 text-xl font-black text-ink">Run the diary</h3>
+              <p class="mt-3 text-sm leading-6 text-slate-500">Take payments or deposits, prevent clashes, manage time off, sync Google Calendar and automate reminders.</p>
+            </article>
+            <article class="card p-6 sm:p-7">
+              <span class="text-sm font-black text-brand-600">03</span>
+              <h3 class="mt-5 text-xl font-black text-ink">Grow repeat business</h3>
+              <p class="mt-3 text-sm leading-6 text-slate-500">Build a customer database, send opted-in campaigns and use promotions to turn spare capacity into revenue.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="border-y border-slate-100 bg-slate-50/70 py-20 sm:py-24">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-3xl text-center">
+            <p class="text-xs font-black uppercase tracking-[.18em] text-brand-600">Everything in one place</p>
+            <h2 class="mt-3 text-3xl font-black tracking-[-.025em] text-ink sm:text-4xl">Less admin. A better booking experience. More room to grow.</h2>
+          </div>
+          <div class="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <article class="card p-6"><span class="feature-icon">↗</span><h3 class="mt-5 text-lg font-black text-ink">Branded online booking</h3><p class="mt-2 text-sm leading-6 text-slate-500">Your services, colours, logo and availability in a clean customer-facing booking journey.</p></article>
+            <article class="card p-6"><span class="feature-icon">£</span><h3 class="mt-5 text-lg font-black text-ink">Payments & deposits</h3><p class="mt-2 text-sm leading-6 text-slate-500">Take full payment, deposits or pay-later bookings with Stripe depending on your plan.</p></article>
+            <article class="card p-6"><span class="feature-icon">◎</span><h3 class="mt-5 text-lg font-black text-ink">Team scheduling</h3><p class="mt-2 text-sm leading-6 text-slate-500">Give each team member their own availability and services, with automatic balanced assignment when needed.</p></article>
+            <article class="card p-6"><span class="feature-icon">♡</span><h3 class="mt-5 text-lg font-black text-ink">Customer CRM</h3><p class="mt-2 text-sm leading-6 text-slate-500">Keep customer details, appointment history, notes and marketing consent together.</p></article>
+            <article class="card p-6"><span class="feature-icon">%</span><h3 class="mt-5 text-lg font-black text-ink">Promotions that fill gaps</h3><p class="mt-2 text-sm leading-6 text-slate-500">Run scheduled offers and incentivise customers to book any available team member.</p></article>
+            <article class="card p-6"><span class="feature-icon">✓</span><h3 class="mt-5 text-lg font-black text-ink">Calendar & reminders</h3><p class="mt-2 text-sm leading-6 text-slate-500">Booking rules, time off, confirmations, reminders, rescheduling, cancellation and Google Calendar sync.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-ink py-20 text-white sm:py-24">
+        <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
+          <div>
+            <p class="text-xs font-black uppercase tracking-[.18em] text-brand-100">Built around revenue</p>
+            <h2 class="mt-3 text-3xl font-black tracking-[-.025em] sm:text-4xl">Booking software should do more than put names in a calendar.</h2>
+            <p class="mt-5 max-w-xl text-base leading-7 text-slate-300">MoreLeads is designed to help small service businesses convert demand, protect their time and make better use of the customers they already have.</p>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="text-2xl font-black text-brand-100">24/7</p><p class="mt-2 text-sm leading-6 text-slate-300">Let customers book while you're busy, closed or away from your phone.</p></div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="text-2xl font-black text-brand-100">One view</p><p class="mt-2 text-sm leading-6 text-slate-300">Bookings, customers, staff, payments and availability in one business dashboard.</p></div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="text-2xl font-black text-brand-100">Smart team</p><p class="mt-2 text-sm leading-6 text-slate-300">Offer flexible team booking and assign appointments to the least-booked eligible person.</p></div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="text-2xl font-black text-brand-100">Your brand</p><p class="mt-2 text-sm leading-6 text-slate-300">Customers book with the business they trust, not through a generic-looking form.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" class="bg-white py-20 sm:py-24">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-2xl text-center">
+            <p class="text-xs font-black uppercase tracking-[.18em] text-brand-600">Simple pricing</p>
+            <h2 class="mt-3 text-3xl font-black tracking-[-.025em] text-ink sm:text-4xl">Start free. Upgrade when it saves you money.</h2>
+          </div>
+          <div class="mt-12 grid gap-5 md:grid-cols-2">
+            <article class="card p-7">
+              <p class="text-sm font-black text-ink">Free</p>
+              <div class="mt-3 flex items-end gap-1"><span class="text-4xl font-black text-ink">£0</span><span class="pb-1 text-sm font-semibold text-slate-400">/month</span></div>
+              <p class="mt-4 text-sm leading-6 text-slate-500">A simple way to start taking paid bookings online.</p>
+              <div class="mt-6 space-y-3 text-sm text-slate-600">
+                <p>✓ Core booking and business dashboard</p>
+                <p>✓ Full online payment at booking</p>
+                <p>✓ 3% MoreLeads platform fee per booking</p>
+                <p>✓ £10 minimum service price</p>
+              </div>
+              <button id="landingPricingStartBtn" type="button" class="btn btn-light mt-7 w-full">Start free</button>
+            </article>
+            <article class="relative overflow-hidden rounded-[1.25rem] border border-brand-500 bg-brand-50/55 p-7 shadow-[0_16px_45px_rgba(8,114,189,.12)]">
+              <span class="absolute right-5 top-5 rounded-full bg-brand-600 px-3 py-1 text-[.68rem] font-black uppercase tracking-wider text-white">Best value</span>
+              <p class="text-sm font-black text-ink">Pro</p>
+              <div class="mt-3 flex items-end gap-1"><span class="text-4xl font-black text-ink">£14.99</span><span class="pb-1 text-sm font-semibold text-slate-400">/month</span></div>
+              <p class="mt-4 text-sm leading-6 text-slate-600">For businesses that want flexible payments without a MoreLeads transaction fee.</p>
+              <div class="mt-6 space-y-3 text-sm text-slate-700">
+                <p>✓ 0% MoreLeads transaction fee</p>
+                <p>✓ Pay later, fixed deposit, percentage deposit or full payment</p>
+                <p>✓ No MoreLeads minimum service price</p>
+                <p>✓ Everything in the core booking system</p>
+              </div>
+              <button id="landingProStartBtn" type="button" class="btn btn-primary mt-7 w-full">Create your account</button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="px-4 pb-20 sm:px-6 sm:pb-24">
+        <div class="mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-brand-600 px-6 py-12 text-center text-white shadow-[0_24px_70px_rgba(8,114,189,.22)] sm:px-12">
+          <h2 class="text-3xl font-black tracking-[-.025em] sm:text-4xl">Make booking easier for your customers — and your business.</h2>
+          <p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-brand-100">Create your booking page, add your services and start sharing availability from one place.</p>
+          <button id="landingBottomStartBtn" type="button" class="btn mt-7 bg-white !px-6 !py-3.5 text-base text-brand-700 hover:bg-brand-50">Start free</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-100 bg-white">
+      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-slate-400 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+        <div class="flex items-center gap-2 font-bold text-slate-600"><span class="grid h-7 w-7 place-items-center rounded-lg bg-brand-600 text-xs font-black text-white">M</span> MoreLeads Bookings</div>
+        <p>Built for service businesses that want fewer gaps and more repeat customers.</p>
+      </div>
+    </footer>
   </section>
 
   <!-- Auth View -->
@@ -261,6 +608,7 @@
       </div>
       <div class="flex items-center justify-center p-6 sm:p-12">
         <div class="w-full max-w-md">
+          <button id="backToLandingBtn" type="button" class="mb-7 inline-flex items-center gap-2 text-sm font-bold text-slate-400 transition hover:text-ink">← Back to MoreLeads</button>
           <div class="mb-10 flex items-center gap-3 lg:hidden">
             <div class="grid h-10 w-10 place-items-center rounded-2xl bg-brand-600 font-black text-white">M</div>
             <span class="font-bold text-ink">Moreleads Bookings</span>
@@ -1681,94 +2029,124 @@
   </section>
 
   <!-- Public Booking View -->
-  <section id="publicBookingView" class="hidden min-h-screen">
-    <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur">
-      <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+  <section id="publicBookingView" class="hidden min-h-screen bg-[#f7f9fc]">
+    <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
         <div class="flex min-w-0 items-center gap-3">
-          <div id="publicBrandLogoWrap" class="hidden h-12 w-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5">
+          <div id="publicBrandLogoWrap" class="hidden h-11 w-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5">
             <img id="publicBrandLogo" class="max-h-full max-w-full object-contain" alt="">
           </div>
           <div class="min-w-0">
-            <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Online booking</p>
-            <h1 id="publicBusinessName" class="truncate text-lg font-bold text-ink">Business</h1>
+            <p class="text-[.64rem] font-black uppercase tracking-[.18em] text-brand-600">Book online</p>
+            <h1 id="publicBusinessName" class="truncate text-base font-black text-ink sm:text-lg">Business</h1>
           </div>
         </div>
-        <div class="text-right">
-          <p class="text-xs font-bold text-slate-600">Europe/London</p>
-          <p class="text-[.68rem] text-slate-400">All appointment times</p>
+        <div class="flex items-center gap-3 text-right">
+          <div class="hidden sm:block">
+            <p class="text-xs font-bold text-slate-600">Europe/London</p>
+            <p class="text-[.66rem] text-slate-400">Appointment times</p>
+          </div>
+          <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[.68rem] font-black text-emerald-700">Secure booking</span>
         </div>
       </div>
     </header>
 
-    <main class="mx-auto max-w-5xl px-4 py-7 sm:px-6 lg:py-10" aria-labelledby="publicBusinessName">
+    <main class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:py-9" aria-labelledby="publicBusinessName">
       <div id="publicError" class="card hidden p-8 text-center sm:p-10"></div>
-      <div id="publicBrandIntroCard" class="card mb-5 hidden p-5 sm:p-7">
-        <h2 id="publicBrandTitle" class="text-2xl font-bold text-ink"></h2>
-        <p id="publicBrandIntro" class="mt-2 max-w-2xl text-sm leading-6 text-slate-500"></p>
+
+      <section id="publicBrandIntroCard" class="booking-hero card mb-5 overflow-hidden p-6 sm:p-8">
+        <div class="max-w-3xl">
+          <p class="text-xs font-black uppercase tracking-[.18em] text-brand-600">Online appointments</p>
+          <h2 id="publicBrandTitle" class="mt-2 text-2xl font-black tracking-[-.02em] text-ink sm:text-3xl">Book an appointment</h2>
+          <p id="publicBrandIntro" class="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Choose a service and an appointment time that suits you.</p>
+          <div class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold text-slate-500">
+            <span class="inline-flex items-center gap-1.5"><span class="text-emerald-500">✓</span> Live availability</span>
+            <span class="inline-flex items-center gap-1.5"><span class="text-emerald-500">✓</span> No customer account needed</span>
+            <span class="inline-flex items-center gap-1.5"><span class="text-emerald-500">✓</span> Private booking management link</span>
+          </div>
+        </div>
+      </section>
+
+      <nav id="publicProgress" class="mb-5 overflow-x-auto pb-1" aria-label="Booking progress">
+        <div class="flex min-w-max gap-2">
+          <button type="button" class="progress-step" data-progress-key="service" data-progress-target="serviceStep" data-status="current"><span class="progress-dot">1</span>Service</button>
+          <button id="progressStaff" type="button" class="progress-step hidden" data-progress-key="staff" data-progress-target="staffStep" data-status="pending"><span class="progress-dot">2</span>Team</button>
+          <button type="button" class="progress-step" data-progress-key="date" data-progress-target="dateStep" data-status="pending"><span class="progress-dot">3</span>Date</button>
+          <button type="button" class="progress-step" data-progress-key="time" data-progress-target="timeStep" data-status="pending"><span class="progress-dot">4</span>Time</button>
+          <button type="button" class="progress-step" data-progress-key="details" data-progress-target="detailsStep" data-status="pending"><span class="progress-dot">5</span>Details</button>
+        </div>
+      </nav>
+
+      <div id="mobileBookingSummary" class="card mb-5 hidden p-4 lg:hidden">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-[.66rem] font-black uppercase tracking-wider text-slate-400">Your booking</p>
+            <p id="mobileSummaryService" class="mt-1 truncate font-black text-ink">Service</p>
+            <p id="mobileSummaryMeta" class="mt-1 text-xs text-slate-500">Choose a date and time</p>
+          </div>
+          <div id="mobileSummaryPrice" class="shrink-0 text-right text-lg font-black text-ink">—</div>
+        </div>
       </div>
-      <div id="bookingJourney" class="grid gap-6 lg:grid-cols-[1.35fr_.65fr]">
+
+      <div id="bookingJourney" class="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,.55fr)]">
         <div class="space-y-5">
-          <!-- Step 1 -->
-          <article class="card p-5 sm:p-7">
-            <div class="flex items-center gap-3">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white">1</span>
+          <article id="serviceStep" class="booking-step card p-5 sm:p-7">
+            <div class="flex items-start gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white">1</span>
               <div>
-                <h2 class="font-bold text-ink">Choose a service</h2>
-                <p class="text-xs text-slate-500">What would you like to book?</p>
+                <h2 class="text-lg font-black text-ink">Choose your service</h2>
+                <p class="mt-1 text-sm text-slate-500">Start with what you'd like to book. You'll see the price and appointment length before choosing a time.</p>
               </div>
             </div>
-            <div id="publicServices" class="mt-5 grid gap-3 sm:grid-cols-2"></div>
+            <div id="publicServices" class="mt-6 grid gap-3 md:grid-cols-2"></div>
           </article>
 
-          <article id="staffStep" class="card hidden p-5 sm:p-7">
-            <div class="flex items-center gap-3">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white">2</span>
+          <article id="staffStep" class="booking-step card hidden p-5 sm:p-7">
+            <div class="flex items-start gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white">2</span>
               <div>
-                <h2 class="font-bold text-ink">Choose a team member</h2>
-                <p class="text-xs text-slate-500">Pick someone specific or choose any available team member.</p>
+                <h2 class="text-lg font-black text-ink">Choose who you'd like to see</h2>
+                <p class="mt-1 text-sm text-slate-500">Pick a specific team member, or let the business assign an available person where offered.</p>
               </div>
             </div>
-            <div id="publicStaffChoices" class="mt-5 grid gap-3 sm:grid-cols-2"></div>
+            <div id="publicStaffChoices" class="mt-6 grid gap-3 sm:grid-cols-2"></div>
           </article>
 
-          <!-- Step 2 -->
-          <article id="dateStep" class="card p-5 opacity-50 sm:p-7">
-            <div class="flex items-center gap-3">
-              <span id="dateStepNumber" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">2</span>
+          <article id="dateStep" class="booking-step card p-5 opacity-50 sm:p-7">
+            <div class="flex items-start gap-3">
+              <span id="dateStepNumber" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">2</span>
               <div>
-                <h2 class="font-bold text-ink">Choose a date</h2>
-                <p class="text-xs text-slate-500">Select a date to see available times.</p>
+                <h2 class="text-lg font-black text-ink">Choose a date</h2>
+                <p class="mt-1 text-sm text-slate-500">Pick the day that suits you and we'll show the available appointment times.</p>
               </div>
             </div>
-            <div class="mt-5 max-w-xs">
+            <div class="mt-6 max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <label class="label" for="publicDate">Appointment date</label>
-              <input id="publicDate" class="field" type="date" disabled>
+              <input id="publicDate" class="field bg-white" type="date" disabled>
             </div>
           </article>
 
-          <!-- Step 3 -->
-          <article id="timeStep" class="card p-5 opacity-50 sm:p-7">
-            <div class="flex items-center gap-3">
-              <span id="timeStepNumber" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">3</span>
+          <article id="timeStep" class="booking-step card p-5 opacity-50 sm:p-7">
+            <div class="flex items-start gap-3">
+              <span id="timeStepNumber" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">3</span>
               <div>
-                <h2 class="font-bold text-ink">Choose a time</h2>
-                <p class="text-xs text-slate-500">Only currently available times are shown.</p>
+                <h2 class="text-lg font-black text-ink">Choose a time</h2>
+                <p class="mt-1 text-sm text-slate-500">Only appointment times that are currently available are shown.</p>
               </div>
             </div>
-            <div id="slotsMessage" class="mt-5 text-sm text-slate-500">Choose a service and date first.</div>
-            <div id="publicSlots" class="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"></div>
+            <div id="slotsMessage" class="mt-6 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">Choose a service and date first.</div>
+            <div id="publicSlots" class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"></div>
           </article>
 
-          <!-- Step 4 -->
-          <article id="detailsStep" class="card p-5 opacity-50 sm:p-7">
-            <div class="flex items-center gap-3">
-              <span id="detailsStepNumber" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">4</span>
+          <article id="detailsStep" class="booking-step card p-5 opacity-50 sm:p-7">
+            <div class="flex items-start gap-3">
+              <span id="detailsStepNumber" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">4</span>
               <div>
-                <h2 class="font-bold text-ink">Your details</h2>
-                <p class="text-xs text-slate-500">We’ll use these details for your appointment.</p>
+                <h2 class="text-lg font-black text-ink">Your details</h2>
+                <p class="mt-1 text-sm text-slate-500">Tell the business who the appointment is for. You'll receive confirmation by email.</p>
               </div>
             </div>
-            <form id="customerBookingForm" class="mt-5 grid gap-4 sm:grid-cols-2">
+            <form id="customerBookingForm" class="mt-6 grid gap-4 sm:grid-cols-2">
               <div>
                 <label class="label" for="customerName">Full name</label>
                 <input id="customerName" class="field" type="text" required maxlength="120" autocomplete="name" placeholder="Your name" disabled>
@@ -1782,7 +2160,7 @@
                 <input id="customerPhone" class="field" type="tel" required maxlength="40" autocomplete="tel" inputmode="tel" placeholder="e.g. 07123 456789" disabled>
               </div>
               <div id="customQuestionsWrap" class="sm:col-span-2 hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">A few more details</p>
+                <p class="text-xs font-black uppercase tracking-wider text-brand-600">A few more details</p>
                 <div id="customQuestions" class="mt-4 space-y-4"></div>
               </div>
               <label class="sm:col-span-2 flex items-start gap-2.5 text-xs leading-5 text-slate-500">
@@ -1791,64 +2169,73 @@
               </label>
               <label class="sm:col-span-2 flex items-start gap-2.5 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
                 <input id="marketingOptIn" class="mt-1 rounded border-slate-300 text-brand-600" type="checkbox" disabled>
-                <span><strong class="text-slate-700">Optional:</strong> Yes, I’d like to receive occasional offers and updates from this business by email. I can unsubscribe at any time.</span>
+                <span><strong class="text-slate-700">Optional:</strong> Yes, I'd like to receive occasional offers and updates from this business by email. I can unsubscribe at any time.</span>
               </label>
-              <button id="confirmBookingBtn" class="btn btn-primary sm:col-span-2" type="submit" disabled>Confirm booking</button>
+              <button id="confirmBookingBtn" class="btn btn-primary !py-3.5 sm:col-span-2" type="submit" disabled>Confirm booking</button>
+              <p class="sm:col-span-2 text-center text-[.7rem] leading-5 text-slate-400">Your booking details are shared with this business so they can manage your appointment.</p>
             </form>
           </article>
 
-          <!-- Success Screen -->
           <article id="bookingSuccess" class="card hidden border-emerald-200 bg-emerald-50 p-7 text-center sm:p-10">
             <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500 text-2xl text-white">✓</div>
-            <p class="mt-5 text-xs font-bold uppercase tracking-[.18em] text-emerald-700">Booking confirmed</p>
-            <h2 class="mt-2 text-2xl font-bold text-ink">You’re all booked in</h2>
+            <p class="mt-5 text-xs font-black uppercase tracking-[.18em] text-emerald-700">Booking confirmed</p>
+            <h2 class="mt-2 text-2xl font-black text-ink">You're all booked in</h2>
             <p id="successSummary" class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600"></p>
             <div id="successManageActions" class="mt-6 hidden flex flex-wrap justify-center gap-2">
               <a id="successRescheduleLink" class="btn btn-primary" href="#">Reschedule booking</a>
               <a id="successCancelLink" class="btn btn-light" href="#">Cancel booking</a>
             </div>
-            <p id="successManageNote" class="mx-auto mt-3 hidden max-w-md text-xs leading-5 text-slate-500">
-              Keep these private links safe. No account is required to manage this appointment.
-            </p>
+            <p id="successManageNote" class="mx-auto mt-3 hidden max-w-md text-xs leading-5 text-slate-500">Keep these private links safe. No account is required to manage this appointment.</p>
             <p id="successEmailStatus" class="mx-auto mt-3 max-w-md text-xs leading-5 text-slate-500"></p>
             <button id="bookAnotherBtn" class="btn btn-light mt-4" type="button">Book another appointment</button>
           </article>
         </div>
 
-        <!-- Sidebar Summary -->
-        <aside class="h-fit lg:sticky lg:top-6">
-          <article class="card overflow-hidden">
+        <aside class="hidden h-fit lg:sticky lg:top-24 lg:block">
+          <article class="booking-summary-card card overflow-hidden">
             <div class="bg-ink p-5 text-white sm:p-6">
-              <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-100">Your appointment</p>
-              <h2 class="mt-1 text-xl font-bold">Booking summary</h2>
+              <p class="text-xs font-black uppercase tracking-[.16em] text-brand-100">Your appointment</p>
+              <h2 class="mt-1 text-xl font-black">Booking summary</h2>
+              <p class="mt-2 text-xs leading-5 text-slate-300">Review your choices as you go.</p>
             </div>
             <dl class="divide-y divide-slate-100 p-5 text-sm sm:p-6">
               <div class="py-3 first:pt-0">
-                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Service</dt>
-                <dd id="summaryService" class="mt-1 font-bold text-slate-700">Not selected</dd>
+                <dt class="text-[.68rem] font-black uppercase tracking-wider text-slate-400">Service</dt>
+                <dd id="summaryService" class="mt-1 font-black text-slate-700">Not selected</dd>
+              </div>
+              <div class="py-3">
+                <dt class="text-[.68rem] font-black uppercase tracking-wider text-slate-400">Duration</dt>
+                <dd id="summaryDuration" class="mt-1 font-bold text-slate-700">—</dd>
               </div>
               <div id="summaryStaffRow" class="hidden py-3">
-                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Team member</dt>
+                <dt class="text-[.68rem] font-black uppercase tracking-wider text-slate-400">Team member</dt>
                 <dd id="summaryStaff" class="mt-1 font-bold text-slate-700">Not selected</dd>
               </div>
               <div class="py-3">
-                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Date</dt>
+                <dt class="text-[.68rem] font-black uppercase tracking-wider text-slate-400">Date</dt>
                 <dd id="summaryDate" class="mt-1 font-bold text-slate-700">Not selected</dd>
               </div>
               <div class="py-3">
-                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Time</dt>
+                <dt class="text-[.68rem] font-black uppercase tracking-wider text-slate-400">Time</dt>
                 <dd id="summaryTime" class="mt-1 font-bold text-slate-700">Not selected</dd>
               </div>
+              <div class="py-3">
+                <dt class="text-[.68rem] font-black uppercase tracking-wider text-slate-400">Payment</dt>
+                <dd id="summaryPayment" class="mt-1 font-bold text-slate-700">—</dd>
+              </div>
               <div class="flex items-end justify-between pt-4">
-                <dt class="font-bold text-slate-500">Price</dt>
-                <dd id="summaryPrice" class="text-2xl font-bold text-ink">—</dd>
+                <dt class="font-black text-slate-500">Price</dt>
+                <dd id="summaryPrice" class="text-2xl font-black text-ink">—</dd>
               </div>
             </dl>
+            <div class="border-t border-slate-100 bg-slate-50 px-5 py-4 text-xs leading-5 text-slate-500">
+              <span class="font-bold text-slate-700">No customer account required.</span> Confirmation and private management links are sent after booking.
+            </div>
           </article>
         </aside>
       </div>
     </main>
-    <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by Moreleads</footer>
+    <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by <span class="font-bold text-slate-500">MoreLeads</span></footer>
   </section>
 
 
@@ -2267,7 +2654,7 @@
     const todayKey = () => dateKeyInZone(new Date());
 
     function showOnly(viewId) {
-      ["loadingView", "authView", "pendingView", "dashboardView", "publicBookingView", "manageBookingView"].forEach(id => {
+      ["loadingView", "landingView", "authView", "pendingView", "dashboardView", "publicBookingView", "manageBookingView"].forEach(id => {
         const el = $(id);
         el.classList.toggle("hidden", id !== viewId);
         if (id === "pendingView") el.classList.toggle("flex", id === viewId);
@@ -2604,11 +2991,21 @@
           await refreshStripePayments(false);
         }
       } else {
-        showOnly("authView");
+        showOnly("landingView");
       }
     }
 
     function bindEvents() {
+      $("landingLoginBtn").addEventListener("click", () => { setAuthMode("login"); showOnly("authView"); });
+      ["landingStartBtn", "landingHeroStartBtn", "landingPricingStartBtn", "landingProStartBtn", "landingBottomStartBtn"].forEach(id => {
+        $(id).addEventListener("click", () => { setAuthMode("register"); showOnly("authView"); });
+      });
+      $("backToLandingBtn").addEventListener("click", () => showOnly("landingView"));
+      document.querySelectorAll("[data-progress-target]").forEach(btn => btn.addEventListener("click", () => {
+        const target = $(btn.dataset.progressTarget);
+        if (target && !target.classList.contains("hidden")) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }));
+
       $("loginModeBtn").addEventListener("click", () => setAuthMode("login"));
       $("registerModeBtn").addEventListener("click", () => setAuthMode("register"));
       $("authForm").addEventListener("submit", handleAuth);
@@ -4057,12 +4454,11 @@
 
       const title = String(profile.booking_page_title || "").trim();
       const intro = String(profile.booking_page_intro || "").trim();
-      const showIntroCard = Boolean(title || intro);
 
-      $("publicBrandIntroCard").classList.toggle("hidden", !showIntroCard);
+      $("publicBrandIntroCard").classList.remove("hidden");
       $("publicBrandTitle").textContent = title || `Book with ${profile.business_name}`;
-      $("publicBrandIntro").textContent = intro || "";
-      $("publicBrandIntro").classList.toggle("hidden", !intro);
+      $("publicBrandIntro").textContent = intro || "Choose a service and an appointment time that suits you.";
+      $("publicBrandIntro").classList.remove("hidden");
     }
 
     function populateBusinessDetails() {
@@ -6459,22 +6855,29 @@
 
     function renderPublicServices() {
       $("publicServices").innerHTML = state.publicServices.length ? state.publicServices.map(s => `
-        <button type="button" class="service-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-service-id="${s.id}">
-          <span class="block font-bold text-ink">${escapeHtml(s.title)}</span>
-          ${s.description ? `<span class="service-description mt-2 block text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</span>` : ""}
-          ${s.promotion_enabled ? `
-            <span class="mt-3 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-              ${escapeHtml(promotionLabel(s))} on eligible dates
+        <button type="button" class="service-choice group rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-500 sm:p-5" data-service-id="${s.id}">
+          <span class="flex items-start justify-between gap-4">
+            <span class="min-w-0">
+              <span class="block text-base font-black text-ink">${escapeHtml(s.title)}</span>
+              ${s.description ? `<span class="service-description mt-2 block text-sm leading-6 text-slate-500">${sanitiseServiceDescription(s.description)}</span>` : ""}
             </span>
-          ` : ""}
-          ${s.flexible_staff_enabled ? `
-            <span class="mt-2 inline-flex rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">
-              Any team member · ${escapeHtml(flexibleStaffDiscountLabel(s))}
-            </span>
-          ` : ""}
-          <span class="mt-3 flex items-center justify-between gap-3 text-sm">
+            <span class="shrink-0 text-right text-base font-black text-ink">${publicPriceHtml(s)}</span>
+          </span>
+          <span class="mt-4 flex flex-wrap gap-2">
+            ${s.promotion_enabled ? `
+              <span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[.7rem] font-black text-emerald-700">
+                ${escapeHtml(promotionLabel(s))} on eligible dates
+              </span>
+            ` : ""}
+            ${s.flexible_staff_enabled ? `
+              <span class="inline-flex rounded-full bg-violet-50 px-2.5 py-1 text-[.7rem] font-black text-violet-700">
+                Any team member · ${escapeHtml(flexibleStaffDiscountLabel(s))}
+              </span>
+            ` : ""}
+          </span>
+          <span class="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs font-bold">
             <span class="text-slate-500">${Number(s.duration_minutes)} minutes</span>
-            <span>${publicPriceHtml(s)}</span>
+            <span class="text-brand-700">Choose service →</span>
           </span>
         </button>
       `).join("") : emptyState("No services available", "This business has not published any bookable services yet.");
@@ -6628,6 +7031,7 @@
       $("publicSlots").innerHTML = "";
       $("slotsMessage").textContent = "Choose a date to see available times.";
       updateSummary();
+      advanceBookingTo("dateStep");
     }
 
     function selectedPublicStaffName() {
@@ -6665,6 +7069,7 @@
       $("publicSlots").innerHTML = "";
       $("slotsMessage").textContent = "Choose a date to see available times.";
       updateSummary();
+      advanceBookingTo(hasStaff ? "staffStep" : "dateStep");
     }
 
     async function handlePublicDateChange() {
@@ -6686,6 +7091,7 @@
         activateStep("timeStep");
         $("slotsMessage").innerHTML = '<span class="inline-flex items-center gap-2"><span class="spinner !h-4 !w-4 !border-2"></span>Checking availability…</span>';
         $("publicSlots").innerHTML = "";
+        advanceBookingTo("timeStep");
         await loadAvailableSlots();
       }
     }
@@ -6902,8 +7308,18 @@
 
       document.querySelectorAll(".slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
 
-      if (state.selectedSlot) activateDetails();
+      if (state.selectedSlot) {
+        activateDetails();
+        advanceBookingTo("detailsStep");
+      }
       updateSummary();
+    }
+
+    function advanceBookingTo(stepId) {
+      if (!window.matchMedia("(max-width: 1023px)").matches) return;
+      const target = $(stepId);
+      if (!target || target.classList.contains("hidden")) return;
+      window.setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 90);
     }
 
     function activateStep(stepId) {
@@ -6932,8 +7348,41 @@
       document.querySelectorAll(".custom-question-input").forEach(el => el.disabled = true);
     }
 
+    function updatePublicProgress() {
+      const hasService = Boolean(state.selectedService);
+      const hasStaff = hasService && publicStaffForService(state.selectedService.id).length > 0;
+      const staffComplete = !hasStaff || Boolean(state.selectedStaffChoice);
+      const dateComplete = Boolean(state.selectedDate);
+      const timeComplete = Boolean(state.selectedSlot);
+
+      $("progressStaff").classList.toggle("hidden", !hasStaff);
+
+      const steps = [
+        { key: "service", complete: hasService },
+        ...(hasStaff ? [{ key: "staff", complete: staffComplete }] : []),
+        { key: "date", complete: dateComplete },
+        { key: "time", complete: timeComplete },
+        { key: "details", complete: false }
+      ];
+
+      let foundCurrent = false;
+      steps.forEach(step => {
+        const el = document.querySelector(`[data-progress-key="${step.key}"]`);
+        if (!el) return;
+        let status = "pending";
+        if (step.complete) status = "complete";
+        else if (!foundCurrent) {
+          status = "current";
+          foundCurrent = true;
+        }
+        el.dataset.status = status;
+      });
+    }
+
     function updateSummary() {
       $("summaryService").textContent = state.selectedService?.title || "Not selected";
+      $("summaryDuration").textContent = state.selectedService ? `${Number(state.selectedService.duration_minutes)} minutes` : "—";
+      $("summaryPayment").textContent = state.selectedService ? paymentRequirementLabel(state.selectedService) : "—";
 
       if (!state.selectedService) {
         $("summaryPrice").textContent = "—";
@@ -6969,6 +7418,19 @@
         : (selectedStaff || (state.selectedStaffChoice === "any" ? "Any available" : "Not selected"));
       $("summaryDate").textContent = state.selectedDate ? prettyDate(state.selectedDate) : "Not selected";
       $("summaryTime").textContent = state.selectedSlot ? `${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}` : "Not selected";
+
+      const mobile = $("mobileBookingSummary");
+      mobile.classList.toggle("hidden", !state.selectedService);
+      if (state.selectedService) {
+        $("mobileSummaryService").textContent = state.selectedService.title;
+        $("mobileSummaryPrice").innerHTML = $("summaryPrice").innerHTML;
+        const bits = [];
+        if (state.selectedDate) bits.push(prettyDate(state.selectedDate, false));
+        if (state.selectedSlot) bits.push(`${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}`);
+        $("mobileSummaryMeta").textContent = bits.length ? bits.join(" · ") : `${Number(state.selectedService.duration_minutes)} min · choose a date and time`;
+      }
+
+      updatePublicProgress();
     }
 
     async function submitCustomerBooking(e) {
