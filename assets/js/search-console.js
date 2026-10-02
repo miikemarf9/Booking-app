@@ -355,7 +355,7 @@ async function loadSearchConsoleReport(showToast = false) {
   if (showToast) setBusy(btn, true, "Refreshing…");
 
   try {
-    const data = await searchConsoleFunction("report");
+    const data = await searchConsoleFunction("report", { days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 });
     renderSearchConsoleReport(data.report || {});
     if (showToast) toast("Search Console refreshed.");
   } catch (err) {
