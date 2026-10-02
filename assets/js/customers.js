@@ -332,7 +332,7 @@ function customerBookings(customer) {
 
     function renderCrmAnalytics(allMetrics) {
       if (!$("crmRepeatRate")) return;
-      $("crmAnalyticsPeriod").textContent = state.customers.length
+      $("crmAnalyticsPeriod").textContent = allMetrics.length
         ? "All-time customer data"
         : "Waiting for customer data";
 
@@ -402,7 +402,7 @@ function customerBookings(customer) {
       });
       $("crmLapsedCustomers").textContent = lapsed;
 
-      const healthTotal = Math.max(1, state.customers.length);
+      const healthTotal = Math.max(1, allMetrics.length);
       const healthItems = [
         ["Future booking", healthRows.booked],
         ["On track", healthRows.on_track],
@@ -411,7 +411,7 @@ function customerBookings(customer) {
         ["Learning", healthRows.learning]
       ];
 
-      $("crmHealthBreakdown").innerHTML = state.customers.length
+      $("crmHealthBreakdown").innerHTML = allMetrics.length
         ? healthItems.map(([label, count]) => {
             const pct = Math.round((count / healthTotal) * 100);
             return `
@@ -802,6 +802,7 @@ function customerBookings(customer) {
         : '<span class="text-xs text-slate-400">No tags yet.</span>';
       $("customerTagInput").value = "";
       $("customerNotes").value = customer.notes || "";
+      if (typeof syncCustomerManagementProfileControls === "function") syncCustomerManagementProfileControls(customer);
 
       renderCustomerTimeline(customer);
     }
