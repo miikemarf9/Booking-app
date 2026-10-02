@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Online booking, diary, payments, availability, team scheduling and customer booking tools for service businesses.">
+  <link rel="icon" type="image/svg+xml" href="grabandbook-icon.svg">
+  <title>Book | Grab&Book</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          ink: "#172033",
+          brand: { 50:"#eef8ff",100:"#d9efff",500:"#1687d9",600:"#0872bd",700:"#075b98" },
+          coral:"#ff765d"
+        },
+        boxShadow: { soft:"0 18px 50px rgba(23,32,51,.08)" }
+      }}
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="product-site-shell min-h-screen text-slate-800 font-sans"><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+    <a href="index.html" class="flex shrink-0 items-center" aria-label="Grab&Book home">
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="block h-8 w-auto sm:h-10">
+    </a>
+    <nav class="hidden items-center gap-6 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
+      <a class="text-brand-700" href="book.html">Book</a>
+      <a class="product-nav-link" href="crm.html">CRM</a>
+      <a class="product-nav-link" href="growth.html">Growth</a>
+      <a class="product-nav-link" href="index.html#pricing">Pricing</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="index.html?auth=login" class="btn btn-light">Log in</a>
+      <a href="index.html?auth=register" class="btn btn-primary">Start free</a>
+    </div>
+  </div>
+  <nav class="product-mobile-nav border-t border-slate-100 px-4 py-2 lg:hidden" aria-label="Mobile product navigation">
+    <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto">
+      <a class="active" href="book.html">Book</a>
+      <a class="" href="crm.html">CRM</a>
+      <a class="" href="growth.html">Growth</a>
+      <a href="index.html#pricing">Pricing</a>
+    </div>
+  </nav>
+</header>
+<main>
+  <section class="product-page-hero overflow-hidden">
+    <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[.9fr_1.1fr] lg:px-8 lg:py-24">
+      <div>
+        <span class="product-kicker">Grab&Book · Book</span>
+        <h1 class="mt-6 text-4xl font-black leading-[1.03] tracking-[-.04em] text-ink sm:text-5xl lg:text-6xl">A diary customers can book without losing your control.</h1>
+        <p class="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">Build services, publish real availability, take payment and keep staff, time off and customer bookings in one operational view.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="index.html?auth=register" class="btn btn-primary !px-6 !py-3.5 text-base">Start free</a>
+          <a href="#book-details" class="btn btn-light !px-6 !py-3.5 text-base">See how Book works ↓</a>
+        </div>
+      </div>
+
+      <div class="product-ui-frame">
+        <div class="product-ui-topbar"><div><p class="product-ui-eyebrow">Diary</p><p class="font-black text-ink">Friday 9 October</p></div><span class="product-status">Live availability</span></div>
+        <div class="grid grid-cols-2 gap-3 bg-slate-50/80 p-4 sm:grid-cols-4 sm:p-5">
+          <div class="product-metric"><span>Booked</span><strong>£620</strong><small>8 appointments</small></div>
+          <div class="product-metric"><span>Free time</span><strong>2h 15m</strong><small>across the team</small></div>
+          <div class="product-metric"><span>Next slot</span><strong>14:30</strong><small>45 min</small></div>
+          <div class="product-metric"><span>Team</span><strong>3</strong><small>working today</small></div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div class="grid gap-3 sm:grid-cols-[82px_1fr]">
+            <div class="hidden space-y-3 text-right text-[.68rem] font-bold text-slate-400 sm:block"><p class="h-14 pt-2">09:00</p><p class="h-14 pt-2">10:00</p><p class="h-14 pt-2">11:00</p><p class="h-14 pt-2">12:00</p></div>
+            <div class="space-y-3">
+              <div class="rounded-xl border border-brand-100 bg-brand-50 p-3"><div class="flex justify-between gap-3"><div><p class="font-bold text-ink">Consultation</p><p class="text-xs text-slate-500">Alex · 10:00–10:45</p></div><strong class="text-sm text-ink">£50</strong></div></div>
+              <div class="rounded-xl border border-violet-100 bg-violet-50 p-3"><div class="flex justify-between gap-3"><div><p class="font-bold text-ink">Premium treatment</p><p class="text-xs text-slate-500">Sam · 11:30–12:30</p></div><strong class="text-sm text-ink">£120</strong></div></div>
+              <div class="rounded-xl border border-dashed border-emerald-200 bg-emerald-50 p-3"><p class="text-xs font-bold uppercase tracking-wider text-emerald-700">Available to book</p><p class="mt-1 font-bold text-emerald-950">14:30 · 45 minutes</p></div>
+            </div>
+          </div>
+          <p class="mt-4 text-[.68rem] text-slate-400">Illustrative demo data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="book-details" class="bg-white py-16 sm:py-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl"><p class="product-section-label">Built around the appointment</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">The booking page and the diary share the same rules.</h2><p class="mt-4 text-base leading-7 text-slate-500">Instead of maintaining a public form separately from your working calendar, Grab&Book uses the services, staff and availability you configure to decide what customers can actually book.</p></div>
+      <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <article class="product-feature"><span>01</span><h3>Services & booking rules</h3><p>Set price, duration, buffers, booking questions, payment requirements and promotional offers at service level.</p></article>
+        <article class="product-feature"><span>02</span><h3>Availability that stays honest</h3><p>Publish working blocks, recurring availability and time off so customers only see slots that fit your rules.</p></article>
+        <article class="product-feature"><span>03</span><h3>Team scheduling</h3><p>Connect services to eligible staff, give team members their own availability and support flexible team booking.</p></article>
+        <article class="product-feature"><span>04</span><h3>Payments & deposits</h3><p>Take full payment, fixed or percentage deposits, or pay-later bookings depending on the plan.</p></article>
+        <article class="product-feature"><span>05</span><h3>Confirmations & reminders</h3><p>Send booking confirmations and reminders, with customer links for rescheduling and cancellation.</p></article>
+        <article class="product-feature"><span>06</span><h3>Calendar connection</h3><p>Keep Grab&Book availability and external commitments aligned through Google Calendar integration.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-slate-100 bg-slate-50/75 py-16 sm:py-24">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
+      <div class="product-ui-frame">
+        <div class="product-ui-topbar"><div><p class="product-ui-eyebrow">Customer journey</p><p class="font-black text-ink">Book a treatment</p></div><span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">Your brand</span></div>
+        <div class="p-5">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border-2 border-brand-500 bg-brand-50 p-4"><p class="font-black text-ink">Premium treatment</p><p class="mt-1 text-sm text-slate-500">60 min · £120</p><p class="mt-3 text-xs font-bold text-brand-700">Selected</p></div>
+            <div class="rounded-2xl border border-slate-200 p-4"><p class="font-black text-ink">Consultation</p><p class="mt-1 text-sm text-slate-500">45 min · £50</p><p class="mt-3 text-xs font-bold text-slate-400">Choose service</p></div>
+          </div>
+          <p class="mt-5 text-xs font-bold uppercase tracking-wider text-slate-400">Available Friday 9 October</p>
+          <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5"><span class="product-slot">10:00</span><span class="product-slot active">11:30</span><span class="product-slot">13:00</span><span class="product-slot">14:30</span><span class="product-slot">16:00</span></div>
+        </div>
+      </div>
+      <div class="max-w-xl lg:justify-self-end"><p class="product-section-label">Customer experience</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Make the easy option the accurate option.</h2><p class="mt-5 text-base leading-7 text-slate-500">Customers choose a service, eligible staff option and real time slot. Your rules do the filtering before the booking reaches the diary.</p><div class="mt-7 space-y-3"><div class="product-point"><strong>Less back-and-forth</strong><span>Customers can book while you are working, closed or away from the phone.</span></div><div class="product-point"><strong>Fewer clashes</strong><span>Availability is checked against the booking rules rather than offered as a static list.</span></div><div class="product-point"><strong>Clearer payments</strong><span>The customer sees what is due at booking before they confirm.</span></div></div></div>
+    </div>
+  </section>
+
+  <section class="bg-white py-16 sm:py-20">
+    <div class="mx-auto max-w-5xl px-4 text-center sm:px-6">
+      <p class="product-section-label">The outcome</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Spend less time arranging appointments and more time running them.</h2>
+      <p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-500">Book is the operational layer. Every confirmed appointment can then strengthen the CRM and feed the Growth view.</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3"><a href="crm.html" class="btn btn-light">Next: explore CRM →</a><a href="index.html?auth=register" class="btn btn-primary">Start free</a></div>
+    </div>
+  </section>
+</main><footer class="border-t border-slate-100 bg-white">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_auto] md:items-end lg:px-8">
+    <div>
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="h-8 w-auto max-w-[160px]">
+      <p class="mt-4 max-w-md text-sm leading-6 text-slate-400">Booking, CRM and growth tools for service businesses that want a clearer view of the customer journey.</p>
+    </div>
+    <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-slate-500">
+      <a class="hover:text-brand-600" href="index.html">Home</a>
+      <a class="hover:text-brand-600" href="book.html">Book</a>
+      <a class="hover:text-brand-600" href="crm.html">CRM</a>
+      <a class="hover:text-brand-600" href="growth.html">Growth</a>
+      <a class="hover:text-brand-600" href="index.html#pricing">Pricing</a>
+    </nav>
+  </div>
+</footer></body></html>
