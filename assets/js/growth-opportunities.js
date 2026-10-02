@@ -580,7 +580,7 @@ function renderGrowthOpportunities() {
   document.querySelectorAll(".growth-opportunity-filter").forEach(function (btn) {
     const active = btn.dataset.opportunityFilter === growthOpportunityState.filter;
     btn.className = active
-      ? "growth-opportunity-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white"
+      ? "growth-opportunity-filter rounded-full bg-brand-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm"
       : "growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600";
   });
 
