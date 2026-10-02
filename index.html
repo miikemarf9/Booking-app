@@ -432,7 +432,7 @@
       <!-- Customers Tab -->
       <section id="tab-customers" class="dashboard-tab hidden">
         <div class="space-y-6">
-          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <article class="card p-5">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total customers</p>
               <p id="crmTotalCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
@@ -453,6 +453,11 @@
               <p id="crmBookedValue" class="mt-2 text-3xl font-bold text-ink">£0</p>
               <p class="mt-1 text-xs text-slate-500">all non-cancelled customer bookings</p>
             </article>
+            <button id="crmRetentionAttentionBtn" class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Needs attention</p>
+              <p id="crmRetentionAttention" class="mt-2 text-3xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">customers due back or drifting away</p>
+            </button>
           </div>
 
           <article class="card p-5 sm:p-6">
@@ -480,6 +485,7 @@
                       <option value="new">New customers</option>
                       <option value="regular">Regular customers</option>
                       <option value="vip">VIP / high value</option>
+                      <option value="retention_attention">Needs retention attention</option>
                       <option value="due_back">Due back</option>
                       <option value="slipping">Slipping away</option>
                       <option value="lapsed">Lapsed customers</option>
@@ -620,6 +626,37 @@
                       <p class="text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Since last appointment</p>
                       <p id="customerProfileDaysSince" class="mt-1 text-sm font-bold text-ink">—</p>
                     </div>
+                  </div>
+                </div>
+
+                <div id="customerRetentionPanel" class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Retention intelligence</p>
+                      <h3 id="customerRetentionTitle" class="mt-1 font-bold text-ink">Learning this customer's pattern</h3>
+                      <p id="customerRetentionDetail" class="mt-1 max-w-xl text-sm leading-6 text-slate-500">Grab&Book will learn when this customer normally returns as more appointments are completed.</p>
+                    </div>
+                    <span id="customerRetentionStatus" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Learning</span>
+                  </div>
+
+                  <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div class="rounded-xl bg-white p-3">
+                      <p class="text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Expected return</p>
+                      <p id="customerExpectedReturn" class="mt-1 text-sm font-bold text-ink">—</p>
+                    </div>
+                    <div class="rounded-xl bg-white p-3">
+                      <p class="text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Timing</p>
+                      <p id="customerRetentionTiming" class="mt-1 text-sm font-bold text-ink">—</p>
+                    </div>
+                    <div class="rounded-xl bg-white p-3">
+                      <p class="text-[.66rem] font-bold uppercase tracking-wider text-slate-400">Pattern confidence</p>
+                      <p id="customerRetentionConfidence" class="mt-1 text-sm font-bold text-ink">—</p>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    <button id="customerRetentionActionBtn" class="btn btn-primary hidden" type="button">Send rebooking message</button>
+                    <button id="customerRetentionBookBtn" class="btn btn-light hidden" type="button">Book appointment</button>
                   </div>
                 </div>
 
