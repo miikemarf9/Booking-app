@@ -494,10 +494,57 @@
         </div>
 
         <article id="growth-channels-section" class="card scroll-mt-32 p-5 sm:p-6">
-          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Channels</p>
-          <h3 class="mt-1 text-xl font-bold text-ink">Compare where customers come from</h3>
-          <p class="mt-2 text-sm leading-6 text-slate-500">Google Organic, Google Ads, Instagram, Facebook, Direct and referrals will appear here on the same commercial metrics as we build the Growth layer.</p>
-          <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">Channel comparison is the next Growth data view. The attribution foundation required for it is already active.</div>
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Channels</p>
+              <h3 class="mt-1 text-xl font-bold text-ink">Compare where customers come from</h3>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Compare acquisition channels on the same Grab&Book metrics: tracked visits, completed bookings, conversion, new customers and booked value.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Last 30 days</span>
+              <button id="growthChannelsRefreshBtn" class="btn btn-light" type="button">Refresh</button>
+            </div>
+          </div>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Tracked visits</p>
+              <p id="growthChannelVisits" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">consented booking journeys</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Bookings</p>
+              <p id="growthChannelBookings" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">completed tracked bookings</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booked value</p>
+              <p id="growthChannelRevenue" class="mt-1 text-2xl font-bold text-ink">£0</p>
+              <p class="mt-1 text-xs text-slate-500">excluding currently cancelled bookings</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Most bookings</p>
+              <p id="growthChannelLeader" class="mt-1 text-lg font-bold text-ink">—</p>
+              <p id="growthChannelLeaderDetail" class="mt-1 text-xs text-slate-500">Waiting for channel data</p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex items-center justify-between gap-3">
+            <div>
+              <p class="text-sm font-bold text-ink">Channel comparison</p>
+              <p class="mt-1 text-xs text-slate-500">Paid and organic traffic are separated where Grab&Book can identify them.</p>
+            </div>
+          </div>
+
+          <div id="growthChannelCards" class="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3"></div>
+
+          <div class="mt-6 overflow-x-auto">
+            <div id="growthChannelTable"></div>
+          </div>
+
+          <div class="mt-5 rounded-2xl bg-amber-50 p-4 text-xs leading-5 text-amber-900">
+            These figures currently use optional Grab&Book booking analytics only. GA4, Search Console, Google Ads and Meta data are not connected yet, so this is a booking-channel comparison rather than a complete website/social audience report.
+          </div>
         </article>
 
         <article id="growth-journey-section" class="card scroll-mt-32 p-5 sm:p-6">
