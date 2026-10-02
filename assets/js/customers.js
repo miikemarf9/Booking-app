@@ -260,6 +260,56 @@ function customerBookings(customer) {
       if (tags.some(tag => tag === current)) select.value = current;
     }
 
+    function populateCrmAutomationSettings() {
+      if (!$("crmAutoRebooking") || !state.profile) return;
+
+      $("crmAutoRebooking").checked = Boolean(state.profile.crm_auto_rebooking_enabled);
+      $("crmAutoWinback").checked = Boolean(state.profile.crm_auto_winback_enabled);
+
+      const enabled = Boolean(
+        state.profile.crm_auto_rebooking_enabled ||
+        state.profile.crm_auto_winback_enabled
+      );
+
+      $("crmAutomationStatus").textContent = enabled ? "Active" : "Off";
+      $("crmAutomationStatus").className = enabled
+        ? "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
+        : "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500";
+
+      $("crmAutomationLastRun").textContent = state.profile.crm_automation_last_run_at
+        ? `Last checked ${prettyDateTime(state.profile.crm_automation_last_run_at)}`
+        : "Not run yet";
+    }
+
+    async function saveCrmAutomationSettings(e) {
+      e.preventDefault();
+      if (!state.profile) return;
+
+      const btn = $("crmAutomationSaveBtn");
+      setBusy(btn, true, "Saving…");
+
+      const updates = {
+        crm_auto_rebooking_enabled: Boolean($("crmAutoRebooking").checked),
+        crm_auto_winback_enabled: Boolean($("crmAutoWinback").checked)
+      };
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .update(updates)
+        .eq("id", state.profile.id)
+        .select("*")
+        .single();
+
+      setBusy(btn, false);
+      if (error) return toast(friendlyDbError(error, "save CRM automation settings"), "error");
+
+      state.profile = data;
+      populateCrmAutomationSettings();
+      toast(updates.crm_auto_rebooking_enabled || updates.crm_auto_winback_enabled
+        ? "CRM automations updated."
+        : "CRM automations turned off.");
+    }
+
     function currentCustomerFilter() {
       return $("customerFilter")?.value || "all";
     }
