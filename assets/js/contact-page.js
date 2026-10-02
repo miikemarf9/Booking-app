@@ -43,6 +43,7 @@
     if (!submit) return;
     submit.disabled = false;
     submit.classList.remove("is-sending");
+    submit.removeAttribute("aria-busy");
     if (label) label.textContent = "Send message";
   }
 
@@ -79,7 +80,11 @@
       if (principles) principles.classList.add("principles-playing");
 
       later(() => {
-        page.classList.remove("contact-motion-enabled", "contact-hero-playing");
+        page.classList.remove("contact-hero-playing");
+        hero.querySelectorAll(".contact-hero-item").forEach(el => {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        });
         if (principles) {
           principles.classList.remove("principles-playing");
           principles.querySelectorAll(".contact-principle-item").forEach(el => {
