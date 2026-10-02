@@ -865,6 +865,17 @@
       $("analyticsConsentDeclineBtn").addEventListener("click", declineBookingAnalytics);
       $("growthFunnelRefreshBtn").addEventListener("click", () => loadGrowthFunnelAnalytics(true));
       $("growthChannelsRefreshBtn").addEventListener("click", () => loadGrowthChannelAnalytics(true));
+      $("growthImportBtn").addEventListener("click", openGrowthImportModal);
+      $("growthImportTemplateBtn").addEventListener("click", downloadGrowthImportTemplate);
+      $("growthImportCloseBtn").addEventListener("click", closeGrowthImportModal);
+      $("growthImportCancelBtn").addEventListener("click", closeGrowthImportModal);
+      $("growthImportChooseBtn").addEventListener("click", () => $("growthImportCsvInput").click());
+      $("growthImportCsvInput").addEventListener("change", e => previewGrowthImportFile(e.target.files?.[0]));
+      $("growthImportConfirmBtn").addEventListener("click", confirmGrowthImport);
+      $("growthImportBatches").addEventListener("click", e => {
+        const btn = e.target.closest("[data-delete-growth-import]");
+        if (btn) deleteGrowthImportBatch(btn.dataset.deleteGrowthImport);
+      });
 
       $("manageRescheduleBtn").addEventListener("click", openManageReschedule);
       $("manageRescheduleCloseBtn").addEventListener("click", closeManageReschedule);
