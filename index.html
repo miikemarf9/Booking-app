@@ -470,16 +470,32 @@
                 <div>
                   <label class="label" for="customerFilter">Customer group</label>
                   <select id="customerFilter" class="field">
-                    <option value="all">All customers</option>
-                    <option value="opted_in">Marketing opted in</option>
-                    <option value="inactive_90">No completed appointment in 90+ days</option>
-                    <option value="service">Previous customers of a service</option>
+                    <optgroup label="Customer groups">
+                      <option value="all">All customers</option>
+                      <option value="opted_in">Marketing opted in</option>
+                      <option value="service">Previous customers of a service</option>
+                      <option value="tag">Customer tag</option>
+                    </optgroup>
+                    <optgroup label="Smart groups">
+                      <option value="new">New customers</option>
+                      <option value="regular">Regular customers</option>
+                      <option value="vip">VIP / high value</option>
+                      <option value="due_back">Due back</option>
+                      <option value="slipping">Slipping away</option>
+                      <option value="lapsed">Lapsed customers</option>
+                      <option value="no_future">No future appointment</option>
+                    </optgroup>
                   </select>
                 </div>
 
                 <div id="customerServiceFilterWrap" class="hidden">
                   <label class="label" for="customerServiceFilter">Service</label>
                   <select id="customerServiceFilter" class="field"></select>
+                </div>
+
+                <div id="customerTagFilterWrap" class="hidden">
+                  <label class="label" for="customerTagFilter">Tag</label>
+                  <select id="customerTagFilter" class="field"></select>
                 </div>
 
                 <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
@@ -588,6 +604,20 @@
                       <p id="customerProfileDaysSince" class="mt-1 text-sm font-bold text-ink">—</p>
                     </div>
                   </div>
+                </div>
+
+                <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div>
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Customer tags</p>
+                    <h3 class="mt-1 font-bold text-ink">Organise this customer</h3>
+                    <p class="mt-1 text-xs leading-5 text-slate-500">Add your own labels such as VIP, Bridal, Monthly or Sensitive skin.</p>
+                  </div>
+                  <div id="customerTagsList" class="mt-4 flex flex-wrap gap-2"></div>
+                  <div class="mt-3 flex gap-2">
+                    <input id="customerTagInput" class="field min-w-0" type="text" maxlength="40" placeholder="Add a tag">
+                    <button id="addCustomerTagBtn" class="btn btn-light shrink-0" type="button">Add tag</button>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-400">Up to 20 tags per customer.</p>
                 </div>
 
                 <div class="mt-6">
