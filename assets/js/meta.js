@@ -1,6 +1,8 @@
 "use strict";
 
 const metaState = {
+  lastReport: null,
+
   appConfigured: false,
   connected: false,
   expired: false,
@@ -473,6 +475,7 @@ function renderMetaCampaignTable(campaigns, attributionRows, currency) {
 }
 
 function renderMetaReport(report, commercial) {
+  metaState.lastReport = report || null;
   const period = report?.period || {};
   const assets = report?.assets || {};
   const paid = report?.paid && !report.paid.error ? report.paid : null;
