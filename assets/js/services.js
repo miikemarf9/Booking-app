@@ -1,3 +1,5 @@
+"use strict";
+
 function updateFreePlanFeePreview() {
       const customerPays = Math.max(0, Number($("srvPrice")?.value || 0));
       const fee = customerPays * 0.03;
