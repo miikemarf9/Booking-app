@@ -500,9 +500,12 @@
               <h3 class="mt-1 text-xl font-bold text-ink">Compare where customers come from</h3>
               <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Compare acquisition channels on the same Grab&Book metrics: tracked visits, completed bookings, conversion, new customers and booked value.</p>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Last 30 days</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Live: last 30 days</span>
+              <button id="growthImportBtn" class="btn btn-primary" type="button">Import existing data</button>
+              <button id="growthImportTemplateBtn" class="btn btn-light" type="button">CSV template</button>
               <button id="growthChannelsRefreshBtn" class="btn btn-light" type="button">Refresh</button>
+              <input id="growthImportCsvInput" class="hidden" type="file" accept=".csv,text/csv">
             </div>
           </div>
 
@@ -543,7 +546,54 @@
           </div>
 
           <div class="mt-5 rounded-2xl bg-amber-50 p-4 text-xs leading-5 text-amber-900">
-            These figures currently use optional Grab&Book booking analytics only. GA4, Search Console, Google Ads and Meta data are not connected yet, so this is a booking-channel comparison rather than a complete website/social audience report.
+            Live figures use optional Grab&Book booking analytics. Imported history is shown separately below, so historical figures are never presented as if Grab&Book tracked them itself.
+          </div>
+
+          <div class="mt-6 border-t border-slate-200 pt-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Imported history</p>
+                <h4 class="mt-1 text-lg font-bold text-ink">Bring your previous marketing data with you</h4>
+                <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">Import historical channel performance from spreadsheets or previous systems. Imported figures stay clearly labelled and do not create customer-level attribution that was never present in the source file.</p>
+              </div>
+              <span id="growthImportBatchCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 imports</span>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Historical visits</p>
+                <p id="growthImportedVisits" class="mt-1 text-2xl font-bold text-ink">0</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Historical bookings</p>
+                <p id="growthImportedBookings" class="mt-1 text-2xl font-bold text-ink">0</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Historical spend</p>
+                <p id="growthImportedSpend" class="mt-1 text-2xl font-bold text-ink">£0</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Historical revenue</p>
+                <p id="growthImportedRevenue" class="mt-1 text-2xl font-bold text-ink">£0</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Historical ROAS</p>
+                <p id="growthImportedRoas" class="mt-1 text-2xl font-bold text-ink">—</p>
+              </div>
+            </div>
+
+            <div id="growthImportedChannelCards" class="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-3"></div>
+            <div id="growthImportedChannelTable" class="mt-5 overflow-x-auto"></div>
+
+            <div class="mt-6">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-sm font-bold text-ink">Import history</p>
+                  <p id="growthImportPeriod" class="mt-1 text-xs text-slate-500">No historical data imported yet.</p>
+                </div>
+              </div>
+              <div id="growthImportBatches" class="mt-3 space-y-2"></div>
+            </div>
           </div>
         </article>
 
@@ -2537,6 +2587,34 @@
     <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by Grab&Book</footer>
   </section>
 
+  <div id="growthImportModal" class="fixed inset-0 z-[85] hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div class="card max-h-[90vh] w-full max-w-2xl overflow-y-auto p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Growth data</p>
+          <h2 class="mt-1 text-xl font-bold text-ink">Import existing marketing data</h2>
+          <p class="mt-1 text-sm leading-6 text-slate-500">Upload a CSV from a spreadsheet or previous platform. Grab&Book will validate the rows before saving anything.</p>
+        </div>
+        <button id="growthImportCloseBtn" class="text-xl font-bold text-slate-400 hover:text-slate-700" type="button" aria-label="Close">×</button>
+      </div>
+
+      <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+        <p class="font-bold text-slate-700">Required columns</p>
+        <p><strong>Date or month</strong> and <strong>Channel</strong>.</p>
+        <p class="mt-2 font-bold text-slate-700">Optional metrics</p>
+        <p>Source, medium, campaign, visits/sessions, clicks, bookings/conversions, spend/cost and revenue/value.</p>
+        <p class="mt-2 text-xs text-slate-400">Examples: 2026-09-01 or 2026-09 for the date. Currency figures should be plain numbers such as 125.50.</p>
+      </div>
+
+      <div id="growthImportPreview" class="mt-5 hidden"></div>
+
+      <div class="mt-5 flex flex-wrap justify-end gap-2">
+        <button id="growthImportCancelBtn" class="btn btn-light" type="button">Cancel</button>
+        <button id="growthImportChooseBtn" class="btn btn-primary" type="button">Choose CSV</button>
+      </div>
+    </div>
+  </div>
+
   <div id="analyticsConsentBanner" class="fixed inset-x-4 bottom-4 z-[90] hidden sm:left-auto sm:max-w-md">
     <div class="card border-slate-200 p-4 shadow-xl">
       <p class="text-sm font-bold text-ink">Help improve the booking journey</p>
@@ -2553,6 +2631,7 @@
   <script src="assets/js/acquisition.js"></script>
   <script src="assets/js/growth-tracking.js"></script>
   <script src="assets/js/growth.js"></script>
+  <script src="assets/js/growth-import.js"></script>
   <script src="assets/js/customers.js"></script>
   <script src="assets/js/customer-management.js"></script>
   <script src="assets/js/settings.js"></script>
