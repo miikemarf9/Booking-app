@@ -1413,9 +1413,9 @@
       .book-product-page.book-motion-ready.book-hero-playing .book-hero-item:nth-child(3){animation-delay:.17s}
       .book-product-page.book-motion-ready.book-hero-playing .book-hero-item:nth-child(4){animation-delay:.24s}
 
-      .book-hero-preview .book-preview-topbar,
-      .book-hero-preview .product-metric,
-      .book-hero-preview .book-diary-item {
+      .book-product-page.book-motion-enabled .book-hero-preview .book-preview-topbar,
+      .book-product-page.book-motion-enabled .book-hero-preview .product-metric,
+      .book-product-page.book-motion-enabled .book-hero-preview .book-diary-item {
         opacity:0;
         transform:translateY(10px);
       }
@@ -1452,7 +1452,7 @@
         transform:none;
       }
 
-      .book-product-page .book-reveal {
+      .book-product-page.book-motion-enabled .book-reveal {
         opacity:0;
         transform:translateY(22px);
         transition:opacity .6s ease,transform .6s cubic-bezier(.2,.72,.25,1);
@@ -1461,7 +1461,7 @@
         opacity:1;
         transform:translateY(0);
       }
-      .book-product-page .book-stagger > * {
+      .book-product-page.book-motion-enabled .book-stagger > * {
         opacity:0;
         transform:translateY(18px);
         transition:opacity .5s ease,transform .5s cubic-bezier(.2,.72,.25,1);
@@ -1486,9 +1486,9 @@
         border-radius:.55rem;
         padding:.5rem .2rem;
       }
-      .book-journey-preview:not(.journey-playing):not(.journey-complete) .book-service-option,
-      .book-journey-preview:not(.journey-playing):not(.journey-complete) .product-slot,
-      .book-journey-preview:not(.journey-playing):not(.journey-complete) .book-confirm-preview {
+      .book-product-page.book-motion-enabled .book-journey-preview:not(.journey-playing):not(.journey-complete) .book-service-option,
+      .book-product-page.book-motion-enabled .book-journey-preview:not(.journey-playing):not(.journey-complete) .product-slot,
+      .book-product-page.book-motion-enabled .book-journey-preview:not(.journey-playing):not(.journey-complete) .book-confirm-preview {
         opacity:0;
         transform:translateY(8px);
       }
@@ -1578,10 +1578,10 @@
       .crm-product-page.crm-motion-ready.crm-hero-playing .crm-hero-item:nth-child(3){animation-delay:.17s}
       .crm-product-page.crm-motion-ready.crm-hero-playing .crm-hero-item:nth-child(4){animation-delay:.24s}
 
-      .crm-hero-preview .crm-preview-topbar,
-      .crm-hero-preview .product-metric,
-      .crm-hero-preview .crm-profile-tag,
-      .crm-hero-preview .crm-timeline-card {
+      .crm-product-page.crm-motion-enabled .crm-hero-preview .crm-preview-topbar,
+      .crm-product-page.crm-motion-enabled .crm-hero-preview .product-metric,
+      .crm-product-page.crm-motion-enabled .crm-hero-preview .crm-profile-tag,
+      .crm-product-page.crm-motion-enabled .crm-hero-preview .crm-timeline-card {
         opacity:0;
         transform:translateY(10px);
       }
@@ -1604,7 +1604,7 @@
       .crm-hero-preview.crm-preview-playing .crm-timeline-card {
         animation:crm-rise .48s cubic-bezier(.2,.72,.25,1) .78s forwards;
       }
-      .crm-hero-preview .crm-timeline-event {
+      .crm-product-page.crm-motion-enabled .crm-hero-preview .crm-timeline-event {
         opacity:0;
         transform:translateX(-8px);
       }
@@ -1623,7 +1623,7 @@
         transform:none;
       }
 
-      .crm-product-page .crm-reveal {
+      .crm-product-page.crm-motion-enabled .crm-reveal {
         opacity:0;
         transform:translateY(22px);
         transition:opacity .6s ease,transform .6s cubic-bezier(.2,.72,.25,1);
@@ -1632,7 +1632,7 @@
         opacity:1;
         transform:translateY(0);
       }
-      .crm-product-page .crm-stagger > * {
+      .crm-product-page.crm-motion-enabled .crm-stagger > * {
         opacity:0;
         transform:translateY(18px);
         transition:opacity .5s ease,transform .5s cubic-bezier(.2,.72,.25,1);
@@ -1647,9 +1647,9 @@
       .crm-product-page .crm-stagger.reveal-in > *:nth-child(5){transition-delay:.24s}
       .crm-product-page .crm-stagger.reveal-in > *:nth-child(6){transition-delay:.30s}
 
-      .crm-analytics-preview .crm-analytics-metrics .product-metric,
-      .crm-analytics-preview .crm-health-bar,
-      .crm-analytics-preview .crm-status-step {
+      .crm-product-page.crm-motion-enabled .crm-analytics-preview .crm-analytics-metrics .product-metric,
+      .crm-product-page.crm-motion-enabled .crm-analytics-preview .crm-health-bar,
+      .crm-product-page.crm-motion-enabled .crm-analytics-preview .crm-status-step {
         opacity:0;
       }
       .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric {
@@ -1661,7 +1661,7 @@
       .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(4){animation-delay:.26s}
       .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(5){animation-delay:.32s}
       .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(6){animation-delay:.38s}
-      .crm-analytics-preview .crm-health-bar {
+      .crm-product-page.crm-motion-enabled .crm-analytics-preview .crm-health-bar {
         transform:scaleX(0);
         opacity:1;
       }
@@ -2133,5 +2133,78 @@
         transform:translateY(-3px);
         border-color:#b8dcf5;
         box-shadow:0 18px 42px rgba(23,32,51,.075);
+      }
+    }
+
+
+    /* Product animation completion states: once built, demos stay fully built. */
+    @media (prefers-reduced-motion:no-preference) {
+      .book-product-page .book-hero-preview.book-preview-complete .book-preview-topbar,
+      .book-product-page .book-hero-preview.book-preview-complete .product-metric,
+      .book-product-page .book-hero-preview.book-preview-complete .book-diary-item {
+        opacity:1 !important;
+        transform:none !important;
+        animation:none !important;
+      }
+      .book-product-page .book-journey-preview.journey-complete .book-service-option,
+      .book-product-page .book-journey-preview.journey-complete .product-slot,
+      .book-product-page .book-journey-preview.journey-complete .book-confirm-preview {
+        opacity:1 !important;
+        transform:none !important;
+      }
+      .book-product-page .book-journey-preview.journey-complete .book-journey-step:last-child {
+        background:#0872bd;
+        color:#fff;
+        box-shadow:0 6px 16px rgba(8,114,189,.14);
+      }
+
+      .crm-product-page .crm-hero-preview.crm-preview-complete .crm-preview-topbar,
+      .crm-product-page .crm-hero-preview.crm-preview-complete .product-metric,
+      .crm-product-page .crm-hero-preview.crm-preview-complete .crm-profile-tag,
+      .crm-product-page .crm-hero-preview.crm-preview-complete .crm-timeline-card,
+      .crm-product-page .crm-hero-preview.crm-preview-complete .crm-timeline-event {
+        opacity:1 !important;
+        transform:none !important;
+        animation:none !important;
+      }
+      .crm-product-page .crm-analytics-preview.analytics-complete .crm-analytics-metrics .product-metric,
+      .crm-product-page .crm-analytics-preview.analytics-complete .crm-status-step {
+        opacity:1 !important;
+        transform:none !important;
+        animation:none !important;
+      }
+      .crm-product-page .crm-analytics-preview.analytics-complete .crm-health-bar {
+        opacity:1 !important;
+        transform:scaleX(1) !important;
+        animation:none !important;
+      }
+      .crm-product-page .crm-analytics-preview.analytics-complete .crm-status-step:last-child {
+        background:#fff7ed;
+        color:#c2410c;
+        box-shadow:0 8px 18px rgba(194,65,12,.08);
+      }
+
+      .growth-product-page .growth-hero-preview.growth-preview-complete .growth-preview-topbar,
+      .growth-product-page .growth-hero-preview.growth-preview-complete .product-metric,
+      .growth-product-page .growth-hero-preview.growth-preview-complete .growth-channel-row {
+        opacity:1 !important;
+        transform:none !important;
+        animation:none !important;
+      }
+      .growth-product-page .growth-quality-preview.quality-complete .growth-quality-card,
+      .growth-product-page .growth-quality-preview.quality-complete .growth-quality-insight {
+        opacity:1 !important;
+        transform:none !important;
+        animation:none !important;
+      }
+      .growth-product-page .growth-integration-flow.flow-complete .growth-integration-source,
+      .growth-product-page .growth-integration-flow.flow-complete .growth-destination {
+        opacity:1 !important;
+        transform:none !important;
+        animation:none !important;
+      }
+      .growth-product-page .growth-integration-flow.flow-complete .growth-destination {
+        border-color:#b8dcf5;
+        box-shadow:0 14px 34px rgba(22,135,217,.07);
       }
     }
