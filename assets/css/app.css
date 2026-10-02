@@ -1210,6 +1210,21 @@
         animation: homepage-bar-grow .72s cubic-bezier(.2,.72,.25,1) 1.02s forwards;
       }
 
+      /* Once the finite hero animation finishes, the dashboard becomes ordinary static UI. */
+      #dashboardPreview.preview-complete .preview-chrome,
+      #dashboardPreview.preview-complete .preview-nav-item,
+      #dashboardPreview.preview-complete .preview-stat,
+      #dashboardPreview.preview-complete .preview-appointment,
+      #dashboardPreview.preview-complete .preview-diary {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+      }
+      #dashboardPreview.preview-complete .preview-progress-bar {
+        transform: scaleX(1) !important;
+        animation: none !important;
+      }
+
       #landingView .saas-reveal {
         opacity: 0;
         transform: translateY(22px);
