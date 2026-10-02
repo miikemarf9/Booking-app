@@ -186,6 +186,7 @@ function renderGrowthCustomerQuality(rows) {
       repeatRate: row.repeat_rate == null ? null : Number(row.repeat_rate),
       bookings: Number(row.active_bookings || 0),
       averageBookings: row.average_bookings_per_customer == null ? null : Number(row.average_bookings_per_customer),
+      firstBookingValue: Number(row.first_booking_value || 0),
       lifetimeValue: Number(row.lifetime_booked_value || 0),
       averageCustomerValue: row.average_customer_value == null ? null : Number(row.average_customer_value),
       repeatValue: Number(row.repeat_booked_value || 0),
@@ -199,6 +200,7 @@ function renderGrowthCustomerQuality(rows) {
     sum.customers += channel.customers;
     sum.completedCustomers += channel.completedCustomers;
     sum.repeatCustomers += channel.repeatCustomers;
+    sum.firstBookingValue += channel.firstBookingValue;
     sum.lifetimeValue += channel.lifetimeValue;
     sum.repeatValue += channel.repeatValue;
     return sum;
@@ -206,6 +208,7 @@ function renderGrowthCustomerQuality(rows) {
     customers: 0,
     completedCustomers: 0,
     repeatCustomers: 0,
+    firstBookingValue: 0,
     lifetimeValue: 0,
     repeatValue: 0
   });
@@ -268,6 +271,10 @@ function renderGrowthCustomerQuality(rows) {
 
         '<div class="mt-4 space-y-2 text-xs">' +
           '<div class="flex items-center justify-between gap-3">' +
+            '<span class="text-slate-500">First-booking value</span>' +
+            '<span class="font-bold text-slate-700">' + money(channel.firstBookingValue) + '</span>' +
+          '</div>' +
+          '<div class="flex items-center justify-between gap-3">' +
             '<span class="text-slate-500">Lifetime booked value</span>' +
             '<span class="font-bold text-slate-700">' + money(channel.lifetimeValue) + '</span>' +
           '</div>' +
@@ -297,6 +304,7 @@ function renderGrowthCustomerQuality(rows) {
           '<th class="pb-2 pr-4 font-bold">Repeat</th>' +
           '<th class="pb-2 pr-4 font-bold">Repeat rate</th>' +
           '<th class="pb-2 pr-4 font-bold">Bookings/customer</th>' +
+          '<th class="pb-2 pr-4 font-bold">First-booking value</th>' +
           '<th class="pb-2 pr-4 font-bold">Lifetime value</th>' +
           '<th class="pb-2 pr-4 font-bold">Avg customer</th>' +
           '<th class="pb-2 pr-4 font-bold">Repeat value</th>' +
@@ -313,6 +321,7 @@ function renderGrowthCustomerQuality(rows) {
               '<td class="py-3 pr-4 text-slate-600">' + channel.repeatCustomers + '</td>' +
               '<td class="py-3 pr-4 font-semibold text-slate-700">' + (channel.repeatRate == null ? "—" : channel.repeatRate + "%") + '</td>' +
               '<td class="py-3 pr-4 text-slate-600">' + (channel.averageBookings == null ? "—" : channel.averageBookings.toFixed(2).replace(/\.00$/, "")) + '</td>' +
+              '<td class="py-3 pr-4 text-slate-600">' + money(channel.firstBookingValue) + '</td>' +
               '<td class="py-3 pr-4 font-semibold text-slate-700">' + money(channel.lifetimeValue) + '</td>' +
               '<td class="py-3 pr-4 font-semibold text-slate-700">' + (channel.averageCustomerValue == null ? "—" : money(channel.averageCustomerValue)) + '</td>' +
               '<td class="py-3 pr-4 text-slate-600">' + money(channel.repeatValue) + '</td>' +
