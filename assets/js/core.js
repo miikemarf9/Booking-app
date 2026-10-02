@@ -869,6 +869,16 @@
       $("ga4RefreshBtn").addEventListener("click", () => loadGa4Integration(true));
       $("ga4DisconnectBtn").addEventListener("click", disconnectGoogleAnalytics);
       $("ga4SavePropertyBtn").addEventListener("click", saveGa4Property);
+      $("searchConsoleConnectBtn").addEventListener("click", connectSearchConsole);
+      $("searchConsoleRefreshBtn").addEventListener("click", () => loadSearchConsoleIntegration(true));
+      $("searchConsoleDisconnectBtn").addEventListener("click", disconnectSearchConsole);
+      $("searchConsoleSaveSiteBtn").addEventListener("click", saveSearchConsoleSite);
+      ["searchConsoleCtrOpportunities", "searchConsolePositionOpportunities", "searchConsolePageOpportunities"].forEach(id => {
+        $(id).addEventListener("click", e => {
+          const btn = e.target.closest("[data-seo-planner-title]");
+          if (btn) addSeoOpportunityToPlanner(btn.dataset.seoPlannerTitle, btn.dataset.seoPlannerDetail);
+        });
+      });
       $("growthImportBtn").addEventListener("click", openGrowthImportModal);
       $("growthImportTemplateBtn").addEventListener("click", downloadGrowthImportTemplate);
       $("growthImportCloseBtn").addEventListener("click", closeGrowthImportModal);
