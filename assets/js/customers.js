@@ -133,7 +133,7 @@ function customerBookings(customer) {
           title: "Learning this customer's pattern",
           detail: "Grab&Book needs at least three completed appointments before it treats a return pattern as reliable enough to act on.",
           timing: `${metrics.past.length} completed visit${metrics.past.length === 1 ? "" : "s"}`,
-          expectedReturn: metrics.expectedReturn,
+          expectedReturn: null,
           confidence: "learning",
           actionable: false
         };
@@ -529,7 +529,7 @@ function customerBookings(customer) {
       $("customerProfileLastVisit").textContent = m.lastVisit ? prettyDate(m.lastVisit) : "—";
       $("customerProfileNextBooking").textContent = m.nextBooking ? prettyDate(m.nextBooking) : "None booked";
       $("customerProfileFavouriteService").textContent = m.favouriteService || "Not enough history";
-      $("customerProfileVisitFrequency").textContent = m.typicalGapDays
+      $("customerProfileVisitFrequency").textContent = m.typicalGapDays && m.visitGapCount >= 2
         ? `About every ${m.typicalGapDays} day${m.typicalGapDays === 1 ? "" : "s"}`
         : "Not enough history";
       $("customerProfileDaysSince").textContent = m.daysSinceLastVisit === null
