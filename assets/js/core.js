@@ -867,6 +867,7 @@
       $("growthChannelsRefreshBtn").addEventListener("click", () => loadGrowthChannelAreaAnalytics(true));
       $("growthPeriodSelect").addEventListener("change", applyGrowthPeriodChange);
       $("growthCompareToggle").addEventListener("change", applyGrowthPeriodChange);
+      $("growthChannelTypeFilter").addEventListener("change", e => setGrowthChannelTypeFilter(e.target.value));
       $("ga4ConnectBtn").addEventListener("click", connectGoogleAnalytics);
       $("ga4RefreshBtn").addEventListener("click", () => loadGa4Integration(true));
       $("ga4DisconnectBtn").addEventListener("click", disconnectGoogleAnalytics);
