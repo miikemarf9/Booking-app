@@ -669,6 +669,9 @@ function calendarDateKey(date) {
         btn.classList.toggle("active", btn.dataset.goSection === sectionId);
       });
 
+      if (area === "growth" && typeof loadGrowthFunnelAnalytics === "function") {
+        loadGrowthFunnelAnalytics(false);
+      }
       window.setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
     }
 
@@ -693,6 +696,7 @@ function calendarDateKey(date) {
         document.querySelectorAll(".subnav-tab").forEach(btn => {
           btn.classList.toggle("active", btn.dataset.goSection === "growth-overview-section");
         });
+        if (typeof loadGrowthFunnelAnalytics === "function") loadGrowthFunnelAnalytics(false);
         window.setTimeout(() => $("growth-overview-section")?.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
         return;
       }
