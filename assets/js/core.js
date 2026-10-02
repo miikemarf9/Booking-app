@@ -732,6 +732,7 @@
       $("customerFilter").addEventListener("change", syncCustomerFilters);
       $("customerServiceFilter").addEventListener("change", renderCustomers);
       $("customerTagFilter").addEventListener("change", renderCustomers);
+      $("crmAutomationForm").addEventListener("submit", saveCrmAutomationSettings);
       $("marketingEmailForm").addEventListener("submit", sendMarketingEmail);
       $("customersList").addEventListener("click", e => {
         const btn = e.target.closest("[data-customer-id]");
@@ -1039,6 +1040,7 @@
         populateBusinessDetails();
         populateBookingRules();
         populateReminderSettings();
+        populateCrmAutomationSettings();
         populateCalendarSettings();
         populateStripePayments();
 
