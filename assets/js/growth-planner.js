@@ -143,7 +143,7 @@ function renderGrowthPlanner() {
   document.querySelectorAll(".growth-planner-filter").forEach(function (btn) {
     const active = btn.dataset.plannerFilter === growthPlannerState.filter;
     btn.className = active
-      ? "growth-planner-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white"
+      ? "growth-planner-filter rounded-full bg-brand-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm"
       : "growth-planner-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600";
   });
 
