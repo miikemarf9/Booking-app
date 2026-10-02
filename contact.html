@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Contact Grab&Book about the product, account support, partnerships or customer feedback.">
+  <link rel="icon" type="image/svg+xml" href="grabandbook-icon.svg">
+  <title>Contact | Grab&Book</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          ink:"#172033",
+          brand:{50:"#eef8ff",100:"#d9efff",500:"#1687d9",600:"#0872bd",700:"#075b98"},
+          coral:"#ff765d"
+        },
+        boxShadow:{soft:"0 18px 50px rgba(23,32,51,.08)"}
+      }}
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="product-site-shell min-h-screen text-slate-800 font-sans"><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+    <a href="index.html" class="flex shrink-0 items-center" aria-label="Grab&Book home">
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="block h-8 w-auto sm:h-10">
+    </a>
+    <nav class="hidden items-center gap-6 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
+      <a class="product-nav-link" href="book.html">Book</a>
+      <a class="product-nav-link" href="crm.html">CRM</a>
+      <a class="product-nav-link" href="growth.html">Growth</a>
+      <a class="product-nav-link" href="case-studies.html">Case studies</a>
+      <a class="text-brand-700" href="contact.html">Contact</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="index.html?auth=login" class="btn btn-light">Log in</a>
+      <a href="index.html?auth=register" class="btn btn-primary">Start free</a>
+    </div>
+  </div>
+  <nav class="product-mobile-nav border-t border-slate-100 px-4 py-2 lg:hidden" aria-label="Mobile product navigation">
+    <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto">
+      <a class="" href="book.html">Book</a>
+      <a class="" href="crm.html">CRM</a>
+      <a class="" href="growth.html">Growth</a>
+      <a class="" href="case-studies.html">Case studies</a>
+      <a class="active" href="contact.html">Contact</a>
+    </div>
+  </nav>
+</header>
+<main>
+  <section class="product-page-hero">
+    <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+      <div class="grid items-start gap-10 lg:grid-cols-[.85fr_1.15fr]">
+        <div class="max-w-xl">
+          <span class="product-kicker">Contact Grab&Book</span>
+          <h1 class="mt-6 text-4xl font-black leading-[1.04] tracking-[-.04em] text-ink sm:text-5xl">A SaaS company you can actually contact.</h1>
+          <p class="mt-6 text-base leading-8 text-slate-600 sm:text-lg">Whether you're deciding if Grab&Book fits your business, need help with the product, or simply have a question, send it directly to us.</p>
+          <div class="mt-8 space-y-3">
+            <div class="contact-principle"><span>01</span><div><strong>No support maze</strong><p>You do not have to search a help centre before you're allowed to ask a question.</p></div></div>
+            <div class="contact-principle"><span>02</span><div><strong>Give us the context once</strong><p>Tell us what you're trying to do and the form gives us the information needed to understand it.</p></div></div>
+            <div class="contact-principle"><span>03</span><div><strong>Product feedback is welcome</strong><p>Questions, friction and feature ideas are useful signals for how Grab&Book should improve.</p></div></div>
+          </div>
+        </div>
+
+        <div class="product-ui-frame p-5 sm:p-7">
+          <div>
+            <p class="product-ui-eyebrow">Send a message</p>
+            <h2 class="mt-2 text-2xl font-black text-ink">What can we help with?</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Your message is submitted directly through the website.</p>
+          </div>
+
+          <form name="grabandbook-contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/contact-thanks.html" class="mt-6 space-y-4">
+            <input type="hidden" name="form-name" value="grabandbook-contact">
+            <p class="hidden"><label>Do not fill this out: <input name="bot-field"></label></p>
+
+            <div>
+              <label class="label" for="contactReason">What is this about?</label>
+              <select id="contactReason" name="reason" class="field" required>
+                <option value="">Choose one</option>
+                <option>I'm considering Grab&Book</option>
+                <option>I need help with my account</option>
+                <option>I have a product or feature question</option>
+                <option>Partnership or case study</option>
+                <option>Something else</option>
+              </select>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div><label class="label" for="contactName">Your name</label><input id="contactName" name="name" class="field" type="text" autocomplete="name" required></div>
+              <div><label class="label" for="contactEmail">Email</label><input id="contactEmail" name="email" class="field" type="email" autocomplete="email" required></div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div><label class="label" for="contactBusiness">Business name <span class="font-normal text-slate-400">(optional)</span></label><input id="contactBusiness" name="business" class="field" type="text" autocomplete="organization"></div>
+              <div><label class="label" for="contactWebsite">Website <span class="font-normal text-slate-400">(optional)</span></label><input id="contactWebsite" name="website" class="field" type="url" inputmode="url" placeholder="https://"></div>
+            </div>
+
+            <div>
+              <label class="label" for="contactMessage">Message</label>
+              <textarea id="contactMessage" name="message" class="field min-h-40 resize-y" maxlength="5000" required placeholder="Tell us what you're trying to do, what you've run into, or what you'd like to know."></textarea>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+              Please don't send passwords, card details or other sensitive credentials through this form.
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full sm:w-auto">Send message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-slate-100 bg-white py-14 sm:py-18">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="product-feature"><span>Sales</span><h3>Is Grab&Book right for me?</h3><p>Ask about features, pricing, workflows or whether the platform fits the way your business takes bookings.</p></article>
+        <article class="product-feature"><span>Support</span><h3>Something isn't working?</h3><p>Describe what you expected, what happened instead and the area of Grab&Book you were using.</p></article>
+        <article class="product-feature"><span>Product</span><h3>Have an idea?</h3><p>Tell us what would save you time or give you a clearer view of your business. Useful feedback belongs close to the product.</p></article>
+      </div>
+    </div>
+  </section>
+</main><footer class="border-t border-slate-100 bg-white">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_auto] md:items-end lg:px-8">
+    <div>
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="h-8 w-auto max-w-[160px]">
+      <p class="mt-4 max-w-md text-sm leading-6 text-slate-400">Booking, CRM and growth tools for service businesses that want a clearer view of the customer journey.</p>
+    </div>
+    <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-slate-500" aria-label="Footer navigation">
+      <a class="hover:text-brand-600" href="index.html">Home</a>
+      <a class="hover:text-brand-600" href="book.html">Book</a>
+      <a class="hover:text-brand-600" href="crm.html">CRM</a>
+      <a class="hover:text-brand-600" href="growth.html">Growth</a>
+      <a class="hover:text-brand-600" href="case-studies.html">Case studies</a>
+      <a class="hover:text-brand-600" href="contact.html">Contact</a>
+    </nav>
+  </div>
+</footer></body></html>
