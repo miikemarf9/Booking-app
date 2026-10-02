@@ -576,6 +576,52 @@
           <div class="mt-6 border-t border-slate-200 pt-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer quality</p>
+                <h4 class="mt-1 text-lg font-bold text-ink">Which channels bring the best customers?</h4>
+                <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">Customers first acquired in the last 30 days, followed through their full Grab&Book history to date. Compare repeat behaviour, lifetime booked value and whether they already have another appointment secured.</p>
+              </div>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">30-day acquisition cohort</span>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Acquired customers</p>
+                <p id="growthQualityCustomers" class="mt-1 text-2xl font-bold text-ink">0</p>
+                <p class="mt-1 text-xs text-slate-500">with known first-touch source</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Repeat customers</p>
+                <p id="growthQualityRepeatCustomers" class="mt-1 text-2xl font-bold text-ink">0</p>
+                <p id="growthQualityRepeatRate" class="mt-1 text-xs text-slate-500">— repeat rate</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Lifetime booked value</p>
+                <p id="growthQualityLifetimeValue" class="mt-1 text-2xl font-bold text-ink">£0</p>
+                <p class="mt-1 text-xs text-slate-500">all non-cancelled bookings</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Repeat booked value</p>
+                <p id="growthQualityRepeatValue" class="mt-1 text-2xl font-bold text-ink">£0</p>
+                <p class="mt-1 text-xs text-slate-500">value after each customer's first booking</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Avg customer value</p>
+                <p id="growthQualityAverageValue" class="mt-1 text-2xl font-bold text-ink">£0</p>
+                <p class="mt-1 text-xs text-slate-500">lifetime booked value per acquired customer</p>
+              </div>
+            </div>
+
+            <div id="growthCustomerQualityCards" class="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-3"></div>
+            <div id="growthCustomerQualityTable" class="mt-5 overflow-x-auto"></div>
+
+            <div class="mt-4 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+              Recent customers have had less time to become repeat customers. Repeat rate is therefore most useful when comparing channels over a similar acquisition period rather than treating it as a final lifetime score.
+            </div>
+          </div>
+
+          <div class="mt-6 border-t border-slate-200 pt-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Imported history</p>
                 <h4 class="mt-1 text-lg font-bold text-ink">Bring your previous marketing data with you</h4>
                 <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">Import historical channel performance from spreadsheets or previous systems. Imported figures stay clearly labelled and do not create customer-level attribution that was never present in the source file.</p>
