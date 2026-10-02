@@ -1254,9 +1254,58 @@
         </article>
 
         <article id="growth-opportunities-section" class="card scroll-mt-32 p-5 sm:p-6">
-          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Opportunities</p>
-          <h3 class="mt-1 text-xl font-bold text-ink">Know what deserves attention</h3>
-          <p class="mt-2 text-sm leading-6 text-slate-500">As channel and funnel data builds up, Grab&Book will surface useful acquisition opportunities rather than leaving owners to interpret raw analytics alone.</p>
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Opportunities</p>
+              <h3 class="mt-1 text-xl font-bold text-ink">Evidence worth reviewing</h3>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Grab&Book looks for patterns in the data and suggests areas that may be worth investigating. It does not automatically change campaigns, budgets, pricing or business settings.</p>
+            </div>
+            <button id="growthOpportunitiesRefreshBtn" class="btn btn-light" type="button">Refresh recommendations</button>
+          </div>
+
+          <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+            <p class="font-bold text-slate-700">How to use these recommendations</p>
+            <p class="mt-1">These are automated data signals based on the information currently available to Grab&Book. They may be affected by small samples, attribution limits, consent choices, delayed platform reporting or tracking configuration. They are not guarantees, instructions, or financial/legal advice. Review the evidence and your wider business context before acting.</p>
+          </div>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="rounded-2xl bg-emerald-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-emerald-700">Potential growth</p>
+              <p id="growthOpportunityGrowthCount" class="mt-1 text-2xl font-bold text-emerald-950">0</p>
+              <p class="mt-1 text-xs text-emerald-800">positive patterns worth reviewing</p>
+            </div>
+            <div class="rounded-2xl bg-blue-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-blue-700">Worth reviewing</p>
+              <p id="growthOpportunityReviewCount" class="mt-1 text-2xl font-bold text-blue-950">0</p>
+              <p class="mt-1 text-xs text-blue-800">areas where the data suggests a check</p>
+            </div>
+            <div class="rounded-2xl bg-amber-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-amber-700">Possible issues</p>
+              <p id="growthOpportunityIssueCount" class="mt-1 text-2xl font-bold text-amber-950">0</p>
+              <p class="mt-1 text-xs text-amber-800">signals that may merit investigation</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-500">Active recommendations</p>
+              <p id="growthOpportunityActiveCount" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p id="growthOpportunityUpdated" class="mt-1 text-xs text-slate-500">Waiting for data</p>
+            </div>
+          </div>
+
+          <div class="mt-5 flex flex-wrap gap-2">
+            <button class="growth-opportunity-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white" data-opportunity-filter="active" type="button">Active</button>
+            <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="growth" type="button">Potential growth</button>
+            <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="review" type="button">Worth reviewing</button>
+            <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="issue" type="button">Possible issues</button>
+            <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="snoozed" type="button">Snoozed</button>
+            <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="dismissed" type="button">Dismissed</button>
+          </div>
+
+          <div id="growthOpportunityList" class="mt-5 space-y-3"></div>
+
+          <div class="mt-5 rounded-2xl bg-slate-50 p-4">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Recommendation policy</p>
+            <p class="mt-1 text-xs leading-5 text-slate-500">Grab&Book uses threshold-based rules and displays the supporting numbers. Recommendations use cautious language such as “consider reviewing” and “may indicate.” They do not promise outcomes or state that changing spend, content or pricing will produce a particular result.</p>
+          </div>
         </article>
       </section>
 
@@ -3316,6 +3365,7 @@
   <script src="assets/js/meta.js"></script>
   <script src="assets/js/growth-import.js"></script>
   <script src="assets/js/growth-planner.js"></script>
+  <script src="assets/js/growth-opportunities.js"></script>
   <script src="assets/js/customers.js"></script>
   <script src="assets/js/customer-management.js"></script>
   <script src="assets/js/settings.js"></script>
