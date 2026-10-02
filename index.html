@@ -394,6 +394,7 @@
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-overview-section" type="button">Overview</button>
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-channels-section" type="button">Channels</button>
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-journey-section" type="button">Journey</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-planner-section" type="button">Planner</button>
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-opportunities-section" type="button">Opportunities</button>
           </nav>
         </div>
@@ -467,6 +468,29 @@
               <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Understand where customers come from, what turns traffic into bookings and which channels create the strongest long-term customer value.</p>
             </div>
             <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Acquisition tracking active</span>
+          </div>
+
+          <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <button class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:shadow-sm" type="button" data-go-section="growth-planner-section">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Open tasks</p>
+              <p id="growthPlannerOpenTasks" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">things to do next</p>
+            </button>
+            <button class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:shadow-sm" type="button" data-go-section="growth-planner-section">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Ideas</p>
+              <p id="growthPlannerIdeas" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">growth thoughts saved</p>
+            </button>
+            <button class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:shadow-sm" type="button" data-go-section="growth-planner-section">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Goals</p>
+              <p id="growthPlannerGoals" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">active growth goals</p>
+            </button>
+            <button class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:shadow-sm" type="button" data-go-section="growth-planner-section">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Channel notes</p>
+              <p id="growthPlannerChannelNotes" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">channel-specific thoughts</p>
+            </button>
           </div>
 
           <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -636,6 +660,38 @@
             <span id="growthFunnelStaffStat" class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Staff selections: 0</span>
             <span id="growthFunnelPaymentStat" class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Paid checkout starts: 0</span>
             <span id="growthFunnelWindow" class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Last 30 days</span>
+          </div>
+        </article>
+
+        <article id="growth-planner-section" class="card scroll-mt-32 p-5 sm:p-6">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Growth planner</p>
+              <h3 class="mt-1 text-xl font-bold text-ink">Turn every thought into a clear next action</h3>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Keep tasks, ideas, goals and channel-specific notes in one place so marketing decisions and future experiments do not get lost across different apps.</p>
+            </div>
+            <button id="growthPlannerAddBtn" class="btn btn-primary" type="button">Add planner item</button>
+          </div>
+
+          <div class="mt-5 flex flex-wrap gap-2">
+            <button class="growth-planner-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white" data-planner-filter="open" type="button">Open</button>
+            <button class="growth-planner-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-planner-filter="task" type="button">Tasks</button>
+            <button class="growth-planner-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-planner-filter="idea" type="button">Ideas</button>
+            <button class="growth-planner-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-planner-filter="goal" type="button">Goals</button>
+            <button class="growth-planner-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-planner-filter="note" type="button">Notes</button>
+            <button class="growth-planner-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-planner-filter="done" type="button">Completed</button>
+          </div>
+
+          <div class="mt-5 grid gap-4 xl:grid-cols-[1.3fr_.7fr]">
+            <div>
+              <div id="growthPlannerList" class="space-y-3"></div>
+            </div>
+            <aside class="rounded-2xl bg-slate-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Channel plans</p>
+              <h4 class="mt-1 font-bold text-ink">Thoughts by channel</h4>
+              <p class="mt-1 text-xs leading-5 text-slate-500">Notes attached to Instagram, Google Ads, Facebook and other channels appear here automatically.</p>
+              <div id="growthPlannerChannels" class="mt-4 space-y-2"></div>
+            </aside>
           </div>
         </article>
 
@@ -2587,6 +2643,70 @@
     <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by Grab&Book</footer>
   </section>
 
+  <div id="growthPlannerModal" class="fixed inset-0 z-[86] hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div class="card max-h-[90vh] w-full max-w-xl overflow-y-auto p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Growth planner</p>
+          <h2 id="growthPlannerModalTitle" class="mt-1 text-xl font-bold text-ink">Add planner item</h2>
+          <p class="mt-1 text-sm leading-6 text-slate-500">Save a task, idea, goal or channel note while it is fresh.</p>
+        </div>
+        <button id="growthPlannerCloseBtn" class="text-xl font-bold text-slate-400 hover:text-slate-700" type="button" aria-label="Close">×</button>
+      </div>
+
+      <form id="growthPlannerForm" class="mt-5 space-y-4">
+        <input id="growthPlannerItemId" type="hidden">
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label" for="growthPlannerType">Type</label>
+            <select id="growthPlannerType" class="field">
+              <option value="task">Task</option>
+              <option value="idea">Idea</option>
+              <option value="goal">Goal</option>
+              <option value="note">Note</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="growthPlannerChannel">Channel</label>
+            <select id="growthPlannerChannel" class="field">
+              <option value="">General Growth</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="label" for="growthPlannerTitle">Title</label>
+          <input id="growthPlannerTitle" class="field" maxlength="200" placeholder="e.g. Test before/after restoration Reel format" required>
+        </div>
+
+        <div>
+          <label class="label" for="growthPlannerDetail">Thoughts / plan</label>
+          <textarea id="growthPlannerDetail" class="field min-h-28 resize-y" maxlength="5000" placeholder="Add the context, next step or reason behind this idea..."></textarea>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label" for="growthPlannerPriority">Priority</label>
+            <select id="growthPlannerPriority" class="field">
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="growthPlannerDueDate">Due date</label>
+            <input id="growthPlannerDueDate" class="field" type="date">
+          </div>
+        </div>
+
+        <div class="flex flex-wrap justify-end gap-2">
+          <button id="growthPlannerCancelBtn" class="btn btn-light" type="button">Cancel</button>
+          <button id="growthPlannerSaveBtn" class="btn btn-primary" type="submit">Save item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="growthImportModal" class="fixed inset-0 z-[85] hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
     <div class="card max-h-[90vh] w-full max-w-2xl overflow-y-auto p-5 sm:p-6">
       <div class="flex items-start justify-between gap-4">
@@ -2633,6 +2753,7 @@
   <script src="assets/js/growth-tracking.js"></script>
   <script src="assets/js/growth.js"></script>
   <script src="assets/js/growth-import.js"></script>
+  <script src="assets/js/growth-planner.js"></script>
   <script src="assets/js/customers.js"></script>
   <script src="assets/js/customer-management.js"></script>
   <script src="assets/js/settings.js"></script>
