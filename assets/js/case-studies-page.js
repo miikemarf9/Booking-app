@@ -44,7 +44,13 @@
       if (!entries.some(entry => entry.isIntersecting)) return;
       observer.disconnect();
       page.classList.add("case-hero-playing");
-      later(() => page.classList.remove("case-motion-enabled", "case-hero-playing"), 850);
+      later(() => {
+        page.classList.remove("case-hero-playing");
+        hero.querySelectorAll(".case-hero-item").forEach(el => {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        });
+      }, 850);
     }, { threshold: .12 });
     observer.observe(hero);
   }
