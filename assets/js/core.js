@@ -873,6 +873,11 @@
       $("searchConsoleRefreshBtn").addEventListener("click", () => loadSearchConsoleIntegration(true));
       $("searchConsoleDisconnectBtn").addEventListener("click", disconnectSearchConsole);
       $("searchConsoleSaveSiteBtn").addEventListener("click", saveSearchConsoleSite);
+      $("googleAdsConnectBtn").addEventListener("click", connectGoogleAds);
+      $("googleAdsRefreshBtn").addEventListener("click", () => loadGoogleAdsIntegration(true));
+      $("googleAdsDisconnectBtn").addEventListener("click", disconnectGoogleAds);
+      $("googleAdsSaveAccountBtn").addEventListener("click", saveGoogleAdsAccount);
+      $("googleAdsPlanBtn").addEventListener("click", addGoogleAdsPlan);
       ["searchConsoleCtrOpportunities", "searchConsolePositionOpportunities", "searchConsolePageOpportunities"].forEach(id => {
         $(id).addEventListener("click", e => {
           const btn = e.target.closest("[data-seo-planner-title]");
