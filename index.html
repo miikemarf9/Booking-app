@@ -503,6 +503,16 @@
                 </div>
               </div>
 
+              <div id="marketingTargetBanner" class="mb-4 hidden rounded-2xl border border-brand-200 bg-brand-50 p-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Direct offer</p>
+                    <p id="marketingTargetText" class="mt-1 text-sm font-bold text-ink">Sending to one customer</p>
+                  </div>
+                  <button id="clearMarketingTargetBtn" class="text-xs font-bold text-brand-700 hover:underline" type="button">Clear</button>
+                </div>
+              </div>
+
               <form id="marketingEmailForm" class="space-y-4">
                 <div>
                   <label class="label" for="marketingSubject">Email subject</label>
@@ -554,6 +564,13 @@
                     <span id="customerMarketingBadge" class="mt-2 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500">Marketing not opted in</span>
                   </div>
                   <span id="customerProfileBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Customer</span>
+                </div>
+
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <button id="customerBookBtn" class="btn btn-primary" type="button">Book appointment</button>
+                  <button id="customerEmailBtn" class="btn btn-light" type="button">Email</button>
+                  <button id="customerCallBtn" class="btn btn-light" type="button">Call</button>
+                  <button id="customerOfferBtn" class="btn btn-light" type="button">Send offer</button>
                 </div>
 
                 <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
