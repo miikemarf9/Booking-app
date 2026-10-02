@@ -1,3 +1,5 @@
+"use strict";
+
 function customerBookings(customer) {
       const email = String(customer?.email || "").toLowerCase();
       return state.bookings
