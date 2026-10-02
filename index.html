@@ -342,6 +342,56 @@
         animation-duration: .01ms !important;
       }
     }
+
+    /* Homepage dashboard preview: finite motion, independent of booking data. */
+    #dashboardPreview [data-preview-count] { font-variant-numeric: tabular-nums; }
+    #dashboardPreview .preview-live { display: inline-flex; align-items: center; gap: .4rem; }
+    #dashboardPreview .preview-live::before {
+      content: ""; width: .4rem; height: .4rem; border-radius: 50%; background: #059669;
+    }
+    #dashboardPreview .preview-diary { position: relative; overflow: hidden; }
+    #dashboardPreview .preview-diary::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.75) 50%, transparent 80%);
+      transform: translateX(-110%); opacity: 0;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      #dashboardPreview.preview-playing { animation: preview-enter .7s ease-out both; }
+      #dashboardPreview.preview-playing .preview-stat,
+      #dashboardPreview.preview-playing .preview-appointment,
+      #dashboardPreview.preview-playing .preview-diary {
+        animation: preview-enter .6s cubic-bezier(.2,.7,.3,1) both;
+      }
+      #dashboardPreview.preview-playing .preview-stat:nth-child(1) { animation-delay: .12s; }
+      #dashboardPreview.preview-playing .preview-stat:nth-child(2) { animation-delay: .24s; }
+      #dashboardPreview.preview-playing .preview-stat:nth-child(3) { animation-delay: .36s; }
+      #dashboardPreview.preview-playing .preview-appointment:nth-child(1) { animation-delay: .48s; }
+      #dashboardPreview.preview-playing .preview-appointment:nth-child(2) { animation-delay: .62s; }
+      #dashboardPreview.preview-playing .preview-diary { animation-delay: .76s; }
+      #dashboardPreview.preview-playing .preview-live::before { animation: preview-pulse 1.4s ease-out 3; }
+      #dashboardPreview.preview-playing .preview-diary::after { animation: preview-sheen 1s ease-in-out 1.4s both; }
+      #dashboardPreview .preview-stat, #dashboardPreview .preview-appointment {
+        transition: box-shadow .2s ease, border-color .2s ease;
+      }
+    }
+    @media (hover: hover) {
+      #dashboardPreview .preview-stat:hover, #dashboardPreview .preview-appointment:hover {
+        border-color: #b8dcf5; box-shadow: 0 6px 18px rgba(22,135,217,.09);
+      }
+    }
+    @keyframes preview-enter {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes preview-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(5,150,105,.3); }
+      100% { box-shadow: 0 0 0 7px rgba(5,150,105,0); }
+    }
+    @keyframes preview-sheen {
+      0% { opacity: 0; transform: translateX(-110%); }
+      20%, 80% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(110%); }
+    }
   </style>
 </head>
 
@@ -401,7 +451,7 @@
 
           <div class="relative">
             <div class="absolute -inset-8 -z-10 rounded-[3rem] bg-brand-500/10 blur-3xl"></div>
-            <div class="overflow-hidden rounded-[1.65rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(23,32,51,.14)]">
+            <div id="dashboardPreview" class="overflow-hidden rounded-[1.65rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(23,32,51,.14)]">
               <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div class="flex items-center gap-3">
                   <img src="grabandbook-icon.svg" alt="" class="h-9 w-9 rounded-xl">
@@ -410,20 +460,20 @@
                     <p class="font-bold text-ink">Friday at a glance</p>
                   </div>
                 </div>
-                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Live</span>
+                <span class="preview-live rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Live</span>
               </div>
               <div class="grid gap-4 bg-slate-50/70 p-5 sm:grid-cols-3">
-                <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                <div class="preview-stat rounded-2xl border border-slate-100 bg-white p-4">
                   <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booked today</p>
-                  <p class="mt-2 text-2xl font-black text-ink">£620</p>
+                  <p class="mt-2 text-2xl font-black text-ink" data-preview-count="620" data-prefix="£">£620</p>
                   <p class="mt-1 text-xs text-emerald-600">8 appointments</p>
                 </div>
-                <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                <div class="preview-stat rounded-2xl border border-slate-100 bg-white p-4">
                   <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Customers</p>
-                  <p class="mt-2 text-2xl font-black text-ink">184</p>
+                  <p class="mt-2 text-2xl font-black text-ink" data-preview-count="184">184</p>
                   <p class="mt-1 text-xs text-slate-500">in your CRM</p>
                 </div>
-                <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                <div class="preview-stat rounded-2xl border border-slate-100 bg-white p-4">
                   <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Next slot</p>
                   <p class="mt-2 text-2xl font-black text-ink">14:30</p>
                   <p class="mt-1 text-xs text-slate-500">45 min available</p>
@@ -438,21 +488,21 @@
                   <span class="text-xs font-bold text-slate-400">Europe/London</span>
                 </div>
                 <div class="mt-4 space-y-3">
-                  <div class="flex items-center justify-between rounded-2xl border border-slate-100 p-4">
+                  <div class="preview-appointment flex items-center justify-between rounded-2xl border border-slate-100 p-4">
                     <div class="flex items-center gap-3">
                       <span class="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-sm font-black text-brand-700">10:00</span>
                       <div><p class="font-bold text-ink">Consultation</p><p class="text-xs text-slate-500">Alex · 45 min</p></div>
                     </div>
                     <span class="text-sm font-black text-ink">£50</span>
                   </div>
-                  <div class="flex items-center justify-between rounded-2xl border border-slate-100 p-4">
+                  <div class="preview-appointment flex items-center justify-between rounded-2xl border border-slate-100 p-4">
                     <div class="flex items-center gap-3">
                       <span class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-sm font-black text-violet-700">11:30</span>
                       <div><p class="font-bold text-ink">Premium treatment</p><p class="text-xs text-slate-500">Sam · 60 min</p></div>
                     </div>
                     <span class="text-sm font-black text-ink">£120</span>
                   </div>
-                  <div class="rounded-2xl border border-dashed border-brand-200 bg-brand-50/60 p-4">
+                  <div class="preview-diary rounded-2xl border border-dashed border-brand-200 bg-brand-50/60 p-4">
                     <p class="text-xs font-bold uppercase tracking-wider text-brand-700">Smart diary</p>
                     <p class="mt-1 text-sm font-semibold text-slate-700">Customers only see genuinely available times. No back-and-forth messages.</p>
                   </div>
@@ -5315,7 +5365,42 @@
       }
 
       googleWindow.document.write(
-        '<!doctype html><title>Connecting Google Calendar</title><body style="font-family:system-ui;padding:32px"><h2>Opening Google…</h2><p>Please wait while Grab&Book starts the secure connection.</p></body>'
+        '<!doctype html><title>Connecting Google Calendar</title><body style="font-family:system-ui;padding:32px"><h2>Opening Google…</h2><p>Please wait while Grab&Book starts the secure connection.</p>
+  <script>
+    // Run once when the preview becomes visible, including after the loading view.
+    (() => {
+      const preview = document.getElementById("dashboardPreview");
+      const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (!preview || motion.matches || !("IntersectionObserver" in window)) return;
+      const counters = [...preview.querySelectorAll("[data-preview-count]")];
+      let frame;
+      const finish = () => {
+        cancelAnimationFrame(frame);
+        counters.forEach(el => { el.textContent = (el.dataset.prefix || "") + el.dataset.previewCount; });
+        preview.classList.remove("preview-playing");
+      };
+      const observer = new IntersectionObserver(entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        observer.disconnect();
+        if (motion.matches) return;
+        preview.classList.add("preview-playing");
+        const started = performance.now();
+        const tick = now => {
+          if (motion.matches || document.hidden) { finish(); return; }
+          const progress = Math.min(1, Math.max(0, (now - started - 250) / 1100));
+          const eased = 1 - Math.pow(1 - progress, 3);
+          counters.forEach(el => {
+            el.textContent = (el.dataset.prefix || "") + Math.round(Number(el.dataset.previewCount) * eased);
+          });
+          if (progress < 1) frame = requestAnimationFrame(tick);
+        };
+        frame = requestAnimationFrame(tick);
+      }, { threshold: .15 });
+      observer.observe(preview);
+      motion.addEventListener("change", event => { if (event.matches) finish(); });
+    })();
+  </script>
+</body>'
       );
       googleWindow.document.close();
 
