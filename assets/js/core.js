@@ -865,6 +865,8 @@
       $("analyticsConsentDeclineBtn").addEventListener("click", declineBookingAnalytics);
       $("growthFunnelRefreshBtn").addEventListener("click", () => loadGrowthFunnelAnalytics(true));
       $("growthChannelsRefreshBtn").addEventListener("click", () => loadGrowthChannelAreaAnalytics(true));
+      $("growthPeriodSelect").addEventListener("change", applyGrowthPeriodChange);
+      $("growthCompareToggle").addEventListener("change", applyGrowthPeriodChange);
       $("ga4ConnectBtn").addEventListener("click", connectGoogleAnalytics);
       $("ga4RefreshBtn").addEventListener("click", () => loadGa4Integration(true));
       $("ga4DisconnectBtn").addEventListener("click", disconnectGoogleAnalytics);
