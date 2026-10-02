@@ -169,10 +169,16 @@ async function loadGrowthChannelAnalytics(showToast = false) {
 }
 
 async function loadGrowthAnalytics(showToast = false) {
-  await Promise.all([
+  const tasks = [
     loadGrowthChannelAnalytics(showToast),
     loadGrowthFunnelAnalytics(showToast)
-  ]);
+  ];
+
+  if (typeof loadGrowthImportHistory === "function") {
+    tasks.push(loadGrowthImportHistory());
+  }
+
+  await Promise.all(tasks);
 }
 
 function growthFunnelStageDefinitions() {
