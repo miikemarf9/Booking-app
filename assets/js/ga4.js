@@ -320,7 +320,7 @@ async function loadGa4Report(showToast = false) {
   if (showToast) setBusy(btn, true, "Refreshing…");
 
   try {
-    const data = await ga4Function("report");
+    const data = await ga4Function("report", { days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 });
     renderGa4Report(data.report || {});
     if (showToast) toast("Google Analytics refreshed.");
   } catch (err) {
