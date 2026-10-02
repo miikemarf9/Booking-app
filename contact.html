@@ -3,9 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Contact Grab&Book about the product, account support, partnerships or customer feedback.">
+  <meta name="description" content="Contact Grab&Book directly about product fit, account support, features, partnerships, case studies or feedback.">
   <link rel="icon" type="image/svg+xml" href="grabandbook-icon.svg">
-  <title>Contact | Grab&Book</title>
+  <title>Contact Grab&Book | Sales, Support & Product Questions</title>
+  <link rel="canonical" href="https://grabandbook.com/contact">
+  <meta name="theme-color" content="#0872bd">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Grab&Book">
+  <meta property="og:title" content="Contact Grab&Book | Sales, Support & Product Questions">
+  <meta property="og:description" content="Contact Grab&Book directly about product fit, account support, features, partnerships, case studies or feedback.">
+  <meta property="og:url" content="https://grabandbook.com/contact">
+  <meta property="og:image" content="https://grabandbook.com/grabandbook-icon.svg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Contact Grab&Book | Sales, Support & Product Questions">
+  <meta name="twitter:description" content="Contact Grab&Book directly about product fit, account support, features, partnerships, case studies or feedback.">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,35 +33,36 @@
   </script>
   <link rel="stylesheet" href="assets/css/app.css">
 </head>
-<body class="product-site-shell min-h-screen text-slate-800 font-sans"><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
+<body class="product-site-shell min-h-screen text-slate-800 font-sans">
+<a href="#main-content" class="skip-link">Skip to main content</a><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
   <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
-    <a href="index.html" class="flex shrink-0 items-center" aria-label="Grab&Book home">
+    <a href="/" class="flex shrink-0 items-center" aria-label="Grab&Book home">
       <img src="grabandbook-logo.svg" alt="Grab&Book" class="block h-8 w-auto sm:h-10">
     </a>
     <nav class="hidden items-center gap-6 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
-      <a class="product-nav-link" href="book.html">Book</a>
-      <a class="product-nav-link" href="crm.html">CRM</a>
-      <a class="product-nav-link" href="growth.html">Growth</a>
-      <a class="product-nav-link" href="index.html#pricing">Pricing</a>
-      <a class="product-nav-link" href="case-studies.html">Case studies</a>
-      <a class="text-brand-700" href="contact.html">Contact</a>
+      <a class="product-nav-link" href="/book">Book</a>
+      <a class="product-nav-link" href="/crm">CRM</a>
+      <a class="product-nav-link" href="/growth">Growth</a>
+      <a class="product-nav-link" href="/#pricing">Pricing</a>
+      <a class="product-nav-link" href="/case-studies">Case studies</a>
+      <a class="text-brand-700" aria-current="page" href="/contact" data-cta="contact">Contact</a>
     </nav>
     <div class="flex items-center gap-2">
-      <a href="index.html?auth=login" class="btn btn-light">Log in</a>
-      <a href="index.html?auth=register" class="btn btn-primary">Start free</a>
+      <a href="/?auth=login" data-cta="login" class="btn btn-light">Log in</a>
+      <a href="/?auth=register" data-cta="start-free" class="btn btn-primary">Start free</a>
     </div>
   </div>
   <nav class="product-mobile-nav border-t border-slate-100 px-4 py-2 lg:hidden" aria-label="Mobile product navigation">
     <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto">
-      <a class="" href="book.html">Book</a>
-      <a class="" href="crm.html">CRM</a>
-      <a class="" href="growth.html">Growth</a>
-      <a class="" href="case-studies.html">Case studies</a>
-      <a class="active" href="contact.html">Contact</a>
+      <a class="" href="/book">Book</a>
+      <a class="" href="/crm">CRM</a>
+      <a class="" href="/growth">Growth</a>
+      <a class="" href="/case-studies">Case studies</a>
+      <a class="active" aria-current="page" href="/contact" data-cta="contact">Contact</a>
     </div>
   </nav>
 </header>
-<main>
+<main id="main-content">
   <section class="product-page-hero">
     <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
       <div class="grid items-start gap-10 lg:grid-cols-[.85fr_1.15fr]">
@@ -71,7 +84,7 @@
             <p class="mt-2 text-sm leading-6 text-slate-500">Your message is submitted directly through the website.</p>
           </div>
 
-          <form name="grabandbook-contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="contact-thanks.html" class="mt-6 space-y-4">
+          <form name="grabandbook-contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/contact-thanks" class="mt-6 space-y-4">
             <input type="hidden" name="form-name" value="grabandbook-contact">
             <p class="hidden"><label>Do not fill this out: <input name="bot-field"></label></p>
 
@@ -129,13 +142,13 @@
       <p class="mt-4 max-w-md text-sm leading-6 text-slate-400">Booking, CRM and growth tools for service businesses that want a clearer view of the customer journey.</p>
     </div>
     <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-slate-500" aria-label="Footer navigation">
-      <a class="hover:text-brand-600" href="index.html">Home</a>
-      <a class="hover:text-brand-600" href="book.html">Book</a>
-      <a class="hover:text-brand-600" href="crm.html">CRM</a>
-      <a class="hover:text-brand-600" href="growth.html">Growth</a>
-      <a class="hover:text-brand-600" href="index.html#pricing">Pricing</a>
-      <a class="hover:text-brand-600" href="case-studies.html">Case studies</a>
-      <a class="hover:text-brand-600" href="contact.html">Contact</a>
+      <a class="hover:text-brand-600" href="/">Home</a>
+      <a class="hover:text-brand-600" href="/book">Book</a>
+      <a class="hover:text-brand-600" href="/crm">CRM</a>
+      <a class="hover:text-brand-600" href="/growth">Growth</a>
+      <a class="hover:text-brand-600" href="/#pricing">Pricing</a>
+      <a class="hover:text-brand-600" href="/case-studies">Case studies</a>
+      <a class="hover:text-brand-600" href="/contact" data-cta="contact">Contact</a>
     </nav>
   </div>
 </footer></body></html>
