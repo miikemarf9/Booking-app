@@ -278,10 +278,10 @@ async function loadGoogleAdsCommercialData() {
     windowsResult,
     campaignResult
   ] = await Promise.all([
-    supabaseClient.rpc("get_growth_channel_summary", { p_days: 30 }),
-    supabaseClient.rpc("get_growth_customer_quality_summary", { p_days: 30 }),
+    supabaseClient.rpc("get_growth_channel_summary", { p_days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 }),
+    supabaseClient.rpc("get_growth_customer_quality_summary", { p_days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 }),
     supabaseClient.rpc("get_google_ads_value_windows", { p_lookback_days: 365 }),
-    supabaseClient.rpc("get_google_ads_campaign_attribution", { p_days: 30 })
+    supabaseClient.rpc("get_google_ads_campaign_attribution", { p_days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 })
   ]);
 
   for (const result of [channelResult, qualityResult, windowsResult, campaignResult]) {
@@ -514,7 +514,7 @@ async function loadGoogleAdsReport(showToast = false) {
 
   try {
     const [adsData, commercial] = await Promise.all([
-      googleAdsFunction("report"),
+      googleAdsFunction("report", { days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 }),
       loadGoogleAdsCommercialData()
     ]);
 
