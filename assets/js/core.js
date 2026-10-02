@@ -864,6 +864,7 @@
       $("analyticsConsentAcceptBtn").addEventListener("click", allowBookingAnalytics);
       $("analyticsConsentDeclineBtn").addEventListener("click", declineBookingAnalytics);
       $("growthFunnelRefreshBtn").addEventListener("click", () => loadGrowthFunnelAnalytics(true));
+      $("growthChannelsRefreshBtn").addEventListener("click", () => loadGrowthChannelAnalytics(true));
 
       $("manageRescheduleBtn").addEventListener("click", openManageReschedule);
       $("manageRescheduleCloseBtn").addEventListener("click", closeManageReschedule);
