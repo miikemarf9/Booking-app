@@ -48,7 +48,6 @@ async function loadPublicBookingPage(profileId) {
         if (serviceStaffErr) throw serviceStaffErr;
 
         state.publicProfile = prof;
-        if (typeof captureAcquisitionTouch === "function") captureAcquisitionTouch(profileId);
         if (typeof initBookingFunnel === "function") initBookingFunnel(profileId);
         state.selectedStaffChoice = null;
         state.publicServices = srvs || [];
@@ -729,7 +728,10 @@ async function loadPublicBookingPage(profileId) {
         }
       }
 
-      const acquisition = typeof getAcquisitionPayload === "function"
+      const acquisitionAllowed =
+        typeof analyticsConsentState === "function" &&
+        analyticsConsentState() === "granted";
+      const acquisition = acquisitionAllowed && typeof getAcquisitionPayload === "function"
         ? getAcquisitionPayload(state.publicProfile.id)
         : { firstTouch: null, lastTouch: null };
 
