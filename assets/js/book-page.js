@@ -24,7 +24,7 @@
 
   function finishAll() {
     clearTimers();
-    page.classList.remove("book-motion-ready", "book-hero-playing");
+    page.classList.remove("book-motion-enabled", "book-motion-ready", "book-hero-playing");
     document.querySelectorAll(".book-reveal, .book-stagger").forEach(el => el.classList.add("reveal-in"));
 
     const preview = document.getElementById("bookHeroPreview");
@@ -41,7 +41,7 @@
       journey.classList.remove("journey-playing");
       journey.classList.add("journey-complete");
       journey.querySelectorAll(".book-service-option,.product-slot,.book-confirm-preview").forEach(el => el.classList.add("show"));
-      journey.querySelectorAll(".book-journey-step").forEach(el => el.classList.remove("active"));
+      journey.querySelectorAll(".book-journey-step").forEach((el, i, all) => el.classList.toggle("active", i === all.length - 1));
     }
   }
 
@@ -50,7 +50,7 @@
     return;
   }
 
-  page.classList.add("book-motion-ready");
+  page.classList.add("book-motion-enabled", "book-motion-ready");
 
   // Hero copy: brief entry, then return to ordinary static content.
   const heroCopy = document.querySelector(".book-hero-copy");
@@ -164,7 +164,7 @@
       }, 2220);
 
       later(() => {
-        steps.forEach(step => step.classList.remove("active"));
+        activateStep(steps.length - 1);
         journey.classList.remove("journey-playing");
         journey.classList.add("journey-complete");
         services.forEach(el => el.classList.add("show"));
