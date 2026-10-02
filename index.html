@@ -344,34 +344,34 @@
   <!-- Dashboard View -->
   <section id="dashboardView" class="hidden min-h-screen">
     <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur">
-      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <div class="flex min-w-0 items-center gap-3">
+      <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4 lg:px-8">
+        <div class="flex min-w-0 w-full items-center gap-3 sm:w-auto">
           <img src="grabandbook-icon.svg" alt="" class="h-10 w-10 shrink-0 rounded-2xl">
           <div class="min-w-0">
             <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Grab&Book dashboard</p>
             <h1 id="dashboardBusinessName" class="truncate font-bold text-ink">Business</h1>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="dashboard-header-actions grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
           <button id="openBookingPageBtn" type="button" class="btn btn-primary hidden sm:inline-flex">View booking page ↗</button>
-          <button id="dashboardSettingsBtn" type="button" class="btn btn-light" data-go-tab="settings">Settings</button>
-          <button id="logoutBtn" type="button" class="btn btn-light">Log out</button>
+          <button id="dashboardSettingsBtn" type="button" class="btn btn-light w-full sm:w-auto" data-go-tab="settings">Settings</button>
+          <button id="logoutBtn" type="button" class="btn btn-light w-full sm:w-auto">Log out</button>
         </div>
       </div>
     </header>
 
     <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
       <div class="mb-7 space-y-3">
-        <div class="overflow-x-auto">
-          <nav class="dashboard-area-nav inline-flex min-w-max gap-1 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm" aria-label="Grab&Book product areas">
-            <button class="area-tab active rounded-xl px-5 py-2.5 text-sm font-bold text-slate-600" data-area="home" data-default-tab="overview" type="button">Home</button>
-            <button class="area-tab rounded-xl px-5 py-2.5 text-sm font-bold text-slate-600" data-area="booking" data-default-tab="calendar" type="button">Booking</button>
-            <button class="area-tab rounded-xl px-5 py-2.5 text-sm font-bold text-slate-600" data-area="crm" data-default-tab="customers" type="button">CRM</button>
-            <button class="area-tab rounded-xl px-5 py-2.5 text-sm font-bold text-slate-600" data-area="growth" data-default-tab="growth" type="button">Growth</button>
+        <div class="dashboard-area-nav-wrap">
+          <nav class="dashboard-area-nav grid w-full grid-cols-4 gap-1 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm sm:inline-flex sm:w-auto sm:min-w-max" aria-label="Grab&Book product areas">
+            <button class="area-tab active rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="home" data-default-tab="overview" type="button">Home</button>
+            <button class="area-tab rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="booking" data-default-tab="calendar" type="button">Booking</button>
+            <button class="area-tab rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="crm" data-default-tab="customers" type="button">CRM</button>
+            <button class="area-tab rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="growth" data-default-tab="growth" type="button">Growth</button>
           </nav>
         </div>
 
-        <div id="dashboardSubnavWrap" class="overflow-x-auto">
+        <div id="dashboardSubnavWrap" class="dashboard-scroll-row overflow-x-auto pb-1">
           <nav class="dashboard-subnav inline-flex min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="home" aria-label="Home navigation">
             <button class="subnav-tab active rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-tab="overview" type="button">Overview</button>
           </nav>
@@ -2877,7 +2877,7 @@
           </div>
 
           <div id="calendarMonthView" class="overflow-x-auto">
-            <div class="min-w-[720px]">
+            <div class="calendar-month-shell min-w-[720px]">
               <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[.68rem] font-bold uppercase tracking-wider text-slate-400">
                 <div class="px-2 py-3">Mon</div>
                 <div class="px-2 py-3">Tue</div>
