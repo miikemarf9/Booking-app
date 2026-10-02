@@ -2,7 +2,9 @@
 
 const growthViewState = {
   days: 30,
-  compare: true
+  compare: true,
+  channelType: "all",
+  channelRows: []
 };
 
 function growthAnalyticsDays() {
@@ -113,6 +115,11 @@ async function applyGrowthPeriodChange() {
 
 
 
+function setGrowthChannelTypeFilter(value) {
+  growthViewState.channelType = value || "all";
+  renderGrowthChannelSummary(growthViewState.channelRows || []);
+}
+
 function growthChannelTypeTone(type) {
   if (type === "Paid") return "bg-violet-50 text-violet-700";
   if (type === "Organic") return "bg-emerald-50 text-emerald-700";
@@ -123,7 +130,13 @@ function growthChannelTypeTone(type) {
 }
 
 function renderGrowthChannelSummary(rows) {
-  const channels = (rows || []).map(function (row) {
+  growthViewState.channelRows = Array.isArray(rows) ? rows.slice() : [];
+  const selectedType = growthViewState.channelType || "all";
+  const channels = (rows || [])
+    .filter(function (row) {
+      return selectedType === "all" || String(row.channel_type || "Other") === selectedType;
+    })
+    .map(function (row) {
     return {
       key: row.channel_key || "unknown",
       label: row.channel_label || "Unknown",
