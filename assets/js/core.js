@@ -22,6 +22,7 @@
       bookings: [],
       customers: [],
       selectedCustomerId: "",
+      marketingTargetCustomerId: "",
       customerTimelineEvents: {},
       customerTimelineLoading: {},
       questions: [],
@@ -747,6 +748,11 @@
         const btn = e.target.closest("[data-remove-customer-tag]");
         if (btn) removeCustomerTag(btn.dataset.removeCustomerTag);
       });
+      $("customerBookBtn").addEventListener("click", bookSelectedCustomer);
+      $("customerEmailBtn").addEventListener("click", emailSelectedCustomer);
+      $("customerCallBtn").addEventListener("click", callSelectedCustomer);
+      $("customerOfferBtn").addEventListener("click", sendOfferToSelectedCustomer);
+      $("clearMarketingTargetBtn").addEventListener("click", clearMarketingTarget);
       $("saveCustomerNotesBtn").addEventListener("click", saveCustomerNotes);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
       $("brandingForm").addEventListener("submit", saveBranding);
