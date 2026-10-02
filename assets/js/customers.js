@@ -463,7 +463,7 @@ function customerBookings(customer) {
             const selected = state.selectedCustomerId === customer.id;
             const last = m.lastVisit ? prettyDateTime(m.lastVisit) : "No completed visits yet";
             const groups = customerSmartGroups(customer);
-            const highlight = ["vip", "lapsed", "slipping", "due_back", "regular", "new"].find(group => groups.includes(group));
+            const highlight = ["lapsed", "slipping", "due_back", "vip", "regular", "new"].find(group => groups.includes(group));
             const tags = customerTags(customer).slice(0, 2);
             return `
               <button type="button" data-customer-id="${customer.id}" class="w-full rounded-2xl border p-4 text-left transition ${selected ? "border-brand-300 bg-brand-50" : "border-slate-200 hover:border-brand-200 hover:bg-slate-50"}">
@@ -517,7 +517,7 @@ function customerBookings(customer) {
         ? "mt-2 inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700"
         : "mt-2 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500";
       const smartGroups = customerSmartGroups(customer);
-      const primaryGroup = ["vip", "lapsed", "slipping", "due_back", "regular", "new"].find(group => smartGroups.includes(group));
+      const primaryGroup = ["lapsed", "slipping", "due_back", "vip", "regular", "new"].find(group => smartGroups.includes(group));
       $("customerProfileBadge").textContent = primaryGroup ? smartGroupLabel(primaryGroup) : "Customer";
       $("customerProfileBadge").className = primaryGroup
         ? "rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700"
