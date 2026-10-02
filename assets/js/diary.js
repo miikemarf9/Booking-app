@@ -240,13 +240,13 @@ function calendarDateKey(date) {
           <button
             type="button"
             data-calendar-date="${dateKey}"
-            class="min-h-[118px] border-b border-r border-slate-200 p-2 text-left align-top transition hover:bg-slate-50 ${!inMonth ? "bg-slate-50/70 text-slate-300" : ""} ${selected ? "ring-2 ring-inset ring-brand-500" : ""} ${isPast && inMonth ? "bg-slate-50/40" : ""}"
+            class="calendar-month-cell min-h-[118px] border-b border-r border-slate-200 p-2 text-left align-top transition hover:bg-slate-50 ${!inMonth ? "bg-slate-50/70 text-slate-300" : ""} ${selected ? "ring-2 ring-inset ring-brand-500" : ""} ${isPast && inMonth ? "bg-slate-50/40" : ""}"
           >
             <div class="mb-2 flex items-center justify-between gap-2">
               <span class="${isToday ? "grid h-7 w-7 place-items-center rounded-full bg-brand-600 font-bold text-white" : "text-sm font-bold " + (inMonth ? "text-slate-700" : "text-slate-300")}">${d.getUTCDate()}</span>
-              ${bookings.length ? `<span class="rounded-full bg-brand-100 px-2 py-0.5 text-[.64rem] font-bold text-brand-700">${bookings.length}</span>` : ""}
+              ${bookings.length ? `<span class="calendar-booking-count rounded-full bg-brand-100 px-2 py-0.5 text-[.64rem] font-bold text-brand-700">${bookings.length}</span>` : ""}
             </div>
-            <div class="space-y-1">
+            <div class="calendar-month-cell-detail space-y-1">
               ${bookingPreview}
               ${moreBookings}
               ${availability}
