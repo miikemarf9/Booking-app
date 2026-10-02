@@ -1,5 +1,118 @@
 "use strict";
 
+const growthViewState = {
+  days: 30,
+  compare: true
+};
+
+function growthAnalyticsDays() {
+  const select = $("growthPeriodSelect");
+  const value = Number(select?.value || growthViewState.days || 30);
+  return [7, 30, 90].includes(value) ? value : 30;
+}
+
+function growthPeriodLabel(days = growthAnalyticsDays()) {
+  return "Last " + days + " days";
+}
+
+function growthComparisonDelta(current, previous, percentagePoints = false) {
+  const now = Number(current);
+  const before = Number(previous);
+
+  if (!growthViewState.compare || !Number.isFinite(now) || !Number.isFinite(before)) {
+    return { text: "—", className: "text-xs font-bold text-slate-400" };
+  }
+
+  if (percentagePoints) {
+    const delta = Math.round((now - before) * 10) / 10;
+    if (!Number.isFinite(delta) || delta === 0) {
+      return { text: "0.0 pp", className: "text-xs font-bold text-slate-500" };
+    }
+    return {
+      text: (delta > 0 ? "+" : "") + delta.toFixed(1) + " pp",
+      className: "text-xs font-bold " + (delta > 0 ? "text-emerald-600" : "text-amber-700")
+    };
+  }
+
+  if (before === 0) {
+    if (now === 0) return { text: "0%", className: "text-xs font-bold text-slate-500" };
+    return { text: "New", className: "text-xs font-bold text-emerald-600" };
+  }
+
+  const delta = ((now - before) / Math.abs(before)) * 100;
+  const rounded = Math.round(delta * 10) / 10;
+  return {
+    text: (rounded > 0 ? "+" : "") + rounded.toFixed(1) + "%",
+    className: "text-xs font-bold " + (rounded > 0 ? "text-emerald-600" : rounded < 0 ? "text-amber-700" : "text-slate-500")
+  };
+}
+
+function setGrowthDelta(id, current, previous, percentagePoints = false) {
+  const el = $(id);
+  if (!el) return;
+  const delta = growthComparisonDelta(current, previous, percentagePoints);
+  el.textContent = delta.text;
+  el.className = delta.className;
+}
+
+function renderGrowthPeriodComparison(rows) {
+  const current = (rows || []).find(row => row.period_key === "current") || {};
+  const previous = (rows || []).find(row => row.period_key === "previous") || {};
+  const days = growthAnalyticsDays();
+
+  $("growthOverviewVisits").textContent = Number(current.tracked_visits || 0).toLocaleString("en-GB");
+  $("growthOverviewBookings").textContent = Number(current.completed_bookings || 0).toLocaleString("en-GB");
+  $("growthOverviewRevenue").textContent = money(Number(current.booked_revenue || 0));
+  $("growthOverviewConversion").textContent = current.conversion_rate == null ? "—" : Number(current.conversion_rate) + "%";
+  $("growthOverviewCompareLabel").textContent = growthViewState.compare
+    ? "vs previous " + days + " days"
+    : growthPeriodLabel(days);
+
+  setGrowthDelta("growthOverviewVisitsDelta", current.tracked_visits, previous.tracked_visits);
+  setGrowthDelta("growthOverviewBookingsDelta", current.completed_bookings, previous.completed_bookings);
+  setGrowthDelta("growthOverviewRevenueDelta", current.booked_revenue, previous.booked_revenue);
+  setGrowthDelta("growthOverviewConversionDelta", current.conversion_rate, previous.conversion_rate, true);
+
+  if (!growthViewState.compare) {
+    ["growthOverviewVisitsDelta","growthOverviewBookingsDelta","growthOverviewRevenueDelta","growthOverviewConversionDelta"].forEach(id => {
+      $(id).textContent = "—";
+      $(id).className = "text-xs font-bold text-slate-400";
+    });
+  }
+
+  const freshness = $("growthDataFreshness");
+  if (freshness) {
+    freshness.textContent = "Updated " + new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    freshness.className = "rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700";
+  }
+  if ($("growthChannelsWindow")) $("growthChannelsWindow").textContent = "Live: last " + days + " days";
+  if ($("growthFunnelWindow")) $("growthFunnelWindow").textContent = "Last " + days + " days";
+}
+
+async function loadGrowthPeriodComparison() {
+  if (!state.profile || !$("growthOverviewVisits")) return;
+
+  const { data, error } = await supabaseClient.rpc("get_growth_period_comparison", {
+    p_days: growthAnalyticsDays()
+  });
+
+  if (error) throw error;
+  renderGrowthPeriodComparison(data || []);
+}
+
+async function applyGrowthPeriodChange() {
+  growthViewState.days = growthAnalyticsDays();
+  growthViewState.compare = Boolean($("growthCompareToggle")?.checked);
+  const freshness = $("growthDataFreshness");
+  if (freshness) {
+    freshness.textContent = "Refreshing…";
+    freshness.className = "rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500";
+  }
+  await loadGrowthAnalytics(false);
+}
+
+
+
 function growthChannelTypeTone(type) {
   if (type === "Paid") return "bg-violet-50 text-violet-700";
   if (type === "Organic") return "bg-emerald-50 text-emerald-700";
@@ -157,7 +270,7 @@ async function loadGrowthChannelAnalytics(showToast = false) {
 
   try {
     const { data, error } = await supabaseClient.rpc("get_growth_channel_summary", {
-      p_days: 30
+      p_days: growthAnalyticsDays()
     });
 
     if (error) throw error;
@@ -339,7 +452,7 @@ async function loadGrowthCustomerQualityAnalytics(showToast = false) {
 
   try {
     const { data, error } = await supabaseClient.rpc("get_growth_customer_quality_summary", {
-      p_days: 30
+      p_days: growthAnalyticsDays()
     });
 
     if (error) throw error;
@@ -365,6 +478,7 @@ async function loadGrowthChannelAreaAnalytics(showToast = false) {
 
 async function loadGrowthAnalytics(showToast = false) {
   const tasks = [
+    loadGrowthPeriodComparison(),
     loadGrowthChannelAreaAnalytics(false),
     loadGrowthFunnelAnalytics(false)
   ];
@@ -509,7 +623,7 @@ async function loadGrowthFunnelAnalytics(showToast = false) {
 
   try {
     const { data, error } = await supabaseClient.rpc("get_booking_funnel_summary", {
-      p_days: 30
+      p_days: growthAnalyticsDays()
     });
 
     if (error) throw error;
