@@ -1,6 +1,8 @@
 "use strict";
 
 const googleAdsState = {
+  lastReport: null,
+
   connected: false,
   developerTokenConfigured: false,
   customerId: "",
@@ -436,6 +438,7 @@ function renderGoogleAdsAdGroups(adGroups, currency) {
 }
 
 function renderGoogleAdsReport(report, commercial) {
+  googleAdsState.lastReport = report || null;
   const summary = report?.summary || {};
   const account = report?.account || {};
   const currency = account.currency_code || googleAdsState.currencyCode || "GBP";
