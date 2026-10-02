@@ -688,7 +688,7 @@ function calendarDateKey(date) {
         document.querySelectorAll(".subnav-tab").forEach(btn => {
           btn.classList.toggle("active", btn.dataset.goSection === "crm-customers-section");
         });
-        window.setTimeout(() => $("crm-customers-section")?.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
+        window.scrollTo({ top: 0, behavior: "auto" });
         return;
       }
 
@@ -697,7 +697,7 @@ function calendarDateKey(date) {
           btn.classList.toggle("active", btn.dataset.goSection === "growth-overview-section");
         });
         if (typeof loadGrowthAnalytics === "function") loadGrowthAnalytics(false);
-        window.setTimeout(() => $("growth-overview-section")?.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
+        window.scrollTo({ top: 0, behavior: "auto" });
         return;
       }
 
