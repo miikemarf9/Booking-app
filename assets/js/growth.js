@@ -381,6 +381,10 @@ async function loadGrowthAnalytics(showToast = false) {
     tasks.push(loadGa4Integration(false));
   }
 
+  if (typeof loadSearchConsoleIntegration === "function") {
+    tasks.push(loadSearchConsoleIntegration(false));
+  }
+
   await Promise.all(tasks);
   if (showToast) toast("Growth refreshed.");
 }
