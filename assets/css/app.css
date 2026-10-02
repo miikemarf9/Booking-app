@@ -1540,3 +1540,178 @@
       .book-product-page .book-stagger > *{transform:translateY(12px)}
       .book-journey-preview .book-journey-step{font-size:.52rem;padding:.45rem .1rem}
     }
+
+
+    /* CRM product page motion */
+    .crm-product-page .crm-hero-item,
+    .crm-product-page .crm-reveal,
+    .crm-product-page .crm-stagger > * {
+      opacity:1;
+      transform:none;
+    }
+
+    @media (prefers-reduced-motion:no-preference) {
+      .crm-product-page.crm-motion-ready .crm-hero-item {
+        opacity:0;
+        transform:translateY(16px);
+      }
+      .crm-product-page.crm-motion-ready.crm-hero-playing .crm-hero-item {
+        animation:crm-rise .58s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .crm-product-page.crm-motion-ready.crm-hero-playing .crm-hero-item:nth-child(1){animation-delay:.03s}
+      .crm-product-page.crm-motion-ready.crm-hero-playing .crm-hero-item:nth-child(2){animation-delay:.10s}
+      .crm-product-page.crm-motion-ready.crm-hero-playing .crm-hero-item:nth-child(3){animation-delay:.17s}
+      .crm-product-page.crm-motion-ready.crm-hero-playing .crm-hero-item:nth-child(4){animation-delay:.24s}
+
+      .crm-hero-preview .crm-preview-topbar,
+      .crm-hero-preview .product-metric,
+      .crm-hero-preview .crm-profile-tag,
+      .crm-hero-preview .crm-timeline-card {
+        opacity:0;
+        transform:translateY(10px);
+      }
+      .crm-hero-preview.crm-preview-playing .crm-preview-topbar {
+        animation:crm-rise .46s cubic-bezier(.2,.72,.25,1) .05s forwards;
+      }
+      .crm-hero-preview.crm-preview-playing .product-metric {
+        animation:crm-rise .44s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .crm-hero-preview.crm-preview-playing .product-metric:nth-child(1){animation-delay:.20s}
+      .crm-hero-preview.crm-preview-playing .product-metric:nth-child(2){animation-delay:.27s}
+      .crm-hero-preview.crm-preview-playing .product-metric:nth-child(3){animation-delay:.34s}
+      .crm-hero-preview.crm-preview-playing .product-metric:nth-child(4){animation-delay:.41s}
+      .crm-hero-preview.crm-preview-playing .crm-profile-tag {
+        animation:crm-tag-pop .4s cubic-bezier(.2,.8,.25,1) forwards;
+      }
+      .crm-hero-preview.crm-preview-playing .crm-profile-tag:nth-child(1){animation-delay:.53s}
+      .crm-hero-preview.crm-preview-playing .crm-profile-tag:nth-child(2){animation-delay:.61s}
+      .crm-hero-preview.crm-preview-playing .crm-profile-tag:nth-child(3){animation-delay:.69s}
+      .crm-hero-preview.crm-preview-playing .crm-timeline-card {
+        animation:crm-rise .48s cubic-bezier(.2,.72,.25,1) .78s forwards;
+      }
+      .crm-hero-preview .crm-timeline-event {
+        opacity:0;
+        transform:translateX(-8px);
+      }
+      .crm-hero-preview.crm-preview-playing .crm-timeline-event {
+        animation:crm-timeline-in .42s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .crm-hero-preview.crm-preview-playing .crm-timeline-event:nth-child(1){animation-delay:.90s}
+      .crm-hero-preview.crm-preview-playing .crm-timeline-event:nth-child(2){animation-delay:1.00s}
+      .crm-hero-preview.crm-preview-playing .crm-timeline-event:nth-child(3){animation-delay:1.10s}
+      .crm-hero-preview.crm-preview-complete .crm-preview-topbar,
+      .crm-hero-preview.crm-preview-complete .product-metric,
+      .crm-hero-preview.crm-preview-complete .crm-profile-tag,
+      .crm-hero-preview.crm-preview-complete .crm-timeline-card,
+      .crm-hero-preview.crm-preview-complete .crm-timeline-event {
+        opacity:1;
+        transform:none;
+      }
+
+      .crm-product-page .crm-reveal {
+        opacity:0;
+        transform:translateY(22px);
+        transition:opacity .6s ease,transform .6s cubic-bezier(.2,.72,.25,1);
+      }
+      .crm-product-page .crm-reveal.reveal-in {
+        opacity:1;
+        transform:translateY(0);
+      }
+      .crm-product-page .crm-stagger > * {
+        opacity:0;
+        transform:translateY(18px);
+        transition:opacity .5s ease,transform .5s cubic-bezier(.2,.72,.25,1);
+      }
+      .crm-product-page .crm-stagger.reveal-in > * {
+        opacity:1;
+        transform:translateY(0);
+      }
+      .crm-product-page .crm-stagger.reveal-in > *:nth-child(2){transition-delay:.06s}
+      .crm-product-page .crm-stagger.reveal-in > *:nth-child(3){transition-delay:.12s}
+      .crm-product-page .crm-stagger.reveal-in > *:nth-child(4){transition-delay:.18s}
+      .crm-product-page .crm-stagger.reveal-in > *:nth-child(5){transition-delay:.24s}
+      .crm-product-page .crm-stagger.reveal-in > *:nth-child(6){transition-delay:.30s}
+
+      .crm-analytics-preview .crm-analytics-metrics .product-metric,
+      .crm-analytics-preview .crm-health-bar,
+      .crm-analytics-preview .crm-status-step {
+        opacity:0;
+      }
+      .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric {
+        animation:crm-rise .42s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(1){animation-delay:.08s}
+      .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(2){animation-delay:.14s}
+      .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(3){animation-delay:.20s}
+      .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(4){animation-delay:.26s}
+      .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(5){animation-delay:.32s}
+      .crm-analytics-preview.analytics-playing .crm-analytics-metrics .product-metric:nth-child(6){animation-delay:.38s}
+      .crm-analytics-preview .crm-health-bar {
+        transform:scaleX(0);
+        opacity:1;
+      }
+      .crm-analytics-preview.analytics-playing .crm-health-bar {
+        animation:crm-bar-grow .68s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .crm-analytics-preview.analytics-playing .crm-health-bars > div:nth-child(1) .crm-health-bar{animation-delay:.56s}
+      .crm-analytics-preview.analytics-playing .crm-health-bars > div:nth-child(2) .crm-health-bar{animation-delay:.66s}
+      .crm-analytics-preview.analytics-playing .crm-health-bars > div:nth-child(3) .crm-health-bar{animation-delay:.76s}
+      .crm-analytics-preview.analytics-playing .crm-status-step {
+        animation:crm-status-pop .42s cubic-bezier(.2,.8,.25,1) forwards;
+      }
+      .crm-analytics-preview.analytics-playing .crm-status-step:nth-child(1){animation-delay:.95s}
+      .crm-analytics-preview.analytics-playing .crm-status-step:nth-child(2){animation-delay:1.17s}
+      .crm-analytics-preview.analytics-playing .crm-status-step:nth-child(3){animation-delay:1.39s}
+      .crm-analytics-preview.analytics-playing .crm-status-step.status-active {
+        background:#fff7ed;
+        color:#c2410c;
+        box-shadow:0 8px 18px rgba(194,65,12,.08);
+      }
+      .crm-analytics-preview.analytics-complete .crm-analytics-metrics .product-metric,
+      .crm-analytics-preview.analytics-complete .crm-status-step {
+        opacity:1;
+        transform:none;
+      }
+      .crm-analytics-preview.analytics-complete .crm-health-bar {
+        opacity:1;
+        transform:scaleX(1);
+      }
+    }
+
+    @media (hover:hover) and (prefers-reduced-motion:no-preference) {
+      .crm-product-page .product-feature {
+        transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+      }
+      .crm-product-page .product-feature:hover {
+        transform:translateY(-3px);
+        border-color:#d8c7ff;
+        box-shadow:0 16px 36px rgba(23,32,51,.07);
+      }
+    }
+
+    @keyframes crm-rise {
+      from{opacity:0;transform:translateY(16px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    @keyframes crm-tag-pop {
+      0%{opacity:0;transform:translateY(7px) scale(.96)}
+      70%{opacity:1;transform:translateY(-1px) scale(1.02)}
+      100%{opacity:1;transform:translateY(0) scale(1)}
+    }
+    @keyframes crm-timeline-in {
+      from{opacity:0;transform:translateX(-8px)}
+      to{opacity:1;transform:translateX(0)}
+    }
+    @keyframes crm-bar-grow {
+      from{transform:scaleX(0)}
+      to{transform:scaleX(1)}
+    }
+    @keyframes crm-status-pop {
+      0%{opacity:0;transform:translateY(5px) scale(.97)}
+      100%{opacity:1;transform:translateY(0) scale(1)}
+    }
+
+    @media (max-width:639px) and (prefers-reduced-motion:no-preference) {
+      .crm-product-page .crm-reveal{transform:translateY(14px)}
+      .crm-product-page .crm-stagger > *{transform:translateY(12px)}
+    }
