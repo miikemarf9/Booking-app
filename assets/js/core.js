@@ -603,6 +603,7 @@
       const stripeReturn = params.get("stripe") || "";
       const subscriptionState = params.get("subscription") || "";
       const proSessionId = params.get("pro_session_id") || "";
+      const requestedAuthMode = params.get("auth") || "";
 
       $("blkDate").min = todayKey();
       $("blkRepeatUntil").min = todayKey();
@@ -651,6 +652,9 @@
           switchTab("payments");
           await refreshStripePayments(false);
         }
+      } else if (requestedAuthMode === "register" || requestedAuthMode === "login") {
+        setAuthMode(requestedAuthMode);
+        showOnly("authView");
       } else {
         showOnly("landingView");
       }
