@@ -575,6 +575,15 @@
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <span id="growthChannelsWindow" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Live: last 30 days</span>
+              <select id="growthChannelTypeFilter" class="field !w-auto !py-2 text-xs font-semibold">
+                <option value="all">All channels</option>
+                <option value="Paid">Paid</option>
+                <option value="Organic">Organic</option>
+                <option value="Social">Social</option>
+                <option value="Direct">Direct</option>
+                <option value="Referral">Referral</option>
+                <option value="Other">Other</option>
+              </select>
               <button id="growthImportBtn" class="btn btn-primary" type="button">Import existing data</button>
               <button id="growthImportTemplateBtn" class="btn btn-light" type="button">CSV template</button>
               <button id="growthChannelsRefreshBtn" class="btn btn-light" type="button">Refresh</button>
