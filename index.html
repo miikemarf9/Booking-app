@@ -56,11 +56,13 @@
           <img src="grabandbook-logo.svg" alt="Grab&Book" class="block h-8 w-auto sm:h-10" style="aspect-ratio: 4.5 / 1;">
         </a>
 
-        <nav class="hidden items-center gap-6 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
+        <nav class="hidden items-center gap-5 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
           <a class="landing-nav-link" href="book.html">Book</a>
           <a class="landing-nav-link" href="crm.html">CRM</a>
           <a class="landing-nav-link" href="growth.html">Growth</a>
           <a class="landing-nav-link" href="#pricing">Pricing</a>
+          <a class="landing-nav-link" href="case-studies.html">Case studies</a>
+          <a class="landing-nav-link" href="contact.html">Contact</a>
         </nav>
 
         <div class="flex items-center gap-2">
@@ -68,6 +70,16 @@
           <button id="landingStartBtn" type="button" class="btn btn-primary">Start free</button>
         </div>
       </div>
+      <nav class="landing-mobile-nav border-t border-slate-100 px-4 py-2 lg:hidden" aria-label="Mobile site navigation">
+        <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto">
+          <a href="book.html">Book</a>
+          <a href="crm.html">CRM</a>
+          <a href="growth.html">Growth</a>
+          <a href="#pricing">Pricing</a>
+          <a href="case-studies.html">Case studies</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </nav>
     </header>
 
     <main>
@@ -465,7 +477,26 @@
         </div>
       </section>
 
-      <!-- Verified social proof and customer case studies will be added here when available. -->
+      <section id="customer-proof" class="border-y border-slate-100 bg-slate-50/75 py-16 sm:py-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+            <div class="max-w-xl">
+              <p class="landing-section-eyebrow">Customer proof</p>
+              <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Real results will be shown as real results.</h2>
+              <p class="mt-4 text-base leading-7 text-slate-500">We're building Grab&Book's first verified customer-story library. Until then, dashboard figures on this site are clearly labelled as illustrative rather than presented as customer outcomes.</p>
+              <div class="mt-6 flex flex-wrap gap-3">
+                <a href="case-studies.html" class="btn btn-light">How we'll publish case studies</a>
+                <a href="contact.html" class="btn btn-primary">Talk to us</a>
+              </div>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-3">
+              <div class="trust-card"><strong>No invented testimonials</strong><span>Customer quotes will only appear with a genuine source and permission.</span></div>
+              <div class="trust-card"><strong>Clear time periods</strong><span>Results will state what was measured and over what period.</span></div>
+              <div class="trust-card"><strong>Direct contact</strong><span>Questions can be sent straight through the site without a support maze.</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section class="px-4 pb-16 sm:px-6 sm:pb-24">
         <div class="mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-brand-600 px-6 py-11 text-center text-white shadow-[0_24px_70px_rgba(8,114,189,.22)] sm:px-12">
@@ -488,6 +519,8 @@
           <a class="hover:text-brand-600" href="crm.html">CRM</a>
           <a class="hover:text-brand-600" href="growth.html">Growth</a>
           <a class="hover:text-brand-600" href="#pricing">Pricing</a>
+          <a class="hover:text-brand-600" href="case-studies.html">Case studies</a>
+          <a class="hover:text-brand-600" href="contact.html">Contact</a>
         </nav>
       </div>
     </footer>
