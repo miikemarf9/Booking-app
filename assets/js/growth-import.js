@@ -236,8 +236,8 @@ async function previewGrowthImportFile(file) {
     const spendIndex = growthHeaderIndex(headers, ["spend","cost","ad_spend","advertising_spend"]);
     const revenueIndex = growthHeaderIndex(headers, ["revenue","value","booking_value","sales"]);
 
-    if (dateIndex < 0 || channelIndex < 0) {
-      return toast('CSV needs a "date" or "month" column and a "channel" column.', "error");
+    if (dateIndex < 0 || (channelIndex < 0 && sourceIndex < 0)) {
+      return toast('CSV needs a "date" or "month" column and either a "channel" or "source" column.', "error");
     }
 
     const parsed = [];
@@ -247,10 +247,11 @@ async function previewGrowthImportFile(file) {
     csv.slice(1, maxRows + 1).forEach(function (row, offset) {
       const rowNumber = offset + 2;
       const period = parseGrowthDate(row[dateIndex]);
-      const channel = String(row[channelIndex] || "").trim().slice(0, 160);
+      const sourceValue = sourceIndex >= 0 ? String(row[sourceIndex] || "").trim() : "";
+      const channel = String(channelIndex >= 0 ? (row[channelIndex] || "") : sourceValue).trim().slice(0, 160);
 
       if (!period || !channel) {
-        errors.push("Row " + rowNumber + ": missing/invalid date or channel.");
+        errors.push("Row " + rowNumber + ": missing/invalid date or channel/source.");
         return;
       }
 
@@ -277,7 +278,7 @@ async function previewGrowthImportFile(file) {
 
       const inferred = inferGrowthSourceMedium(
         channel,
-        sourceIndex >= 0 ? row[sourceIndex] : "",
+        sourceValue,
         mediumIndex >= 0 ? row[mediumIndex] : ""
       );
 
