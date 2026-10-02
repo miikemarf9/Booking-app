@@ -558,12 +558,15 @@ function customerBookings(customer) {
         booking_confirmation: "Booking confirmation email",
         reminder_24h: "24-hour reminder email",
         reminder_2h: "2-hour reminder email",
-        followup: "Follow-up email",
         reschedule_confirmation: "Reschedule confirmation email",
         cancellation_confirmation: "Cancellation confirmation email"
       };
-      const label = labels[messageType] || "Customer email";
-      return status === "failed" ? `${label} failed` : `${label} sent`;
+      const label = String(messageType || "").startsWith("followup_")
+        ? "Follow-up email"
+        : (labels[messageType] || "Customer email");
+      if (status === "failed") return `${label} failed`;
+      if (status === "processing") return `${label} being sent`;
+      return `${label} sent`;
     }
 
     function timelineEventTone(type) {
@@ -728,7 +731,10 @@ function customerBookings(customer) {
             detail: customer.marketing_consent_source === "booking_form" ? "Opted in during online booking." : ""
           });
         }
-        if (customer.marketing_opt_out_at) {
+        const hasLoggedUnsubscribe = (activityResult.data || []).some(activity =>
+          activity.activity_type === "marketing" && activity.title === "Marketing unsubscribed"
+        );
+        if (customer.marketing_opt_out_at && !hasLoggedUnsubscribe) {
           events.push({
             time: customer.marketing_opt_out_at,
             type: "marketing",
