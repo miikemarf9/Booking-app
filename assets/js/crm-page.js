@@ -28,7 +28,7 @@
 
   function finishAll() {
     clearTimers();
-    page.classList.remove("crm-motion-ready", "crm-hero-playing");
+    page.classList.remove("crm-motion-enabled", "crm-motion-ready", "crm-hero-playing");
 
     document.querySelectorAll(".crm-reveal, .crm-stagger").forEach(el => {
       el.classList.add("reveal-in");
@@ -50,7 +50,7 @@
       analytics.querySelectorAll("[data-crm-analytics-count]").forEach(el => {
         el.textContent = finalText(el, "crmAnalyticsCount");
       });
-      analytics.querySelectorAll(".crm-status-step").forEach(el => el.classList.remove("status-active"));
+      analytics.querySelectorAll(".crm-status-step").forEach((el, i, all) => el.classList.toggle("status-active", i === all.length - 1));
     }
   }
 
@@ -59,7 +59,7 @@
     return;
   }
 
-  page.classList.add("crm-motion-ready");
+  page.classList.add("crm-motion-enabled", "crm-motion-ready");
 
   // Hero copy
   const heroCopy = document.querySelector(".crm-hero-copy");
@@ -163,7 +163,7 @@
           setFinal();
           analytics.classList.remove("analytics-playing");
           analytics.classList.add("analytics-complete");
-          statuses.forEach(el => el.classList.remove("status-active"));
+          setStatus(statuses.length - 1);
           return;
         }
 
@@ -184,7 +184,7 @@
       later(() => setStatus(1), 1180);
       later(() => setStatus(2), 1580);
       later(() => {
-        statuses.forEach(el => el.classList.remove("status-active"));
+        setStatus(statuses.length - 1);
         analytics.classList.remove("analytics-playing");
         analytics.classList.add("analytics-complete");
       }, 2260);
