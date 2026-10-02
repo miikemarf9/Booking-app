@@ -728,6 +728,19 @@
 
       $("bookingFilter").addEventListener("change", renderBookings);
       $("bookingsList").addEventListener("click", handleBookingListClick);
+      $("addCustomerBtn").addEventListener("click", openAddCustomer);
+      $("importCustomersBtn").addEventListener("click", () => $("customerCsvInput").click());
+      $("exportCustomersBtn").addEventListener("click", exportCustomersCsv);
+      $("customerCsvInput").addEventListener("change", e => importCustomersCsv(e.target.files?.[0]));
+      $("customerEditorForm").addEventListener("submit", saveCustomerEditor);
+      $("customerEditorCloseBtn").addEventListener("click", () => closeCustomerModal("customerEditorModal"));
+      $("customerEditorCancelBtn").addEventListener("click", () => closeCustomerModal("customerEditorModal"));
+      $("customerEditBtn").addEventListener("click", openEditCustomer);
+      $("customerArchiveBtn").addEventListener("click", toggleSelectedCustomerArchive);
+      $("customerMergeBtn").addEventListener("click", openCustomerMerge);
+      $("customerMergeForm").addEventListener("submit", mergeCustomerProfiles);
+      $("customerMergeCloseBtn").addEventListener("click", () => closeCustomerModal("customerMergeModal"));
+      $("customerMergeCancelBtn").addEventListener("click", () => closeCustomerModal("customerMergeModal"));
       $("customerSearch").addEventListener("input", renderCustomers);
       $("customerFilter").addEventListener("change", syncCustomerFilters);
       $("customerServiceFilter").addEventListener("change", renderCustomers);
@@ -1138,7 +1151,7 @@
       const totalVal = upcoming.reduce((acc, b) => acc + Number(b.booked_price ?? b.services?.price ?? state.services.find(s => s.id === b.service_id)?.price ?? 0), 0);
 
       $("statServices").textContent = state.services.length;
-      $("statCustomers").textContent = state.customers.length;
+      $("statCustomers").textContent = state.customers.filter(c => !c.archived_at).length;
       $("statDates").textContent = activeDates.size;
       $("statBookings").textContent = upcoming.length;
       $("statValue").textContent = money(totalVal);
