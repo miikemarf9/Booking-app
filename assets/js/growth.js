@@ -174,10 +174,190 @@ async function loadGrowthChannelAnalytics(showToast = false) {
   }
 }
 
+function renderGrowthCustomerQuality(rows) {
+  const channels = (rows || []).map(function (row) {
+    return {
+      key: row.channel_key || "unknown",
+      label: row.channel_label || "Unknown",
+      type: row.channel_type || "Other",
+      customers: Number(row.acquired_customers || 0),
+      completedCustomers: Number(row.completed_customers || 0),
+      repeatCustomers: Number(row.repeat_customers || 0),
+      repeatRate: row.repeat_rate == null ? null : Number(row.repeat_rate),
+      bookings: Number(row.active_bookings || 0),
+      averageBookings: row.average_bookings_per_customer == null ? null : Number(row.average_bookings_per_customer),
+      lifetimeValue: Number(row.lifetime_booked_value || 0),
+      averageCustomerValue: row.average_customer_value == null ? null : Number(row.average_customer_value),
+      repeatValue: Number(row.repeat_booked_value || 0),
+      futureCustomers: Number(row.customers_with_future_booking || 0),
+      noFutureCustomers: Number(row.no_future_booking_customers || 0),
+      noFutureRate: row.no_future_booking_rate == null ? null : Number(row.no_future_booking_rate)
+    };
+  });
+
+  const totals = channels.reduce(function (sum, channel) {
+    sum.customers += channel.customers;
+    sum.completedCustomers += channel.completedCustomers;
+    sum.repeatCustomers += channel.repeatCustomers;
+    sum.lifetimeValue += channel.lifetimeValue;
+    sum.repeatValue += channel.repeatValue;
+    return sum;
+  }, {
+    customers: 0,
+    completedCustomers: 0,
+    repeatCustomers: 0,
+    lifetimeValue: 0,
+    repeatValue: 0
+  });
+
+  const repeatRate = totals.completedCustomers
+    ? Math.round((totals.repeatCustomers / totals.completedCustomers) * 1000) / 10
+    : null;
+  const avgValue = totals.customers ? totals.lifetimeValue / totals.customers : 0;
+
+  $("growthQualityCustomers").textContent = totals.customers;
+  $("growthQualityRepeatCustomers").textContent = totals.repeatCustomers;
+  $("growthQualityRepeatRate").textContent = repeatRate == null ? "— repeat rate" : repeatRate + "% repeat rate";
+  $("growthQualityLifetimeValue").textContent = money(totals.lifetimeValue);
+  $("growthQualityRepeatValue").textContent = money(totals.repeatValue);
+  $("growthQualityAverageValue").textContent = money(avgValue);
+
+  if (!channels.length) {
+    $("growthCustomerQualityCards").innerHTML =
+      '<div class="lg:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center">' +
+        '<p class="font-bold text-slate-600">No attributed customer cohort yet</p>' +
+        '<p class="mt-1 text-sm text-slate-400">Customer quality appears after new customers are acquired through tracked channels.</p>' +
+      '</div>';
+    $("growthCustomerQualityTable").innerHTML = "";
+    return;
+  }
+
+  $("growthCustomerQualityCards").innerHTML = channels.map(function (channel) {
+    if (typeof registerGrowthPlannerChannel === "function") {
+      registerGrowthPlannerChannel(channel.key, channel.label);
+    }
+
+    return (
+      '<article class="rounded-2xl border border-slate-200 bg-white p-4">' +
+        '<div class="flex items-start justify-between gap-3">' +
+          '<div class="min-w-0">' +
+            '<p class="truncate text-base font-bold text-ink">' + escapeHtml(channel.label) + '</p>' +
+            '<p class="mt-1 text-xs text-slate-400">' + channel.customers + ' acquired customer' + (channel.customers === 1 ? "" : "s") + '</p>' +
+          '</div>' +
+          '<span class="shrink-0 rounded-full px-2.5 py-1 text-[.68rem] font-bold ' + growthChannelTypeTone(channel.type) + '">' + escapeHtml(channel.type) + '</span>' +
+        '</div>' +
+
+        '<div class="mt-4 grid grid-cols-2 gap-3">' +
+          '<div class="rounded-xl bg-slate-50 p-3">' +
+            '<p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Repeat rate</p>' +
+            '<p class="mt-1 text-lg font-bold text-ink">' + (channel.repeatRate == null ? "—" : channel.repeatRate + "%") + '</p>' +
+          '</div>' +
+          '<div class="rounded-xl bg-slate-50 p-3">' +
+            '<p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Avg customer value</p>' +
+            '<p class="mt-1 text-lg font-bold text-ink">' + (channel.averageCustomerValue == null ? "—" : money(channel.averageCustomerValue)) + '</p>' +
+          '</div>' +
+          '<div class="rounded-xl bg-slate-50 p-3">' +
+            '<p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Bookings/customer</p>' +
+            '<p class="mt-1 text-lg font-bold text-ink">' + (channel.averageBookings == null ? "—" : channel.averageBookings.toFixed(2).replace(/\.00$/, "")) + '</p>' +
+          '</div>' +
+          '<div class="rounded-xl bg-slate-50 p-3">' +
+            '<p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Repeat value</p>' +
+            '<p class="mt-1 text-lg font-bold text-ink">' + money(channel.repeatValue) + '</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="mt-4 space-y-2 text-xs">' +
+          '<div class="flex items-center justify-between gap-3">' +
+            '<span class="text-slate-500">Lifetime booked value</span>' +
+            '<span class="font-bold text-slate-700">' + money(channel.lifetimeValue) + '</span>' +
+          '</div>' +
+          '<div class="flex items-center justify-between gap-3">' +
+            '<span class="text-slate-500">Future booking secured</span>' +
+            '<span class="font-bold text-slate-700">' + channel.futureCustomers + '</span>' +
+          '</div>' +
+          '<div class="flex items-center justify-between gap-3">' +
+            '<span class="text-slate-500">No future booking</span>' +
+            '<span class="font-bold text-slate-700">' + (channel.noFutureRate == null ? "—" : channel.noFutureRate + "%") + '</span>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="mt-4 border-t border-slate-100 pt-3">' +
+          '<button class="text-xs font-bold text-brand-600 hover:underline" type="button" data-planner-channel="' + escapeHtml(channel.key) + '" data-planner-label="' + escapeHtml(channel.label) + '">+ Add note / plan</button>' +
+        '</div>' +
+      '</article>'
+    );
+  }).join("");
+
+  $("growthCustomerQualityTable").innerHTML =
+    '<table class="w-full min-w-[980px] text-left text-sm">' +
+      '<thead>' +
+        '<tr class="border-b border-slate-200 text-[.68rem] uppercase tracking-wider text-slate-400">' +
+          '<th class="pb-2 pr-4 font-bold">Channel</th>' +
+          '<th class="pb-2 pr-4 font-bold">Customers</th>' +
+          '<th class="pb-2 pr-4 font-bold">Repeat</th>' +
+          '<th class="pb-2 pr-4 font-bold">Repeat rate</th>' +
+          '<th class="pb-2 pr-4 font-bold">Bookings/customer</th>' +
+          '<th class="pb-2 pr-4 font-bold">Lifetime value</th>' +
+          '<th class="pb-2 pr-4 font-bold">Avg customer</th>' +
+          '<th class="pb-2 pr-4 font-bold">Repeat value</th>' +
+          '<th class="pb-2 pr-4 font-bold">Future booked</th>' +
+          '<th class="pb-2 font-bold">No future booking</th>' +
+        '</tr>' +
+      '</thead>' +
+      '<tbody>' +
+        channels.map(function (channel) {
+          return (
+            '<tr class="border-b border-slate-100 last:border-0">' +
+              '<td class="py-3 pr-4 font-bold text-ink">' + escapeHtml(channel.label) + '</td>' +
+              '<td class="py-3 pr-4 text-slate-600">' + channel.customers + '</td>' +
+              '<td class="py-3 pr-4 text-slate-600">' + channel.repeatCustomers + '</td>' +
+              '<td class="py-3 pr-4 font-semibold text-slate-700">' + (channel.repeatRate == null ? "—" : channel.repeatRate + "%") + '</td>' +
+              '<td class="py-3 pr-4 text-slate-600">' + (channel.averageBookings == null ? "—" : channel.averageBookings.toFixed(2).replace(/\.00$/, "")) + '</td>' +
+              '<td class="py-3 pr-4 font-semibold text-slate-700">' + money(channel.lifetimeValue) + '</td>' +
+              '<td class="py-3 pr-4 font-semibold text-slate-700">' + (channel.averageCustomerValue == null ? "—" : money(channel.averageCustomerValue)) + '</td>' +
+              '<td class="py-3 pr-4 text-slate-600">' + money(channel.repeatValue) + '</td>' +
+              '<td class="py-3 pr-4 text-slate-600">' + channel.futureCustomers + '</td>' +
+              '<td class="py-3 font-semibold text-slate-700">' + (channel.noFutureRate == null ? "—" : channel.noFutureRate + "%") + '</td>' +
+            '</tr>'
+          );
+        }).join("") +
+      '</tbody>' +
+    '</table>';
+}
+
+async function loadGrowthCustomerQualityAnalytics(showToast = false) {
+  if (!state.profile || !$("growthCustomerQualityCards")) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc("get_growth_customer_quality_summary", {
+      p_days: 30
+    });
+
+    if (error) throw error;
+    renderGrowthCustomerQuality(data || []);
+    if (showToast) toast("Customer quality refreshed.");
+  } catch (err) {
+    console.error("Growth customer quality error:", err);
+    $("growthCustomerQualityCards").innerHTML =
+      '<div class="lg:col-span-2 xl:col-span-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">Customer quality could not be loaded.</div>';
+    $("growthCustomerQualityTable").innerHTML = "";
+    if (showToast) toast(friendlyDbError(err, "load customer quality"), "error");
+  }
+}
+
+async function loadGrowthChannelAreaAnalytics(showToast = false) {
+  await Promise.all([
+    loadGrowthChannelAnalytics(false),
+    loadGrowthCustomerQualityAnalytics(false)
+  ]);
+
+  if (showToast) toast("Growth channels refreshed.");
+}
+
 async function loadGrowthAnalytics(showToast = false) {
   const tasks = [
-    loadGrowthChannelAnalytics(showToast),
-    loadGrowthFunnelAnalytics(showToast)
+    loadGrowthChannelAreaAnalytics(false),
+    loadGrowthFunnelAnalytics(false)
   ];
 
   if (typeof loadGrowthImportHistory === "function") {
@@ -189,6 +369,7 @@ async function loadGrowthAnalytics(showToast = false) {
   }
 
   await Promise.all(tasks);
+  if (showToast) toast("Growth refreshed.");
 }
 
 function growthFunnelStageDefinitions() {
