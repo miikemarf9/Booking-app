@@ -259,7 +259,10 @@ function customerBookings(customer) {
         const sent = Number(data?.sent || 0);
         const failed = Number(data?.failed || 0);
         $("marketingEmailForm").reset();
+
+        recipients.forEach(customer => { delete state.customerTimelineEvents[customer.id]; });
         if (state.marketingTargetCustomerId) clearMarketingTarget(false);
+        renderCustomers();
 
         if (failed) {
           toast(`Sent to ${sent} customer${sent === 1 ? "" : "s"}; ${failed} email${failed === 1 ? "" : "s"} failed.`, "info");
