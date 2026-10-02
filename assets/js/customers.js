@@ -79,6 +79,62 @@ function customerBookings(customer) {
     }
 
 
+    function customerSmartGroups(customer) {
+      const m = customerMetrics(customer);
+      const groups = [];
+      const completed = m.past.length;
+
+      if (m.bookingCount >= 1 && completed <= 1) groups.push("new");
+      if (completed >= 3) groups.push("regular");
+      if (m.value >= 500 || completed >= 8) groups.push("vip");
+      if (!m.nextBooking && m.bookingCount >= 1) groups.push("no_future");
+
+      if (!m.nextBooking && m.averageGapDays && m.daysSinceLastVisit !== null) {
+        if (m.daysSinceLastVisit >= m.averageGapDays) groups.push("due_back");
+        if (m.daysSinceLastVisit >= Math.max(Math.round(m.averageGapDays * 1.5), m.averageGapDays + 14)) {
+          groups.push("slipping");
+        }
+      }
+
+      if (!m.nextBooking && m.daysSinceLastVisit !== null && m.daysSinceLastVisit >= 180) {
+        groups.push("lapsed");
+      }
+
+      return groups;
+    }
+
+    function smartGroupLabel(key) {
+      return ({
+        new: "New",
+        regular: "Regular",
+        vip: "VIP",
+        due_back: "Due back",
+        slipping: "Slipping away",
+        lapsed: "Lapsed",
+        no_future: "No future booking"
+      })[key] || key;
+    }
+
+    function customerTags(customer) {
+      return Array.isArray(customer?.tags)
+        ? customer.tags.map(tag => String(tag || "").trim()).filter(Boolean)
+        : [];
+    }
+
+    function populateCustomerTagFilter() {
+      const select = $("customerTagFilter");
+      if (!select) return;
+      const current = select.value;
+      const tags = [...new Set(state.customers.flatMap(customer => customerTags(customer)))]
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+      select.innerHTML = tags.length
+        ? tags.map(tag => `<option value="${escapeHtml(tag)}">${escapeHtml(tag)}</option>`).join("")
+        : '<option value="">No tags yet</option>';
+
+      if (tags.some(tag => tag === current)) select.value = current;
+    }
+
     function currentCustomerFilter() {
       return $("customerFilter")?.value || "all";
     }
@@ -99,15 +155,20 @@ function customerBookings(customer) {
 
       const metrics = customerMetrics(customer);
 
-      if (filter === "inactive_90") {
-        const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
-        return Boolean(metrics.lastVisit) && new Date(metrics.lastVisit).getTime() < cutoff;
-      }
-
       if (filter === "service") {
         const serviceId = $("customerServiceFilter")?.value || "";
         if (!serviceId) return false;
         return metrics.active.some(b => b.service_id === serviceId);
+      }
+
+      if (filter === "tag") {
+        const tag = $("customerTagFilter")?.value || "";
+        if (!tag) return false;
+        return customerTags(customer).some(customerTag => customerTag === tag);
+      }
+
+      if (["new", "regular", "vip", "due_back", "slipping", "lapsed", "no_future"].includes(filter)) {
+        return customerSmartGroups(customer).includes(filter);
       }
 
       return true;
@@ -129,9 +190,13 @@ function customerBookings(customer) {
     }
 
     function syncCustomerFilters() {
-      const serviceMode = currentCustomerFilter() === "service";
+      const filter = currentCustomerFilter();
+      const serviceMode = filter === "service";
+      const tagMode = filter === "tag";
       $("customerServiceFilterWrap")?.classList.toggle("hidden", !serviceMode);
+      $("customerTagFilterWrap")?.classList.toggle("hidden", !tagMode);
       populateCustomerServiceFilter();
+      populateCustomerTagFilter();
       renderCustomers();
     }
 
@@ -193,6 +258,7 @@ function customerBookings(customer) {
       if (!$("customersList")) return;
 
       populateCustomerServiceFilter();
+      populateCustomerTagFilter();
       const customers = filteredCustomersForCrm()
         .sort((a, b) => {
           const aBookings = customerBookings(a);
@@ -232,6 +298,9 @@ function customerBookings(customer) {
             const m = customerMetrics(customer);
             const selected = state.selectedCustomerId === customer.id;
             const last = m.lastVisit ? prettyDateTime(m.lastVisit) : "No completed visits yet";
+            const groups = customerSmartGroups(customer);
+            const highlight = ["vip", "lapsed", "slipping", "due_back", "regular", "new"].find(group => groups.includes(group));
+            const tags = customerTags(customer).slice(0, 2);
             return `
               <button type="button" data-customer-id="${customer.id}" class="w-full rounded-2xl border p-4 text-left transition ${selected ? "border-brand-300 bg-brand-50" : "border-slate-200 hover:border-brand-200 hover:bg-slate-50"}">
                 <div class="flex items-start justify-between gap-3">
@@ -245,6 +314,10 @@ function customerBookings(customer) {
                       ? '<span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[.64rem] font-bold text-emerald-700">Marketing ✓</span>'
                       : '<span class="rounded-full bg-slate-50 px-2.5 py-1 text-[.64rem] font-bold text-slate-400">No marketing</span>'}
                   </div>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  ${highlight ? `<span class="rounded-full bg-brand-50 px-2.5 py-1 text-[.64rem] font-bold text-brand-700">${escapeHtml(smartGroupLabel(highlight))}</span>` : ""}
+                  ${tags.map(tag => `<span class="rounded-full bg-violet-50 px-2.5 py-1 text-[.64rem] font-bold text-violet-700">${escapeHtml(tag)}</span>`).join("")}
                 </div>
                 <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                   <span><strong class="text-slate-700">${money(m.value)}</strong> booked</span>
@@ -273,9 +346,11 @@ function customerBookings(customer) {
       $("customerMarketingBadge").className = customer.marketing_email_opt_in
         ? "mt-2 inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700"
         : "mt-2 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500";
-      $("customerProfileBadge").textContent = m.bookingCount >= 2 ? "Returning customer" : "Customer";
-      $("customerProfileBadge").className = m.bookingCount >= 2
-        ? "rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
+      const smartGroups = customerSmartGroups(customer);
+      const primaryGroup = ["vip", "lapsed", "slipping", "due_back", "regular", "new"].find(group => smartGroups.includes(group));
+      $("customerProfileBadge").textContent = primaryGroup ? smartGroupLabel(primaryGroup) : "Customer";
+      $("customerProfileBadge").className = primaryGroup
+        ? "rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700"
         : "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500";
       $("customerProfileBookings").textContent = m.bookingCount;
       $("customerProfileValue").textContent = money(m.value);
@@ -290,6 +365,16 @@ function customerBookings(customer) {
       $("customerProfileDaysSince").textContent = m.daysSinceLastVisit === null
         ? "No past appointments"
         : (m.daysSinceLastVisit === 0 ? "Today" : `${m.daysSinceLastVisit} day${m.daysSinceLastVisit === 1 ? "" : "s"}`);
+      const tags = customerTags(customer);
+      $("customerTagsList").innerHTML = tags.length
+        ? tags.map(tag => `
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1.5 text-xs font-bold text-violet-700">
+              ${escapeHtml(tag)}
+              <button type="button" data-remove-customer-tag="${escapeHtml(tag)}" class="text-violet-400 hover:text-violet-700" aria-label="Remove ${escapeHtml(tag)}">×</button>
+            </span>
+          `).join("")
+        : '<span class="text-xs text-slate-400">No tags yet.</span>';
+      $("customerTagInput").value = "";
       $("customerNotes").value = customer.notes || "";
 
       $("customerHistory").innerHTML = m.all.length
@@ -318,6 +403,60 @@ function customerBookings(customer) {
       if (!state.customers.some(c => c.id === customerId)) return;
       state.selectedCustomerId = customerId;
       renderCustomers();
+    }
+
+    async function saveCustomerTags(tags, successMessage = "Customer tags updated.") {
+      const customer = state.customers.find(c => c.id === state.selectedCustomerId);
+      if (!customer) return;
+
+      const cleanTags = [...new Map(
+        tags
+          .map(tag => String(tag || "").trim().replace(/\s+/g, " ").slice(0, 40))
+          .filter(Boolean)
+          .map(tag => [tag.toLowerCase(), tag])
+      ).values()].slice(0, 20);
+
+      const { data, error } = await supabaseClient
+        .from("customers")
+        .update({
+          tags: cleanTags,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", customer.id)
+        .eq("profile_id", state.profile.id)
+        .select("*")
+        .single();
+
+      if (error) return toast(friendlyDbError(error, "save customer tags"), "error");
+
+      state.customers = state.customers.map(c => c.id === data.id ? data : c);
+      renderCustomers();
+      toast(successMessage);
+    }
+
+    async function addCustomerTag() {
+      const customer = state.customers.find(c => c.id === state.selectedCustomerId);
+      if (!customer) return;
+
+      const input = $("customerTagInput");
+      const tag = String(input?.value || "").trim().replace(/\s+/g, " ").slice(0, 40);
+      if (!tag) return;
+
+      const existing = customerTags(customer);
+      if (existing.some(existingTag => existingTag.toLowerCase() === tag.toLowerCase())) {
+        input.value = "";
+        return toast("That tag is already on this customer.", "info");
+      }
+      if (existing.length >= 20) return toast("This customer already has 20 tags.", "error");
+
+      await saveCustomerTags([...existing, tag], "Tag added.");
+    }
+
+    async function removeCustomerTag(tag) {
+      const customer = state.customers.find(c => c.id === state.selectedCustomerId);
+      if (!customer) return;
+      const next = customerTags(customer).filter(existingTag => existingTag !== tag);
+      await saveCustomerTags(next, "Tag removed.");
     }
 
     async function saveCustomerNotes() {
