@@ -605,3 +605,41 @@
         }
       }
     }
+
+
+    /* Mobile app-wide touch and form safeguards */
+    @media (max-width: 639px) {
+      #publicBookingView .field,
+      #publicBookingView input,
+      #publicBookingView select,
+      #publicBookingView textarea,
+      #authView .field,
+      #authView input,
+      #authView select,
+      #authView textarea,
+      #manageBookingView .field,
+      #manageBookingView input,
+      #manageBookingView select,
+      #manageBookingView textarea {
+        font-size: 16px;
+      }
+      #publicBookingView .btn,
+      #publicBookingView button,
+      #authView .btn,
+      #manageBookingView .btn {
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+      #publicBookingView .booking-step {
+        scroll-margin-top: 5.5rem;
+      }
+      #publicBookingView,
+      #authView,
+      #manageBookingView {
+        overflow-x: clip;
+      }
+      .landing-shell .btn {
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+    }
