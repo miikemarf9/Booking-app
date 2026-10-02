@@ -1738,9 +1738,9 @@
       .growth-product-page.growth-motion-ready.growth-hero-playing .growth-hero-item:nth-child(3){animation-delay:.17s}
       .growth-product-page.growth-motion-ready.growth-hero-playing .growth-hero-item:nth-child(4){animation-delay:.24s}
 
-      .growth-hero-preview .growth-preview-topbar,
-      .growth-hero-preview .product-metric,
-      .growth-hero-preview .growth-channel-row {
+      .growth-product-page.growth-motion-enabled .growth-hero-preview .growth-preview-topbar,
+      .growth-product-page.growth-motion-enabled .growth-hero-preview .product-metric,
+      .growth-product-page.growth-motion-enabled .growth-hero-preview .growth-channel-row {
         opacity:0;
         transform:translateY(10px);
       }
@@ -1781,7 +1781,7 @@
         transform:none;
       }
 
-      .growth-product-page .growth-reveal {
+      .growth-product-page.growth-motion-enabled .growth-reveal {
         opacity:0;
         transform:translateY(22px);
         transition:opacity .6s ease,transform .6s cubic-bezier(.2,.72,.25,1);
@@ -1790,7 +1790,7 @@
         opacity:1;
         transform:translateY(0);
       }
-      .growth-product-page .growth-stagger > * {
+      .growth-product-page.growth-motion-enabled .growth-stagger > * {
         opacity:0;
         transform:translateY(18px);
         transition:opacity .5s ease,transform .5s cubic-bezier(.2,.72,.25,1);
@@ -1805,8 +1805,8 @@
       .growth-product-page .growth-stagger.reveal-in > *:nth-child(5){transition-delay:.24s}
       .growth-product-page .growth-stagger.reveal-in > *:nth-child(6){transition-delay:.30s}
 
-      .growth-quality-preview .growth-quality-card,
-      .growth-quality-preview .growth-quality-insight {
+      .growth-product-page.growth-motion-enabled .growth-quality-preview .growth-quality-card,
+      .growth-product-page.growth-motion-enabled .growth-quality-preview .growth-quality-insight {
         opacity:0;
         transform:translateY(10px);
       }
@@ -1829,14 +1829,18 @@
       .growth-quality-preview.quality-playing .growth-quality-instagram {
         box-shadow:0 16px 32px rgba(124,58,237,.08);
       }
+      .growth-quality-preview .growth-quality-card.quality-focus {
+        transform:translateY(-3px) scale(1.008);
+        box-shadow:0 18px 38px rgba(23,32,51,.11);
+      }
       .growth-quality-preview.quality-complete .growth-quality-card,
       .growth-quality-preview.quality-complete .growth-quality-insight {
         opacity:1;
         transform:none;
       }
 
-      .growth-integration-flow .growth-integration-source,
-      .growth-integration-flow .growth-destination {
+      .growth-product-page.growth-motion-enabled .growth-integration-flow .growth-integration-source,
+      .growth-product-page.growth-motion-enabled .growth-integration-flow .growth-destination {
         opacity:0;
         transform:translateY(14px);
       }
