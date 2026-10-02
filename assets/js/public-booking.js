@@ -860,11 +860,11 @@ async function loadPublicBookingPage(profileId) {
     }
 
     function resetPublicJourney() {
-      if (typeof resetBookingFunnelSession === "function") resetBookingFunnelSession();
       state.selectedService = null;
       state.selectedStaffChoice = null;
       state.selectedDate = "";
       state.selectedSlot = null;
+      if (typeof resetBookingFunnelSession === "function") resetBookingFunnelSession();
 
       $("customerBookingForm").reset();
       state.publicQuestions = state.publicQuestions || [];
