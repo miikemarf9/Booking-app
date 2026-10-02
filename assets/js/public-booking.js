@@ -49,6 +49,7 @@ async function loadPublicBookingPage(profileId) {
 
         state.publicProfile = prof;
         if (typeof captureAcquisitionTouch === "function") captureAcquisitionTouch(profileId);
+        if (typeof initBookingFunnel === "function") initBookingFunnel(profileId);
         state.selectedStaffChoice = null;
         state.publicServices = srvs || [];
         state.publicQuestions = questions || [];
@@ -248,6 +249,10 @@ async function loadPublicBookingPage(profileId) {
       state.selectedStaffChoice = btn.dataset.staffChoice;
       state.selectedDate = "";
       state.selectedSlot = null;
+      if (typeof trackBookingFunnelEvent === "function") {
+        const selectedStaffId = ["any", "flexible"].includes(state.selectedStaffChoice) ? null : state.selectedStaffChoice;
+        trackBookingFunnelEvent("staff_selected", { staffId: selectedStaffId });
+      }
       document.querySelectorAll(".staff-choice").forEach(el => el.classList.toggle("selected", el === btn));
 
       $("publicDate").disabled = false;
@@ -271,6 +276,9 @@ async function loadPublicBookingPage(profileId) {
       if (!btn) return;
 
       state.selectedService = state.publicServices.find(s => s.id === btn.dataset.serviceId) || null;
+      if (state.selectedService && typeof trackBookingFunnelEvent === "function") {
+        trackBookingFunnelEvent("service_selected", { serviceId: state.selectedService.id });
+      }
       state.selectedStaffChoice = null;
       state.selectedDate = "";
       state.selectedSlot = null;
@@ -315,6 +323,9 @@ async function loadPublicBookingPage(profileId) {
           return;
         }
 
+        if (typeof trackBookingFunnelEvent === "function") {
+          trackBookingFunnelEvent("date_selected", { serviceId: state.selectedService.id });
+        }
         activateStep("timeStep");
         $("slotsMessage").innerHTML = '<span class="inline-flex items-center gap-2"><span class="spinner !h-4 !w-4 !border-2"></span>Checking availability…</span>';
         $("publicSlots").innerHTML = "";
@@ -536,6 +547,12 @@ async function loadPublicBookingPage(profileId) {
       document.querySelectorAll(".slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
 
       if (state.selectedSlot) {
+        if (typeof trackBookingFunnelEvent === "function") {
+          trackBookingFunnelEvent("slot_selected", {
+            serviceId: state.selectedService?.id || null,
+            staffId: state.selectedSlot.staffId || null
+          });
+        }
         activateDetails();
         advanceBookingTo("detailsStep");
       }
@@ -716,7 +733,7 @@ async function loadPublicBookingPage(profileId) {
         ? getAcquisitionPayload(state.publicProfile.id)
         : { firstTouch: null, lastTouch: null };
 
-      const { data, error } = await publicClient.rpc("public_create_booking_v2", {
+      const { data, error } = await publicClient.rpc("public_create_booking_v3", {
         p_profile_id: state.publicProfile.id,
         p_service_id: state.selectedService.id,
         p_customer_name: $("customerName").value.trim(),
@@ -728,7 +745,10 @@ async function loadPublicBookingPage(profileId) {
         p_staff_id: flexibleTeamBooking ? null : (state.selectedSlot.staffId || null),
         p_flexible_staff: flexibleTeamBooking,
         p_acquisition_first_touch: acquisition.firstTouch,
-        p_acquisition_last_touch: acquisition.lastTouch
+        p_acquisition_last_touch: acquisition.lastTouch,
+        p_funnel_session_id: typeof currentBookingFunnelSessionId === "function"
+          ? currentBookingFunnelSessionId()
+          : null
       });
       setBusy(submitBtn, false);
 
@@ -766,6 +786,13 @@ async function loadPublicBookingPage(profileId) {
         return toast("The booking was created, but its secure management link could not be generated.", "error");
       }
 
+      if (typeof trackBookingFunnelEvent === "function") {
+        await trackBookingFunnelEvent("booking_created", {
+          serviceId: state.selectedService?.id || null,
+          staffId: state.selectedSlot?.staffId || null
+        });
+      }
+
       const finalPrice = Number(created.booked_price ?? promotionForDate(state.selectedService, state.selectedDate).price);
       const bookedStaffName = created.staff_name || selectedPublicStaffName();
       const summaryText = `${state.selectedService.title}${bookedStaffName ? " with " + bookedStaffName : ""} at ${state.publicProfile.business_name} on ${prettyDateTime(created.start_time || state.selectedSlot.start.toISOString())} · ${money(finalPrice)}.`;
@@ -785,8 +812,21 @@ async function loadPublicBookingPage(profileId) {
         if (checkout?.error) throw new Error(checkout.error);
 
         if (checkout?.checkout_url) {
+          if (typeof trackBookingFunnelEvent === "function") {
+            await trackBookingFunnelEvent("payment_started", {
+              serviceId: state.selectedService?.id || null,
+              staffId: state.selectedSlot?.staffId || null
+            });
+          }
           window.location.assign(checkout.checkout_url);
           return;
+        }
+
+        if (typeof trackBookingFunnelEvent === "function") {
+          await trackBookingFunnelEvent("booking_completed", {
+            serviceId: state.selectedService?.id || null,
+            staffId: state.selectedSlot?.staffId || null
+          });
         }
 
         $("successRescheduleLink").href = buildManageUrl(created.manage_token, "reschedule");
@@ -820,6 +860,7 @@ async function loadPublicBookingPage(profileId) {
     }
 
     function resetPublicJourney() {
+      if (typeof resetBookingFunnelSession === "function") resetBookingFunnelSession();
       state.selectedService = null;
       state.selectedStaffChoice = null;
       state.selectedDate = "";
