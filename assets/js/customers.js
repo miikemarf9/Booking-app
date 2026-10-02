@@ -310,6 +310,202 @@ function customerBookings(customer) {
         : "CRM automations turned off.");
     }
 
+    function medianNumber(values) {
+      const nums = values.filter(value => Number.isFinite(Number(value))).map(Number).sort((a, b) => a - b);
+      if (!nums.length) return null;
+      const middle = Math.floor(nums.length / 2);
+      return nums.length % 2
+        ? nums[middle]
+        : (nums[middle - 1] + nums[middle]) / 2;
+    }
+
+    function sameCalendarMonth(dateValue, reference = new Date()) {
+      if (!dateValue) return false;
+      const date = new Date(dateValue);
+      return date.getFullYear() === reference.getFullYear() &&
+        date.getMonth() === reference.getMonth();
+    }
+
+    function previousCalendarMonth(reference = new Date()) {
+      return new Date(reference.getFullYear(), reference.getMonth() - 1, 1);
+    }
+
+    function renderCrmAnalytics(allMetrics) {
+      if (!$("crmRepeatRate")) return;
+
+      const customersWithCompleted = allMetrics.filter(x => x.metrics.past.length >= 1);
+      const repeatCustomers = customersWithCompleted.filter(x => x.metrics.past.length >= 2);
+      const repeatRate = customersWithCompleted.length
+        ? Math.round((repeatCustomers.length / customersWithCompleted.length) * 100)
+        : null;
+
+      $("crmRepeatRate").textContent = repeatRate === null ? "—" : `${repeatRate}%`;
+      $("crmRepeatRateDetail").textContent = customersWithCompleted.length
+        ? `${repeatCustomers.length} of ${customersWithCompleted.length} completed customers returned`
+        : "No completed customers yet";
+
+      const customersWithValue = allMetrics.filter(x => x.metrics.bookingCount > 0);
+      const totalValue = customersWithValue.reduce((sum, x) => sum + x.metrics.value, 0);
+      $("crmAverageCustomerValue").textContent = customersWithValue.length
+        ? money(totalValue / customersWithValue.length)
+        : money(0);
+
+      const reliableCycles = allMetrics
+        .filter(x => x.metrics.visitGapCount >= 2 && x.metrics.typicalGapDays)
+        .map(x => x.metrics.typicalGapDays);
+      const medianCycle = medianNumber(reliableCycles);
+      $("crmTypicalReturnCycle").textContent = medianCycle
+        ? `${Math.round(medianCycle)} days`
+        : "—";
+      $("crmTypicalReturnDetail").textContent = reliableCycles.length
+        ? `median across ${reliableCycles.length} customer pattern${reliableCycles.length === 1 ? "" : "s"}`
+        : "Needs repeat customer history";
+
+      const now = new Date();
+      const prevMonth = previousCalendarMonth(now);
+      const newThisMonth = allMetrics.filter(x => sameCalendarMonth(x.metrics.firstVisit, now)).length;
+      const newPreviousMonth = allMetrics.filter(x => sameCalendarMonth(x.metrics.firstVisit, prevMonth)).length;
+      $("crmNewThisMonth").textContent = newThisMonth;
+      $("crmNewThisMonthDetail").textContent = newPreviousMonth
+        ? `${newPreviousMonth} first-time customer${newPreviousMonth === 1 ? "" : "s"} last month`
+        : "first completed appointment this month";
+
+      const noFuture = customersWithCompleted.filter(x => !x.metrics.nextBooking);
+      const noFutureRate = customersWithCompleted.length
+        ? Math.round((noFuture.length / customersWithCompleted.length) * 100)
+        : null;
+      $("crmNoFutureBookingRate").textContent = noFutureRate === null ? "—" : `${noFutureRate}%`;
+      $("crmNoFutureBookingDetail").textContent = customersWithCompleted.length
+        ? `${noFuture.length} of ${customersWithCompleted.length} completed customers`
+        : "customers with history but nothing ahead";
+
+      const healthRows = {
+        booked: 0,
+        on_track: 0,
+        due_soon: 0,
+        attention: 0,
+        learning: 0
+      };
+      let lapsed = 0;
+
+      allMetrics.forEach(x => {
+        const status = customerRetentionInsight(x.customer, x.metrics).status;
+        if (status === "booked") healthRows.booked += 1;
+        else if (status === "on_track") healthRows.on_track += 1;
+        else if (status === "due_soon") healthRows.due_soon += 1;
+        else if (["due_back", "slipping", "lapsed"].includes(status)) healthRows.attention += 1;
+        else healthRows.learning += 1;
+        if (status === "lapsed") lapsed += 1;
+      });
+      $("crmLapsedCustomers").textContent = lapsed;
+
+      const healthTotal = Math.max(1, state.customers.length);
+      const healthItems = [
+        ["Future booking", healthRows.booked],
+        ["On track", healthRows.on_track],
+        ["Due soon", healthRows.due_soon],
+        ["Needs attention", healthRows.attention],
+        ["Learning", healthRows.learning]
+      ];
+
+      $("crmHealthBreakdown").innerHTML = state.customers.length
+        ? healthItems.map(([label, count]) => {
+            const pct = Math.round((count / healthTotal) * 100);
+            return `
+              <div>
+                <div class="flex items-center justify-between gap-3 text-xs">
+                  <span class="font-semibold text-slate-600">${escapeHtml(label)}</span>
+                  <span class="font-bold text-slate-700">${count} · ${pct}%</span>
+                </div>
+                <div class="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div class="h-full rounded-full bg-slate-300" style="width:${pct}%"></div>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : '<p class="text-sm text-slate-400">Customer health will appear after bookings are completed.</p>';
+
+      const serviceMap = new Map();
+      allMetrics.forEach(({ metrics }) => {
+        const byService = new Map();
+
+        metrics.past.forEach(booking => {
+          const serviceId = booking.service_id || "";
+          if (!serviceId) return;
+          const service = booking.services || state.services.find(s => s.id === serviceId) || {};
+          const current = byService.get(serviceId) || {
+            id: serviceId,
+            title: service.title || "Service",
+            bookings: 0,
+            value: 0
+          };
+          current.bookings += 1;
+          current.value += Number(booking.booked_price ?? service.price ?? 0);
+          byService.set(serviceId, current);
+        });
+
+        byService.forEach(customerService => {
+          const current = serviceMap.get(customerService.id) || {
+            id: customerService.id,
+            title: customerService.title,
+            customers: 0,
+            repeatCustomers: 0,
+            bookings: 0,
+            value: 0
+          };
+          current.customers += 1;
+          if (customerService.bookings >= 2) current.repeatCustomers += 1;
+          current.bookings += customerService.bookings;
+          current.value += customerService.value;
+          serviceMap.set(customerService.id, current);
+        });
+      });
+
+      const serviceRows = [...serviceMap.values()]
+        .map(service => ({
+          ...service,
+          repeatRate: service.customers
+            ? Math.round((service.repeatCustomers / service.customers) * 100)
+            : 0
+        }))
+        .sort((a, b) =>
+          b.repeatRate - a.repeatRate ||
+          b.customers - a.customers ||
+          b.bookings - a.bookings
+        );
+
+      $("crmServiceRetention").innerHTML = serviceRows.length
+        ? `
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[620px] text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-[.68rem] uppercase tracking-wider text-slate-400">
+                  <th class="pb-2 pr-4 font-bold">Service</th>
+                  <th class="pb-2 pr-4 font-bold">Customers</th>
+                  <th class="pb-2 pr-4 font-bold">Repeat</th>
+                  <th class="pb-2 pr-4 font-bold">Repeat rate</th>
+                  <th class="pb-2 font-bold">Completed value</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${serviceRows.map(service => `
+                  <tr class="border-b border-slate-100 last:border-0">
+                    <td class="py-3 pr-4 font-bold text-ink">${escapeHtml(service.title)}</td>
+                    <td class="py-3 pr-4 text-slate-600">${service.customers}</td>
+                    <td class="py-3 pr-4 text-slate-600">${service.repeatCustomers}</td>
+                    <td class="py-3 pr-4">
+                      <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">${service.repeatRate}%</span>
+                    </td>
+                    <td class="py-3 font-semibold text-slate-700">${money(service.value)}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `
+        : '<p class="text-sm text-slate-400">Service retention will appear after completed appointments.</p>';
+    }
+
     function currentCustomerFilter() {
       return $("customerFilter")?.value || "all";
     }
@@ -484,6 +680,8 @@ function customerBookings(customer) {
       const retentionAttention = allMetrics.filter(x =>
         ["due_back", "slipping", "lapsed"].includes(customerRetentionInsight(x.customer, x.metrics).status)
       ).length;
+
+      renderCrmAnalytics(allMetrics);
 
       $("crmTotalCustomers").textContent = state.customers.length;
       $("crmReturningCustomers").textContent = returning;
