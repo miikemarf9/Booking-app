@@ -394,6 +394,11 @@ async function loadGrowthAnalytics(showToast = false) {
   }
 
   await Promise.all(tasks);
+
+  if (typeof loadGrowthOpportunityEngine === "function") {
+    await loadGrowthOpportunityEngine(false);
+  }
+
   if (showToast) toast("Growth refreshed.");
 }
 
