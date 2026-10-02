@@ -1326,3 +1326,52 @@
       #landingView .saas-reveal { transform: translateY(14px); }
       #landingView .saas-stagger > * { transform: translateY(12px); }
     }
+
+
+    /* Homepage product-preview micro interactions */
+    @media (prefers-reduced-motion:no-preference) {
+      #product-book .saas-product-preview .landing-calendar-day i {
+        transform: scale(0);
+        opacity: 0;
+      }
+      #product-book .saas-product-preview.reveal-in .landing-calendar-day i {
+        animation: homepage-dot-pop .38s cubic-bezier(.2,.8,.3,1) forwards;
+      }
+      #product-book .saas-product-preview.reveal-in .landing-calendar-day:nth-child(5) i { animation-delay:.22s; }
+      #product-book .saas-product-preview.reveal-in .landing-calendar-day:nth-child(8) i { animation-delay:.28s; }
+      #product-book .saas-product-preview.reveal-in .landing-calendar-day:nth-child(10) i { animation-delay:.34s; }
+      #product-book .saas-product-preview.reveal-in .landing-calendar-day:nth-child(12) i { animation-delay:.40s; }
+      #product-book .saas-product-preview.reveal-in .landing-calendar-day:nth-child(13) i { animation-delay:.46s; }
+
+      #product-crm .saas-product-preview .border-l > div {
+        opacity: 0;
+        transform: translateX(-8px);
+      }
+      #product-crm .saas-product-preview.reveal-in .border-l > div {
+        animation: homepage-timeline-in .44s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      #product-crm .saas-product-preview.reveal-in .border-l > div:nth-child(1) { animation-delay:.18s; }
+      #product-crm .saas-product-preview.reveal-in .border-l > div:nth-child(2) { animation-delay:.28s; }
+      #product-crm .saas-product-preview.reveal-in .border-l > div:nth-child(3) { animation-delay:.38s; }
+
+      #product-growth .saas-product-preview .growth-detail-row {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      #product-growth .saas-product-preview.reveal-in .growth-detail-row {
+        animation: homepage-rise .4s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      #product-growth .saas-product-preview.reveal-in .growth-detail-row:nth-child(2) { animation-delay:.18s; }
+      #product-growth .saas-product-preview.reveal-in .growth-detail-row:nth-child(3) { animation-delay:.27s; }
+      #product-growth .saas-product-preview.reveal-in .growth-detail-row:nth-child(4) { animation-delay:.36s; }
+    }
+
+    @keyframes homepage-dot-pop {
+      0% { opacity:0; transform:scale(0); }
+      70% { opacity:1; transform:scale(1.35); }
+      100% { opacity:1; transform:scale(1); }
+    }
+    @keyframes homepage-timeline-in {
+      from { opacity:0; transform:translateX(-8px); }
+      to { opacity:1; transform:translateX(0); }
+    }
