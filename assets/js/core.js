@@ -728,10 +728,22 @@
       $("customerSearch").addEventListener("input", renderCustomers);
       $("customerFilter").addEventListener("change", syncCustomerFilters);
       $("customerServiceFilter").addEventListener("change", renderCustomers);
+      $("customerTagFilter").addEventListener("change", renderCustomers);
       $("marketingEmailForm").addEventListener("submit", sendMarketingEmail);
       $("customersList").addEventListener("click", e => {
         const btn = e.target.closest("[data-customer-id]");
         if (btn) selectCustomer(btn.dataset.customerId);
+      });
+      $("addCustomerTagBtn").addEventListener("click", addCustomerTag);
+      $("customerTagInput").addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          addCustomerTag();
+        }
+      });
+      $("customerTagsList").addEventListener("click", e => {
+        const btn = e.target.closest("[data-remove-customer-tag]");
+        if (btn) removeCustomerTag(btn.dataset.removeCustomerTag);
       });
       $("saveCustomerNotesBtn").addEventListener("click", saveCustomerNotes);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
