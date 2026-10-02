@@ -616,14 +616,81 @@ function calendarDateKey(date) {
       }
     }
 
-    function switchTab(tabId) {
-      const settingsChildren = new Set(["team", "time-off", "booking-rules", "booking-questions", "branding", "business-details", "reminders", "payments"]);
-      const primaryTab = ["calendar", "bookings"].includes(tabId)
-        ? "calendar"
-        : (settingsChildren.has(tabId) ? "settings" : tabId);
+    function dashboardAreaForTab(tabId) {
+      if (tabId === "overview") return "home";
+      if (["calendar", "bookings", "services", "availability", "payments"].includes(tabId)) return "booking";
+      if (tabId === "customers") return "crm";
+      if (tabId === "growth") return "growth";
+      return "settings";
+    }
 
-      document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === primaryTab));
+    function syncDashboardArea(area, activeTab = "") {
+      document.querySelectorAll(".area-tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.area === area);
+      });
+
+      document.querySelectorAll("[data-area-subnav]").forEach(nav => {
+        const active = nav.dataset.areaSubnav === area;
+        nav.classList.toggle("hidden", !active);
+        nav.classList.toggle("inline-flex", active);
+      });
+
+      const settingsBtn = $("dashboardSettingsBtn");
+      if (settingsBtn) {
+        settingsBtn.classList.toggle("!bg-slate-900", area === "settings");
+        settingsBtn.classList.toggle("!text-white", area === "settings");
+      }
+
+      document.querySelectorAll(".subnav-tab").forEach(btn => {
+        const target = btn.dataset.goTab || "";
+        const active =
+          (activeTab === "bookings" && target === "calendar") ||
+          target === activeTab;
+        btn.classList.toggle("active", active);
+      });
+    }
+
+    function switchArea(area) {
+      const btn = document.querySelector(`.area-tab[data-area="${area}"]`);
+      if (!btn) return;
+      switchTab(btn.dataset.defaultTab || "overview");
+    }
+
+    function goDashboardSection(sectionId) {
+      const section = $(sectionId);
+      if (!section) return;
+
+      const area = sectionId.startsWith("crm-") ? "crm" : "growth";
+      const tabId = area === "crm" ? "customers" : "growth";
       document.querySelectorAll(".dashboard-tab").forEach(el => el.classList.toggle("hidden", el.id !== `tab-${tabId}`));
+      syncDashboardArea(area, tabId);
+
+      document.querySelectorAll(".subnav-tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.goSection === sectionId);
+      });
+
+      window.setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
+    }
+
+    function switchTab(tabId) {
+      const area = dashboardAreaForTab(tabId);
+      const visibleTab = ["team", "time-off", "booking-rules", "booking-questions", "branding", "business-details", "reminders"].includes(tabId)
+        ? tabId
+        : tabId;
+
+      document.querySelectorAll(".dashboard-tab").forEach(el => el.classList.toggle("hidden", el.id !== `tab-${visibleTab}`));
+      syncDashboardArea(area, tabId);
+
+      if (tabId === "customers") {
+        document.querySelectorAll(".subnav-tab").forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.goSection === "crm-customers-section");
+        });
+      } else if (tabId === "growth") {
+        document.querySelectorAll(".subnav-tab").forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.goSection === "growth-overview-section");
+        });
+      }
+
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
