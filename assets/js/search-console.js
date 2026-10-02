@@ -1,6 +1,8 @@
 "use strict";
 
 const searchConsoleState = {
+  lastReport: null,
+
   connected: false,
   siteUrl: "",
   permissionLevel: "",
@@ -255,6 +257,7 @@ function seoOpportunityCard(row, type) {
 }
 
 function renderSearchConsoleReport(report) {
+  searchConsoleState.lastReport = report || null;
   const summary = report?.summary || {};
   const period = report?.period || {};
 
