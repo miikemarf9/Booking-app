@@ -1,3 +1,5 @@
+"use strict";
+
 function bookingCard(b, allowCancel = false) {
       const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
       const member = b.staff_members || state.staff.find(s => s.id === b.staff_id) || null;
