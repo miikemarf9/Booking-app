@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Thanks for contacting Grab&Book.">
+  <link rel="icon" type="image/svg+xml" href="grabandbook-icon.svg">
+  <title>Message sent | Grab&Book</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          ink:"#172033",
+          brand:{50:"#eef8ff",100:"#d9efff",500:"#1687d9",600:"#0872bd",700:"#075b98"},
+          coral:"#ff765d"
+        },
+        boxShadow:{soft:"0 18px 50px rgba(23,32,51,.08)"}
+      }}
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="product-site-shell min-h-screen text-slate-800 font-sans"><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+    <a href="index.html" class="flex shrink-0 items-center" aria-label="Grab&Book home">
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="block h-8 w-auto sm:h-10">
+    </a>
+    <nav class="hidden items-center gap-6 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
+      <a class="product-nav-link" href="book.html">Book</a>
+      <a class="product-nav-link" href="crm.html">CRM</a>
+      <a class="product-nav-link" href="growth.html">Growth</a>
+      <a class="product-nav-link" href="case-studies.html">Case studies</a>
+      <a class="product-nav-link" href="contact.html">Contact</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="index.html?auth=login" class="btn btn-light">Log in</a>
+      <a href="index.html?auth=register" class="btn btn-primary">Start free</a>
+    </div>
+  </div>
+  <nav class="product-mobile-nav border-t border-slate-100 px-4 py-2 lg:hidden" aria-label="Mobile product navigation">
+    <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto">
+      <a class="" href="book.html">Book</a>
+      <a class="" href="crm.html">CRM</a>
+      <a class="" href="growth.html">Growth</a>
+      <a class="" href="case-studies.html">Case studies</a>
+      <a class="" href="contact.html">Contact</a>
+    </div>
+  </nav>
+</header>
+<main class="min-h-[65vh]">
+  <section class="product-page-hero">
+    <div class="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 sm:py-32">
+      <span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-emerald-50 text-2xl font-black text-emerald-700">✓</span>
+      <h1 class="mt-6 text-4xl font-black tracking-[-.04em] text-ink">Message sent.</h1>
+      <p class="mx-auto mt-4 max-w-xl text-base leading-7 text-slate-500">Thanks for getting in touch with Grab&Book. Your message has been submitted.</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3"><a href="index.html" class="btn btn-primary">Back to homepage</a><a href="growth.html" class="btn btn-light">Explore the product</a></div>
+    </div>
+  </section>
+</main><footer class="border-t border-slate-100 bg-white">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_auto] md:items-end lg:px-8">
+    <div>
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="h-8 w-auto max-w-[160px]">
+      <p class="mt-4 max-w-md text-sm leading-6 text-slate-400">Booking, CRM and growth tools for service businesses that want a clearer view of the customer journey.</p>
+    </div>
+    <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-slate-500" aria-label="Footer navigation">
+      <a class="hover:text-brand-600" href="index.html">Home</a>
+      <a class="hover:text-brand-600" href="book.html">Book</a>
+      <a class="hover:text-brand-600" href="crm.html">CRM</a>
+      <a class="hover:text-brand-600" href="growth.html">Growth</a>
+      <a class="hover:text-brand-600" href="case-studies.html">Case studies</a>
+      <a class="hover:text-brand-600" href="contact.html">Contact</a>
+    </nav>
+  </div>
+</footer></body></html>
