@@ -363,3 +363,108 @@
       20%, 80% { opacity: 1; }
       100% { opacity: 0; transform: translateX(110%); }
     }
+
+
+    /* Dashboard visual system: keep the working UI aligned with the Grab&Book brand. */
+    #dashboardView {
+      background:
+        radial-gradient(circle at 8% 0%, rgba(22, 135, 217, .075), transparent 30rem),
+        linear-gradient(180deg, #fbfdff 0%, #f7f9fc 100%);
+      color: #344054;
+    }
+    #dashboardView > header {
+      position: sticky;
+      top: 0;
+      z-index: 35;
+      border-color: rgba(216, 222, 233, .9);
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 1px 0 rgba(23, 32, 51, .025), 0 10px 30px rgba(23, 32, 51, .035);
+      backdrop-filter: blur(16px);
+    }
+    #dashboardView .dashboard-area-nav {
+      box-shadow: 0 7px 22px rgba(23, 32, 51, .055);
+    }
+    #dashboardView .area-tab {
+      color: #526074;
+      transition: background-color .16s ease, color .16s ease, box-shadow .16s ease, transform .16s ease;
+    }
+    #dashboardView .area-tab:hover:not(.active) {
+      background: #eef8ff;
+      color: #075b98;
+    }
+    #dashboardView .area-tab.active {
+      background: #0872bd;
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(8, 114, 189, .18);
+    }
+    #dashboardView .dashboard-subnav {
+      border: 1px solid #e5eaf1;
+      background: rgba(241, 245, 249, .88);
+    }
+    #dashboardView .subnav-tab {
+      color: #667085;
+      transition: background-color .16s ease, color .16s ease, box-shadow .16s ease;
+    }
+    #dashboardView .subnav-tab:hover:not(.active) {
+      color: #0872bd;
+      background: rgba(255, 255, 255, .72);
+    }
+    #dashboardView .subnav-tab.active {
+      background: #ffffff;
+      color: #075b98;
+      box-shadow: 0 2px 8px rgba(23, 32, 51, .07);
+    }
+    #dashboardView .card {
+      border-color: #e3e9f1;
+      background: rgba(255, 255, 255, .97);
+      box-shadow: 0 10px 28px rgba(23, 32, 51, .045);
+    }
+    #dashboardView .field,
+    #dashboardView .rich-editor-shell {
+      border-color: #d8e0ea;
+    }
+    #dashboardView .field:hover {
+      border-color: #c7d2df;
+    }
+    #dashboardView .btn-light {
+      border-color: #d8e0ea;
+      color: #475467;
+      box-shadow: 0 1px 2px rgba(23, 32, 51, .025);
+    }
+    #dashboardView .btn-light:hover:not(:disabled) {
+      border-color: #b8dcf5;
+      background: #f7fbff;
+      color: #075b98;
+    }
+    #dashboardView .btn-dark {
+      background: #0872bd;
+      color: #ffffff;
+    }
+    #dashboardView .btn-dark:hover:not(:disabled) {
+      background: #075b98;
+    }
+    #dashboardView .growth-planner-filter,
+    #dashboardView .growth-opportunity-filter {
+      transition: background-color .16s ease, color .16s ease, box-shadow .16s ease;
+    }
+    #dashboardView .growth-planner-filter.bg-slate-100:hover,
+    #dashboardView .growth-opportunity-filter.bg-slate-100:hover {
+      background: #eef8ff;
+      color: #075b98;
+    }
+    #dashboardView select,
+    #dashboardView input,
+    #dashboardView textarea {
+      accent-color: #0872bd;
+    }
+    #dashboardView .text-ink {
+      color: #172033;
+    }
+    @media (max-width: 639px) {
+      #dashboardView > header > div {
+        align-items: flex-start;
+      }
+      #dashboardView .dashboard-area-nav {
+        width: max-content;
+      }
+    }
