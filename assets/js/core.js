@@ -858,8 +858,12 @@
       $("publicStaffChoices").addEventListener("click", handlePublicStaffClick);
       $("publicDate").addEventListener("change", handlePublicDateChange);
       $("publicSlots").addEventListener("click", handlePublicSlotClick);
+      $("customerBookingForm").addEventListener("focusin", handleBookingDetailsInteraction);
       $("customerBookingForm").addEventListener("submit", submitCustomerBooking);
       $("bookAnotherBtn").addEventListener("click", resetPublicJourney);
+      $("analyticsConsentAcceptBtn").addEventListener("click", allowBookingAnalytics);
+      $("analyticsConsentDeclineBtn").addEventListener("click", declineBookingAnalytics);
+      $("growthFunnelRefreshBtn").addEventListener("click", () => loadGrowthFunnelAnalytics(true));
 
       $("manageRescheduleBtn").addEventListener("click", openManageReschedule);
       $("manageRescheduleCloseBtn").addEventListener("click", closeManageReschedule);
