@@ -479,3 +479,129 @@
         width: max-content;
       }
     }
+
+
+    /* Mobile dashboard optimisation */
+    #dashboardView .area-tab,
+    #dashboardView .subnav-tab,
+    #dashboardView .btn {
+      touch-action: manipulation;
+    }
+    #dashboardView .overflow-x-auto,
+    #dashboardView .dashboard-scroll-row,
+    #calendarMonthView,
+    #calendarWeekView {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+    }
+    #dashboardView table {
+      font-variant-numeric: tabular-nums;
+    }
+    #dashboardView table th,
+    #dashboardView table td {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 639px) {
+      #dashboardView > header {
+        position: sticky;
+        top: 0;
+      }
+      #dashboardView > header > div {
+        align-items: stretch;
+      }
+      #dashboardView .dashboard-header-actions .btn {
+        min-width: 0;
+        min-height: 42px;
+        padding-left: .7rem;
+        padding-right: .7rem;
+      }
+      #dashboardView .dashboard-area-nav {
+        width: 100%;
+      }
+      #dashboardView .area-tab,
+      #dashboardView .subnav-tab {
+        min-height: 44px;
+      }
+      #dashboardView #dashboardSubnavWrap {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        scroll-padding-inline: 1rem;
+      }
+      #dashboardView .dashboard-subnav {
+        scroll-snap-type: x proximity;
+      }
+      #dashboardView .dashboard-subnav .subnav-tab {
+        scroll-snap-align: start;
+      }
+      #dashboardView .card {
+        border-radius: 1rem;
+      }
+      #dashboardView .field,
+      #dashboardView input,
+      #dashboardView select,
+      #dashboardView textarea {
+        font-size: 16px;
+      }
+      #dashboardView .btn {
+        min-height: 44px;
+      }
+      #dashboardView .calendar-month-shell {
+        min-width: 100% !important;
+      }
+      #dashboardView .calendar-month-cell {
+        min-height: 58px !important;
+        padding: .3rem !important;
+        text-align: center;
+      }
+      #dashboardView .calendar-month-cell > div:first-child {
+        margin-bottom: 0 !important;
+        justify-content: center;
+        gap: .2rem;
+      }
+      #dashboardView .calendar-month-cell-detail {
+        display: none;
+      }
+      #dashboardView .calendar-booking-count {
+        width: .42rem;
+        height: .42rem;
+        overflow: hidden;
+        padding: 0 !important;
+        border-radius: 999px;
+        background: #1687d9;
+        color: transparent;
+        font-size: 0;
+      }
+      #dashboardView #calendarMonthView {
+        overflow-x: visible;
+      }
+      #dashboardView #calendarWeekView {
+        scroll-snap-type: x proximity;
+      }
+      #dashboardView #bookingCalendarWeekGrid > * {
+        scroll-snap-align: start;
+      }
+      #customerEditorModal,
+      #growthImportModal {
+        align-items: flex-end;
+        padding: .5rem;
+      }
+      #customerEditorModal > .card,
+      #growthImportModal > .card {
+        max-height: calc(100dvh - 1rem);
+        border-radius: 1rem;
+        padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+      }
+    }
+
+    @supports (padding: max(0px)) {
+      @media (max-width: 639px) {
+        #dashboardView > header > div {
+          padding-left: max(1rem, env(safe-area-inset-left));
+          padding-right: max(1rem, env(safe-area-inset-right));
+        }
+      }
+    }
