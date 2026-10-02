@@ -250,7 +250,7 @@ function customerBookings(customer) {
       const select = $("customerTagFilter");
       if (!select) return;
       const current = select.value;
-      const tags = [...new Set(state.customers.flatMap(customer => customerTags(customer)))]
+      const tags = [...new Set(state.customers.filter(customer => !customer.archived_at).flatMap(customer => customerTags(customer)))]
         .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 
       select.innerHTML = tags.length
@@ -525,6 +525,8 @@ function customerBookings(customer) {
 
     function customerMatchesCurrentFilter(customer) {
       const filter = currentCustomerFilter();
+      if (filter === "archived") return Boolean(customer.archived_at);
+      if (customer.archived_at) return false;
       if (filter === "opted_in") return Boolean(customer.marketing_email_opt_in);
 
       const metrics = customerMetrics(customer);
@@ -566,9 +568,9 @@ function customerBookings(customer) {
     function marketingEligibleCustomers() {
       if (state.marketingTargetCustomerId) {
         const customer = state.customers.find(c => c.id === state.marketingTargetCustomerId);
-        return customer?.marketing_email_opt_in ? [customer] : [];
+        return customer?.marketing_email_opt_in && !customer.archived_at ? [customer] : [];
       }
-      return filteredCustomersForCrm().filter(customer => Boolean(customer.marketing_email_opt_in));
+      return filteredCustomersForCrm().filter(customer => Boolean(customer.marketing_email_opt_in) && !customer.archived_at);
     }
 
     function syncMarketingTargetUi() {
@@ -669,7 +671,9 @@ function customerBookings(customer) {
           return bLast - aLast;
         });
 
-      const allMetrics = state.customers.map(customer => ({
+      const activeCustomers = state.customers.filter(customer => !customer.archived_at);
+      const archivedCount = state.customers.length - activeCustomers.length;
+      const allMetrics = activeCustomers.map(customer => ({
         customer,
         metrics: customerMetrics(customer)
       }));
@@ -686,12 +690,12 @@ function customerBookings(customer) {
 
       renderCrmAnalytics(allMetrics);
 
-      $("crmTotalCustomers").textContent = state.customers.length;
+      $("crmTotalCustomers").textContent = activeCustomers.length;
       $("crmReturningCustomers").textContent = returning;
       $("crmRecentCustomers").textContent = recent;
       $("crmBookedValue").textContent = money(bookedValue);
       $("crmRetentionAttention").textContent = retentionAttention;
-      $("customerCountBadge").textContent = `${customers.length} shown · ${state.customers.length} total`;
+      $("customerCountBadge").textContent = currentCustomerFilter() === "archived" ? `${customers.length} archived` : `${customers.length} shown · ${activeCustomers.length} active${archivedCount ? ` · ${archivedCount} archived` : ""}`;
       syncMarketingTargetUi();
       const eligible = marketingEligibleCustomers();
       $("marketingEligibleBadge").textContent = state.marketingTargetCustomerId
