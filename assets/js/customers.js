@@ -332,6 +332,9 @@ function customerBookings(customer) {
 
     function renderCrmAnalytics(allMetrics) {
       if (!$("crmRepeatRate")) return;
+      $("crmAnalyticsPeriod").textContent = state.customers.length
+        ? "All-time customer data"
+        : "Waiting for customer data";
 
       const customersWithCompleted = allMetrics.filter(x => x.metrics.past.length >= 1);
       const repeatCustomers = customersWithCompleted.filter(x => x.metrics.past.length >= 2);
