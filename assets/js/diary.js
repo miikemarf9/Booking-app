@@ -637,7 +637,7 @@ function calendarDateKey(date) {
 
       const settingsBtn = $("dashboardSettingsBtn");
       if (settingsBtn) {
-        settingsBtn.classList.toggle("!bg-slate-900", area === "settings");
+        settingsBtn.classList.toggle("!bg-brand-600", area === "settings");
         settingsBtn.classList.toggle("!text-white", area === "settings");
       }
 
