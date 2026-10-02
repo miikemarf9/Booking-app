@@ -362,7 +362,6 @@ function buildGoogleAdsOpportunities(attributionRows) {
         evidence: [
           "Campaign: " + (campaign.name || campaign.id || "Unnamed"),
           clicks + " Google Ads clicks",
-          metaMoney ? "" : "",
           "Spend: " + (typeof googleAdsMoney === "function" ? googleAdsMoney(spend, currency) : spend + " " + currency),
           "0 matched Grab&Book bookings in the same reporting window"
         ].filter(Boolean),
