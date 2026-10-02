@@ -109,7 +109,7 @@ function buildFirstPartyOpportunities(channelRows, qualityRows, funnelRows) {
         title: channel.label + " has tracked visits but no completed bookings",
         recommendation: "Consider checking the landing experience, offer, booking journey and attribution setup before changing activity or spend.",
         evidence: [
-          channel.visits + " tracked visits in the last 30 days",
+          channel.visits + " tracked visits in the selected period",
           "0 completed Grab&Book bookings matched to this channel"
         ],
         rationale: "This may indicate conversion friction, tracking gaps, low-intent traffic, or simply a small/atypical period. The data does not identify the cause on its own.",
@@ -138,7 +138,7 @@ function buildFirstPartyOpportunities(channelRows, qualityRows, funnelRows) {
           opportunityPct(weightedConversion) + " weighted average across comparable tracked channels",
           channel.bookings + " completed bookings from " + channel.visits + " tracked visits"
         ],
-        rationale: "This is a relative pattern in the current 30-day sample. It does not mean increasing activity or spend will produce the same result.",
+        rationale: "This is a relative pattern in the current selected-period sample. It does not mean increasing activity or spend will produce the same result.",
         channelKey: channel.key,
         channelLabel: channel.label,
         sampleNote: "Requires at least 20 visits and 3 completed bookings."
@@ -490,11 +490,11 @@ async function loadGrowthOpportunityEngine(showToast = false) {
       googleCampaignResult,
       metaCampaignResult
     ] = await Promise.all([
-      supabaseClient.rpc("get_growth_channel_summary", { p_days: 30 }),
-      supabaseClient.rpc("get_growth_customer_quality_summary", { p_days: 30 }),
-      supabaseClient.rpc("get_booking_funnel_summary", { p_days: 30 }),
-      supabaseClient.rpc("get_google_ads_campaign_attribution", { p_days: 30 }),
-      supabaseClient.rpc("get_meta_ads_campaign_attribution", { p_days: 30 })
+      supabaseClient.rpc("get_growth_channel_summary", { p_days: (typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30) }),
+      supabaseClient.rpc("get_growth_customer_quality_summary", { p_days: (typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30) }),
+      supabaseClient.rpc("get_booking_funnel_summary", { p_days: (typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30) }),
+      supabaseClient.rpc("get_google_ads_campaign_attribution", { p_days: (typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30) }),
+      supabaseClient.rpc("get_meta_ads_campaign_attribution", { p_days: (typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30) })
     ]);
 
     for (const result of [
