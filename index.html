@@ -868,6 +868,183 @@
             </div>
           </div>
 
+          <div id="metaIntegrationCard" class="mt-6 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Meta · Facebook · Instagram</p>
+                  <span id="metaStatusBadge" class="rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">Not connected</span>
+                </div>
+                <h4 id="metaStatusTitle" class="mt-2 text-lg font-bold text-ink">Connect paid and organic social performance</h4>
+                <p id="metaStatusHelp" class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">Bring Meta Ads spend and campaign data together with Facebook Page and Instagram professional-account insights, then compare them with real Grab&Book bookings and customer value.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button id="metaPlanBtn" class="btn btn-light" type="button">+ Add Meta plan</button>
+                <button id="metaConnectBtn" class="btn btn-primary" type="button">Connect Meta</button>
+                <button id="metaRefreshBtn" class="btn btn-light" type="button">Check connection</button>
+                <button id="metaDisconnectBtn" class="btn btn-light hidden" type="button">Disconnect</button>
+              </div>
+            </div>
+
+            <div id="metaAppSetup" class="mt-5 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm font-bold text-amber-950">Grab&Book's Meta app still needs configuring</p>
+              <p class="mt-1 text-xs leading-5 text-amber-900">Add the Meta app credentials to Supabase Edge Function secrets as <code class="rounded bg-white/70 px-1 py-0.5">META_APP_ID</code> and <code class="rounded bg-white/70 px-1 py-0.5">META_APP_SECRET</code>. External client accounts may also require Meta App Review / Advanced Access for the requested read permissions.</p>
+            </div>
+
+            <div id="metaExpiryWarning" class="mt-5 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs leading-5 text-amber-900"></div>
+
+            <div id="metaAssetSetup" class="mt-5 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm font-bold text-amber-950">Choose the Meta assets this business uses</p>
+              <p class="mt-1 text-xs leading-5 text-amber-900">Select an ad account for paid reporting and/or a Facebook Page for Facebook + linked Instagram organic insights.</p>
+
+              <div class="mt-4 grid gap-3 lg:grid-cols-2">
+                <div>
+                  <label class="label" for="metaAdAccountSelect">Meta ad account</label>
+                  <select id="metaAdAccountSelect" class="field">
+                    <option value="">No ad account</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" for="metaPageSelect">Facebook Page / Instagram</label>
+                  <select id="metaPageSelect" class="field">
+                    <option value="">No Page</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-3 flex justify-end">
+                <button id="metaSaveAssetsBtn" class="btn btn-primary" type="button">Use these assets</button>
+              </div>
+            </div>
+
+            <div id="metaReportWrap" class="mt-5 hidden">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p id="metaAssetsName" class="text-sm font-bold text-ink">Meta assets</p>
+                  <p id="metaPeriod" class="mt-1 text-xs text-slate-400">Last 30 completed days</p>
+                </div>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Live Meta data</span>
+              </div>
+
+              <div id="metaPaidSection" class="mt-5 hidden rounded-2xl bg-white p-4">
+                <div>
+                  <p class="text-sm font-bold text-ink">Meta Ads</p>
+                  <p class="mt-1 text-xs text-slate-400">Paid performance directly from the selected Meta ad account.</p>
+                </div>
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+                  <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Spend</p>
+                    <p id="metaPaidSpend" class="mt-1 text-xl font-bold text-ink">£0</p>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Impressions</p>
+                    <p id="metaPaidImpressions" class="mt-1 text-xl font-bold text-ink">0</p>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Reach</p>
+                    <p id="metaPaidReach" class="mt-1 text-xl font-bold text-ink">0</p>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Clicks</p>
+                    <p id="metaPaidClicks" class="mt-1 text-xl font-bold text-ink">0</p>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Avg CPC</p>
+                    <p id="metaPaidCpc" class="mt-1 text-xl font-bold text-ink">—</p>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Meta leads</p>
+                    <p id="metaPaidLeads" class="mt-1 text-xl font-bold text-ink">0</p>
+                  </div>
+                </div>
+
+                <div class="mt-5 border-t border-slate-100 pt-5">
+                  <p class="text-sm font-bold text-ink">Grab&Book commercial return</p>
+                  <p class="mt-1 text-xs leading-5 text-slate-400">Facebook/Instagram paid traffic measured through Grab&Book attribution, kept separate from Meta's own reported actions.</p>
+
+                  <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Tracked bookings</p><p id="metaTrackedBookings" class="mt-1 text-xl font-bold text-ink">0</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">New customers</p><p id="metaNewCustomers" class="mt-1 text-xl font-bold text-ink">0</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Booked revenue</p><p id="metaBookedRevenue" class="mt-1 text-xl font-bold text-ink">£0</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Cost / booking</p><p id="metaCostPerBooking" class="mt-1 text-xl font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">CAC</p><p id="metaCac" class="mt-1 text-xl font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Grab&Book ROAS</p><p id="metaRoas" class="mt-1 text-xl font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Repeat rate</p><p id="metaRepeatRate" class="mt-1 text-xl font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Avg customer value</p><p id="metaAverageCustomerValue" class="mt-1 text-xl font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Repeat booked value</p><p id="metaRepeatBookedValue" class="mt-1 text-xl font-bold text-ink">£0</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">LTV : CAC</p><p id="metaLtvCac" class="mt-1 text-xl font-bold text-ink">—</p></div>
+                  </div>
+                </div>
+
+                <div class="mt-5 border-t border-slate-100 pt-5">
+                  <p class="text-sm font-bold text-ink">30 / 60 / 90-day Meta Ads customer value</p>
+                  <div id="metaValueWindows" class="mt-4 grid gap-3 sm:grid-cols-3"></div>
+                </div>
+
+                <div class="mt-5 border-t border-slate-100 pt-5">
+                  <p class="text-sm font-bold text-ink">Meta campaign performance</p>
+                  <p class="mt-1 text-xs leading-5 text-slate-400">Campaign spend/clicks from Meta plus Grab&Book bookings/revenue only where UTM campaign matches the Meta campaign name or ID exactly.</p>
+                  <div id="metaCampaignTable" class="mt-3 overflow-x-auto"></div>
+                </div>
+              </div>
+
+              <div class="mt-5 grid gap-5 xl:grid-cols-2">
+                <div id="facebookOrganicSection" class="hidden rounded-2xl bg-white p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-sm font-bold text-ink">Facebook organic</p>
+                      <p id="facebookOrganicName" class="mt-1 text-xs text-slate-400">Facebook Page</p>
+                    </div>
+                    <button class="text-xs font-bold text-brand-600 hover:underline" type="button" data-planner-channel="facebook" data-planner-label="Facebook">+ Add note / plan</button>
+                  </div>
+
+                  <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Followers</p><p id="facebookFollowers" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Post engagements</p><p id="facebookEngagements" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Page views</p><p id="facebookPageViews" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Follows</p><p id="facebookFollows" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                  </div>
+
+                  <div class="mt-4 border-t border-slate-100 pt-4 text-xs">
+                    <div class="flex items-center justify-between gap-3"><span class="text-slate-500">Grab&Book bookings</span><span id="facebookOrganicBookings" class="font-bold text-slate-700">0</span></div>
+                    <div class="mt-2 flex items-center justify-between gap-3"><span class="text-slate-500">Booked revenue</span><span id="facebookOrganicRevenue" class="font-bold text-slate-700">£0</span></div>
+                    <div class="mt-2 flex items-center justify-between gap-3"><span class="text-slate-500">Repeat rate</span><span id="facebookOrganicRepeatRate" class="font-bold text-slate-700">—</span></div>
+                  </div>
+                </div>
+
+                <div id="instagramOrganicSection" class="hidden rounded-2xl bg-white p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-sm font-bold text-ink">Instagram organic</p>
+                      <p id="instagramOrganicName" class="mt-1 text-xs text-slate-400">Instagram professional account</p>
+                    </div>
+                    <button class="text-xs font-bold text-brand-600 hover:underline" type="button" data-planner-channel="instagram" data-planner-label="Instagram">+ Add note / plan</button>
+                  </div>
+
+                  <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Followers</p><p id="instagramFollowers" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Views</p><p id="instagramViews" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Reach</p><p id="instagramReach" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Accounts engaged</p><p id="instagramAccountsEngaged" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Interactions</p><p id="instagramInteractions" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Profile-link taps</p><p id="instagramLinkTaps" class="mt-1 text-lg font-bold text-ink">—</p></div>
+                  </div>
+
+                  <div class="mt-4 border-t border-slate-100 pt-4 text-xs">
+                    <div class="flex items-center justify-between gap-3"><span class="text-slate-500">Grab&Book bookings</span><span id="instagramOrganicBookings" class="font-bold text-slate-700">0</span></div>
+                    <div class="mt-2 flex items-center justify-between gap-3"><span class="text-slate-500">Booked revenue</span><span id="instagramOrganicRevenue" class="font-bold text-slate-700">£0</span></div>
+                    <div class="mt-2 flex items-center justify-between gap-3"><span class="text-slate-500">Repeat rate</span><span id="instagramOrganicRepeatRate" class="font-bold text-slate-700">—</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-2xl bg-slate-100 p-4 text-xs leading-5 text-slate-500">
+                Meta may suppress or remove individual organic metrics based on account type, audience size, privacy thresholds or API changes. Grab&Book shows unavailable metrics as “—” rather than treating missing data as zero. Instagram insights require a Professional account for this Facebook-login integration.
+              </div>
+            </div>
+          </div>
+
           <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div class="rounded-2xl bg-slate-50 p-4">
               <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Tracked visits</p>
@@ -3136,6 +3313,7 @@
   <script src="assets/js/ga4.js"></script>
   <script src="assets/js/search-console.js"></script>
   <script src="assets/js/google-ads.js"></script>
+  <script src="assets/js/meta.js"></script>
   <script src="assets/js/growth-import.js"></script>
   <script src="assets/js/growth-planner.js"></script>
   <script src="assets/js/customers.js"></script>
