@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Grab&amp;Book">
+  <defs>
+    <linearGradient id="gbAccent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f3d57"/>
+      <stop offset="1" stop-color="#2a9bb6"/>
+    </linearGradient>
+  </defs>
+  <path d="M22 45c0-12 10-22 22-22h73c12 0 22 10 22 22v14H51c-14 0-26 12-26 26v26c0 14 12 26 26 26h49c12 0 22-10 22-22V95H96v18H57c-5 0-10-5-10-10V88c0-5 5-10 10-10h82v40c0 23-19 42-42 42H58c-25 0-46-21-46-46V45z" fill="url(#gbAccent)"/>
+  <rect x="40" y="6" width="18" height="41" rx="9" fill="#12324a"/>
+  <rect x="90" y="6" width="18" height="41" rx="9" fill="#12324a"/>
+  <path d="M59 95l15 15 31-34" fill="none" stroke="#2a9bb6" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
