@@ -877,6 +877,34 @@
         if (btn) deleteGrowthImportBatch(btn.dataset.deleteGrowthImport);
       });
 
+      $("growthPlannerAddBtn").addEventListener("click", () => openGrowthPlannerModal());
+      $("growthPlannerCloseBtn").addEventListener("click", closeGrowthPlannerModal);
+      $("growthPlannerCancelBtn").addEventListener("click", closeGrowthPlannerModal);
+      $("growthPlannerForm").addEventListener("submit", saveGrowthPlannerItem);
+      document.querySelectorAll(".growth-planner-filter").forEach(btn => {
+        btn.addEventListener("click", () => setGrowthPlannerFilter(btn.dataset.plannerFilter));
+      });
+      $("growthPlannerList").addEventListener("click", e => {
+        const toggle = e.target.closest("[data-planner-toggle]");
+        if (toggle) return toggleGrowthPlannerItem(toggle.dataset.plannerToggle);
+
+        const edit = e.target.closest("[data-planner-edit]");
+        if (edit) return editGrowthPlannerItem(edit.dataset.plannerEdit);
+
+        const del = e.target.closest("[data-planner-delete]");
+        if (del) return deleteGrowthPlannerItem(del.dataset.plannerDelete);
+      });
+      $("growthPlannerChannels").addEventListener("click", e => {
+        const btn = e.target.closest("[data-planner-channel-add]");
+        if (btn) openGrowthPlannerForChannel(btn.dataset.plannerChannelAdd, btn.dataset.plannerChannelLabel);
+      });
+      ["growthChannelCards", "growthImportedChannelCards"].forEach(id => {
+        $(id).addEventListener("click", e => {
+          const btn = e.target.closest("[data-planner-channel]");
+          if (btn) openGrowthPlannerForChannel(btn.dataset.plannerChannel, btn.dataset.plannerLabel);
+        });
+      });
+
       $("manageRescheduleBtn").addEventListener("click", openManageReschedule);
       $("manageRescheduleCloseBtn").addEventListener("click", closeManageReschedule);
       $("manageCancelBtn").addEventListener("click", cancelManagedBooking);
