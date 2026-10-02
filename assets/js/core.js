@@ -883,6 +883,26 @@
       $("metaDisconnectBtn").addEventListener("click", disconnectMeta);
       $("metaSaveAssetsBtn").addEventListener("click", saveMetaAssets);
       $("metaPlanBtn").addEventListener("click", addMetaPlan);
+      $("growthOpportunitiesRefreshBtn").addEventListener("click", () => loadGrowthOpportunityEngine(true));
+      document.querySelectorAll(".growth-opportunity-filter").forEach(btn => {
+        btn.addEventListener("click", () => setGrowthOpportunityFilter(btn.dataset.opportunityFilter));
+      });
+      $("growthOpportunityList").addEventListener("click", e => {
+        const planner = e.target.closest("[data-opportunity-planner]");
+        if (planner) return addGrowthOpportunityToPlanner(planner.dataset.opportunityPlanner);
+
+        const snooze = e.target.closest("[data-opportunity-snooze]");
+        if (snooze) return snoozeGrowthOpportunity(
+          snooze.dataset.opportunitySnooze,
+          Number(snooze.dataset.snoozeDays || 7)
+        );
+
+        const dismiss = e.target.closest("[data-opportunity-dismiss]");
+        if (dismiss) return dismissGrowthOpportunity(dismiss.dataset.opportunityDismiss);
+
+        const restore = e.target.closest("[data-opportunity-restore]");
+        if (restore) return restoreGrowthOpportunity(restore.dataset.opportunityRestore);
+      });
       $("metaReportWrap").addEventListener("click", e => {
         const btn = e.target.closest("[data-planner-channel]");
         if (btn) openGrowthPlannerForChannel(btn.dataset.plannerChannel, btn.dataset.plannerLabel);
