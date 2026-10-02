@@ -109,6 +109,19 @@ function buildCurrentAcquisitionTouch() {
     medium = medium || "cpc";
   }
 
+  if (!source && fbclid) {
+    if (inferred && (inferred.source === "instagram" || inferred.source === "facebook")) {
+      source = inferred.source;
+    } else {
+      source = "facebook";
+    }
+    medium = medium || "paid_social";
+  }
+
+  if (source && fbclid && !medium && (source === "facebook" || source === "instagram" || source === "meta")) {
+    medium = "paid_social";
+  }
+
   if (!source && inferred) {
     source = inferred.source;
     medium = medium || inferred.medium;
