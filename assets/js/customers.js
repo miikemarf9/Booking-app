@@ -39,12 +39,38 @@ function customerBookings(customer) {
           visitGaps.push((current - previous) / 86400000);
         }
       }
-      const averageGapDays = visitGaps.length
-        ? Math.round(visitGaps.reduce((sum, days) => sum + days, 0) / visitGaps.length)
+
+      const sortedGaps = [...visitGaps].sort((a, b) => a - b);
+      let typicalGapDays = null;
+      if (sortedGaps.length) {
+        const middle = Math.floor(sortedGaps.length / 2);
+        const median = sortedGaps.length % 2
+          ? sortedGaps[middle]
+          : (sortedGaps[middle - 1] + sortedGaps[middle]) / 2;
+        typicalGapDays = Math.max(1, Math.round(median));
+      }
+
+      const gapVariability = typicalGapDays && visitGaps.length >= 2
+        ? visitGaps.reduce((sum, days) => sum + Math.abs(days - typicalGapDays), 0) / visitGaps.length / typicalGapDays
         : null;
+
+      let patternConfidence = "learning";
+      if (visitGaps.length >= 2) {
+        if (visitGaps.length >= 4 && gapVariability !== null && gapVariability <= 0.25) patternConfidence = "high";
+        else if (gapVariability !== null && gapVariability <= 0.5) patternConfidence = "medium";
+        else patternConfidence = "low";
+      }
 
       const daysSinceLastVisit = lastVisit
         ? Math.max(0, Math.floor((now - new Date(lastVisit).getTime()) / 86400000))
+        : null;
+
+      const expectedReturn = lastVisit && typicalGapDays
+        ? new Date(new Date(lastVisit).getTime() + typicalGapDays * 86400000).toISOString()
+        : null;
+
+      const daysFromExpected = expectedReturn
+        ? Math.floor((now - new Date(expectedReturn).getTime()) / 86400000)
         : null;
 
       const serviceCounts = new Map();
@@ -72,9 +98,116 @@ function customerBookings(customer) {
         lastVisit,
         firstVisit,
         nextBooking,
-        averageGapDays,
+        averageGapDays: typicalGapDays,
+        typicalGapDays,
+        visitGapCount: visitGaps.length,
+        gapVariability,
+        patternConfidence,
+        expectedReturn,
+        daysFromExpected,
         daysSinceLastVisit,
         favouriteService
+      };
+    }
+
+    function customerRetentionInsight(customer, metrics = customerMetrics(customer)) {
+      const service = metrics.favouriteService || "usual service";
+
+      if (metrics.nextBooking) {
+        return {
+          status: "booked",
+          label: "Future booking secured",
+          title: "This customer is already rebooked",
+          detail: `Their next appointment is ${prettyDate(metrics.nextBooking)}.`,
+          timing: "Already booked",
+          expectedReturn: metrics.expectedReturn,
+          confidence: metrics.patternConfidence,
+          actionable: false
+        };
+      }
+
+      if (metrics.past.length < 3 || metrics.visitGapCount < 2 || !metrics.typicalGapDays || !metrics.expectedReturn) {
+        return {
+          status: "learning",
+          label: "Learning",
+          title: "Learning this customer's pattern",
+          detail: "Grab&Book needs at least three completed appointments before it treats a return pattern as reliable enough to act on.",
+          timing: `${metrics.past.length} completed visit${metrics.past.length === 1 ? "" : "s"}`,
+          expectedReturn: metrics.expectedReturn,
+          confidence: "learning",
+          actionable: false
+        };
+      }
+
+      const daysUntilExpected = Math.ceil((new Date(metrics.expectedReturn).getTime() - Date.now()) / 86400000);
+      const overdueDays = Math.max(0, -daysUntilExpected);
+      const slippingThreshold = Math.max(
+        metrics.typicalGapDays + 14,
+        Math.round(metrics.typicalGapDays * 1.5)
+      );
+      const lapsedThreshold = Math.max(180, Math.round(metrics.typicalGapDays * 3));
+
+      if (metrics.daysSinceLastVisit >= lapsedThreshold) {
+        return {
+          status: "lapsed",
+          label: "Lapsed",
+          title: "This customer looks lapsed",
+          detail: `They normally return about every ${metrics.typicalGapDays} days, but it has been ${metrics.daysSinceLastVisit} days since their last appointment. A win-back message is worth considering.`,
+          timing: `${overdueDays} days overdue`,
+          expectedReturn: metrics.expectedReturn,
+          confidence: metrics.patternConfidence,
+          actionable: true
+        };
+      }
+
+      if (metrics.daysSinceLastVisit >= slippingThreshold) {
+        return {
+          status: "slipping",
+          label: "Slipping away",
+          title: "This customer may be slipping away",
+          detail: `Their usual ${service} pattern is about every ${metrics.typicalGapDays} days. They are now well beyond that rhythm with nothing booked.`,
+          timing: `${overdueDays} days overdue`,
+          expectedReturn: metrics.expectedReturn,
+          confidence: metrics.patternConfidence,
+          actionable: true
+        };
+      }
+
+      if (daysUntilExpected <= 0) {
+        return {
+          status: "due_back",
+          label: "Due back",
+          title: "This customer is due back",
+          detail: `Based on their own history, they normally return about every ${metrics.typicalGapDays} days for ${service}. A rebooking message would be timely now.`,
+          timing: overdueDays === 0 ? "Due today" : `${overdueDays} day${overdueDays === 1 ? "" : "s"} overdue`,
+          expectedReturn: metrics.expectedReturn,
+          confidence: metrics.patternConfidence,
+          actionable: true
+        };
+      }
+
+      if (daysUntilExpected <= 7) {
+        return {
+          status: "due_soon",
+          label: "Due soon",
+          title: "This customer is likely due soon",
+          detail: `Their normal booking rhythm suggests another ${service} appointment around ${prettyDate(metrics.expectedReturn)}.`,
+          timing: `Due in ${daysUntilExpected} day${daysUntilExpected === 1 ? "" : "s"}`,
+          expectedReturn: metrics.expectedReturn,
+          confidence: metrics.patternConfidence,
+          actionable: true
+        };
+      }
+
+      return {
+        status: "on_track",
+        label: "On track",
+        title: "No retention action needed yet",
+        detail: `Their booking history suggests they are likely to return around ${prettyDate(metrics.expectedReturn)}.`,
+        timing: `Likely due in ${daysUntilExpected} days`,
+        expectedReturn: metrics.expectedReturn,
+        confidence: metrics.patternConfidence,
+        actionable: false
       };
     }
 
@@ -83,22 +216,14 @@ function customerBookings(customer) {
       const m = customerMetrics(customer);
       const groups = [];
       const completed = m.past.length;
+      const retention = customerRetentionInsight(customer, m);
 
       if (m.bookingCount >= 1 && completed <= 1) groups.push("new");
       if (completed >= 3) groups.push("regular");
       if (m.value >= 500 || completed >= 8) groups.push("vip");
       if (!m.nextBooking && m.bookingCount >= 1) groups.push("no_future");
 
-      if (!m.nextBooking && m.averageGapDays && m.daysSinceLastVisit !== null) {
-        if (m.daysSinceLastVisit >= m.averageGapDays) groups.push("due_back");
-        if (m.daysSinceLastVisit >= Math.max(Math.round(m.averageGapDays * 1.5), m.averageGapDays + 14)) {
-          groups.push("slipping");
-        }
-      }
-
-      if (!m.nextBooking && m.daysSinceLastVisit !== null && m.daysSinceLastVisit >= 180) {
-        groups.push("lapsed");
-      }
+      if (["due_back", "slipping", "lapsed"].includes(retention.status)) groups.push(retention.status);
 
       return groups;
     }
@@ -165,6 +290,10 @@ function customerBookings(customer) {
         const tag = $("customerTagFilter")?.value || "";
         if (!tag) return false;
         return customerTags(customer).some(customerTag => customerTag === tag);
+      }
+
+      if (filter === "retention_attention") {
+        return ["due_back", "slipping", "lapsed"].includes(customerRetentionInsight(customer, metrics).status);
       }
 
       if (["new", "regular", "vip", "due_back", "slipping", "lapsed", "no_future"].includes(filter)) {
@@ -302,11 +431,15 @@ function customerBookings(customer) {
         return t >= recentCutoff && t <= Date.now();
       })).length;
       const bookedValue = allMetrics.reduce((sum, x) => sum + x.metrics.value, 0);
+      const retentionAttention = allMetrics.filter(x =>
+        ["due_back", "slipping", "lapsed"].includes(customerRetentionInsight(x.customer, x.metrics).status)
+      ).length;
 
       $("crmTotalCustomers").textContent = state.customers.length;
       $("crmReturningCustomers").textContent = returning;
       $("crmRecentCustomers").textContent = recent;
       $("crmBookedValue").textContent = money(bookedValue);
+      $("crmRetentionAttention").textContent = retentionAttention;
       $("customerCountBadge").textContent = `${customers.length} shown · ${state.customers.length} total`;
       syncMarketingTargetUi();
       const eligible = marketingEligibleCustomers();
@@ -396,12 +529,13 @@ function customerBookings(customer) {
       $("customerProfileLastVisit").textContent = m.lastVisit ? prettyDate(m.lastVisit) : "—";
       $("customerProfileNextBooking").textContent = m.nextBooking ? prettyDate(m.nextBooking) : "None booked";
       $("customerProfileFavouriteService").textContent = m.favouriteService || "Not enough history";
-      $("customerProfileVisitFrequency").textContent = m.averageGapDays
-        ? `About every ${m.averageGapDays} day${m.averageGapDays === 1 ? "" : "s"}`
+      $("customerProfileVisitFrequency").textContent = m.typicalGapDays
+        ? `About every ${m.typicalGapDays} day${m.typicalGapDays === 1 ? "" : "s"}`
         : "Not enough history";
       $("customerProfileDaysSince").textContent = m.daysSinceLastVisit === null
         ? "No past appointments"
         : (m.daysSinceLastVisit === 0 ? "Today" : `${m.daysSinceLastVisit} day${m.daysSinceLastVisit === 1 ? "" : "s"}`);
+      renderCustomerRetention(customer, m);
       const tags = customerTags(customer);
       $("customerTagsList").innerHTML = tags.length
         ? tags.map(tag => `
@@ -637,6 +771,86 @@ function customerBookings(customer) {
       const customer = state.customers.find(c => c.id === customerId);
       if (customer && state.selectedCustomerId === customerId) loadCustomerTimeline(customer);
       return true;
+    }
+
+    function retentionConfidenceLabel(metrics, insight) {
+      if (insight.confidence === "high") return `High · ${metrics.visitGapCount} intervals`;
+      if (insight.confidence === "medium") return `Medium · ${metrics.visitGapCount} intervals`;
+      if (insight.confidence === "low") return `Low · ${metrics.visitGapCount} intervals`;
+      return "Still learning";
+    }
+
+    function renderCustomerRetention(customer, metrics = customerMetrics(customer)) {
+      const insight = customerRetentionInsight(customer, metrics);
+      const title = $("customerRetentionTitle");
+      const detail = $("customerRetentionDetail");
+      const status = $("customerRetentionStatus");
+      const expected = $("customerExpectedReturn");
+      const timing = $("customerRetentionTiming");
+      const confidence = $("customerRetentionConfidence");
+      const actionBtn = $("customerRetentionActionBtn");
+      const bookBtn = $("customerRetentionBookBtn");
+
+      if (!title || !detail || !status || !expected || !timing || !confidence || !actionBtn || !bookBtn) return;
+
+      title.textContent = insight.title;
+      detail.textContent = insight.detail;
+      status.textContent = insight.label;
+      expected.textContent = insight.expectedReturn ? prettyDate(insight.expectedReturn) : "Not enough history";
+      timing.textContent = insight.timing;
+      confidence.textContent = retentionConfidenceLabel(metrics, insight);
+
+      const tone = ({
+        booked: "bg-emerald-100 text-emerald-700",
+        on_track: "bg-emerald-100 text-emerald-700",
+        due_soon: "bg-sky-100 text-sky-700",
+        due_back: "bg-amber-100 text-amber-800",
+        slipping: "bg-orange-100 text-orange-800",
+        lapsed: "bg-red-100 text-red-700",
+        learning: "bg-slate-200 text-slate-600"
+      })[insight.status] || "bg-slate-200 text-slate-600";
+      status.className = `rounded-full px-3 py-1 text-xs font-bold ${tone}`;
+
+      const canMarket = Boolean(customer.marketing_email_opt_in);
+      actionBtn.classList.toggle("hidden", !insight.actionable || !canMarket);
+      bookBtn.classList.toggle("hidden", !insight.actionable);
+
+      actionBtn.textContent = insight.status === "lapsed"
+        ? "Send win-back message"
+        : (insight.status === "due_soon" ? "Send rebooking reminder" : "Send rebooking message");
+    }
+
+    function sendRetentionMessage() {
+      const customer = selectedCrmCustomer();
+      if (!customer) return;
+      const metrics = customerMetrics(customer);
+      const insight = customerRetentionInsight(customer, metrics);
+
+      if (!insight.actionable) return toast("No retention action is needed for this customer right now.", "info");
+      if (!customer.marketing_email_opt_in) {
+        return toast("This customer has not opted in to marketing emails.", "error");
+      }
+
+      state.marketingTargetCustomerId = customer.id;
+      syncMarketingTargetUi();
+
+      const service = metrics.favouriteService || "usual appointment";
+      const bookingUrl = buildPublicUrl(state.profile.id);
+
+      if (insight.status === "lapsed") {
+        $("marketingSubject").value = "We'd love to see you again";
+        $("marketingMessage").value = `Hi ${customer.name},\n\nIt's been a little while since your last ${service}. We'd love to welcome you back.\n\nYou can book your next appointment here: ${bookingUrl}`;
+      } else if (insight.status === "slipping") {
+        $("marketingSubject").value = "Ready for your next appointment?";
+        $("marketingMessage").value = `Hi ${customer.name},\n\nIt looks like you may be due for your next ${service}. If you'd like to get something in the diary, you can book here: ${bookingUrl}`;
+      } else {
+        $("marketingSubject").value = "Time to book your next visit?";
+        $("marketingMessage").value = `Hi ${customer.name},\n\nBased on your usual visits, it may be about time for your next ${service}. You can choose a time that suits you here: ${bookingUrl}`;
+      }
+
+      renderCustomers();
+      $("marketingEmailForm")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(() => $("marketingMessage")?.focus(), 350);
     }
 
     function selectedCrmCustomer() {
