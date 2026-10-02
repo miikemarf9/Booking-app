@@ -678,7 +678,9 @@
       $("copyBookingUrlBtn").addEventListener("click", copyPublicUrl);
 
       document.querySelectorAll(".nav-tab").forEach(tab => tab.addEventListener("click", () => switchTab(tab.dataset.tab)));
+      document.querySelectorAll(".area-tab").forEach(tab => tab.addEventListener("click", () => switchArea(tab.dataset.area)));
       document.querySelectorAll("[data-go-tab]").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.goTab)));
+      document.querySelectorAll("[data-go-section]").forEach(btn => btn.addEventListener("click", () => goDashboardSection(btn.dataset.goSection)));
 
       $("serviceForm").addEventListener("submit", saveService);
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
