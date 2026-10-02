@@ -2208,3 +2208,41 @@
         box-shadow:0 14px 34px rgba(22,135,217,.07);
       }
     }
+
+
+    /* Homepage hero benefit grid */
+    .hero-benefit-item {
+      display:flex;
+      align-items:flex-start;
+      gap:.7rem;
+      min-height:3.25rem;
+      padding:.85rem 1rem;
+      border:1px solid #e7ebf0;
+      border-radius:1rem;
+      background:rgba(255,255,255,.82);
+      text-align:left;
+      line-height:1.35;
+      box-shadow:0 8px 24px rgba(23,32,51,.035);
+    }
+    .hero-benefit-tick {
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      width:1.3rem;
+      height:1.3rem;
+      margin-top:.02rem;
+      border-radius:999px;
+      background:#ecfdf5;
+      color:#059669;
+      font-size:.72rem;
+      font-weight:900;
+      line-height:1;
+    }
+    @media (max-width:639px) {
+      .hero-proof-grid {
+        grid-template-columns:1fr;
+      }
+      .hero-benefit-item {
+        min-height:auto;
+      }
+    }
