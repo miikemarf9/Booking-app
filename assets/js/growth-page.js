@@ -52,7 +52,7 @@
 
   function finishAll() {
     clearTimers();
-    page.classList.remove("growth-motion-ready", "growth-hero-playing");
+    page.classList.remove("growth-motion-enabled", "growth-motion-ready", "growth-hero-playing");
 
     document.querySelectorAll(".growth-reveal, .growth-stagger").forEach(el => {
       el.classList.add("reveal-in");
@@ -89,7 +89,7 @@
     return;
   }
 
-  page.classList.add("growth-motion-ready");
+  page.classList.add("growth-motion-enabled", "growth-motion-ready");
 
   // Hero copy.
   const heroCopy = document.querySelector(".growth-hero-copy");
