@@ -13,18 +13,68 @@ function customerBookings(customer) {
     function customerMetrics(customer) {
       const all = customerBookings(customer);
       const active = all.filter(b => b.status !== "cancelled");
-      const past = active.filter(b => new Date(b.start_time).getTime() <= Date.now());
+      const now = Date.now();
+      const past = active
+        .filter(b => new Date(b.start_time).getTime() <= now)
+        .sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+      const future = active
+        .filter(b => new Date(b.start_time).getTime() > now)
+        .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+
       const value = active.reduce((sum, b) => sum + Number(
         b.booked_price ?? b.services?.price ?? state.services.find(s => s.id === b.service_id)?.price ?? 0
       ), 0);
+
       const lastVisit = past.length ? past[0].start_time : null;
+      const firstVisit = past.length ? past[past.length - 1].start_time : null;
+      const nextBooking = future.length ? future[0].start_time : null;
+      const averageValue = active.length ? value / active.length : 0;
+
+      const chronologicalPast = [...past].reverse();
+      const visitGaps = [];
+      for (let i = 1; i < chronologicalPast.length; i += 1) {
+        const previous = new Date(chronologicalPast[i - 1].start_time).getTime();
+        const current = new Date(chronologicalPast[i].start_time).getTime();
+        if (Number.isFinite(previous) && Number.isFinite(current) && current > previous) {
+          visitGaps.push((current - previous) / 86400000);
+        }
+      }
+      const averageGapDays = visitGaps.length
+        ? Math.round(visitGaps.reduce((sum, days) => sum + days, 0) / visitGaps.length)
+        : null;
+
+      const daysSinceLastVisit = lastVisit
+        ? Math.max(0, Math.floor((now - new Date(lastVisit).getTime()) / 86400000))
+        : null;
+
+      const serviceCounts = new Map();
+      const serviceSource = past.length ? past : active;
+      serviceSource.forEach(booking => {
+        if (!booking.service_id) return;
+        serviceCounts.set(booking.service_id, (serviceCounts.get(booking.service_id) || 0) + 1);
+      });
+      const favouriteServiceId = [...serviceCounts.entries()]
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+      const favouriteService = favouriteServiceId
+        ? (state.services.find(s => s.id === favouriteServiceId)?.title ||
+           serviceSource.find(b => b.service_id === favouriteServiceId)?.services?.title ||
+           null)
+        : null;
 
       return {
         all,
         active,
+        past,
+        future,
         bookingCount: active.length,
         value,
-        lastVisit
+        averageValue,
+        lastVisit,
+        firstVisit,
+        nextBooking,
+        averageGapDays,
+        daysSinceLastVisit,
+        favouriteService
       };
     }
 
@@ -229,7 +279,17 @@ function customerBookings(customer) {
         : "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500";
       $("customerProfileBookings").textContent = m.bookingCount;
       $("customerProfileValue").textContent = money(m.value);
+      $("customerProfileAverageValue").textContent = money(m.averageValue);
+      $("customerProfileFirstVisit").textContent = m.firstVisit ? prettyDate(m.firstVisit) : "—";
       $("customerProfileLastVisit").textContent = m.lastVisit ? prettyDate(m.lastVisit) : "—";
+      $("customerProfileNextBooking").textContent = m.nextBooking ? prettyDate(m.nextBooking) : "None booked";
+      $("customerProfileFavouriteService").textContent = m.favouriteService || "Not enough history";
+      $("customerProfileVisitFrequency").textContent = m.averageGapDays
+        ? `About every ${m.averageGapDays} day${m.averageGapDays === 1 ? "" : "s"}`
+        : "Not enough history";
+      $("customerProfileDaysSince").textContent = m.daysSinceLastVisit === null
+        ? "No past appointments"
+        : (m.daysSinceLastVisit === 0 ? "Today" : `${m.daysSinceLastVisit} day${m.daysSinceLastVisit === 1 ? "" : "s"}`);
       $("customerNotes").value = customer.notes || "";
 
       $("customerHistory").innerHTML = m.all.length
