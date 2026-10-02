@@ -726,6 +726,7 @@
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="bookings" type="button">Bookings</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="customers" type="button">Customers</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="services" type="button">Services</button>
+          <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="availability" type="button">Availability</button>
           <button class="nav-tab rounded-xl px-4 py-2.5 text-sm font-bold text-slate-500" data-tab="settings" type="button">Settings</button>
         </nav>
       </div>
@@ -938,6 +939,14 @@
 
       <!-- Services Tab -->
       <section id="tab-services" class="dashboard-tab hidden">
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking setup</p>
+            <h2 class="mt-1 text-2xl font-bold text-ink">Services</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Create what customers can book, then set the availability for each service.</p>
+          </div>
+          <button class="btn btn-light" data-go-tab="availability" type="button">Set availability</button>
+        </div>
         <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Service editor</p>
@@ -1143,7 +1152,14 @@
 
       <!-- Availability Tab -->
       <section id="tab-availability" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking setup</p>
+            <h2 class="mt-1 text-2xl font-bold text-ink">Availability</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Set when each service can actually be booked by customers.</p>
+          </div>
+          <button class="btn btn-light" data-go-tab="services" type="button">Manage services</button>
+        </div>
         <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
@@ -1395,17 +1411,6 @@
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">People</p>
                 <h3 class="mt-1 text-lg font-bold text-ink">Team</h3>
                 <p class="mt-2 text-sm leading-6 text-slate-500">Add staff, assign services and give each person their own availability.</p>
-              </div>
-              <span class="text-xl text-slate-300">→</span>
-            </div>
-          </button>
-
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="availability">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule</p>
-                <h3 class="mt-1 text-lg font-bold text-ink">Availability</h3>
-                <p class="mt-2 text-sm leading-6 text-slate-500">Choose the dates and times customers can book.</p>
               </div>
               <span class="text-xl text-slate-300">→</span>
             </div>
