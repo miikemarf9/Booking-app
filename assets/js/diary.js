@@ -685,10 +685,16 @@ function calendarDateKey(date) {
         document.querySelectorAll(".subnav-tab").forEach(btn => {
           btn.classList.toggle("active", btn.dataset.goSection === "crm-customers-section");
         });
-      } else if (tabId === "growth") {
+        window.setTimeout(() => $("crm-customers-section")?.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
+        return;
+      }
+
+      if (tabId === "growth") {
         document.querySelectorAll(".subnav-tab").forEach(btn => {
           btn.classList.toggle("active", btn.dataset.goSection === "growth-overview-section");
         });
+        window.setTimeout(() => $("growth-overview-section")?.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
+        return;
       }
 
       window.scrollTo({ top: 0, behavior: "smooth" });
