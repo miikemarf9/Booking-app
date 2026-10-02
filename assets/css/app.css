@@ -2213,30 +2213,38 @@
     /* Homepage hero benefit grid */
     .hero-benefit-item {
       display:flex;
-      align-items:flex-start;
-      gap:.7rem;
+      align-items:center;
+      justify-content:space-between;
+      gap:.9rem;
       min-height:3.25rem;
       padding:.85rem 1rem;
-      border:1px solid #e7ebf0;
+      border:1px solid #bbf7d0;
       border-radius:1rem;
-      background:rgba(255,255,255,.82);
+      background:#f0fdf4;
+      color:#166534;
       text-align:left;
       line-height:1.35;
-      box-shadow:0 8px 24px rgba(23,32,51,.035);
+      box-shadow:0 8px 24px rgba(22,101,52,.055);
+    }
+    .hero-benefit-item > span:not(.hero-benefit-tick) {
+      min-width:0;
+      flex:1 1 auto;
     }
     .hero-benefit-tick {
       display:grid;
       place-items:center;
+      order:2;
       flex:0 0 auto;
       width:1.3rem;
       height:1.3rem;
-      margin-top:.02rem;
+      margin-top:0;
       border-radius:999px;
-      background:#ecfdf5;
-      color:#059669;
+      background:#16a34a;
+      color:#fff;
       font-size:.72rem;
       font-weight:900;
       line-height:1;
+      box-shadow:0 3px 9px rgba(22,163,74,.18);
     }
     @media (max-width:639px) {
       .hero-proof-grid {
