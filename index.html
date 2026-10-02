@@ -621,6 +621,109 @@
             </div>
           </div>
 
+          <div id="searchConsoleIntegrationCard" class="mt-6 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Google Search Console</p>
+                  <span id="searchConsoleStatusBadge" class="rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">Not connected</span>
+                </div>
+                <h4 id="searchConsoleStatusTitle" class="mt-2 text-lg font-bold text-ink">Connect your SEO performance</h4>
+                <p id="searchConsoleStatusHelp" class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">Bring in real Google Search clicks, impressions, CTR, average position, queries and landing pages.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button id="searchConsoleConnectBtn" class="btn btn-primary" type="button">Connect Search Console</button>
+                <button id="searchConsoleRefreshBtn" class="btn btn-light" type="button">Check connection</button>
+                <button id="searchConsoleDisconnectBtn" class="btn btn-light hidden" type="button">Disconnect</button>
+              </div>
+            </div>
+
+            <div id="searchConsoleSiteSetup" class="mt-5 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm font-bold text-amber-950">Choose the Search Console property</p>
+              <p class="mt-1 text-xs leading-5 text-amber-900">Only properties this Google account can access will appear.</p>
+              <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+                <select id="searchConsoleSiteSelect" class="field flex-1">
+                  <option value="">Loading properties…</option>
+                </select>
+                <button id="searchConsoleSaveSiteBtn" class="btn btn-primary" type="button">Use this property</button>
+              </div>
+            </div>
+
+            <div id="searchConsoleReportWrap" class="mt-5 hidden">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p id="searchConsoleSiteName" class="text-sm font-bold text-ink">Search Console property</p>
+                  <p id="searchConsolePeriod" class="mt-1 text-xs text-slate-400">28 completed days</p>
+                </div>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Live Search Console data</span>
+              </div>
+
+              <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Google clicks</p>
+                  <p id="searchConsoleClicks" class="mt-1 text-2xl font-bold text-ink">0</p>
+                </div>
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Impressions</p>
+                  <p id="searchConsoleImpressions" class="mt-1 text-2xl font-bold text-ink">0</p>
+                </div>
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Search CTR</p>
+                  <p id="searchConsoleCtr" class="mt-1 text-2xl font-bold text-ink">—</p>
+                </div>
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Avg position</p>
+                  <p id="searchConsolePosition" class="mt-1 text-2xl font-bold text-ink">—</p>
+                </div>
+              </div>
+
+              <div class="mt-5 rounded-2xl bg-white p-4">
+                <div>
+                  <p class="text-sm font-bold text-ink">SEO opportunities</p>
+                  <p class="mt-1 text-xs leading-5 text-slate-400">Based on real Search Console impressions, CTR and average position. These are review prompts, not guaranteed ranking gains.</p>
+                </div>
+                <div class="mt-4 grid gap-4 xl:grid-cols-3">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">High impressions · low CTR</p>
+                    <div id="searchConsoleCtrOpportunities" class="mt-3 space-y-2"></div>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Positions 4–15</p>
+                    <div id="searchConsolePositionOpportunities" class="mt-3 space-y-2"></div>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pages to review</p>
+                    <div id="searchConsolePageOpportunities" class="mt-3 space-y-2"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 grid gap-5 xl:grid-cols-2">
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-sm font-bold text-ink">Top search queries</p>
+                  <p class="mt-1 text-xs text-slate-400">Queries ordered by Google Search clicks.</p>
+                  <div id="searchConsoleQueriesTable" class="mt-3 overflow-x-auto"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4">
+                  <p class="text-sm font-bold text-ink">Top search pages</p>
+                  <p class="mt-1 text-xs text-slate-400">Pages receiving organic Google Search visibility.</p>
+                  <div id="searchConsolePagesTable" class="mt-3 overflow-x-auto"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4 xl:col-span-2">
+                  <p class="text-sm font-bold text-ink">Search device mix</p>
+                  <p class="mt-1 text-xs text-slate-400">Clicks and impressions by device from Search Console.</p>
+                  <div id="searchConsoleDevicesTable" class="mt-3 overflow-x-auto"></div>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-2xl bg-slate-100 p-4 text-xs leading-5 text-slate-500">
+                Search Console reports may return top rows rather than every possible query/page. Grab&Book keeps this SEO data distinct from booking attribution so it does not claim a booking came from a specific keyword unless that link is actually known.
+              </div>
+            </div>
+          </div>
+
           <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div class="rounded-2xl bg-slate-50 p-4">
               <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Tracked visits</p>
@@ -2887,6 +2990,7 @@
   <script src="assets/js/growth-tracking.js"></script>
   <script src="assets/js/growth.js"></script>
   <script src="assets/js/ga4.js"></script>
+  <script src="assets/js/search-console.js"></script>
   <script src="assets/js/growth-import.js"></script>
   <script src="assets/js/growth-planner.js"></script>
   <script src="assets/js/customers.js"></script>
