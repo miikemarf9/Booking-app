@@ -186,10 +186,29 @@ function customerBookings(customer) {
     }
 
     function marketingEligibleCustomers() {
+      if (state.marketingTargetCustomerId) {
+        const customer = state.customers.find(c => c.id === state.marketingTargetCustomerId);
+        return customer?.marketing_email_opt_in ? [customer] : [];
+      }
       return filteredCustomersForCrm().filter(customer => Boolean(customer.marketing_email_opt_in));
     }
 
+    function syncMarketingTargetUi() {
+      const customer = state.customers.find(c => c.id === state.marketingTargetCustomerId);
+      $("marketingTargetBanner")?.classList.toggle("hidden", !customer);
+      if (customer && $("marketingTargetText")) {
+        $("marketingTargetText").textContent = `Sending only to ${customer.name}`;
+      }
+    }
+
+    function clearMarketingTarget(render = true) {
+      state.marketingTargetCustomerId = "";
+      syncMarketingTargetUi();
+      if (render) renderCustomers();
+    }
+
     function syncCustomerFilters() {
+      if (state.marketingTargetCustomerId) clearMarketingTarget(false);
       const filter = currentCustomerFilter();
       const serviceMode = filter === "service";
       const tagMode = filter === "tag";
@@ -240,6 +259,7 @@ function customerBookings(customer) {
         const sent = Number(data?.sent || 0);
         const failed = Number(data?.failed || 0);
         $("marketingEmailForm").reset();
+        if (state.marketingTargetCustomerId) clearMarketingTarget(false);
 
         if (failed) {
           toast(`Sent to ${sent} customer${sent === 1 ? "" : "s"}; ${failed} email${failed === 1 ? "" : "s"} failed.`, "info");
@@ -285,11 +305,19 @@ function customerBookings(customer) {
       $("crmRecentCustomers").textContent = recent;
       $("crmBookedValue").textContent = money(bookedValue);
       $("customerCountBadge").textContent = `${customers.length} shown · ${state.customers.length} total`;
+      syncMarketingTargetUi();
       const eligible = marketingEligibleCustomers();
-      $("marketingEligibleBadge").textContent = `${eligible.length} eligible`;
-      $("marketingRecipientText").textContent = eligible.length
-        ? `${eligible.length} opted-in customer${eligible.length === 1 ? "" : "s"} will receive this email.`
-        : "No opted-in customers in this group.";
+      $("marketingEligibleBadge").textContent = state.marketingTargetCustomerId
+        ? (eligible.length ? "1 direct recipient" : "Not eligible")
+        : `${eligible.length} eligible`;
+      const directCustomer = state.customers.find(c => c.id === state.marketingTargetCustomerId);
+      $("marketingRecipientText").textContent = directCustomer
+        ? (eligible.length
+            ? `Only ${directCustomer.name} will receive this email.`
+            : `${directCustomer.name} has not opted in to marketing emails.`)
+        : (eligible.length
+            ? `${eligible.length} opted-in customer${eligible.length === 1 ? "" : "s"} will receive this email.`
+            : "No opted-in customers in this group.");
       $("sendMarketingEmailBtn").disabled = !eligible.length;
       $("sendMarketingEmailBtn").classList.toggle("opacity-50", !eligible.length);
 
@@ -342,6 +370,12 @@ function customerBookings(customer) {
       const m = customerMetrics(customer);
       $("customerProfileName").textContent = customer.name;
       $("customerProfileContact").textContent = [customer.email, customer.phone].filter(Boolean).join(" · ");
+      $("customerCallBtn").disabled = !customer.phone;
+      $("customerCallBtn").classList.toggle("opacity-50", !customer.phone);
+      $("customerCallBtn").title = customer.phone ? `Call ${customer.phone}` : "No phone number saved";
+      $("customerOfferBtn").title = customer.marketing_email_opt_in
+        ? "Compose a direct marketing offer for this customer"
+        : "This customer has not opted in to marketing emails";
       $("customerMarketingBadge").textContent = customer.marketing_email_opt_in ? "Marketing emails opted in" : "Marketing not opted in";
       $("customerMarketingBadge").className = customer.marketing_email_opt_in
         ? "mt-2 inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700"
@@ -600,6 +634,69 @@ function customerBookings(customer) {
       const customer = state.customers.find(c => c.id === customerId);
       if (customer && state.selectedCustomerId === customerId) loadCustomerTimeline(customer);
       return true;
+    }
+
+    function selectedCrmCustomer() {
+      return state.customers.find(c => c.id === state.selectedCustomerId) || null;
+    }
+
+    function bookSelectedCustomer() {
+      const customer = selectedCrmCustomer();
+      if (!customer || !state.profile) return;
+
+      const key = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const storageKey = `gb-booking-prefill-${key}`;
+      const payload = {
+        name: customer.name || "",
+        email: customer.email || "",
+        phone: customer.phone || "",
+        marketingOptIn: Boolean(customer.marketing_email_opt_in),
+        createdAt: Date.now()
+      };
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(payload));
+      } catch (err) {
+        console.error("Booking prefill storage error:", err);
+        return toast("Could not prepare this customer's booking details.", "error");
+      }
+
+      const url = new URL(buildPublicUrl(state.profile.id));
+      url.searchParams.set("prefill", key);
+      window.open(url.toString(), "_blank", "noopener");
+    }
+
+    function emailSelectedCustomer() {
+      const customer = selectedCrmCustomer();
+      if (!customer?.email) return toast("This customer does not have an email address.", "error");
+      window.location.href = `mailto:${customer.email}`;
+    }
+
+    function callSelectedCustomer() {
+      const customer = selectedCrmCustomer();
+      if (!customer?.phone) return toast("This customer does not have a phone number.", "error");
+      const phone = String(customer.phone).replace(/[^+\d]/g, "");
+      window.location.href = `tel:${phone}`;
+    }
+
+    function sendOfferToSelectedCustomer() {
+      const customer = selectedCrmCustomer();
+      if (!customer) return;
+      if (!customer.marketing_email_opt_in) {
+        return toast("This customer has not opted in to marketing emails.", "error");
+      }
+
+      state.marketingTargetCustomerId = customer.id;
+      syncMarketingTargetUi();
+      renderCustomers();
+
+      if (!$("marketingSubject").value.trim()) {
+        $("marketingSubject").value = "An offer for your next visit";
+      }
+
+      const form = $("marketingEmailForm");
+      form?.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(() => $("marketingMessage")?.focus(), 350);
     }
 
     function selectCustomer(customerId) {
