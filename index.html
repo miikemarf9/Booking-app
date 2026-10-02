@@ -113,21 +113,21 @@
     <main id="main-content">
       <section class="landing-grid overflow-hidden">
         <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[.92fr_1.08fr] lg:px-8 lg:py-24">
-          <div>
-            <span class="landing-kicker">Booking + CRM + Growth</span>
-            <h1 class="mt-6 max-w-3xl text-4xl font-black leading-[1.03] tracking-[-.04em] text-ink sm:text-5xl lg:text-[3.65rem]">
+          <div class="homepage-hero-copy">
+            <span class="landing-kicker hero-motion-item">Booking + CRM + Growth</span>
+            <h1 class="hero-motion-item mt-6 max-w-3xl text-4xl font-black leading-[1.03] tracking-[-.04em] text-ink sm:text-5xl lg:text-[3.65rem]">
               Run the booking. Know the customer. Understand the growth.
             </h1>
-            <p class="mt-6 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+            <p class="hero-motion-item mt-6 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
               Grab&Book brings online booking, customer management and commercial performance into one connected system for service businesses.
             </p>
 
-            <div class="mt-8 flex flex-wrap gap-3">
+            <div class="hero-motion-item mt-8 flex flex-wrap gap-3">
               <button id="landingHeroStartBtn" data-cta="start-free" type="button" class="btn btn-primary !px-6 !py-3.5 text-base">Start free</button>
               <a href="#product-overview" class="btn btn-light !px-6 !py-3.5 text-base">Explore the platform ↓</a>
             </div>
 
-            <div class="mt-8 grid max-w-xl grid-cols-2 gap-x-5 gap-y-3 text-sm font-semibold text-slate-500 sm:grid-cols-3">
+            <div class="hero-motion-item hero-proof-grid mt-8 grid max-w-xl grid-cols-2 gap-x-5 gap-y-3 text-sm font-semibold text-slate-500 sm:grid-cols-3">
               <span class="inline-flex items-center gap-2"><span class="text-emerald-500">✓</span> Online booking</span>
               <span class="inline-flex items-center gap-2"><span class="text-emerald-500">✓</span> Customer CRM</span>
               <span class="inline-flex items-center gap-2"><span class="text-emerald-500">✓</span> Growth analytics</span>
@@ -145,7 +145,7 @@
             </div>
 
             <div id="dashboardPreview" class="overflow-hidden rounded-[1.65rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(23,32,51,.14)]">
-              <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <div class="preview-chrome flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div class="flex items-center gap-3">
                   <img src="grabandbook-icon.svg" alt="" class="h-9 w-9 rounded-xl">
                   <div>
@@ -157,11 +157,11 @@
               </div>
 
               <div class="border-b border-slate-100 px-4 py-3 sm:px-5">
-                <div class="grid grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1 text-center text-[.68rem] font-bold sm:text-xs">
-                  <span class="rounded-lg bg-brand-600 px-2 py-2 text-white">Home</span>
-                  <span class="rounded-lg px-2 py-2 text-slate-500">Booking</span>
-                  <span class="rounded-lg px-2 py-2 text-slate-500">CRM</span>
-                  <span class="rounded-lg px-2 py-2 text-slate-500">Growth</span>
+                <div class="preview-nav grid grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1 text-center text-[.68rem] font-bold sm:text-xs">
+                  <span class="preview-nav-item rounded-lg bg-brand-600 px-2 py-2 text-white">Home</span>
+                  <span class="preview-nav-item rounded-lg px-2 py-2 text-slate-500">Booking</span>
+                  <span class="preview-nav-item rounded-lg px-2 py-2 text-slate-500">CRM</span>
+                  <span class="preview-nav-item rounded-lg px-2 py-2 text-slate-500">Growth</span>
                 </div>
               </div>
 
@@ -178,7 +178,7 @@
                 </div>
                 <div class="preview-stat rounded-2xl border border-slate-100 bg-white p-4">
                   <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booking conversion</p>
-                  <p class="mt-2 text-2xl font-black text-ink">18.6%</p>
+                  <p class="mt-2 text-2xl font-black text-ink" data-preview-count="18.6" data-suffix="%" data-decimals="1">18.6%</p>
                   <p class="mt-1 text-xs text-brand-600">last 30 days</p>
                 </div>
               </div>
@@ -212,12 +212,12 @@
 
                   <div class="preview-diary rounded-2xl border border-brand-100 bg-brand-50/60 p-4">
                     <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-700">Customer value</p>
-                    <p class="mt-2 text-2xl font-black text-ink">£146</p>
+                    <p class="mt-2 text-2xl font-black text-ink" data-preview-count="146" data-prefix="£">£146</p>
                     <p class="mt-1 text-xs text-slate-500">average booked value</p>
                     <div class="mt-4 h-2 overflow-hidden rounded-full bg-white">
-                      <div class="h-full w-[72%] rounded-full bg-brand-500"></div>
+                      <div class="preview-progress-bar h-full w-[72%] origin-left rounded-full bg-brand-500"></div>
                     </div>
-                    <p class="mt-2 text-[.68rem] font-semibold text-brand-700">Repeat customers · 43%</p>
+                    <p class="preview-repeat mt-2 text-[.68rem] font-semibold text-brand-700">Repeat customers · <span data-preview-count="43" data-suffix="%">43%</span></p>
                   </div>
                 </div>
               </div>
@@ -228,7 +228,7 @@
 
       <section id="product-overview" class="landing-anchor bg-white py-16 sm:py-20">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="mx-auto max-w-3xl text-center">
+          <div class="saas-reveal mx-auto max-w-3xl text-center">
             <p class="landing-section-eyebrow">One connected platform</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Three parts of the business. One source of truth.</h2>
             <p class="mt-4 text-base leading-7 text-slate-500">
@@ -236,8 +236,8 @@
             </p>
           </div>
 
-          <div class="mt-10 grid gap-5 lg:grid-cols-3">
-            <a href="/book" class="landing-product-card group">
+          <div class="saas-stagger mt-10 grid gap-5 lg:grid-cols-3">
+            <a href="/book" class="landing-product-card product-card-book group">
               <div class="flex items-start justify-between gap-4">
                 <span class="feature-icon">01</span>
                 <span class="text-sm font-black text-brand-600 transition group-hover:translate-x-1">Explore →</span>
@@ -247,14 +247,14 @@
               <div class="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-4">
                 <div class="flex items-center justify-between text-xs font-bold"><span class="text-slate-500">Next available</span><span class="text-brand-700">14:30 today</span></div>
                 <div class="mt-3 grid grid-cols-3 gap-2 text-center text-[.68rem] font-bold">
-                  <span class="rounded-lg bg-white px-2 py-2 text-slate-500">10:00</span>
-                  <span class="rounded-lg bg-brand-600 px-2 py-2 text-white">14:30</span>
-                  <span class="rounded-lg bg-white px-2 py-2 text-slate-500">16:15</span>
+                  <span class="book-mini-slot rounded-lg bg-white px-2 py-2 text-slate-500">10:00</span>
+                  <span class="book-mini-slot book-mini-slot-active rounded-lg bg-brand-600 px-2 py-2 text-white">14:30</span>
+                  <span class="book-mini-slot rounded-lg bg-white px-2 py-2 text-slate-500">16:15</span>
                 </div>
               </div>
             </a>
 
-            <a href="/crm" class="landing-product-card group">
+            <a href="/crm" class="landing-product-card product-card-crm group">
               <div class="flex items-start justify-between gap-4">
                 <span class="feature-icon">02</span>
                 <span class="text-sm font-black text-brand-600 transition group-hover:translate-x-1">Explore →</span>
@@ -267,13 +267,13 @@
                   <div><p class="text-sm font-bold text-ink">Alex Morgan</p><p class="text-xs text-slate-400">6 completed visits</p></div>
                 </div>
                 <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
-                  <span class="rounded-lg bg-white p-2 text-slate-500"><strong class="block text-ink">£420</strong>Booked value</span>
-                  <span class="rounded-lg bg-white p-2 text-slate-500"><strong class="block text-ink">34 days</strong>Since last visit</span>
+                  <span class="crm-mini-stat rounded-lg bg-white p-2 text-slate-500"><strong class="block text-ink">£420</strong>Booked value</span>
+                  <span class="crm-mini-stat rounded-lg bg-white p-2 text-slate-500"><strong class="block text-ink">34 days</strong>Since last visit</span>
                 </div>
               </div>
             </a>
 
-            <a href="/growth" class="landing-product-card group">
+            <a href="/growth" class="landing-product-card product-card-growth group">
               <div class="flex items-start justify-between gap-4">
                 <span class="feature-icon">03</span>
                 <span class="text-sm font-black text-brand-600 transition group-hover:translate-x-1">Explore →</span>
@@ -283,9 +283,9 @@
               <div class="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-4">
                 <div class="space-y-2 text-xs">
                   <div class="flex items-center justify-between"><span class="font-semibold text-slate-500">Google</span><span class="font-black text-ink">£1,840</span></div>
-                  <div class="h-1.5 rounded-full bg-white"><div class="h-full w-[78%] rounded-full bg-brand-500"></div></div>
+                  <div class="h-1.5 rounded-full bg-white"><div class="growth-mini-bar h-full w-[78%] origin-left rounded-full bg-brand-500"></div></div>
                   <div class="flex items-center justify-between"><span class="font-semibold text-slate-500">Instagram</span><span class="font-black text-ink">£970</span></div>
-                  <div class="h-1.5 rounded-full bg-white"><div class="h-full w-[46%] rounded-full bg-violet-500"></div></div>
+                  <div class="h-1.5 rounded-full bg-white"><div class="growth-mini-bar h-full w-[46%] origin-left rounded-full bg-violet-500"></div></div>
                 </div>
               </div>
             </a>
@@ -295,7 +295,7 @@
 
       <section id="product-book" class="landing-anchor border-y border-slate-100 bg-slate-50/75 py-16 sm:py-24">
         <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
-          <div class="max-w-xl">
+          <div class="saas-reveal max-w-xl">
             <p class="landing-section-eyebrow">Book</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">A booking experience that stays connected to the way you actually work.</h2>
             <p class="mt-5 text-base leading-7 text-slate-500">
@@ -309,7 +309,7 @@
             </div>
           </div>
 
-          <div class="landing-product-preview">
+          <div class="landing-product-preview saas-reveal saas-product-preview">
             <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
               <div><p class="text-[.68rem] font-black uppercase tracking-wider text-brand-600">Diary</p><p class="text-sm font-black text-ink">October 2026</p></div>
               <span class="rounded-full bg-slate-100 px-3 py-1 text-[.68rem] font-bold text-slate-500">Demo view</span>
@@ -343,7 +343,7 @@
 
       <section id="product-crm" class="landing-anchor bg-white py-16 sm:py-24">
         <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.08fr_.92fr] lg:px-8">
-          <div class="landing-product-preview order-2 lg:order-1">
+          <div class="landing-product-preview saas-reveal saas-product-preview order-2 lg:order-1">
             <div class="border-b border-slate-100 px-5 py-4">
               <p class="text-[.68rem] font-black uppercase tracking-wider text-brand-600">Customer CRM</p>
               <div class="mt-3 flex items-center justify-between gap-4">
@@ -368,7 +368,7 @@
             </div>
           </div>
 
-          <div class="order-1 max-w-xl lg:order-2 lg:justify-self-end">
+          <div class="saas-reveal order-1 max-w-xl lg:order-2 lg:justify-self-end">
             <p class="landing-section-eyebrow">CRM</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Turn a booking history into a useful customer picture.</h2>
             <p class="mt-5 text-base leading-7 text-slate-500">
@@ -385,7 +385,7 @@
 
       <section id="product-growth" class="landing-anchor border-y border-slate-100 bg-slate-50/75 py-16 sm:py-24">
         <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
-          <div class="max-w-xl">
+          <div class="saas-reveal max-w-xl">
             <p class="landing-section-eyebrow">Growth</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Connect marketing activity to the customers and revenue it creates.</h2>
             <p class="mt-5 text-base leading-7 text-slate-500">
@@ -416,13 +416,13 @@
                 <div class="grid grid-cols-[1.25fr_.65fr_.65fr_.8fr] bg-slate-50 px-3 py-2 text-[.6rem] font-bold uppercase text-slate-400 sm:px-4 sm:text-[.68rem]">
                   <span>Channel</span><span>Bookings</span><span>Conv.</span><span>Value</span>
                 </div>
-                <div class="grid grid-cols-[1.25fr_.65fr_.65fr_.8fr] items-center border-t border-slate-100 px-3 py-3 text-xs sm:px-4 sm:text-sm">
+                <div class="growth-detail-row grid grid-cols-[1.25fr_.65fr_.65fr_.8fr] items-center border-t border-slate-100 px-3 py-3 text-xs sm:px-4 sm:text-sm">
                   <span class="font-bold text-ink">Google</span><span class="text-slate-500">84</span><span class="text-slate-500">21.4%</span><span class="font-bold text-ink">£3,420</span>
                 </div>
-                <div class="grid grid-cols-[1.25fr_.65fr_.65fr_.8fr] items-center border-t border-slate-100 px-3 py-3 text-xs sm:px-4 sm:text-sm">
+                <div class="growth-detail-row grid grid-cols-[1.25fr_.65fr_.65fr_.8fr] items-center border-t border-slate-100 px-3 py-3 text-xs sm:px-4 sm:text-sm">
                   <span class="font-bold text-ink">Instagram</span><span class="text-slate-500">48</span><span class="text-slate-500">17.1%</span><span class="font-bold text-ink">£1,960</span>
                 </div>
-                <div class="grid grid-cols-[1.25fr_.65fr_.65fr_.8fr] items-center border-t border-slate-100 px-3 py-3 text-xs sm:px-4 sm:text-sm">
+                <div class="growth-detail-row grid grid-cols-[1.25fr_.65fr_.65fr_.8fr] items-center border-t border-slate-100 px-3 py-3 text-xs sm:px-4 sm:text-sm">
                   <span class="font-bold text-ink">Direct</span><span class="text-slate-500">62</span><span class="text-slate-500">24.2%</span><span class="font-bold text-ink">£2,410</span>
                 </div>
               </div>
@@ -434,13 +434,13 @@
 
       <section id="how-it-works" class="bg-white py-16 sm:py-20">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="max-w-3xl">
+          <div class="saas-reveal max-w-3xl">
             <p class="landing-section-eyebrow">Why connect it?</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">The useful questions sit between the systems.</h2>
             <p class="mt-4 text-base leading-7 text-slate-500">Grab&Book is being built so a service business can answer operational and commercial questions from the same underlying customer journey.</p>
           </div>
 
-          <div class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div class="saas-stagger mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <article class="card p-5"><p class="text-xs font-black uppercase tracking-wider text-brand-600">Diary</p><h3 class="mt-2 font-black text-ink">Where are the gaps?</h3><p class="mt-2 text-sm leading-6 text-slate-500">See upcoming bookings, availability and spare capacity.</p></article>
             <article class="card p-5"><p class="text-xs font-black uppercase tracking-wider text-brand-600">Customers</p><h3 class="mt-2 font-black text-ink">Who comes back?</h3><p class="mt-2 text-sm leading-6 text-slate-500">Use booking history and retention data to understand repeat behaviour.</p></article>
             <article class="card p-5"><p class="text-xs font-black uppercase tracking-wider text-brand-600">Marketing</p><h3 class="mt-2 font-black text-ink">What creates bookings?</h3><p class="mt-2 text-sm leading-6 text-slate-500">Compare channels using real booking outcomes, not traffic alone.</p></article>
@@ -451,14 +451,14 @@
 
       <section class="bg-ink py-16 text-white sm:py-20">
         <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
-          <div>
+          <div class="saas-reveal">
             <p class="text-xs font-black uppercase tracking-[.18em] text-brand-100">Built for service businesses</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] sm:text-4xl">More useful than another disconnected dashboard.</h2>
             <p class="mt-5 max-w-xl text-base leading-7 text-slate-300">
               The goal is straightforward: reduce admin, make booking easier for customers and give the business owner a clearer view of what is happening.
             </p>
           </div>
-          <div class="grid gap-4 sm:grid-cols-2">
+          <div class="saas-stagger grid gap-4 sm:grid-cols-2">
             <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="text-lg font-black text-brand-100">One customer journey</p><p class="mt-2 text-sm leading-6 text-slate-300">Booking activity can feed the CRM and growth reporting instead of becoming isolated data.</p></div>
             <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="text-lg font-black text-brand-100">First-party context</p><p class="mt-2 text-sm leading-6 text-slate-300">Understand marketing alongside bookings and customer value.</p></div>
             <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="text-lg font-black text-brand-100">Built-in planning</p><p class="mt-2 text-sm leading-6 text-slate-300">Keep channel notes, tasks, ideas and goals close to the data they relate to.</p></div>
@@ -469,12 +469,12 @@
 
       <section id="pricing" class="landing-anchor bg-white py-16 sm:py-24">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div class="mx-auto max-w-2xl text-center">
+          <div class="saas-reveal mx-auto max-w-2xl text-center">
             <p class="landing-section-eyebrow">Simple pricing</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Start free. Upgrade when the paid plan makes sense.</h2>
           </div>
 
-          <div class="mt-10 grid gap-5 md:grid-cols-2">
+          <div class="saas-stagger mt-10 grid gap-5 md:grid-cols-2">
             <article class="card p-7">
               <p class="text-sm font-black text-ink">Free</p>
               <div class="mt-3 flex items-end gap-1"><span class="text-4xl font-black text-ink">£0</span><span class="pb-1 text-sm font-semibold text-slate-400">/month</span></div>
@@ -508,7 +508,7 @@
       <section id="customer-proof" class="border-y border-slate-100 bg-slate-50/75 py-16 sm:py-20">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
-            <div class="max-w-xl">
+            <div class="saas-reveal max-w-xl">
               <p class="landing-section-eyebrow">Customer proof</p>
               <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Real results will be shown as real results.</h2>
               <p class="mt-4 text-base leading-7 text-slate-500">We're building Grab&Book's first verified customer-story library. Until then, dashboard figures on this site are clearly labelled as illustrative rather than presented as customer outcomes.</p>
@@ -517,7 +517,7 @@
                 <a href="/contact" data-cta="contact" class="btn btn-primary">Talk to us</a>
               </div>
             </div>
-            <div class="grid gap-4 sm:grid-cols-3">
+            <div class="saas-stagger grid gap-4 sm:grid-cols-3">
               <div class="trust-card"><strong>No invented testimonials</strong><span>Customer quotes will only appear with a genuine source and permission.</span></div>
               <div class="trust-card"><strong>Clear time periods</strong><span>Results will state what was measured and over what period.</span></div>
               <div class="trust-card"><strong>Direct contact</strong><span>Questions can be sent straight through the site without a support maze.</span></div>
@@ -527,7 +527,7 @@
       </section>
 
       <section class="px-4 pb-16 sm:px-6 sm:pb-24">
-        <div class="mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-brand-600 px-6 py-11 text-center text-white shadow-[0_24px_70px_rgba(8,114,189,.22)] sm:px-12">
+        <div class="homepage-final-cta saas-reveal mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-brand-600 px-6 py-11 text-center text-white shadow-[0_24px_70px_rgba(8,114,189,.22)] sm:px-12">
           <p class="text-xs font-black uppercase tracking-[.18em] text-brand-100">Start with the booking</p>
           <h2 class="mx-auto mt-3 max-w-3xl text-3xl font-black tracking-[-.03em] sm:text-4xl">Give customers an easier way to book — then build from there.</h2>
           <p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-brand-100">Create your booking page, add your services and start bringing the customer journey into one place.</p>
