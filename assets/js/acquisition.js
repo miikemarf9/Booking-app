@@ -7,6 +7,17 @@ function acquisitionStorageKey(profileId) {
   return "gb-acquisition-" + ACQUISITION_STORAGE_VERSION + ":" + profileId;
 }
 
+function clearAcquisitionTouch(profileId) {
+  if (!profileId) return;
+  const key = acquisitionStorageKey(profileId);
+  acquisitionRuntimeStore.delete(key);
+  try {
+    localStorage.removeItem(key);
+  } catch (err) {
+    console.error("Attribution storage clear error:", err);
+  }
+}
+
 function acquisitionDeviceType() {
   const ua = navigator.userAgent || "";
   if (/ipad|tablet|kindle|playbook|silk/i.test(ua)) return "tablet";
@@ -134,7 +145,7 @@ function buildCurrentAcquisitionTouch() {
 
   return {
     source: source,
-    medium: medium || "(none)",
+    medium: medium || (source === "direct" ? "(none)" : "unknown"),
     campaign: (params.get("utm_campaign") || "").trim().slice(0, 200) || undefined,
     content: (params.get("utm_content") || "").trim().slice(0, 200) || undefined,
     term: (params.get("utm_term") || "").trim().slice(0, 200) || undefined,
