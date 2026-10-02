@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Customer CRM, retention analytics, smart groups, customer history and consent-aware communications for service businesses.">
+  <link rel="icon" type="image/svg+xml" href="grabandbook-icon.svg">
+  <title>CRM | Grab&Book</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          ink: "#172033",
+          brand: { 50:"#eef8ff",100:"#d9efff",500:"#1687d9",600:"#0872bd",700:"#075b98" },
+          coral:"#ff765d"
+        },
+        boxShadow: { soft:"0 18px 50px rgba(23,32,51,.08)" }
+      }}
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="product-site-shell min-h-screen text-slate-800 font-sans"><header class="product-site-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+    <a href="index.html" class="flex shrink-0 items-center" aria-label="Grab&Book home">
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="block h-8 w-auto sm:h-10">
+    </a>
+    <nav class="hidden items-center gap-6 text-sm font-bold text-slate-500 lg:flex" aria-label="Product navigation">
+      <a class="product-nav-link" href="book.html">Book</a>
+      <a class="text-brand-700" href="crm.html">CRM</a>
+      <a class="product-nav-link" href="growth.html">Growth</a>
+      <a class="product-nav-link" href="index.html#pricing">Pricing</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="index.html?auth=login" class="btn btn-light">Log in</a>
+      <a href="index.html?auth=register" class="btn btn-primary">Start free</a>
+    </div>
+  </div>
+  <nav class="product-mobile-nav border-t border-slate-100 px-4 py-2 lg:hidden" aria-label="Mobile product navigation">
+    <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto">
+      <a class="" href="book.html">Book</a>
+      <a class="active" href="crm.html">CRM</a>
+      <a class="" href="growth.html">Growth</a>
+      <a href="index.html#pricing">Pricing</a>
+    </div>
+  </nav>
+</header>
+<main>
+  <section class="product-page-hero overflow-hidden">
+    <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[.9fr_1.1fr] lg:px-8 lg:py-24">
+      <div>
+        <span class="product-kicker">Grab&Book · CRM</span>
+        <h1 class="mt-6 text-4xl font-black leading-[1.03] tracking-[-.04em] text-ink sm:text-5xl lg:text-6xl">Know who is booking — and who should be coming back.</h1>
+        <p class="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">Every booking can build one customer record, giving you history, value, retention signals, notes, consent and communication tools in the same place.</p>
+        <div class="mt-8 flex flex-wrap gap-3"><a href="index.html?auth=register" class="btn btn-primary !px-6 !py-3.5 text-base">Start free</a><a href="#crm-details" class="btn btn-light !px-6 !py-3.5 text-base">See CRM in depth ↓</a></div>
+      </div>
+
+      <div class="product-ui-frame">
+        <div class="product-ui-topbar"><div><p class="product-ui-eyebrow">Customer profile</p><p class="font-black text-ink">Alex Morgan</p></div><span class="product-status">Active customer</span></div>
+        <div class="grid grid-cols-2 gap-3 bg-slate-50/80 p-4 sm:grid-cols-4 sm:p-5">
+          <div class="product-metric"><span>Visits</span><strong>6</strong><small>completed</small></div>
+          <div class="product-metric"><span>Booked value</span><strong>£420</strong><small>non-cancelled</small></div>
+          <div class="product-metric"><span>Avg booking</span><strong>£70</strong><small>per visit</small></div>
+          <div class="product-metric"><span>Return cycle</span><strong>41d</strong><small>typical</small></div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-700">Regular</span><span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Marketing opted in</span><span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">Due back soon</span></div>
+          <div class="mt-5 rounded-2xl border border-slate-100 p-4"><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Timeline</p><div class="mt-4 space-y-4 border-l border-slate-200 pl-4"><div><p class="text-sm font-bold text-ink">Premium treatment · £85</p><p class="text-xs text-slate-400">Completed · 28 Aug</p></div><div><p class="text-sm font-bold text-ink">Consultation · £50</p><p class="text-xs text-slate-400">Completed · 04 Jul</p></div><div><p class="text-sm font-bold text-ink">Customer note</p><p class="text-xs text-slate-400">Prefers afternoon appointments</p></div></div></div>
+          <p class="mt-4 text-[.68rem] text-slate-400">Illustrative demo data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="crm-details" class="bg-white py-16 sm:py-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl"><p class="product-section-label">Customer intelligence</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">A CRM built from actual appointment behaviour.</h2><p class="mt-4 text-base leading-7 text-slate-500">The useful part is not just storing names and email addresses. Grab&Book uses booking history to help organise customers around value, frequency and whether they appear to be drifting away.</p></div>
+      <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <article class="product-feature"><span>01</span><h3>One customer profile</h3><p>Keep bookings, history, notes, contact information, tags and marketing consent around the same customer.</p></article>
+        <article class="product-feature"><span>02</span><h3>Retention status</h3><p>Use completed appointment history to identify customers who are on track, due back, slipping or lapsed.</p></article>
+        <article class="product-feature"><span>03</span><h3>Customer value</h3><p>Track non-cancelled booked value and average customer value rather than treating every customer as equal.</p></article>
+        <article class="product-feature"><span>04</span><h3>Smart groups</h3><p>Filter new, regular, VIP/high-value, due-back, slipping, lapsed or no-future-booking customers.</p></article>
+        <article class="product-feature"><span>05</span><h3>Consent-aware campaigns</h3><p>Email selected customer groups while restricting marketing messages to people who have explicitly opted in.</p></article>
+        <article class="product-feature"><span>06</span><h3>Retention automation</h3><p>Optionally send rebooking or win-back emails when a customer's own booking pattern indicates the right moment.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-slate-100 bg-slate-50/75 py-16 sm:py-24">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
+      <div class="product-ui-frame">
+        <div class="product-ui-topbar"><div><p class="product-ui-eyebrow">CRM analytics</p><p class="font-black text-ink">Customer performance</p></div><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">All-time data</span></div>
+        <div class="grid grid-cols-2 gap-3 bg-slate-50/80 p-4 sm:grid-cols-3 sm:p-5">
+          <div class="product-metric"><span>Repeat rate</span><strong>47%</strong><small>completed customers</small></div>
+          <div class="product-metric"><span>Avg value</span><strong>£168</strong><small>per customer</small></div>
+          <div class="product-metric"><span>Return cycle</span><strong>43d</strong><small>typical</small></div>
+          <div class="product-metric"><span>New this month</span><strong>28</strong><small>first completed visit</small></div>
+          <div class="product-metric"><span>No future booking</span><strong>36%</strong><small>with history</small></div>
+          <div class="product-metric"><span>Lapsed</span><strong>14</strong><small>need attention</small></div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <p class="text-sm font-black text-ink">Customer health</p>
+          <div class="mt-4 space-y-3">
+            <div><div class="flex justify-between text-xs font-bold"><span class="text-slate-500">On track</span><span class="text-ink">54</span></div><div class="mt-1.5 h-2 rounded-full bg-slate-100"><div class="h-full w-[72%] rounded-full bg-emerald-500"></div></div></div>
+            <div><div class="flex justify-between text-xs font-bold"><span class="text-slate-500">Due back</span><span class="text-ink">18</span></div><div class="mt-1.5 h-2 rounded-full bg-slate-100"><div class="h-full w-[38%] rounded-full bg-amber-400"></div></div></div>
+            <div><div class="flex justify-between text-xs font-bold"><span class="text-slate-500">Slipping / lapsed</span><span class="text-ink">14</span></div><div class="mt-1.5 h-2 rounded-full bg-slate-100"><div class="h-full w-[28%] rounded-full bg-rose-400"></div></div></div>
+          </div>
+          <p class="mt-4 text-[.68rem] text-slate-400">Illustrative demo data.</p>
+        </div>
+      </div>
+
+      <div class="max-w-xl lg:justify-self-end"><p class="product-section-label">Retention</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Do more than count customers. Understand their rhythm.</h2><p class="mt-5 text-base leading-7 text-slate-500">A repeat customer often has their own normal return pattern. Grab&Book can use that history to distinguish someone who is simply not due yet from someone who may be drifting away.</p><div class="mt-7 space-y-3"><div class="product-point"><strong>Pattern-based prompts</strong><span>Retention logic is based on the customer's own completed appointment history.</span></div><div class="product-point"><strong>Service retention</strong><span>Compare which services are associated with stronger repeat behaviour.</span></div><div class="product-point"><strong>Built-in safeguards</strong><span>Automated retention requires sufficient history, consent and cooldown rules.</span></div></div></div>
+    </div>
+  </section>
+
+  <section class="bg-white py-16 sm:py-20">
+    <div class="mx-auto max-w-5xl px-4 text-center sm:px-6">
+      <p class="product-section-label">The connection</p><h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">A customer record becomes even more useful when you know where that customer came from.</h2><p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-500">That is where Growth takes over: acquisition source, conversion and booked value can be analysed alongside the customer relationship.</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3"><a href="growth.html" class="btn btn-light">Next: explore Growth →</a><a href="index.html?auth=register" class="btn btn-primary">Start free</a></div>
+    </div>
+  </section>
+</main><footer class="border-t border-slate-100 bg-white">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_auto] md:items-end lg:px-8">
+    <div>
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="h-8 w-auto max-w-[160px]">
+      <p class="mt-4 max-w-md text-sm leading-6 text-slate-400">Booking, CRM and growth tools for service businesses that want a clearer view of the customer journey.</p>
+    </div>
+    <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-slate-500">
+      <a class="hover:text-brand-600" href="index.html">Home</a>
+      <a class="hover:text-brand-600" href="book.html">Book</a>
+      <a class="hover:text-brand-600" href="crm.html">CRM</a>
+      <a class="hover:text-brand-600" href="growth.html">Growth</a>
+      <a class="hover:text-brand-600" href="index.html#pricing">Pricing</a>
+    </nav>
+  </div>
+</footer></body></html>
