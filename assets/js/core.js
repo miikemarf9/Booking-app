@@ -864,7 +864,7 @@
       $("analyticsConsentAcceptBtn").addEventListener("click", allowBookingAnalytics);
       $("analyticsConsentDeclineBtn").addEventListener("click", declineBookingAnalytics);
       $("growthFunnelRefreshBtn").addEventListener("click", () => loadGrowthFunnelAnalytics(true));
-      $("growthChannelsRefreshBtn").addEventListener("click", () => loadGrowthChannelAnalytics(true));
+      $("growthChannelsRefreshBtn").addEventListener("click", () => loadGrowthChannelAreaAnalytics(true));
       $("growthImportBtn").addEventListener("click", openGrowthImportModal);
       $("growthImportTemplateBtn").addEventListener("click", downloadGrowthImportTemplate);
       $("growthImportCloseBtn").addEventListener("click", closeGrowthImportModal);
@@ -898,7 +898,7 @@
         const btn = e.target.closest("[data-planner-channel-add]");
         if (btn) openGrowthPlannerForChannel(btn.dataset.plannerChannelAdd, btn.dataset.plannerChannelLabel);
       });
-      ["growthChannelCards", "growthImportedChannelCards"].forEach(id => {
+      ["growthChannelCards", "growthCustomerQualityCards", "growthImportedChannelCards"].forEach(id => {
         $(id).addEventListener("click", e => {
           const btn = e.target.closest("[data-planner-channel]");
           if (btn) openGrowthPlannerForChannel(btn.dataset.plannerChannel, btn.dataset.plannerLabel);
