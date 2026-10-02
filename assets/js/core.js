@@ -22,6 +22,8 @@
       bookings: [],
       customers: [],
       selectedCustomerId: "",
+      customerTimelineEvents: {},
+      customerTimelineLoading: {},
       questions: [],
       timeOff: [],
       bookingsError: null,
