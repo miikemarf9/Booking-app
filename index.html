@@ -467,7 +467,56 @@
               <h2 class="mt-1 text-2xl font-bold text-ink">Acquire more valuable customers</h2>
               <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Understand where customers come from, what turns traffic into bookings and which channels create the strongest long-term customer value.</p>
             </div>
-            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Acquisition tracking active</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+                Period
+                <select id="growthPeriodSelect" class="ml-2 bg-transparent font-bold text-ink outline-none">
+                  <option value="7">7 days</option>
+                  <option value="30" selected>30 days</option>
+                  <option value="90">90 days</option>
+                </select>
+              </label>
+              <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+                <input id="growthCompareToggle" type="checkbox" checked>
+                Compare previous period
+              </label>
+              <span id="growthDataFreshness" class="rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700">Acquisition tracking active</span>
+            </div>
+          </div>
+
+          <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="card p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Tracked visits</p>
+              <div class="mt-1 flex items-end justify-between gap-3">
+                <p id="growthOverviewVisits" class="text-2xl font-bold text-ink">0</p>
+                <p id="growthOverviewVisitsDelta" class="text-xs font-bold text-slate-400">—</p>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">consented booking-page journeys</p>
+            </article>
+            <article class="card p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Completed bookings</p>
+              <div class="mt-1 flex items-end justify-between gap-3">
+                <p id="growthOverviewBookings" class="text-2xl font-bold text-ink">0</p>
+                <p id="growthOverviewBookingsDelta" class="text-xs font-bold text-slate-400">—</p>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">tracked completed journeys</p>
+            </article>
+            <article class="card p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booked revenue</p>
+              <div class="mt-1 flex items-end justify-between gap-3">
+                <p id="growthOverviewRevenue" class="text-2xl font-bold text-ink">£0</p>
+                <p id="growthOverviewRevenueDelta" class="text-xs font-bold text-slate-400">—</p>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">non-cancelled tracked bookings</p>
+            </article>
+            <article class="card p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booking conversion</p>
+              <div class="mt-1 flex items-end justify-between gap-3">
+                <p id="growthOverviewConversion" class="text-2xl font-bold text-ink">—</p>
+                <p id="growthOverviewConversionDelta" class="text-xs font-bold text-slate-400">—</p>
+              </div>
+              <p id="growthOverviewCompareLabel" class="mt-1 text-xs text-slate-500">vs previous 30 days</p>
+            </article>
           </div>
 
           <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -525,7 +574,7 @@
               <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Compare acquisition channels on the same Grab&Book metrics: tracked visits, completed bookings, conversion, new customers and booked value.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Live: last 30 days</span>
+              <span id="growthChannelsWindow" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Live: last 30 days</span>
               <button id="growthImportBtn" class="btn btn-primary" type="button">Import existing data</button>
               <button id="growthImportTemplateBtn" class="btn btn-light" type="button">CSV template</button>
               <button id="growthChannelsRefreshBtn" class="btn btn-light" type="button">Refresh</button>
