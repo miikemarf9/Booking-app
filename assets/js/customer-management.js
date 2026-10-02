@@ -33,6 +33,15 @@ function syncCustomerManagementProfileControls(customer) {
     callBtn.disabled = archived || !customer.phone;
     callBtn.classList.toggle("opacity-50", archived || !customer.phone);
   }
+
+  if (archived) {
+    if ($("customerProfileBadge")) {
+      $("customerProfileBadge").textContent = "Archived";
+      $("customerProfileBadge").className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
+    }
+    if ($("customerRetentionActionBtn")) $("customerRetentionActionBtn").classList.add("hidden");
+    if ($("customerRetentionBookBtn")) $("customerRetentionBookBtn").classList.add("hidden");
+  }
 }
 
 function editorTagsFromInput() {
