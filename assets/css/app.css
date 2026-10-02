@@ -443,6 +443,17 @@
     #dashboardView .btn-dark:hover:not(:disabled) {
       background: #075b98;
     }
+    #dashboardView #dashboardSettingsBtn.dashboard-settings-active {
+      border-color: #0872bd !important;
+      background: #0872bd !important;
+      color: #ffffff !important;
+      box-shadow: 0 6px 16px rgba(8, 114, 189, .16);
+    }
+    #dashboardView #dashboardSettingsBtn.dashboard-settings-active:hover {
+      border-color: #075b98 !important;
+      background: #075b98 !important;
+      color: #ffffff !important;
+    }
     #dashboardView .growth-planner-filter,
     #dashboardView .growth-opportunity-filter {
       transition: background-color .16s ease, color .16s ease, box-shadow .16s ease;
