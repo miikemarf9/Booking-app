@@ -473,6 +473,9 @@ function renderGrowthImportedSummary(rows, batches) {
     $("growthImportedChannelTable").innerHTML = "";
   } else {
     $("growthImportedChannelCards").innerHTML = channels.map(function (channel) {
+      if (typeof registerGrowthPlannerChannel === "function") {
+        registerGrowthPlannerChannel(channel.key, channel.label);
+      }
       return (
         '<article class="rounded-2xl border border-slate-200 bg-white p-4">' +
           '<div class="flex items-start justify-between gap-3">' +
@@ -489,6 +492,9 @@ function renderGrowthImportedSummary(rows, batches) {
             '<span class="rounded-full bg-slate-50 px-2.5 py-1 font-semibold text-slate-600">Conv. ' + (channel.conversion == null ? "—" : channel.conversion + "%") + '</span>' +
             '<span class="rounded-full bg-slate-50 px-2.5 py-1 font-semibold text-slate-600">Cost/booking ' + (channel.costPerBooking == null ? "—" : money(channel.costPerBooking)) + '</span>' +
             '<span class="rounded-full bg-slate-50 px-2.5 py-1 font-semibold text-slate-600">ROAS ' + (channel.roas == null ? "—" : channel.roas + "×") + '</span>' +
+          '</div>' +
+          '<div class="mt-4 border-t border-slate-100 pt-3">' +
+            '<button class="text-xs font-bold text-brand-600 hover:underline" type="button" data-planner-channel="' + escapeHtml(channel.key) + '" data-planner-label="' + escapeHtml(channel.label) + '">+ Add note / plan</button>' +
           '</div>' +
         '</article>'
       );
