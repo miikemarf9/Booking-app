@@ -359,10 +359,10 @@ function metaOrganicCommercial(channelRows, qualityRows, key) {
 
 async function loadMetaCommercialData() {
   const [channels, quality, windows, campaigns] = await Promise.all([
-    supabaseClient.rpc("get_growth_channel_summary", { p_days: 30 }),
-    supabaseClient.rpc("get_growth_customer_quality_summary", { p_days: 30 }),
+    supabaseClient.rpc("get_growth_channel_summary", { p_days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 }),
+    supabaseClient.rpc("get_growth_customer_quality_summary", { p_days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 }),
     supabaseClient.rpc("get_meta_ads_value_windows", { p_lookback_days: 365 }),
-    supabaseClient.rpc("get_meta_ads_campaign_attribution", { p_days: 30 })
+    supabaseClient.rpc("get_meta_ads_campaign_attribution", { p_days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 })
   ]);
 
   for (const result of [channels, quality, windows, campaigns]) {
@@ -585,7 +585,7 @@ async function loadMetaReport(showToast = false) {
 
   try {
     const [metaData, commercial] = await Promise.all([
-      metaFunction("report"),
+      metaFunction("report", { days: typeof growthAnalyticsDays === "function" ? growthAnalyticsDays() : 30 }),
       loadMetaCommercialData()
     ]);
 
