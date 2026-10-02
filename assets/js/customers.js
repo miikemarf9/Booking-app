@@ -377,26 +377,229 @@ function customerBookings(customer) {
       $("customerTagInput").value = "";
       $("customerNotes").value = customer.notes || "";
 
-      $("customerHistory").innerHTML = m.all.length
-        ? m.all.map(b => {
-            const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
-            const cancelled = b.status === "cancelled";
-            return `
-              <div class="rounded-2xl border border-slate-200 p-4 ${cancelled ? "bg-slate-50 opacity-70" : ""}">
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p class="font-bold text-ink">${escapeHtml(srv.title || "Service")}</p>
-                    <p class="mt-1 text-sm text-slate-500">${escapeHtml(prettyDateTime(b.start_time))}</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-bold text-slate-700">${money(b.booked_price ?? srv.price ?? 0)}</p>
-                    <p class="mt-1 text-[.68rem] font-bold uppercase tracking-wider ${cancelled ? "text-slate-400" : "text-emerald-600"}">${cancelled ? "Cancelled" : "Booked"}</p>
-                  </div>
+      renderCustomerTimeline(customer);
+    }
+
+
+    function customerTimelineMessageTitle(messageType, status) {
+      const labels = {
+        confirmation: "Booking confirmation email",
+        booking_confirmation: "Booking confirmation email",
+        reminder_24h: "24-hour reminder email",
+        reminder_2h: "2-hour reminder email",
+        followup: "Follow-up email",
+        reschedule_confirmation: "Reschedule confirmation email",
+        cancellation_confirmation: "Cancellation confirmation email"
+      };
+      const label = labels[messageType] || "Customer email";
+      return status === "failed" ? `${label} failed` : `${label} sent`;
+    }
+
+    function timelineEventTone(type) {
+      if (type === "cancelled" || type === "email_failed") return "bg-red-100 text-red-700";
+      if (type === "email" || type === "marketing") return "bg-sky-100 text-sky-700";
+      if (type === "note" || type === "tag") return "bg-violet-100 text-violet-700";
+      if (type === "rescheduled") return "bg-amber-100 text-amber-700";
+      if (type === "appointment") return "bg-emerald-100 text-emerald-700";
+      return "bg-brand-50 text-brand-700";
+    }
+
+    function timelineEventSymbol(type) {
+      if (type === "cancelled") return "×";
+      if (type === "rescheduled") return "↻";
+      if (type === "email" || type === "email_failed" || type === "marketing") return "✉";
+      if (type === "note") return "✎";
+      if (type === "tag") return "#";
+      if (type === "appointment") return "✓";
+      return "•";
+    }
+
+    function renderCustomerTimeline(customer) {
+      const el = $("customerTimeline");
+      if (!el || !customer) return;
+
+      const cached = state.customerTimelineEvents[customer.id];
+      if (!cached) {
+        el.innerHTML = '<div class="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">Loading customer activity…</div>';
+        if (!state.customerTimelineLoading[customer.id]) loadCustomerTimeline(customer);
+        return;
+      }
+
+      el.innerHTML = cached.length
+        ? cached.map(event => `
+            <div class="flex gap-3 rounded-2xl border border-slate-200 p-4">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-black ${timelineEventTone(event.type)}">${timelineEventSymbol(event.type)}</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                  <p class="font-bold text-ink">${escapeHtml(event.title)}</p>
+                  <time class="shrink-0 text-[.68rem] font-semibold text-slate-400">${escapeHtml(prettyDateTime(event.time))}</time>
                 </div>
+                ${event.detail ? `<p class="mt-1 whitespace-pre-line text-sm leading-6 text-slate-500">${escapeHtml(event.detail)}</p>` : ""}
               </div>
-            `;
-          }).join("")
-        : emptyState("No booking history", "This customer does not have any bookings yet.");
+            </div>
+          `).join("")
+        : emptyState("No activity yet", "Customer activity will appear here as bookings, messages and CRM updates happen.");
+    }
+
+    async function loadCustomerTimeline(customer) {
+      if (!customer || state.customerTimelineLoading[customer.id]) return;
+      state.customerTimelineLoading[customer.id] = true;
+
+      try {
+        const bookings = customerBookings(customer);
+        const bookingIds = bookings.map(b => b.id).filter(Boolean);
+
+        const activityPromise = supabaseClient
+          .from("customer_activity")
+          .select("id,activity_type,title,detail,booking_id,metadata,created_at")
+          .eq("profile_id", state.profile.id)
+          .eq("customer_id", customer.id)
+          .order("created_at", { ascending: false });
+
+        const messagePromise = bookingIds.length
+          ? supabaseClient
+              .from("booking_message_log")
+              .select("id,booking_id,message_type,channel,status,error_message,created_at,sent_at")
+              .in("booking_id", bookingIds)
+              .order("created_at", { ascending: false })
+          : Promise.resolve({ data: [], error: null });
+
+        const [activityResult, messageResult] = await Promise.all([activityPromise, messagePromise]);
+
+        if (activityResult.error) console.error("Customer activity load error:", activityResult.error);
+        if (messageResult.error) console.error("Customer message history load error:", messageResult.error);
+
+        const events = [];
+
+        (activityResult.data || []).forEach(activity => {
+          events.push({
+            time: activity.created_at,
+            type: activity.activity_type || "manual",
+            title: activity.title,
+            detail: activity.detail || ""
+          });
+        });
+
+        bookings.forEach(booking => {
+          const service = booking.services || state.services.find(s => s.id === booking.service_id) || {};
+          const serviceName = service.title || "Service";
+          const price = money(booking.booked_price ?? service.price ?? 0);
+          const appointmentTime = new Date(booking.start_time).getTime();
+          const future = appointmentTime > Date.now();
+
+          if (booking.created_at) {
+            events.push({
+              time: booking.created_at,
+              type: "booking",
+              title: "Booking created",
+              detail: `${serviceName} · ${prettyDateTime(booking.start_time)} · ${price}`
+            });
+          }
+
+          if (booking.rescheduled_at) {
+            events.push({
+              time: booking.rescheduled_at,
+              type: "rescheduled",
+              title: "Appointment rescheduled",
+              detail: `Moved to ${prettyDateTime(booking.start_time)}`
+            });
+          }
+
+          if (booking.cancelled_at) {
+            events.push({
+              time: booking.cancelled_at,
+              type: "cancelled",
+              title: "Booking cancelled",
+              detail: `${serviceName} · appointment was ${prettyDateTime(booking.start_time)}`
+            });
+          } else if (booking.start_time) {
+            events.push({
+              time: booking.start_time,
+              type: "appointment",
+              title: future ? "Upcoming appointment" : "Appointment",
+              detail: `${serviceName} · ${price}`
+            });
+          }
+
+          const hasLoggedConfirmation = (messageResult.data || []).some(message =>
+            message.booking_id === booking.id &&
+            ["confirmation", "booking_confirmation"].includes(message.message_type)
+          );
+          if (booking.confirmation_email_sent_at && !hasLoggedConfirmation) {
+            events.push({
+              time: booking.confirmation_email_sent_at,
+              type: "email",
+              title: "Booking confirmation email sent",
+              detail: serviceName
+            });
+          }
+        });
+
+        (messageResult.data || []).forEach(message => {
+          const booking = bookings.find(b => b.id === message.booking_id);
+          const service = booking?.services || state.services.find(s => s.id === booking?.service_id) || {};
+          const failed = message.status === "failed";
+          events.push({
+            time: message.sent_at || message.created_at,
+            type: failed ? "email_failed" : "email",
+            title: customerTimelineMessageTitle(message.message_type, message.status),
+            detail: failed
+              ? (message.error_message || service.title || "")
+              : (service.title || "")
+          });
+        });
+
+        if (customer.marketing_opt_in_at) {
+          events.push({
+            time: customer.marketing_opt_in_at,
+            type: "marketing",
+            title: "Marketing consent given",
+            detail: customer.marketing_consent_source === "booking_form" ? "Opted in during online booking." : ""
+          });
+        }
+        if (customer.marketing_opt_out_at) {
+          events.push({
+            time: customer.marketing_opt_out_at,
+            type: "marketing",
+            title: "Marketing unsubscribed",
+            detail: ""
+          });
+        }
+
+        state.customerTimelineEvents[customer.id] = events
+          .filter(event => event.time)
+          .sort((a, b) => new Date(b.time) - new Date(a.time))
+          .slice(0, 80);
+      } catch (err) {
+        console.error("Customer timeline error:", err);
+        state.customerTimelineEvents[customer.id] = [];
+      } finally {
+        state.customerTimelineLoading[customer.id] = false;
+        if (state.selectedCustomerId === customer.id) renderCustomerTimeline(customer);
+      }
+    }
+
+    async function logCustomerActivity(customerId, activityType, title, detail = "", metadata = {}) {
+      const { error } = await supabaseClient
+        .from("customer_activity")
+        .insert({
+          profile_id: state.profile.id,
+          customer_id: customerId,
+          activity_type: activityType,
+          title,
+          detail: String(detail || "").slice(0, 4000) || null,
+          metadata
+        });
+
+      if (error) {
+        console.error("Customer activity log error:", error);
+        return false;
+      }
+
+      delete state.customerTimelineEvents[customerId];
+      const customer = state.customers.find(c => c.id === customerId);
+      if (customer && state.selectedCustomerId === customerId) loadCustomerTimeline(customer);
+      return true;
     }
 
     function selectCustomer(customerId) {
@@ -409,6 +612,7 @@ function customerBookings(customer) {
       const customer = state.customers.find(c => c.id === state.selectedCustomerId);
       if (!customer) return;
 
+      const previousTags = customerTags(customer);
       const cleanTags = [...new Map(
         tags
           .map(tag => String(tag || "").trim().replace(/\s+/g, " ").slice(0, 40))
@@ -430,6 +634,17 @@ function customerBookings(customer) {
       if (error) return toast(friendlyDbError(error, "save customer tags"), "error");
 
       state.customers = state.customers.map(c => c.id === data.id ? data : c);
+
+      const added = cleanTags.filter(tag => !previousTags.some(oldTag => oldTag.toLowerCase() === tag.toLowerCase()));
+      const removed = previousTags.filter(tag => !cleanTags.some(newTag => newTag.toLowerCase() === tag.toLowerCase()));
+      if (added.length || removed.length) {
+        const details = [
+          added.length ? `Added: ${added.join(", ")}` : "",
+          removed.length ? `Removed: ${removed.join(", ")}` : ""
+        ].filter(Boolean).join("\n");
+        await logCustomerActivity(customer.id, "tag", "Customer tags updated", details, { added, removed });
+      }
+
       renderCustomers();
       toast(successMessage);
     }
@@ -464,12 +679,14 @@ function customerBookings(customer) {
       if (!customer) return;
 
       const btn = $("saveCustomerNotesBtn");
+      const previousNote = customer.notes || "";
+      const nextNote = $("customerNotes").value.trim();
       setBusy(btn, true, "Saving…");
 
       const { data, error } = await supabaseClient
         .from("customers")
         .update({
-          notes: $("customerNotes").value.trim(),
+          notes: nextNote,
           updated_at: new Date().toISOString()
         })
         .eq("id", customer.id)
@@ -481,6 +698,14 @@ function customerBookings(customer) {
       if (error) return toast(friendlyDbError(error, "save customer notes"), "error");
 
       state.customers = state.customers.map(c => c.id === data.id ? data : c);
+      if (previousNote !== nextNote) {
+        await logCustomerActivity(
+          customer.id,
+          "note",
+          nextNote ? "Private note updated" : "Private note cleared",
+          nextNote ? nextNote.slice(0, 4000) : ""
+        );
+      }
       renderCustomers();
       toast("Customer notes saved.");
     }
