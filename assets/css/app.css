@@ -1151,3 +1151,178 @@
         gap: .35rem;
       }
     }
+
+
+    /* Homepage SaaS motion system */
+    #landingView .hero-motion-item {
+      opacity: 1;
+      transform: none;
+    }
+    #landingView .saas-reveal,
+    #landingView .saas-stagger > * {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      #landingView.homepage-motion-ready .hero-motion-item {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      #landingView.homepage-motion-ready.homepage-hero-playing .hero-motion-item {
+        animation: homepage-rise .62s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      #landingView.homepage-motion-ready.homepage-hero-playing .hero-motion-item:nth-child(1) { animation-delay: .04s; }
+      #landingView.homepage-motion-ready.homepage-hero-playing .hero-motion-item:nth-child(2) { animation-delay: .11s; }
+      #landingView.homepage-motion-ready.homepage-hero-playing .hero-motion-item:nth-child(3) { animation-delay: .18s; }
+      #landingView.homepage-motion-ready.homepage-hero-playing .hero-motion-item:nth-child(4) { animation-delay: .25s; }
+      #landingView.homepage-motion-ready.homepage-hero-playing .hero-motion-item:nth-child(5) { animation-delay: .32s; }
+
+      #dashboardPreview .preview-chrome,
+      #dashboardPreview .preview-nav-item,
+      #dashboardPreview .preview-stat,
+      #dashboardPreview .preview-appointment,
+      #dashboardPreview .preview-diary {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      #dashboardPreview.preview-playing .preview-chrome {
+        animation: homepage-rise .5s cubic-bezier(.2,.72,.25,1) .05s forwards;
+      }
+      #dashboardPreview.preview-playing .preview-nav-item {
+        animation: homepage-rise .42s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      #dashboardPreview.preview-playing .preview-nav-item:nth-child(1) { animation-delay: .17s; }
+      #dashboardPreview.preview-playing .preview-nav-item:nth-child(2) { animation-delay: .22s; }
+      #dashboardPreview.preview-playing .preview-nav-item:nth-child(3) { animation-delay: .27s; }
+      #dashboardPreview.preview-playing .preview-nav-item:nth-child(4) { animation-delay: .32s; }
+      #dashboardPreview.preview-playing .preview-stat:nth-child(1) { animation: homepage-rise .48s cubic-bezier(.2,.72,.25,1) .36s forwards; }
+      #dashboardPreview.preview-playing .preview-stat:nth-child(2) { animation: homepage-rise .48s cubic-bezier(.2,.72,.25,1) .43s forwards; }
+      #dashboardPreview.preview-playing .preview-stat:nth-child(3) { animation: homepage-rise .48s cubic-bezier(.2,.72,.25,1) .50s forwards; }
+      #dashboardPreview.preview-playing .preview-appointment:nth-child(1) { animation: homepage-slide-in .52s cubic-bezier(.2,.72,.25,1) .62s forwards; }
+      #dashboardPreview.preview-playing .preview-appointment:nth-child(2) { animation: homepage-slide-in .52s cubic-bezier(.2,.72,.25,1) .72s forwards; }
+      #dashboardPreview.preview-playing .preview-diary { animation: homepage-rise .52s cubic-bezier(.2,.72,.25,1) .82s forwards; }
+
+      #dashboardPreview .preview-progress-bar {
+        transform: scaleX(0);
+      }
+      #dashboardPreview.preview-playing .preview-progress-bar {
+        animation: homepage-bar-grow .72s cubic-bezier(.2,.72,.25,1) 1.02s forwards;
+      }
+
+      #landingView .saas-reveal {
+        opacity: 0;
+        transform: translateY(22px);
+        transition: opacity .62s ease, transform .62s cubic-bezier(.2,.72,.25,1);
+      }
+      #landingView .saas-reveal.reveal-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      #landingView .saas-stagger > * {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity .5s ease, transform .5s cubic-bezier(.2,.72,.25,1);
+      }
+      #landingView .saas-stagger.reveal-in > * {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      #landingView .saas-stagger.reveal-in > *:nth-child(2) { transition-delay: .07s; }
+      #landingView .saas-stagger.reveal-in > *:nth-child(3) { transition-delay: .14s; }
+      #landingView .saas-stagger.reveal-in > *:nth-child(4) { transition-delay: .21s; }
+
+      .landing-product-card {
+        will-change: transform;
+      }
+      .product-card-book .book-mini-slot,
+      .product-card-crm .crm-mini-stat,
+      .product-card-growth .growth-mini-bar {
+        transition: transform .28s ease, box-shadow .28s ease, opacity .28s ease;
+      }
+      .product-card-growth .growth-mini-bar {
+        transform: scaleX(.35);
+      }
+      .saas-stagger.reveal-in .product-card-growth .growth-mini-bar {
+        transform: scaleX(1);
+        transition-duration: .75s;
+        transition-delay: .38s;
+      }
+
+      .saas-product-preview.reveal-in {
+        box-shadow: 0 24px 65px rgba(23,32,51,.105);
+      }
+      .saas-product-preview .growth-detail-row {
+        transition: background-color .2s ease;
+      }
+
+      .homepage-final-cta {
+        position: relative;
+        isolation: isolate;
+      }
+      .homepage-final-cta::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: linear-gradient(110deg, transparent 18%, rgba(255,255,255,.18) 46%, transparent 72%);
+        transform: translateX(-120%);
+        opacity: 0;
+      }
+      .homepage-final-cta.reveal-in::after {
+        animation: homepage-cta-sheen 1s ease .38s both;
+      }
+    }
+
+    @media (hover:hover) and (prefers-reduced-motion:no-preference) {
+      .product-card-book:hover .book-mini-slot-active {
+        transform: translateY(-2px) scale(1.035);
+        box-shadow: 0 8px 18px rgba(8,114,189,.16);
+      }
+      .product-card-book:hover .book-mini-slot:not(.book-mini-slot-active) {
+        opacity: .72;
+      }
+      .product-card-crm:hover .crm-mini-stat:first-child {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 16px rgba(23,32,51,.07);
+      }
+      .product-card-crm:hover .crm-mini-stat:nth-child(2) {
+        transform: translateY(-2px);
+        transition-delay: .05s;
+        box-shadow: 0 7px 16px rgba(23,32,51,.07);
+      }
+      .product-card-growth:hover .growth-mini-bar {
+        filter: saturate(1.12);
+        transform: scaleX(1);
+      }
+      .saas-product-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 30px 72px rgba(23,32,51,.12);
+      }
+      .saas-product-preview {
+        transition: transform .25s ease, box-shadow .25s ease;
+      }
+    }
+
+    @keyframes homepage-rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes homepage-slide-in {
+      from { opacity: 0; transform: translateX(-14px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes homepage-bar-grow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    @keyframes homepage-cta-sheen {
+      0% { opacity: 0; transform: translateX(-120%); }
+      20%, 75% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(120%); }
+    }
+
+    @media (max-width:639px) and (prefers-reduced-motion:no-preference) {
+      #landingView .saas-reveal { transform: translateY(14px); }
+      #landingView .saas-stagger > * { transform: translateY(12px); }
+    }
