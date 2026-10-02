@@ -1931,3 +1931,172 @@
       .growth-product-page .growth-reveal{transform:translateY(14px)}
       .growth-product-page .growth-stagger > *{transform:translateY(12px)}
     }
+
+
+    /* Trust pages motion: case studies + contact */
+    .case-studies-page .case-hero-item,
+    .case-studies-page .case-method-step,
+    .case-studies-page .case-reveal,
+    .contact-product-page .contact-hero-item,
+    .contact-product-page .contact-principle-item,
+    .contact-product-page .contact-reveal,
+    .contact-product-page .contact-stagger > *,
+    .contact-thanks-page .contact-thanks-card {
+      opacity:1;
+      transform:none;
+    }
+
+    .contact-submit-spinner {
+      width:1rem;
+      height:1rem;
+      border:2px solid rgba(255,255,255,.45);
+      border-top-color:#fff;
+      border-radius:999px;
+      animation:trust-spinner .7s linear infinite;
+    }
+    #contactSubmitBtn.is-sending {
+      cursor:wait;
+      opacity:.92;
+    }
+    #contactSubmitBtn.is-sending .contact-submit-spinner {
+      display:inline-block;
+    }
+    #contactSubmitBtn.is-sending .contact-submit-label {
+      margin-right:.45rem;
+    }
+
+    @media (prefers-reduced-motion:no-preference) {
+      .case-studies-page.case-motion-enabled .case-hero-item,
+      .contact-product-page.contact-motion-enabled .contact-hero-item {
+        opacity:0;
+        transform:translateY(14px);
+      }
+      .case-studies-page.case-motion-enabled.case-hero-playing .case-hero-item,
+      .contact-product-page.contact-motion-enabled.contact-hero-playing .contact-hero-item {
+        animation:trust-rise .56s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .case-studies-page.case-motion-enabled.case-hero-playing .case-hero-item:nth-child(1),
+      .contact-product-page.contact-motion-enabled.contact-hero-playing .contact-hero-item:nth-child(1){animation-delay:.03s}
+      .case-studies-page.case-motion-enabled.case-hero-playing .case-hero-item:nth-child(2),
+      .contact-product-page.contact-motion-enabled.contact-hero-playing .contact-hero-item:nth-child(2){animation-delay:.10s}
+      .case-studies-page.case-motion-enabled.case-hero-playing .case-hero-item:nth-child(3),
+      .contact-product-page.contact-motion-enabled.contact-hero-playing .contact-hero-item:nth-child(3){animation-delay:.17s}
+
+      .case-studies-page.case-motion-enabled .case-method-step {
+        opacity:0;
+        transform:translateY(14px);
+      }
+      .case-method-flow.flow-playing .case-method-step {
+        animation:trust-rise .46s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .case-method-flow.flow-playing .case-method-step:nth-child(1){animation-delay:.05s}
+      .case-method-flow.flow-playing .case-method-step:nth-child(2){animation-delay:.16s}
+      .case-method-flow.flow-playing .case-method-step:nth-child(3){animation-delay:.27s}
+      .case-method-flow.flow-playing .case-method-step::after {
+        content:"";
+      }
+
+      .case-studies-page.case-motion-enabled .case-reveal,
+      .contact-product-page.contact-motion-enabled .contact-reveal {
+        opacity:0;
+        transform:translateY(18px);
+        transition:opacity .58s ease,transform .58s cubic-bezier(.2,.72,.25,1);
+      }
+      .case-studies-page .case-reveal.reveal-in,
+      .contact-product-page .contact-reveal.reveal-in {
+        opacity:1;
+        transform:translateY(0);
+      }
+
+      .case-metric-item {
+        transition:background-color .2s ease;
+      }
+      .case-metric-grid.metrics-playing .case-metric-item {
+        animation:trust-metric-settle .42s cubic-bezier(.2,.72,.25,1) both;
+      }
+      .case-metric-grid.metrics-playing .case-metric-item:nth-child(1){animation-delay:.05s}
+      .case-metric-grid.metrics-playing .case-metric-item:nth-child(2){animation-delay:.10s}
+      .case-metric-grid.metrics-playing .case-metric-item:nth-child(3){animation-delay:.15s}
+      .case-metric-grid.metrics-playing .case-metric-item:nth-child(4){animation-delay:.20s}
+      .case-metric-grid.metrics-playing .case-metric-item:nth-child(5){animation-delay:.25s}
+      .case-metric-grid.metrics-playing .case-metric-item:nth-child(6){animation-delay:.30s}
+
+      .contact-product-page.contact-motion-enabled .contact-principle-item {
+        opacity:0;
+        transform:translateX(-8px);
+      }
+      .contact-principles.principles-playing .contact-principle-item {
+        animation:trust-slide-in .44s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .contact-principles.principles-playing .contact-principle-item:nth-child(1){animation-delay:.12s}
+      .contact-principles.principles-playing .contact-principle-item:nth-child(2){animation-delay:.22s}
+      .contact-principles.principles-playing .contact-principle-item:nth-child(3){animation-delay:.32s}
+
+      .contact-product-page.contact-motion-enabled .contact-stagger > * {
+        opacity:0;
+        transform:translateY(12px);
+        transition:opacity .46s ease,transform .46s cubic-bezier(.2,.72,.25,1);
+      }
+      .contact-product-page .contact-stagger.reveal-in > * {
+        opacity:1;
+        transform:translateY(0);
+      }
+      .contact-product-page .contact-stagger.reveal-in > *:nth-child(2){transition-delay:.07s}
+      .contact-product-page .contact-stagger.reveal-in > *:nth-child(3){transition-delay:.14s}
+
+      .contact-thanks-page.thanks-motion-enabled .contact-thanks-card {
+        opacity:0;
+        transform:translateY(12px);
+      }
+      .contact-thanks-page.thanks-motion-enabled.thanks-playing .contact-thanks-card {
+        animation:trust-rise .56s cubic-bezier(.2,.72,.25,1) forwards;
+      }
+      .contact-thanks-page.thanks-motion-enabled.thanks-playing .contact-success-icon {
+        animation:trust-success .6s cubic-bezier(.2,.8,.25,1) .16s both;
+      }
+    }
+
+    @media (hover:hover) and (prefers-reduced-motion:no-preference) {
+      .case-method-card,
+      .case-metric,
+      .contact-product-page .product-feature {
+        transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+      }
+      .case-method-card:hover,
+      .contact-product-page .product-feature:hover {
+        transform:translateY(-2px);
+        border-color:#cfe8f8;
+        box-shadow:0 14px 30px rgba(23,32,51,.055);
+      }
+      .case-metric:hover {
+        background:#fbfdff;
+      }
+    }
+
+    @keyframes trust-rise {
+      from{opacity:0;transform:translateY(14px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    @keyframes trust-slide-in {
+      from{opacity:0;transform:translateX(-8px)}
+      to{opacity:1;transform:translateX(0)}
+    }
+    @keyframes trust-metric-settle {
+      from{opacity:.55;transform:scale(.985)}
+      to{opacity:1;transform:scale(1)}
+    }
+    @keyframes trust-success {
+      0%{opacity:0;transform:scale(.72)}
+      70%{opacity:1;transform:scale(1.08)}
+      100%{opacity:1;transform:scale(1)}
+    }
+    @keyframes trust-spinner {
+      to{transform:rotate(360deg)}
+    }
+
+    @media (max-width:639px) and (prefers-reduced-motion:no-preference) {
+      .case-studies-page.case-motion-enabled .case-reveal,
+      .contact-product-page.contact-motion-enabled .contact-reveal {
+        transform:translateY(12px);
+      }
+    }
