@@ -878,6 +878,15 @@
       $("googleAdsDisconnectBtn").addEventListener("click", disconnectGoogleAds);
       $("googleAdsSaveAccountBtn").addEventListener("click", saveGoogleAdsAccount);
       $("googleAdsPlanBtn").addEventListener("click", addGoogleAdsPlan);
+      $("metaConnectBtn").addEventListener("click", connectMeta);
+      $("metaRefreshBtn").addEventListener("click", () => loadMetaIntegration(true));
+      $("metaDisconnectBtn").addEventListener("click", disconnectMeta);
+      $("metaSaveAssetsBtn").addEventListener("click", saveMetaAssets);
+      $("metaPlanBtn").addEventListener("click", addMetaPlan);
+      $("metaReportWrap").addEventListener("click", e => {
+        const btn = e.target.closest("[data-planner-channel]");
+        if (btn) openGrowthPlannerForChannel(btn.dataset.plannerChannel, btn.dataset.plannerLabel);
+      });
       ["searchConsoleCtrOpportunities", "searchConsolePositionOpportunities", "searchConsolePageOpportunities"].forEach(id => {
         $(id).addEventListener("click", e => {
           const btn = e.target.closest("[data-seo-planner-title]");
