@@ -643,6 +643,24 @@
         return await loadPublicBookingPage(businessId);
       }
 
+      const publicLandingAnchors = new Set([
+        "#pricing",
+        "#product-overview",
+        "#faq",
+        "#customer-proof"
+      ]);
+      const requestedLandingAnchor = publicLandingAnchors.has(window.location.hash)
+        ? window.location.hash
+        : "";
+
+      if (requestedLandingAnchor && !subscriptionState && !stripeReturn && !requestedAuthMode) {
+        showOnly("landingView");
+        window.setTimeout(() => {
+          document.querySelector(requestedLandingAnchor)?.scrollIntoView({ block: "start" });
+        }, 0);
+        return;
+      }
+
       const { data, error } = await supabaseClient.auth.getUser();
       if (!error && data?.user) {
         await loadOwner(data.user);
