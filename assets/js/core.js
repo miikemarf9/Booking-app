@@ -1328,6 +1328,7 @@
       renderPlanSubscription();
       populateBranding();
       renderCalendarDashboard();
+      if (typeof loadWorkspaceTasks === "function") loadWorkspaceTasks();
 
       const warnEl = $("dashboardDataWarning");
       if (state.bookingsError) {
