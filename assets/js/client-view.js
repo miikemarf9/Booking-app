@@ -214,7 +214,7 @@ function renderCustomers(data) {
     <section class="card overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full text-left text-sm">
-          <thead class="bg-slate-50 text-[.68rem] font-bold uppercase tracking-wider text-slate-400"><tr><th class="px-5 py-3">Customer</th><th class="px-4 py-3 text-right">Bookings</th><th class="px-4 py-3 text-right">Booked value</th><th class="px-4 py-3">Next booking</th><th class="px-4 py-3">Marketing</th><th class="px-5 py-3">Tags</th></tr></thead>
+          <thead class="bg-slate-50 text-[.68rem] font-bold uppercase tracking-wider text-slate-400"><tr><th class="px-5 py-3">Customer</th><th class="px-4 py-3 text-right">Bookings in view</th><th class="px-4 py-3 text-right">Value in view</th><th class="px-4 py-3">Next booking</th><th class="px-4 py-3">Marketing</th><th class="px-5 py-3">Tags</th></tr></thead>
           <tbody>${rows || '<tr><td colspan="6" class="px-5 py-10 text-center text-slate-400">No active customers.</td></tr>'}</tbody>
         </table>
       </div>
