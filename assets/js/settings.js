@@ -18,12 +18,16 @@ const WORKSPACE_AREA_START_PAGES = {
   crm: "customers",
   growth: "growth"
 };
+const DASHBOARD_THEMES = ["light", "dark", "system"];
+const DASHBOARD_ACCENTS = ["blue", "emerald", "violet", "graphite"];
 
 function defaultDashboardPreferences() {
   return {
     visible_areas: [...WORKSPACE_PRESETS.full],
     workspace_preset: "full",
-    start_page: "overview"
+    start_page: "overview",
+    theme_preference: "system",
+    accent_color: "blue"
   };
 }
 
@@ -39,6 +43,138 @@ function normaliseWorkspaceStartPage(startPage, areas) {
   const requestedArea = WORKSPACE_START_PAGE_AREAS[startPage];
   if (requestedArea && visibleAreas.includes(requestedArea)) return startPage;
   return WORKSPACE_AREA_START_PAGES[visibleAreas[0]] || "overview";
+}
+
+function normaliseDashboardTheme(theme) {
+  return DASHBOARD_THEMES.includes(theme) ? theme : "system";
+}
+
+function normaliseDashboardAccent(accent) {
+  return DASHBOARD_ACCENTS.includes(accent) ? accent : "blue";
+}
+
+function resolvedDashboardTheme(preference) {
+  const theme = normaliseDashboardTheme(preference);
+  if (theme !== "system") return theme;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function dashboardThemeLabel(theme) {
+  if (theme === "light") return "Light";
+  if (theme === "dark") return "Dark";
+  return "Use device";
+}
+
+function dashboardAccentLabel(accent) {
+  if (accent === "emerald") return "Emerald";
+  if (accent === "violet") return "Violet";
+  if (accent === "graphite") return "Graphite";
+  return "Grab&Book Blue";
+}
+
+function applyDashboardAppearance(preferences) {
+  const dashboard = $("dashboardView");
+  if (!dashboard) return;
+
+  const source = preferences || state.dashboardPreferences || defaultDashboardPreferences();
+  const themePreference = normaliseDashboardTheme(source.theme_preference);
+  const accent = normaliseDashboardAccent(source.accent_color);
+
+  dashboard.dataset.dashboardTheme = resolvedDashboardTheme(themePreference);
+  dashboard.dataset.dashboardThemePreference = themePreference;
+  dashboard.dataset.dashboardAccent = accent;
+}
+
+function syncDashboardAppearanceForm() {
+  if (!$("dashboardAppearanceForm")) return;
+  const selectedTheme = document.querySelector('input[name="dashboardTheme"]:checked')?.value || "system";
+  const selectedAccent = document.querySelector('input[name="dashboardAccent"]:checked')?.value || "blue";
+
+  document.querySelectorAll(".dashboard-theme-option").forEach(function (label) {
+    label.classList.toggle("appearance-selected", label.querySelector("input")?.checked);
+  });
+  document.querySelectorAll(".dashboard-accent-option").forEach(function (label) {
+    label.classList.toggle("appearance-selected", label.querySelector("input")?.checked);
+  });
+
+  if ($("dashboardAppearanceSummary")) {
+    $("dashboardAppearanceSummary").textContent = dashboardThemeLabel(selectedTheme) + " theme · " + dashboardAccentLabel(selectedAccent);
+  }
+}
+
+function populateDashboardAppearance() {
+  if (!$("dashboardAppearanceForm")) return;
+  const preferences = state.dashboardPreferences || defaultDashboardPreferences();
+  const theme = normaliseDashboardTheme(preferences.theme_preference);
+  const accent = normaliseDashboardAccent(preferences.accent_color);
+  const themeInput = document.querySelector('input[name="dashboardTheme"][value="' + theme + '"]');
+  const accentInput = document.querySelector('input[name="dashboardAccent"][value="' + accent + '"]');
+  if (themeInput) themeInput.checked = true;
+  if (accentInput) accentInput.checked = true;
+  syncDashboardAppearanceForm();
+}
+
+function previewDashboardAppearance() {
+  const theme = document.querySelector('input[name="dashboardTheme"]:checked')?.value || "system";
+  const accent = document.querySelector('input[name="dashboardAccent"]:checked')?.value || "blue";
+  applyDashboardAppearance({ theme_preference: theme, accent_color: accent });
+  syncDashboardAppearanceForm();
+}
+
+async function saveDashboardAppearance(event) {
+  event.preventDefault();
+  if (!state.user?.id) return;
+
+  const current = state.dashboardPreferences || defaultDashboardPreferences();
+  const visibleAreas = normaliseWorkspaceAreas(current.visible_areas);
+  const theme = normaliseDashboardTheme(document.querySelector('input[name="dashboardTheme"]:checked')?.value);
+  const accent = normaliseDashboardAccent(document.querySelector('input[name="dashboardAccent"]:checked')?.value);
+  const startPage = normaliseWorkspaceStartPage(current.start_page, visibleAreas);
+  const btn = $("dashboardAppearanceSaveBtn");
+  setBusy(btn, true, "Saving…");
+
+  const { data, error } = await supabaseClient
+    .from("dashboard_preferences")
+    .upsert({
+      user_id: state.user.id,
+      visible_areas: visibleAreas,
+      workspace_preset: workspacePresetForAreas(visibleAreas),
+      start_page: startPage,
+      theme_preference: theme,
+      accent_color: accent,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" })
+    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color")
+    .single();
+
+  setBusy(btn, false);
+  if (error) {
+    applyDashboardAppearance(current);
+    populateDashboardAppearance();
+    return toast(friendlyDbError(error, "save dashboard appearance"), "error");
+  }
+
+  state.dashboardPreferences = {
+    visible_areas: normaliseWorkspaceAreas(data.visible_areas),
+    workspace_preset: workspacePresetForAreas(data.visible_areas),
+    start_page: normaliseWorkspaceStartPage(data.start_page, data.visible_areas),
+    theme_preference: normaliseDashboardTheme(data.theme_preference),
+    accent_color: normaliseDashboardAccent(data.accent_color)
+  };
+
+  applyDashboardAppearance();
+  populateDashboardAppearance();
+  toast("Appearance updated.");
+}
+
+function bindDashboardSystemTheme() {
+  if (!window.matchMedia || window.__grabBookThemeListenerBound) return;
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  media.addEventListener?.("change", function () {
+    const preferences = state.dashboardPreferences || defaultDashboardPreferences();
+    if (normaliseDashboardTheme(preferences.theme_preference) === "system") applyDashboardAppearance(preferences);
+  });
+  window.__grabBookThemeListenerBound = true;
 }
 
 function workspacePresetForAreas(areas) {
@@ -64,13 +200,16 @@ async function loadDashboardPreferences() {
 
   const { data, error } = await supabaseClient
     .from("dashboard_preferences")
-    .select("visible_areas, workspace_preset, start_page")
+    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color")
     .eq("user_id", state.user.id)
     .maybeSingle();
 
   if (error) {
     console.warn("Dashboard preferences could not be loaded:", error.message || error);
     applyDashboardWorkspacePreferences();
+    applyDashboardAppearance();
+    bindDashboardSystemTheme();
+    populateDashboardAppearance();
     return state.dashboardPreferences;
   }
 
@@ -79,12 +218,17 @@ async function loadDashboardPreferences() {
     state.dashboardPreferences = {
       visible_areas: visibleAreas,
       workspace_preset: workspacePresetForAreas(visibleAreas),
-      start_page: normaliseWorkspaceStartPage(data.start_page, visibleAreas)
+      start_page: normaliseWorkspaceStartPage(data.start_page, visibleAreas),
+      theme_preference: normaliseDashboardTheme(data.theme_preference),
+      accent_color: normaliseDashboardAccent(data.accent_color)
     };
   }
 
   applyDashboardWorkspacePreferences();
+  applyDashboardAppearance();
+  bindDashboardSystemTheme();
   populateWorkspacePersonalisation();
+  populateDashboardAppearance();
   return state.dashboardPreferences;
 }
 
@@ -202,9 +346,11 @@ async function saveWorkspacePersonalisation(event) {
       visible_areas: visibleAreas,
       workspace_preset: preset,
       start_page: startPage,
+      theme_preference: normaliseDashboardTheme(state.dashboardPreferences?.theme_preference),
+      accent_color: normaliseDashboardAccent(state.dashboardPreferences?.accent_color),
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id" })
-    .select("visible_areas, workspace_preset, start_page")
+    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color")
     .single();
 
   setBusy(btn, false);
@@ -214,7 +360,9 @@ async function saveWorkspacePersonalisation(event) {
   state.dashboardPreferences = {
     visible_areas: savedAreas,
     workspace_preset: workspacePresetForAreas(savedAreas),
-    start_page: normaliseWorkspaceStartPage(data?.start_page || startPage, savedAreas)
+    start_page: normaliseWorkspaceStartPage(data?.start_page || startPage, savedAreas),
+    theme_preference: normaliseDashboardTheme(data?.theme_preference || state.dashboardPreferences?.theme_preference),
+    accent_color: normaliseDashboardAccent(data?.accent_color || state.dashboardPreferences?.accent_color)
   };
 
   applyDashboardWorkspacePreferences();
