@@ -181,7 +181,7 @@ function selectBusiness(profileId) {
       <a class="btn btn-light" href="client-view.html?business=${encodeURIComponent(profileId)}" target="_blank" rel="noopener">View as client ↗</a>
       <button class="btn btn-light" type="button" data-scroll-inspector>Inspect setup ↓</button>
     </div>
-    <p class="mt-3 text-xs leading-5 text-slate-400">Admin access is read-only. Client data cannot be edited from this console.</p>
+    <p class="mt-3 text-xs leading-5 text-slate-400">Inspection remains read-only. Any change available under Support is explicit, server-authorised and written to the audit log.</p>
   `;
 
   $("adminInspectorBusinessName").textContent = business.business_name || "Unnamed business";
@@ -228,7 +228,8 @@ async function loadBusinessInspector(profileId, force = false) {
   try {
     const data = await invokeAdmin({ action:"get_business_detail", profile_id:profileId });
     if (!data || adminState.selectedId !== profileId) return;
-    adminState.inspectors[profileId] = data.inspector;
+    const existingSupport = adminState.inspectors[profileId]?.support;
+    adminState.inspectors[profileId] = { ...data.inspector, support: existingSupport };
     renderInspector();
   } catch (error) {
     console.error("Client inspector failed", error);
@@ -243,7 +244,7 @@ async function loadBusinessInspector(profileId, force = false) {
 }
 
 function setInspectorTab(tab) {
-  const allowed = ["book","crm","growth","personalisation","integrations"];
+  const allowed = ["book","crm","growth","personalisation","integrations","support"];
   adminState.inspectorTab = allowed.includes(tab) ? tab : "book";
   document.querySelectorAll("[data-inspector-tab]").forEach(button => {
     const active = button.dataset.inspectorTab === adminState.inspectorTab;
@@ -253,6 +254,9 @@ function setInspectorTab(tab) {
     button.classList.toggle("text-slate-500", !active);
   });
   renderInspector();
+  if (adminState.inspectorTab === "support" && adminState.selectedId) {
+    loadSupportTools(adminState.selectedId);
+  }
 }
 
 function diagnosticStatusMeta(status) {
@@ -343,6 +347,14 @@ function renderInspector() {
   const data = adminState.inspectors[adminState.selectedId];
   if (!data) return;
   renderDiagnosticsSummary(data.diagnostics);
+
+  if (adminState.inspectorTab === "support") {
+    $("adminInspectorContent").innerHTML = data.support
+      ? renderSupportInspector(data.support, data)
+      : '<div class="py-12 text-center text-sm font-semibold text-slate-400"><span class="spinner mr-2 inline-block"></span> Loading support tools…</div>';
+    return;
+  }
+
   const renderers = {
     book: renderBookInspector,
     crm: renderCrmInspector,
@@ -562,6 +574,234 @@ function renderIntegrationsInspector(integrations) {
     </div>`;
 }
 
+
+function supportStatusPill(status) {
+  const value = String(status || "").toLowerCase();
+  if (value === "connected" || value === "succeeded" || value === "active") {
+    return '<span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700">' + escapeHtml(titleCase(value)) + '</span>';
+  }
+  if (value === "reconnect_recommended" || value === "past_due" || value === "trialing") {
+    return '<span class="rounded-full bg-amber-50 px-2.5 py-1 text-[.68rem] font-bold text-amber-700">' + escapeHtml(titleCase(value)) + '</span>';
+  }
+  if (value === "failed") {
+    return '<span class="rounded-full bg-red-50 px-2.5 py-1 text-[.68rem] font-bold text-red-700">Failed</span>';
+  }
+  return '<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">' + escapeHtml(titleCase(value || "Not connected")) + '</span>';
+}
+
+function reconnectCard(name, connection, instruction) {
+  const connected = Boolean(connection?.connected);
+  const detail = connection?.label || connection?.account_email || "";
+  return `<article class="rounded-2xl border border-slate-200 p-4">
+    <div class="flex flex-wrap items-start justify-between gap-2">
+      <div><p class="font-bold text-ink">${escapeHtml(name)}</p>${detail ? `<p class="mt-1 text-xs text-slate-400">${escapeHtml(detail)}</p>` : ""}</div>
+      ${supportStatusPill(connection?.status || (connected ? "connected" : "not_connected"))}
+    </div>
+    <p class="mt-3 text-sm leading-6 text-slate-500">${escapeHtml(instruction)}</p>
+    ${connection?.token_expires_at ? `<p class="mt-2 text-xs text-slate-400">Token expires: ${escapeHtml(dateTime(connection.token_expires_at))}</p>` : ""}
+  </article>`;
+}
+
+function renderSupportInspector(support) {
+  const issues = Array.isArray(support.email_issues) ? support.email_issues : [];
+  const audit = Array.isArray(support.audit_log) ? support.audit_log : [];
+  const subscription = support.subscription || {};
+  const account = support.account || {};
+  const integrations = support.integrations || {};
+
+  const issueRows = issues.length ? issues.map(issue => `<tr class="border-t border-slate-100">
+    <td class="px-4 py-3">
+      <p class="font-bold text-slate-700">${escapeHtml(titleCase(issue.message_type))}</p>
+      <p class="mt-1 text-xs text-slate-400">${escapeHtml(issue.error_message || "Email needs attention.")}</p>
+    </td>
+    <td class="px-4 py-3"><p class="font-bold text-slate-700">${escapeHtml(issue.customer_name || "Customer")}</p><p class="mt-1 text-xs text-slate-400">${escapeHtml(issue.customer_email || "")}</p></td>
+    <td class="px-4 py-3 text-xs text-slate-500">${escapeHtml(issue.service_title || "Service")}<br>${escapeHtml(dateTime(issue.appointment_at))}</td>
+    <td class="px-4 py-3 text-right"><button type="button" class="btn btn-light" data-support-retry-email data-retry-kind="${escapeHtml(issue.retry_kind)}" data-booking-id="${escapeHtml(issue.booking_id)}" data-message-log-id="${escapeHtml(issue.message_log_id || "")}" data-customer-email="${escapeHtml(issue.customer_email || "")}" data-message-type="${escapeHtml(issue.message_type)}">Retry email</button></td>
+  </tr>`).join("") : '<tr><td colspan="4" class="px-4 py-8 text-center text-sm text-slate-400">No failed or missing booking emails found in the recent support sample.</td></tr>';
+
+  const auditRows = audit.length ? audit.map(item => `<tr class="border-t border-slate-100">
+    <td class="px-4 py-3 text-xs text-slate-500">${escapeHtml(dateTime(item.created_at))}</td>
+    <td class="px-4 py-3">${supportStatusPill(item.status)}</td>
+    <td class="px-4 py-3 font-bold text-slate-700">${escapeHtml(titleCase(item.action))}</td>
+    <td class="px-4 py-3 text-sm text-slate-500">${escapeHtml(item.summary || "")}</td>
+    <td class="px-4 py-3 text-xs text-slate-400">${escapeHtml(item.admin_email || item.admin_user_id || "Admin")}</td>
+  </tr>`).join("") : '<tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-400">No support actions have been recorded for this business yet.</td></tr>';
+
+  const approvalAction = account.is_approved
+    ? `<button type="button" class="btn btn-light" data-support-approval="false">Pause owner dashboard access</button>`
+    : `<button type="button" class="btn btn-primary" data-support-approval="true">Approve owner dashboard access</button>`;
+
+  return `
+    ${sectionHeading("Support", "Controlled support actions for this business. Every server-side change in this workspace is written to the audit log.")}
+
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      ${metricCard("Email issues", number(issues.length), support.email_issue_sample_limited ? "Recent 300 bookings sampled" : "failed or missing sends")}
+      ${metricCard("Account access", account.is_approved ? "Approved" : "Paused")}
+      ${metricCard("Plan", String(subscription.plan_code || "free").toUpperCase(), titleCase(subscription.status || "active"))}
+      ${metricCard("Audit entries", number(audit.length), "latest support actions")}
+    </div>
+
+    <section class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
+      <div class="flex flex-wrap items-start justify-between gap-3 bg-slate-50 px-4 py-4">
+        <div><p class="font-bold text-ink">Email recovery</p><p class="mt-1 text-xs leading-5 text-slate-500">Retry only booking emails that are missing or recorded as failed. The customer address is never editable here.</p></div>
+        ${issues.length ? '<span class="rounded-full bg-amber-100 px-2.5 py-1 text-[.68rem] font-bold text-amber-700">' + number(issues.length) + ' need attention</span>' : statusPill("Clear", true)}
+      </div>
+      <div class="overflow-x-auto"><table class="min-w-full text-left text-sm">
+        <thead class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400"><tr><th class="px-4 py-3">Email</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Appointment</th><th class="px-4 py-3 text-right">Action</th></tr></thead>
+        <tbody>${issueRows}</tbody>
+      </table></div>
+    </section>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <section class="rounded-2xl border border-slate-200 p-4 sm:p-5">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div><p class="font-bold text-ink">Subscription</p><p class="mt-1 text-xs leading-5 text-slate-500">Refresh Grab&Book’s stored subscription state directly from Stripe. This does not cancel, upgrade or charge the client.</p></div>
+          <button type="button" class="btn btn-light" data-support-refresh-subscription ${subscription.stripe_subscription_id ? "" : "disabled"}>Refresh from Stripe</button>
+        </div>
+        <dl class="mt-3">
+          ${detailRow("Plan", String(subscription.plan_code || "free").toUpperCase())}
+          ${detailRow("Status", titleCase(subscription.status || "active"))}
+          ${detailRow("Current period ends", dateTime(subscription.current_period_end))}
+          ${detailRow("Cancels at period end", yesNo(subscription.cancel_at_period_end))}
+          ${detailRow("Stripe customer", subscription.stripe_customer_id || "—")}
+          ${detailRow("Stripe subscription", subscription.stripe_subscription_id || "—")}
+          ${detailRow("Last synced", dateTime(subscription.updated_at))}
+        </dl>
+      </section>
+
+      <section class="rounded-2xl border border-slate-200 p-4 sm:p-5">
+        <p class="font-bold text-ink">Account actions</p>
+        <p class="mt-1 text-xs leading-5 text-slate-500">Access changes are reversible and audited. They do not delete the business, bookings, customers or billing records.</p>
+        <dl class="mt-3">
+          ${detailRow("Owner email", account.owner_email || "—")}
+          ${detailRow("Business contact", account.contact_email || "—")}
+          ${detailRow("Last sign-in", dateTime(account.last_sign_in_at))}
+          ${detailRow("Dashboard access", account.is_approved ? "Approved" : "Paused")}
+        </dl>
+        <div class="mt-4">${approvalAction}</div>
+      </section>
+    </div>
+
+    <section class="mt-6">
+      <div class="mb-4"><p class="font-bold text-ink">Reconnect instructions</p><p class="mt-1 text-sm leading-6 text-slate-500">OAuth reconnection stays with the business owner. Support can diagnose the connection, but never receives or exposes their provider tokens.</p></div>
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        ${reconnectCard("Google Calendar", integrations.calendar, "Ask the owner to open Settings → Google Calendar and choose Reconnect Google Calendar.")}
+        ${reconnectCard("Google Analytics", integrations.google_analytics, "Ask the owner to open Growth → Google Analytics and choose Reconnect Google Analytics.")}
+        ${reconnectCard("Google Ads", integrations.google_ads, "Ask the owner to open Growth → Google Ads and choose Reconnect Google Ads.")}
+        ${reconnectCard("Search Console", integrations.search_console, "Ask the owner to open Growth → Search Console and choose Reconnect Search Console.")}
+        ${reconnectCard("Meta", integrations.meta, "Ask the owner to open Growth → Meta and choose Connect Meta again.")}
+      </div>
+    </section>
+
+    <section class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
+      <div class="bg-slate-50 px-4 py-4"><p class="font-bold text-ink">Support audit log</p><p class="mt-1 text-xs leading-5 text-slate-500">Latest 50 support actions for this business, including failed attempts.</p></div>
+      <div class="overflow-x-auto"><table class="min-w-full text-left text-sm">
+        <thead class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400"><tr><th class="px-4 py-3">When</th><th class="px-4 py-3">Result</th><th class="px-4 py-3">Action</th><th class="px-4 py-3">Summary</th><th class="px-4 py-3">Admin</th></tr></thead>
+        <tbody>${auditRows}</tbody>
+      </table></div>
+    </section>`;
+}
+
+async function loadSupportTools(profileId, force = false) {
+  const inspector = adminState.inspectors[profileId];
+  if (!inspector) return;
+  if (!force && inspector.support) {
+    if (adminState.selectedId === profileId && adminState.inspectorTab === "support") renderInspector();
+    return;
+  }
+
+  if (adminState.selectedId === profileId && adminState.inspectorTab === "support") {
+    $("adminInspectorContent").innerHTML = '<div class="py-12 text-center text-sm font-semibold text-slate-400"><span class="spinner mr-2 inline-block"></span> Loading support tools…</div>';
+  }
+
+  try {
+    const data = await invokeAdmin({ action:"get_support_tools", profile_id:profileId });
+    if (!data || adminState.selectedId !== profileId) return;
+    adminState.inspectors[profileId].support = data.support;
+    if (adminState.inspectorTab === "support") renderInspector();
+  } catch (error) {
+    console.error("Support tools failed", error);
+    if (adminState.selectedId === profileId && adminState.inspectorTab === "support") {
+      $("adminInspectorContent").innerHTML = '<div class="rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700">' + escapeHtml(error.message || "Support tools could not be loaded.") + '</div>';
+    }
+  }
+}
+
+async function handleSupportClick(event) {
+  const retry = event.target.closest("[data-support-retry-email]");
+  const approval = event.target.closest("[data-support-approval]");
+  const refreshSubscription = event.target.closest("[data-support-refresh-subscription]");
+  if (!retry && !approval && !refreshSubscription) return;
+
+  const profileId = adminState.selectedId;
+  if (!profileId) return;
+
+  if (retry) {
+    const email = retry.dataset.customerEmail || "the customer";
+    const type = titleCase(retry.dataset.messageType || "email");
+    if (!window.confirm(`Retry ${type} to ${email}? This will send a real email to the customer.`)) return;
+    retry.disabled = true;
+    try {
+      const data = await invokeAdmin({
+        action:"support_retry_email",
+        profile_id:profileId,
+        retry_kind:retry.dataset.retryKind,
+        booking_id:retry.dataset.bookingId,
+        message_log_id:retry.dataset.messageLogId || null,
+      });
+      toast(data.message || "Email retried.");
+      await loadSupportTools(profileId, true);
+      await loadBusinessInspector(profileId, true);
+      await loadSupportTools(profileId, true);
+    } catch (error) {
+      toast(error.message || "Email could not be retried.", "error");
+      await loadSupportTools(profileId, true);
+    } finally {
+      retry.disabled = false;
+    }
+    return;
+  }
+
+  if (refreshSubscription) {
+    if (!window.confirm("Refresh this business’s subscription state from Stripe? This only synchronises status; it does not charge, cancel or change the plan.")) return;
+    refreshSubscription.disabled = true;
+    try {
+      const data = await invokeAdmin({ action:"support_refresh_subscription", profile_id:profileId });
+      toast(data.message || "Subscription refreshed.");
+      await loadSupportTools(profileId, true);
+    } catch (error) {
+      toast(error.message || "Subscription could not be refreshed.", "error");
+      await loadSupportTools(profileId, true);
+    } finally {
+      refreshSubscription.disabled = false;
+    }
+    return;
+  }
+
+  if (approval) {
+    const approved = approval.dataset.supportApproval === "true";
+    const message = approved
+      ? "Approve owner dashboard access for this business?"
+      : "Pause owner dashboard access? This does not delete any business data or cancel billing.";
+    if (!window.confirm(message)) return;
+    approval.disabled = true;
+    try {
+      const data = await invokeAdmin({ action:"support_set_approval", profile_id:profileId, approved });
+      const business = adminState.businesses.find(item => item.profile_id === profileId);
+      if (business) business.is_approved = approved;
+      renderBusinesses();
+      toast(data.message || "Account access updated.");
+      await loadBusinessInspector(profileId, true);
+      await loadSupportTools(profileId, true);
+    } catch (error) {
+      toast(error.message || "Account access could not be updated.", "error");
+      await loadSupportTools(profileId, true);
+    } finally {
+      approval.disabled = false;
+    }
+  }
+}
+
 async function loadAdminBusinesses(showMessage = false) {
   const btn = $("adminRefreshBtn");
   if (btn) btn.disabled = true;
@@ -614,6 +854,7 @@ async function initAdmin() {
   await loadAdminBusinesses();
 }
 
+$("adminInspectorContent")?.addEventListener("click", handleSupportClick);
 $("adminSearch")?.addEventListener("input", renderBusinesses);
 $("adminPlanFilter")?.addEventListener("change", renderBusinesses);
 $("adminAccountFilter")?.addEventListener("change", renderBusinesses);
