@@ -600,21 +600,41 @@ function growthCompactHours(minutes) {
   return (Math.round(hours * 10) / 10).toLocaleString("en-GB", { maximumFractionDigits: 1 }) + "h";
 }
 
-function setGrowthHealthMetric(key, ready, detail) {
+function growthHealthStatusClass(status) {
+  if (status === "healthy") return "rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700";
+  if (status === "monitor") return "rounded-full bg-amber-100 px-2.5 py-1 text-[.68rem] font-bold text-amber-800";
+  if (status === "attention") return "rounded-full bg-red-100 px-2.5 py-1 text-[.68rem] font-bold text-red-700";
+  return "rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold text-slate-600";
+}
+
+function growthHealthStatusLabel(status) {
+  return ({
+    healthy: "Healthy",
+    monitor: "Monitor",
+    attention: "Needs attention",
+    learning: "Learning"
+  })[status] || "Learning";
+}
+
+function setGrowthHealthMetric(key, metric) {
   const status = $("growthHealth" + key + "Status");
   const detailEl = $("growthHealth" + key + "Detail");
   if (!status || !detailEl) return;
 
-  status.textContent = ready ? "Measured" : "Learning";
-  status.className = ready
-    ? "rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700"
-    : "rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold text-slate-600";
-  detailEl.textContent = detail;
+  status.textContent = growthHealthStatusLabel(metric.status);
+  status.className = growthHealthStatusClass(metric.status);
+  detailEl.textContent = metric.detail;
 }
 
 function growthRetentionHealthMetric() {
   if (typeof customerMetrics !== "function" || typeof customerRetentionInsight !== "function") {
-    return { ready: false, detail: "Waiting for CRM customer intelligence." };
+    return {
+      key: "Retention",
+      status: "learning",
+      score: 0,
+      detail: "Waiting for CRM customer intelligence.",
+      reason: "Grab&Book does not yet have enough CRM intelligence to judge retention."
+    };
   }
 
   const activeCustomers = (state.customers || []).filter(function (customer) {
@@ -630,23 +650,313 @@ function growthRetentionHealthMetric() {
   });
   const completed = rows.filter(function (row) { return row.metrics.past.length >= 1; });
   const repeat = completed.filter(function (row) { return row.metrics.past.length >= 2; });
-  const attention = rows.filter(function (row) {
+  const reliable = rows.filter(function (row) { return row.retention.status !== "learning"; });
+  const attention = reliable.filter(function (row) {
     return ["due_back", "slipping", "lapsed"].includes(row.retention.status);
   });
   const repeatRate = completed.length ? Math.round((repeat.length / completed.length) * 100) : null;
+  const attentionRate = reliable.length ? Math.round((attention.length / reliable.length) * 100) : null;
 
-  if (completed.length < 3) {
+  if (completed.length < 5 || reliable.length < 3) {
     return {
-      ready: false,
+      key: "Retention",
+      status: "learning",
+      score: 0,
       detail: completed.length
-        ? completed.length + " completed customer" + (completed.length === 1 ? "" : "s") + " · needs more CRM history"
-        : "Waiting for completed customer history."
+        ? completed.length + " completed customer" + (completed.length === 1 ? "" : "s") + " · needs more repeat history"
+        : "Waiting for completed customer history.",
+      reason: "Retention stays in Learning until there is enough completed and repeat-customer history."
+    };
+  }
+
+  let status = "healthy";
+  let score = 15;
+  if (attentionRate >= 30) {
+    status = "attention";
+    score = Math.min(100, 65 + attentionRate / 2);
+  } else if (attentionRate >= 15) {
+    status = "monitor";
+    score = 40 + attentionRate;
+  }
+
+  return {
+    key: "Retention",
+    status,
+    score,
+    detail: repeatRate + "% repeat rate · " + attention.length + " of " + reliable.length + " established customer" + (reliable.length === 1 ? "" : "s") + " need attention",
+    reason: attention.length
+      ? attention.length + " established customer" + (attention.length === 1 ? "" : "s") + " are due back, slipping away or lapsed."
+      : "Established customers are not currently showing a meaningful overdue-return signal."
+  };
+}
+
+function growthDemandHealthMetric(currentBookings, previousBookings, capacityReady, utilisation, days) {
+  const sample = currentBookings.length + previousBookings.length;
+  const change = growthPercentChange(currentBookings.length, previousBookings.length);
+  let detail = currentBookings.length + " booking" + (currentBookings.length === 1 ? "" : "s") + " in the last " + days + " days";
+
+  if (previousBookings.length && change != null) {
+    const rounded = Math.round(change);
+    detail += " · " + (rounded > 0 ? "+" : "") + rounded + "% vs previous period";
+  } else if (currentBookings.length && previousBookings.length === 0) {
+    detail += " · no bookings in previous period";
+  }
+
+  if (sample < 10 || (previousBookings.length < 3 && !capacityReady)) {
+    return {
+      key: "Demand",
+      status: "learning",
+      score: 0,
+      detail: detail + " · needs more history",
+      reason: "Demand stays in Learning until there is enough booking history to distinguish a real pattern from normal variation."
+    };
+  }
+
+  if (capacityReady && utilisation < 45 && currentBookings.length >= 3) {
+    return {
+      key: "Demand",
+      status: "attention",
+      score: Math.min(100, 82 - utilisation),
+      detail: detail + " · only " + utilisation + "% of offered time was booked",
+      reason: "There is substantial unused appointment capacity, so generating more qualified bookings appears to be the clearest demand opportunity."
+    };
+  }
+
+  if (capacityReady && utilisation < 65 && currentBookings.length >= 3) {
+    return {
+      key: "Demand",
+      status: "monitor",
+      score: Math.min(64, 65 - utilisation + 35),
+      detail: detail + " · " + utilisation + "% of offered time was booked",
+      reason: "There is meaningful spare appointment capacity. Demand is not necessarily weak, but more bookings could be absorbed without adding hours."
+    };
+  }
+
+  if (change != null && previousBookings.length >= 3 && change <= -25) {
+    return {
+      key: "Demand",
+      status: "attention",
+      score: Math.min(100, 60 + Math.abs(change)),
+      detail,
+      reason: "Completed booking volume has fallen materially against the previous comparable period."
+    };
+  }
+
+  if (change != null && previousBookings.length >= 3 && change <= -10) {
+    return {
+      key: "Demand",
+      status: "monitor",
+      score: Math.min(64, 35 + Math.abs(change)),
+      detail,
+      reason: "Booking volume is below the previous comparable period, but the movement is not yet strong enough to treat as a clear demand problem."
     };
   }
 
   return {
+    key: "Demand",
+    status: "healthy",
+    score: 15,
+    detail,
+    reason: capacityReady
+      ? "Booking volume is not showing a material decline and available time is being used at a reasonable level."
+      : "Booking volume is not showing a material decline against the available comparison."
+  };
+}
+
+function growthConversionHealthMetric(currentPeriod, previousPeriod) {
+  const visits = Number(currentPeriod.tracked_visits || 0);
+  const previousVisits = Number(previousPeriod.tracked_visits || 0);
+  const conversion = currentPeriod.conversion_rate == null ? null : Number(currentPeriod.conversion_rate);
+  const previousConversion = previousPeriod.conversion_rate == null ? null : Number(previousPeriod.conversion_rate);
+
+  if (visits < 20 || conversion == null) {
+    return {
+      key: "Booking conversion",
+      status: "learning",
+      score: 0,
+      detail: visits + " tracked visit" + (visits === 1 ? "" : "s") + " · needs at least 20",
+      reason: "There are not enough consented booking-page journeys to judge conversion reliably."
+    };
+  }
+
+  if (previousVisits < 20 || previousConversion == null) {
+    return {
+      key: "Booking conversion",
+      status: "learning",
+      score: 0,
+      detail: conversion + "% booking conversion · current period measured, comparison still learning",
+      reason: "Current conversion can be measured, but Grab&Book needs a comparable previous sample before deciding whether it is improving or weakening."
+    };
+  }
+
+  const delta = Math.round((conversion - previousConversion) * 10) / 10;
+  const detail = conversion + "% booking conversion · " + (delta > 0 ? "+" : "") + delta.toFixed(1) + " pp vs previous period";
+
+  if (delta <= -5) {
+    return {
+      key: "Booking conversion",
+      status: "attention",
+      score: Math.min(100, 65 + Math.abs(delta) * 4),
+      detail,
+      reason: "A materially smaller share of tracked booking-page visitors are completing a booking than in the previous comparable period."
+    };
+  }
+
+  if (delta <= -2) {
+    return {
+      key: "Booking conversion",
+      status: "monitor",
+      score: Math.min(64, 40 + Math.abs(delta) * 4),
+      detail,
+      reason: "Booking conversion has softened enough to watch, although normal variation may still explain part of the movement."
+    };
+  }
+
+  return {
+    key: "Booking conversion",
+    status: "healthy",
+    score: 15,
+    detail,
+    reason: "Booking conversion is broadly stable or improving against the previous comparable period."
+  };
+}
+
+function growthCapacityHealthMetric(availability, bookedMinutes) {
+  const historyComplete = availability.minutes > 0 && bookedMinutes <= availability.minutes * 1.1;
+  const ready = availability.sourceBlocks >= 5 && historyComplete;
+  const utilisation = ready ? Math.min(100, Math.round((bookedMinutes / availability.minutes) * 100)) : null;
+
+  if (!ready) {
+    let detail = "Waiting for enough availability history.";
+    if (availability.sourceBlocks > 0 && !historyComplete) {
+      detail = "Availability history is incomplete for the bookings in this period.";
+    } else if (availability.sourceBlocks > 0) {
+      detail = availability.sourceBlocks + " availability slot" + (availability.sourceBlocks === 1 ? "" : "s") + " · needs at least 5";
+    }
+    return {
+      key: "Capacity",
+      status: "learning",
+      score: 0,
+      ready: false,
+      utilisation: null,
+      detail,
+      reason: "Grab&Book does not yet have enough complete availability history to judge whether capacity is constraining growth."
+    };
+  }
+
+  const detail = utilisation + "% utilised · " + growthCompactHours(bookedMinutes) + " booked of " + growthCompactHours(availability.minutes) + " offered";
+
+  if (utilisation >= 90) {
+    return {
+      key: "Capacity",
+      status: "attention",
+      score: Math.min(100, 65 + (utilisation - 90) * 3),
+      ready: true,
+      utilisation,
+      detail,
+      reason: "Most offered appointment time is already being used, so additional demand may be difficult to absorb without changing hours, staffing or pricing."
+    };
+  }
+
+  if (utilisation >= 75) {
+    return {
+      key: "Capacity",
+      status: "monitor",
+      score: 40 + (utilisation - 75),
+      ready: true,
+      utilisation,
+      detail,
+      reason: "The diary is becoming well utilised. Capacity is not yet a clear constraint, but it is worth watching as bookings grow."
+    };
+  }
+
+  return {
+    key: "Capacity",
+    status: "healthy",
+    score: 15,
     ready: true,
-    detail: repeatRate + "% repeat rate · " + attention.length + " customer" + (attention.length === 1 ? "" : "s") + " need attention"
+    utilisation,
+    detail,
+    reason: "There is still enough unused appointment time for the business to absorb additional bookings."
+  };
+}
+
+function growthRevenueHealthMetric(currentBookings, previousBookings) {
+  const current = currentBookings.filter(function (booking) {
+    return growthBookingMinutes(booking) > 0;
+  });
+  const previous = previousBookings.filter(function (booking) {
+    return growthBookingMinutes(booking) > 0;
+  });
+
+  const currentMinutes = current.reduce(function (sum, booking) {
+    return sum + growthBookingMinutes(booking);
+  }, 0);
+  const currentRevenue = current.reduce(function (sum, booking) {
+    return sum + growthBookingValue(booking);
+  }, 0);
+  const previousMinutes = previous.reduce(function (sum, booking) {
+    return sum + growthBookingMinutes(booking);
+  }, 0);
+  const previousRevenue = previous.reduce(function (sum, booking) {
+    return sum + growthBookingValue(booking);
+  }, 0);
+
+  const valuePerHour = currentMinutes ? currentRevenue / (currentMinutes / 60) : null;
+  const previousValuePerHour = previousMinutes ? previousRevenue / (previousMinutes / 60) : null;
+
+  if (current.length < 3 || valuePerHour == null) {
+    return {
+      key: "Revenue efficiency",
+      status: "learning",
+      score: 0,
+      detail: current.length
+        ? current.length + " booking" + (current.length === 1 ? "" : "s") + " with usable duration data · needs at least 3"
+        : "Waiting for completed booking value and duration data.",
+      reason: "There is not enough completed booking value and duration data to judge revenue efficiency."
+    };
+  }
+
+  if (previous.length < 3 || !previousValuePerHour) {
+    return {
+      key: "Revenue efficiency",
+      status: "learning",
+      score: 0,
+      detail: money(valuePerHour) + " booked value per booked hour · comparison still learning",
+      reason: "Current booked value per hour can be measured, but a comparable previous-period baseline is still needed."
+    };
+  }
+
+  const change = growthPercentChange(valuePerHour, previousValuePerHour);
+  const rounded = Math.round(change);
+  const detail = money(valuePerHour) + " booked value per booked hour · " + (rounded > 0 ? "+" : "") + rounded + "% vs previous period";
+
+  if (change <= -15) {
+    return {
+      key: "Revenue efficiency",
+      status: "attention",
+      score: Math.min(100, 65 + Math.abs(change)),
+      detail,
+      reason: "The business is generating materially less booked value for each booked hour than in the previous comparable period."
+    };
+  }
+
+  if (change <= -5) {
+    return {
+      key: "Revenue efficiency",
+      status: "monitor",
+      score: Math.min(64, 40 + Math.abs(change)),
+      detail,
+      reason: "Booked value per booked hour has softened enough to monitor before assuming a pricing or service-mix problem."
+    };
+  }
+
+  return {
+    key: "Revenue efficiency",
+    status: "healthy",
+    score: 15,
+    detail,
+    reason: "Booked value per booked hour is broadly stable or improving against the previous comparable period."
   };
 }
 
@@ -657,119 +967,80 @@ function renderGrowthBusinessHealthMetrics() {
   const bounds = growthPeriodBounds(days);
   const currentBookings = growthActiveBookingsBetween(bounds.currentStart, bounds.currentEnd);
   const previousBookings = growthActiveBookingsBetween(bounds.previousStart, bounds.previousEnd);
-
-  const demandSample = currentBookings.length + previousBookings.length;
-  const demandChange = growthPercentChange(currentBookings.length, previousBookings.length);
-  let demandDetail = currentBookings.length + " booking" + (currentBookings.length === 1 ? "" : "s") + " in the last " + days + " days";
-  if (previousBookings.length && demandChange != null) {
-    const rounded = Math.round(demandChange);
-    demandDetail += " · " + (rounded > 0 ? "+" : "") + rounded + "% vs previous period";
-  } else if (currentBookings.length && previousBookings.length === 0) {
-    demandDetail += " · no bookings in previous period";
-  }
-  setGrowthHealthMetric(
-    "Demand",
-    demandSample >= 5,
-    demandSample >= 5 ? demandDetail : demandDetail + " · needs more history"
-  );
-
-  const period = growthViewState.periodComparison || {};
-  const currentPeriod = period.current || {};
-  const trackedVisits = Number(currentPeriod.tracked_visits || 0);
-  const conversion = currentPeriod.conversion_rate == null ? null : Number(currentPeriod.conversion_rate);
-  setGrowthHealthMetric(
-    "Conversion",
-    trackedVisits >= 20 && conversion != null,
-    trackedVisits >= 20 && conversion != null
-      ? conversion + "% booking conversion · " + trackedVisits + " tracked visits"
-      : trackedVisits + " tracked visit" + (trackedVisits === 1 ? "" : "s") + " · needs at least 20"
-  );
-
-  const retention = growthRetentionHealthMetric();
-  setGrowthHealthMetric("Retention", retention.ready, retention.detail);
-
   const availability = growthAvailabilitySummary(bounds.currentStart, bounds.currentEnd);
   const bookedMinutes = currentBookings.reduce(function (sum, booking) {
     return sum + growthBookingMinutes(booking);
   }, 0);
-  const capacityHistoryComplete = availability.minutes > 0 && bookedMinutes <= availability.minutes * 1.1;
-  const capacityReady = availability.sourceBlocks >= 5 && capacityHistoryComplete;
-  const utilisation = capacityReady
-    ? Math.min(100, Math.round((bookedMinutes / availability.minutes) * 100))
-    : null;
 
-  let capacityDetail = "Waiting for enough availability history.";
-  if (availability.sourceBlocks > 0 && !capacityHistoryComplete) {
-    capacityDetail = "Availability history is incomplete for the bookings in this period.";
-  } else if (capacityReady) {
-    capacityDetail = utilisation + "% utilised · " + growthCompactHours(bookedMinutes) + " booked of " + growthCompactHours(availability.minutes) + " offered";
-  } else if (availability.sourceBlocks > 0) {
-    capacityDetail = availability.sourceBlocks + " availability slot" + (availability.sourceBlocks === 1 ? "" : "s") + " · needs at least 5";
-  }
-  setGrowthHealthMetric("Capacity", capacityReady, capacityDetail);
+  const capacity = growthCapacityHealthMetric(availability, bookedMinutes);
+  const period = growthViewState.periodComparison || {};
+  const currentPeriod = period.current || {};
+  const previousPeriod = period.previous || {};
 
-  const bookingsWithDuration = currentBookings.filter(function (booking) {
-    return growthBookingMinutes(booking) > 0;
-  });
-  const revenueMinutes = bookingsWithDuration.reduce(function (sum, booking) {
-    return sum + growthBookingMinutes(booking);
-  }, 0);
-  const revenue = bookingsWithDuration.reduce(function (sum, booking) {
-    return sum + growthBookingValue(booking);
-  }, 0);
-
-  const previousWithDuration = previousBookings.filter(function (booking) {
-    return growthBookingMinutes(booking) > 0;
-  });
-  const previousMinutes = previousWithDuration.reduce(function (sum, booking) {
-    return sum + growthBookingMinutes(booking);
-  }, 0);
-  const previousRevenue = previousWithDuration.reduce(function (sum, booking) {
-    return sum + growthBookingValue(booking);
-  }, 0);
-
-  const valuePerHour = revenueMinutes ? revenue / (revenueMinutes / 60) : null;
-  const previousValuePerHour = previousMinutes ? previousRevenue / (previousMinutes / 60) : null;
-  const efficiencyChange = valuePerHour != null && previousValuePerHour
-    ? growthPercentChange(valuePerHour, previousValuePerHour)
-    : null;
-  const efficiencyReady = bookingsWithDuration.length >= 3 && valuePerHour != null;
-
-  let efficiencyDetail = bookingsWithDuration.length
-    ? bookingsWithDuration.length + " booking" + (bookingsWithDuration.length === 1 ? "" : "s") + " with usable duration data · needs at least 3"
-    : "Waiting for completed booking value and duration data.";
-  if (efficiencyReady) {
-    efficiencyDetail = money(valuePerHour) + " booked value per booked hour";
-    if (efficiencyChange != null) {
-      const rounded = Math.round(efficiencyChange);
-      efficiencyDetail += " · " + (rounded > 0 ? "+" : "") + rounded + "% vs previous period";
-    }
-  }
-  setGrowthHealthMetric("Revenue", efficiencyReady, efficiencyDetail);
-
-  const readiness = [
-    demandSample >= 5,
-    trackedVisits >= 20 && conversion != null,
-    retention.ready,
-    capacityReady,
-    efficiencyReady
+  const metrics = [
+    growthDemandHealthMetric(currentBookings, previousBookings, capacity.ready, capacity.utilisation, days),
+    growthConversionHealthMetric(currentPeriod, previousPeriod),
+    growthRetentionHealthMetric(),
+    capacity,
+    growthRevenueHealthMetric(currentBookings, previousBookings)
   ];
-  const readyCount = readiness.filter(Boolean).length;
+
+  const metricKeys = ["Demand", "Conversion", "Retention", "Capacity", "Revenue"];
+  metrics.forEach(function (metric, index) {
+    setGrowthHealthMetric(metricKeys[index], metric);
+  });
+
+  const readyMetrics = metrics.filter(function (metric) { return metric.status !== "learning"; });
+  const readyCount = readyMetrics.length;
   const dataStatus = $("growthHealthDataStatus");
   if (dataStatus) {
-    dataStatus.textContent = readyCount + "/5 metrics ready";
+    dataStatus.textContent = readyCount + "/5 areas diagnosed";
     dataStatus.className = readyCount === 5
       ? "rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700"
       : "rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600";
   }
 
+  const priority = readyMetrics
+    .filter(function (metric) { return metric.status === "attention" || metric.status === "monitor"; })
+    .sort(function (a, b) {
+      const statusWeight = { attention: 2, monitor: 1 };
+      return (statusWeight[b.status] - statusWeight[a.status]) || (b.score - a.score);
+    })[0] || null;
+
   const primaryTitle = $("growthHealthPrimaryTitle");
   const primaryReason = $("growthHealthPrimaryReason");
-  if (primaryTitle) primaryTitle.textContent = readyCount ? "Business health data connected" : "Building your business baseline";
+  const whyBtn = $("growthHealthWhyBtn");
+
+  if (!readyCount) {
+    if (primaryTitle) primaryTitle.textContent = "Building your business baseline";
+    if (primaryReason) primaryReason.textContent = "Once there is enough reliable data, Grab&Book will explain which area appears to deserve attention and why. Until then, no issue will be assumed.";
+    if (whyBtn) {
+      whyBtn.disabled = true;
+      whyBtn.dataset.healthReason = "";
+    }
+    return;
+  }
+
+  if (priority) {
+    if (primaryTitle) primaryTitle.textContent = priority.key;
+    if (primaryReason) primaryReason.textContent = priority.reason;
+    if (whyBtn) {
+      whyBtn.disabled = true;
+      whyBtn.dataset.healthReason = priority.reason;
+      whyBtn.title = "Detailed evidence and actions are added in Step 4.";
+    }
+    return;
+  }
+
+  if (primaryTitle) primaryTitle.textContent = "No clear issue detected";
   if (primaryReason) {
-    primaryReason.textContent = readyCount
-      ? "Grab&Book can currently measure " + readyCount + " of 5 health areas. It will only judge which area deserves attention once enough reliable evidence is available."
-      : "Once there is enough reliable data, Grab&Book will explain which area appears to deserve attention and why. Until then, no issue will be assumed.";
+    primaryReason.textContent = readyCount === 5
+      ? "None of the five measured areas currently crosses Grab&Book's conservative attention thresholds."
+      : "None of the " + readyCount + " areas with enough evidence currently crosses Grab&Book's conservative attention thresholds. The remaining areas are still learning.";
+  }
+  if (whyBtn) {
+    whyBtn.disabled = true;
+    whyBtn.dataset.healthReason = "";
   }
 }
 
