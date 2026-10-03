@@ -216,6 +216,7 @@ async function loadBusinessInspector(profileId, force = false) {
   $("adminInspectorLoading").classList.remove("hidden");
   $("adminInspectorLoading").classList.add("flex");
   $("adminInspectorError").classList.add("hidden");
+  $("adminInspectorHealth").innerHTML = '<div class="flex items-center gap-2 text-sm font-semibold text-slate-400"><span class="spinner"></span> Running client health checks…</div>';
   $("adminInspectorContent").innerHTML = '<div class="py-12 text-center text-sm font-semibold text-slate-400">Loading client setup…</div>';
 
   try {
@@ -227,6 +228,7 @@ async function loadBusinessInspector(profileId, force = false) {
     console.error("Client inspector failed", error);
     $("adminInspectorError").textContent = error.message || "Client inspector could not be loaded.";
     $("adminInspectorError").classList.remove("hidden");
+    $("adminInspectorHealth").innerHTML = '<p class="text-sm font-semibold text-slate-400">Diagnostics could not be completed for this client.</p>';
     $("adminInspectorContent").innerHTML = "";
   } finally {
     $("adminInspectorLoading").classList.add("hidden");
