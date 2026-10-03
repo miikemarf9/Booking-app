@@ -718,6 +718,14 @@
           if (typeof syncWorkspacePersonalisationForm === "function") syncWorkspacePersonalisationForm();
         });
       });
+      $("dashboardAppearanceForm")?.addEventListener("submit", event => {
+        if (typeof saveDashboardAppearance === "function") saveDashboardAppearance(event);
+      });
+      document.querySelectorAll('input[name="dashboardTheme"], input[name="dashboardAccent"]').forEach(input => {
+        input.addEventListener("change", () => {
+          if (typeof previewDashboardAppearance === "function") previewDashboardAppearance();
+        });
+      });
 
       $("growthHealthWhyBtn")?.addEventListener("click", () => {
         if (typeof toggleGrowthHealthWhy === "function") toggleGrowthHealthWhy();
