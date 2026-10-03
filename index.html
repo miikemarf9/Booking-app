@@ -825,6 +825,42 @@
           </article>
         </div>
 
+        <article class="card p-5 sm:p-6">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Today & priorities</p>
+              <h2 class="mt-1 text-xl font-bold text-ink">What needs doing next?</h2>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Tasks and reminders are ordered around today first, then anything overdue, then upcoming work. Within each date group, high-priority work rises to the top.</p>
+            </div>
+            <button id="workspaceTaskAddBtn" class="btn btn-primary" type="button">Add task / reminder</button>
+          </div>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-3">
+            <div class="rounded-2xl bg-brand-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-700">Today</p>
+              <p id="workspacePriorityTodayCount" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">due or reminding today</p>
+            </div>
+            <div class="rounded-2xl bg-red-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-red-700">Needs attention</p>
+              <p id="workspacePriorityOverdueCount" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">overdue tasks or reminders</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-500">Upcoming</p>
+              <p id="workspacePriorityUpcomingCount" class="mt-1 text-2xl font-bold text-ink">0</p>
+              <p class="mt-1 text-xs text-slate-500">scheduled ahead</p>
+            </div>
+          </div>
+
+          <div id="workspacePriorityList" class="mt-5 space-y-3">
+            <div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center text-sm text-slate-400">Loading your priorities…</div>
+          </div>
+          <div class="mt-4 text-center">
+            <button id="workspaceTasksShowAllBtn" class="hidden text-sm font-bold text-brand-600 hover:underline" type="button">View all</button>
+          </div>
+        </article>
+
         <div class="grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
           <article class="card p-5 sm:p-6">
             <div class="flex items-center justify-between gap-4">
@@ -4144,6 +4180,64 @@
     <footer class="px-4 pb-8 text-center text-xs text-slate-400">Booking powered by Grab&Book</footer>
   </section>
 
+  <div id="workspaceTaskModal" class="fixed inset-0 z-[87] hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div class="card max-h-[90vh] w-full max-w-xl overflow-y-auto p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Tasks & reminders</p>
+          <h2 id="workspaceTaskModalTitle" class="mt-1 text-xl font-bold text-ink">Add task / reminder</h2>
+          <p class="mt-1 text-sm leading-6 text-slate-500">Give it a priority, due date or reminder date and Grab&Book will organise it on Home.</p>
+        </div>
+        <button id="workspaceTaskCloseBtn" class="text-xl font-bold text-slate-400 hover:text-slate-700" type="button" aria-label="Close">×</button>
+      </div>
+
+      <form id="workspaceTaskForm" class="mt-5 space-y-4">
+        <input id="workspaceTaskId" type="hidden">
+        <input id="workspaceTaskSourceType" type="hidden">
+        <input id="workspaceTaskSourceId" type="hidden">
+        <input id="workspaceTaskSourceLabel" type="hidden">
+
+        <div>
+          <label class="label" for="workspaceTaskTitle">Task</label>
+          <input id="workspaceTaskTitle" class="field" maxlength="200" placeholder="e.g. Call Sarah about rebooking" required>
+        </div>
+
+        <div>
+          <label class="label" for="workspaceTaskDetail">Notes</label>
+          <textarea id="workspaceTaskDetail" class="field min-h-28 resize-y" maxlength="5000" placeholder="Add useful context or the next step..."></textarea>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label class="label" for="workspaceTaskPriority">Priority</label>
+            <select id="workspaceTaskPriority" class="field">
+              <option value="high">High</option>
+              <option value="normal" selected>Normal</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="workspaceTaskDueDate">Due date</label>
+            <input id="workspaceTaskDueDate" class="field" type="date">
+          </div>
+          <div>
+            <label class="label" for="workspaceTaskReminderDate">Reminder date</label>
+            <input id="workspaceTaskReminderDate" class="field" type="date">
+            <p class="mt-1 text-[.68rem] leading-4 text-slate-400">Highlighted on Home on this date.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <button id="workspaceTaskDeleteBtn" class="btn btn-light hidden text-red-600" type="button">Delete</button>
+          <div class="ml-auto flex flex-wrap gap-2">
+            <button id="workspaceTaskCancelBtn" class="btn btn-light" type="button">Cancel</button>
+            <button id="workspaceTaskSaveBtn" class="btn btn-primary" type="submit">Add to priorities</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="growthPlannerModal" class="fixed inset-0 z-[86] hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
     <div class="card max-h-[90vh] w-full max-w-xl overflow-y-auto p-5 sm:p-6">
       <div class="flex items-start justify-between gap-4">
@@ -4258,7 +4352,8 @@
   <script src="assets/js/google-ads.js"></script>
   <script src="assets/js/meta.js"></script>
   <script src="assets/js/growth-import.js"></script>
-  <script src="assets/js/growth-planner.js"></script>
+  <script src="assets/js/tasks.js?v=1"></script>
+  <script src="assets/js/growth-planner.js?v=tasks1"></script>
   <script src="assets/js/growth-opportunities.js"></script>
   <script src="assets/js/customers.js"></script>
   <script src="assets/js/customer-management.js"></script>
