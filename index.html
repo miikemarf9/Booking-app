@@ -997,7 +997,7 @@
                   </div>
                   <div class="mt-4 grid gap-3 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
                     <div class="rounded-xl bg-slate-50 p-3">
-                      <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booked value</p>
+                      <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Monthly booked value</p>
                       <p id="growthScenarioBaselineRevenue" class="mt-1 text-lg font-bold text-ink">—</p>
                     </div>
                     <div class="rounded-xl bg-slate-50 p-3">
@@ -1021,10 +1021,16 @@
                         <input id="growthScenarioAssumption" type="number" inputmode="decimal" disabled class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 pr-12 text-sm font-bold text-ink outline-none disabled:cursor-not-allowed disabled:text-slate-400" placeholder="—">
                         <span id="growthScenarioAssumptionSuffix" class="absolute inset-y-0 right-3 flex items-center text-xs font-bold text-slate-400"></span>
                       </div>
+                      <div id="growthScenarioPricePresets" class="mt-2 hidden flex-wrap gap-2">
+                        <button type="button" data-scenario-price="5" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-brand-300 hover:text-brand-700">+5%</button>
+                        <button type="button" data-scenario-price="10" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-brand-300 hover:text-brand-700">+10%</button>
+                        <button type="button" data-scenario-price="15" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-brand-300 hover:text-brand-700">+15%</button>
+                      </div>
                     </div>
                     <button id="growthScenarioRunBtn" type="button" class="btn btn-primary self-end" disabled>Run scenario</button>
                   </div>
                   <p id="growthScenarioAssumptionHelp" class="mt-2 text-xs leading-5 text-slate-500">The calculation engine will only produce a result when the required baseline data and assumption are available.</p>
+                  <p id="growthScenarioValidation" class="mt-2 hidden text-xs font-bold text-red-600"></p>
                 </div>
               </div>
 
