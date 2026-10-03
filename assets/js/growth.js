@@ -1803,10 +1803,10 @@ function growthHealthActionConfig(metricKey) {
       help: "Open the booking journey to see where tracked visitors stop before completing an appointment."
     },
     "Retention": {
-      label: "Review retention",
-      type: "section",
-      target: "crm-retention-section",
-      help: "Open CRM Retention to see the customers behind the signal, including who is due back, slipping away or lapsed."
+      label: "View affected customers",
+      type: "retention-customers",
+      target: "",
+      help: "Review the exact customers behind this signal, or prepare a consent-checked rebooking campaign. Nothing is sent until you review the draft and confirm."
     },
     "Capacity": {
       label: "Review diary",
@@ -1843,6 +1843,11 @@ function runGrowthHealthAction() {
   if (!btn) return;
   const type = btn.dataset.actionType || "";
   const target = btn.dataset.actionTarget || "";
+
+  if (type === "retention-customers" && typeof openRetentionAttentionCustomers === "function") {
+    openRetentionAttentionCustomers();
+    return;
+  }
   if (!target) return;
 
   if (type === "section" && typeof goDashboardSection === "function") {
@@ -1861,7 +1866,8 @@ function populateGrowthHealthWhy(priority, metrics) {
   const list = $("growthHealthEvidenceList");
   const actionHelp = $("growthHealthActionHelp");
   const actionBtn = $("growthHealthActionBtn");
-  if (!panel || !title || !explanation || !list || !actionHelp || !actionBtn) return;
+  const campaignBtn = $("growthHealthCampaignBtn");
+  if (!panel || !title || !explanation || !list || !actionHelp || !actionBtn || !campaignBtn) return;
 
   title.textContent = priority.key + " · " + growthHealthStatusLabel(priority.status);
   explanation.textContent = priority.reason;
@@ -1902,6 +1908,9 @@ function populateGrowthHealthWhy(priority, metrics) {
     actionBtn.dataset.actionTarget = "";
     actionBtn.classList.add("hidden");
   }
+
+  campaignBtn.classList.toggle("hidden", priority.key !== "Retention");
+  campaignBtn.disabled = priority.key !== "Retention";
 }
 
 function renderGrowthBusinessHealthMetrics() {
