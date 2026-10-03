@@ -548,6 +548,193 @@ function growthScenarioMonthlyFactor(days) {
   return (365.25 / 12) / Math.max(1, Number(days || 30));
 }
 
+function growthScenarioWeekday(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    timeZone: typeof BUSINESS_TIME_ZONE === "string" ? BUSINESS_TIME_ZONE : "Europe/London"
+  }).format(date);
+}
+
+function growthScenarioCustomerKey(booking) {
+  if (booking?.customer_id) return "id:" + booking.customer_id;
+  const email = String(booking?.customer_email || "").trim().toLowerCase();
+  return email ? "email:" + email : "";
+}
+
+function growthScenarioRetentionData() {
+  if (typeof customerMetrics !== "function" || typeof customerRetentionInsight !== "function") {
+    return { ready: false, reason: "CRM retention intelligence is not available yet." };
+  }
+
+  const rows = (state.customers || [])
+    .filter(function (customer) { return !customer.archived_at; })
+    .map(function (customer) {
+      const metrics = customerMetrics(customer);
+      return { customer, metrics, retention: customerRetentionInsight(customer, metrics) };
+    });
+
+  const reliable = rows.filter(function (row) { return row.retention.status !== "learning"; });
+  const attention = reliable.filter(function (row) {
+    return ["due_back", "slipping", "lapsed"].includes(row.retention.status);
+  });
+
+  const attentionValues = attention.map(function (row) {
+    const completed = row.metrics.past || [];
+    if (!completed.length) return 0;
+    const total = completed.reduce(function (sum, booking) { return sum + growthBookingValue(booking); }, 0);
+    return total / completed.length;
+  }).filter(function (value) { return value > 0; });
+
+  const averageAttentionValue = attentionValues.length
+    ? attentionValues.reduce(function (sum, value) { return sum + value; }, 0) / attentionValues.length
+    : 0;
+
+  return {
+    ready: reliable.length >= 5 && attention.length >= 3 && averageAttentionValue > 0,
+    reliableCustomers: reliable.length,
+    attentionCustomers: attention.length,
+    averageAttentionValue,
+    reason: reliable.length < 5
+      ? "Needs at least 5 established customers with usable retention patterns."
+      : attention.length < 3
+        ? "Needs at least 3 established customers currently due back, slipping or lapsed."
+        : averageAttentionValue <= 0
+          ? "Needs usable completed-booking value for retention customers."
+          : ""
+  };
+}
+
+function growthScenarioCapacityData(bookings, bounds) {
+  const availability = growthAvailabilitySummary(bounds.currentStart, bounds.currentEnd);
+  const bookedMinutes = bookings.reduce(function (sum, booking) { return sum + growthBookingMinutes(booking); }, 0);
+  const revenue = bookings.reduce(function (sum, booking) { return sum + growthBookingValue(booking); }, 0);
+  const complete = availability.minutes > 0 && bookedMinutes <= availability.minutes * 1.1;
+  const utilisation = complete ? Math.min(100, bookedMinutes / availability.minutes * 100) : null;
+  const valuePerBookedHour = bookedMinutes > 0 ? revenue / (bookedMinutes / 60) : 0;
+
+  return {
+    ready: availability.sourceBlocks >= 5 && complete && bookedMinutes >= 180 && valuePerBookedHour > 0,
+    sourceBlocks: availability.sourceBlocks,
+    availabilityMinutes: availability.minutes,
+    bookedMinutes,
+    utilisation,
+    valuePerBookedHour,
+    complete
+  };
+}
+
+function growthScenarioQuietPeriodData(bookings, bounds) {
+  const availabilityByDay = new Map();
+
+  (state.blocks || []).forEach(function (block) {
+    if (block.is_active === false || block.block_date < bounds.currentStart || block.block_date > bounds.currentEnd) return;
+    const start = growthTimeMinutes(block.start_time);
+    const end = growthTimeMinutes(block.end_time);
+    if (start == null || end == null || end <= start) return;
+
+    const day = growthScenarioWeekday(block.block_date + "T12:00:00Z");
+    if (!day) return;
+    if (!availabilityByDay.has(day)) availabilityByDay.set(day, { day, minutes: 0, sourceBlocks: 0, groups: new Map() });
+    const row = availabilityByDay.get(day);
+    row.sourceBlocks += 1;
+    const resource = block.staff_id || "business";
+    const groupKey = block.block_date + "|" + resource;
+    if (!row.groups.has(groupKey)) row.groups.set(groupKey, []);
+    row.groups.get(groupKey).push([start, end]);
+  });
+
+  availabilityByDay.forEach(function (row) {
+    row.groups.forEach(function (intervals) {
+      intervals.sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+      let current = null;
+      intervals.forEach(function (interval) {
+        if (!current) {
+          current = interval.slice();
+        } else if (interval[0] <= current[1]) {
+          current[1] = Math.max(current[1], interval[1]);
+        } else {
+          row.minutes += current[1] - current[0];
+          current = interval.slice();
+        }
+      });
+      if (current) row.minutes += current[1] - current[0];
+    });
+  });
+
+  const bookedByDay = new Map();
+  bookings.forEach(function (booking) {
+    const day = growthScenarioWeekday(booking.start_time);
+    if (!day) return;
+    bookedByDay.set(day, (bookedByDay.get(day) || 0) + growthBookingMinutes(booking));
+  });
+
+  const candidates = Array.from(availabilityByDay.values())
+    .map(function (row) {
+      const bookedMinutes = bookedByDay.get(row.day) || 0;
+      const complete = row.minutes > 0 && bookedMinutes <= row.minutes * 1.1;
+      const utilisation = complete ? Math.min(100, bookedMinutes / row.minutes * 100) : null;
+      return {
+        day: row.day,
+        availabilityMinutes: row.minutes,
+        bookedMinutes,
+        sourceBlocks: row.sourceBlocks,
+        utilisation,
+        complete
+      };
+    })
+    .filter(function (row) {
+      return row.complete && row.sourceBlocks >= 3 && row.availabilityMinutes >= 180 && row.utilisation < 70;
+    })
+    .sort(function (a, b) { return a.utilisation - b.utilisation || b.availabilityMinutes - a.availabilityMinutes; });
+
+  return candidates[0] || { ready: false };
+}
+
+function growthScenarioServiceMixData(bookings) {
+  const byService = new Map();
+  bookings.forEach(function (booking) {
+    if (!booking.service_id) return;
+    if (!byService.has(booking.service_id)) {
+      const service = booking.services || (state.services || []).find(function (item) { return item.id === booking.service_id; }) || {};
+      byService.set(booking.service_id, {
+        id: booking.service_id,
+        title: service.title || "Service",
+        bookings: 0,
+        revenue: 0
+      });
+    }
+    const row = byService.get(booking.service_id);
+    row.bookings += 1;
+    row.revenue += growthBookingValue(booking);
+  });
+
+  const qualified = Array.from(byService.values())
+    .filter(function (row) { return row.bookings >= 3 && row.revenue > 0; })
+    .map(function (row) {
+      return Object.assign({}, row, { averageValue: row.revenue / row.bookings });
+    })
+    .sort(function (a, b) { return b.averageValue - a.averageValue; });
+
+  if (qualified.length < 2) return { ready: false, qualifiedServices: qualified.length };
+
+  const totalBookings = qualified.reduce(function (sum, row) { return sum + row.bookings; }, 0);
+  const totalRevenue = qualified.reduce(function (sum, row) { return sum + row.revenue; }, 0);
+  const qualifiedAverage = totalBookings ? totalRevenue / totalBookings : 0;
+  const target = qualified[0];
+
+  return {
+    ready: totalBookings >= 8 && qualifiedAverage > 0 && target.averageValue >= qualifiedAverage * 1.05,
+    qualifiedServices: qualified.length,
+    qualifiedBookings: totalBookings,
+    qualifiedAverage,
+    targetServiceId: target.id,
+    targetServiceTitle: target.title,
+    targetServiceAverage: target.averageValue
+  };
+}
+
 function growthScenarioBaseline() {
   const days = growthAnalyticsDays();
   const bounds = growthPeriodBounds(days);
@@ -561,17 +748,102 @@ function growthScenarioBaseline() {
   const averageBooking = bookingCount ? totalRevenue / bookingCount : 0;
   const weeklyBookings = bookingCount / days * 7;
   const monthlyBookings = bookingCount * monthlyFactor;
+  const capacity = growthScenarioCapacityData(bookings, bounds);
+  const quietPeriod = growthScenarioQuietPeriodData(bookings, bounds);
+  const serviceMix = growthScenarioServiceMixData(bookings);
+  const retention = growthScenarioRetentionData();
+
+  if (quietPeriod?.day) quietPeriod.ready = capacity.ready && quietPeriod.utilisation != null && quietPeriod.utilisation < 70;
 
   return {
     days,
+    bounds,
     bookingCount,
     totalRevenue,
     monthlyRevenue,
     averageBooking,
     weeklyBookings,
     monthlyBookings,
+    monthlyFactor,
+    capacity,
+    quietPeriod,
+    serviceMix,
+    retention,
     ready: bookingCount > 0 && totalRevenue > 0
   };
+}
+
+function growthScenarioAdvancedOptions(baseline) {
+  if (!baseline?.ready) return [];
+  const options = [];
+
+  if (baseline.retention?.ready) {
+    options.push({ value: "retention", label: "Improve retention / rebooking" });
+  }
+  if (baseline.capacity?.ready && baseline.capacity.utilisation < 95) {
+    options.push({ value: "capacity", label: "Increase capacity utilisation" });
+  }
+  if (baseline.quietPeriod?.ready) {
+    options.push({ value: "quiet-period", label: "Fill quieter " + baseline.quietPeriod.day + "s" });
+  }
+  if (baseline.serviceMix?.ready) {
+    options.push({ value: "service-mix", label: "Shift service mix toward " + baseline.serviceMix.targetServiceTitle });
+  }
+  if (baseline.capacity?.ready && baseline.capacity.utilisation >= 75) {
+    options.push({ value: "additional-capacity", label: "Add appointment capacity" });
+  }
+
+  return options;
+}
+
+function renderGrowthScenarioOptions(baseline) {
+  const select = $("growthScenarioType");
+  if (!select) return;
+  const previous = select.value;
+
+  select.innerHTML = "";
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Choose a scenario";
+  select.appendChild(placeholder);
+
+  const core = document.createElement("optgroup");
+  core.label = "Core scenarios";
+  [
+    ["price", "Change prices"],
+    ["bookings", "Add bookings per week"],
+    ["average-value", "Change average booking value"]
+  ].forEach(function (entry) {
+    const option = document.createElement("option");
+    option.value = entry[0];
+    option.textContent = entry[1];
+    core.appendChild(option);
+  });
+  select.appendChild(core);
+
+  const advancedOptions = growthScenarioAdvancedOptions(baseline);
+  if (advancedOptions.length) {
+    const advanced = document.createElement("optgroup");
+    advanced.label = "Business-performance scenarios";
+    advancedOptions.forEach(function (entry) {
+      const option = document.createElement("option");
+      option.value = entry.value;
+      option.textContent = entry.label;
+      advanced.appendChild(option);
+    });
+    select.appendChild(advanced);
+  }
+
+  if (Array.from(select.options).some(function (option) { return option.value === previous; })) {
+    select.value = previous;
+  }
+
+  const help = $("growthScenarioAvailabilityHelp");
+  if (help) {
+    help.textContent = advancedOptions.length
+      ? advancedOptions.length + " advanced scenario" + (advancedOptions.length === 1 ? "" : "s") + " unlocked from the data in this period. Other advanced scenarios stay hidden until their evidence threshold is met."
+      : "Advanced scenarios stay hidden until there is enough real booking, CRM or capacity data to support them.";
+  }
 }
 
 function growthScenarioMoney(value) {
@@ -616,9 +888,15 @@ function growthScenarioInputValid() {
   const type = $("growthScenarioType")?.value || "";
   const value = Number($("growthScenarioAssumption")?.value);
   if (!baseline?.ready || !type || !Number.isFinite(value)) return false;
+
   if (type === "price") return value > 0 && value <= 100;
   if (type === "bookings") return value > 0 && value <= 500;
   if (type === "average-value") return value > 0 && value <= 100000;
+  if (type === "retention") return baseline.retention?.ready && value > 0 && value <= 100;
+  if (type === "capacity") return baseline.capacity?.ready && value > baseline.capacity.utilisation && value <= 100;
+  if (type === "quiet-period") return baseline.quietPeriod?.ready && value > baseline.quietPeriod.utilisation && value <= 100;
+  if (type === "service-mix") return baseline.serviceMix?.ready && value > 0 && value <= 100;
+  if (type === "additional-capacity") return baseline.capacity?.ready && baseline.capacity.utilisation >= 75 && value > 0 && value <= 168;
   return false;
 }
 
@@ -660,6 +938,59 @@ function syncGrowthScenarioControls(resetResult = true) {
       max: "100000",
       step: "0.01",
       help: "Enter the average value you want to model. Booking volume stays at the current monthly equivalent."
+    },
+    retention: {
+      label: "Attention customers who rebook",
+      suffix: "%",
+      placeholder: "e.g. 30",
+      min: "1",
+      max: "100",
+      step: "1",
+      help: baseline?.retention?.ready
+        ? "Model one additional booking from a percentage of the " + baseline.retention.attentionCustomers + " established customers currently due back, slipping or lapsed."
+        : "This scenario needs reliable CRM retention history."
+    },
+    capacity: {
+      label: "Target utilisation",
+      suffix: "%",
+      placeholder: baseline?.capacity?.utilisation != null ? "Above " + Math.round(baseline.capacity.utilisation) : "e.g. 80",
+      min: baseline?.capacity?.utilisation != null ? String(Math.min(99.9, baseline.capacity.utilisation + 0.1)) : "0.1",
+      max: "100",
+      step: "0.1",
+      help: baseline?.capacity?.ready
+        ? "Current utilisation is " + Math.round(baseline.capacity.utilisation) + "%. The model fills more of the appointment time already offered."
+        : "This scenario needs reliable historical availability and booked-time data."
+    },
+    "quiet-period": {
+      label: baseline?.quietPeriod?.day ? "Target " + baseline.quietPeriod.day + " utilisation" : "Target quiet-period utilisation",
+      suffix: "%",
+      placeholder: baseline?.quietPeriod?.utilisation != null ? "Above " + Math.round(baseline.quietPeriod.utilisation) : "e.g. 60",
+      min: baseline?.quietPeriod?.utilisation != null ? String(Math.min(99.9, baseline.quietPeriod.utilisation + 0.1)) : "0.1",
+      max: "100",
+      step: "0.1",
+      help: baseline?.quietPeriod?.ready
+        ? baseline.quietPeriod.day + " is the quietest weekday with enough availability history in this period."
+        : "This scenario needs a repeated quieter weekday with reliable availability history."
+    },
+    "service-mix": {
+      label: "Bookings shifted to " + (baseline?.serviceMix?.targetServiceTitle || "higher-value service"),
+      suffix: "%",
+      placeholder: "e.g. 10",
+      min: "0.1",
+      max: "100",
+      step: "0.1",
+      help: baseline?.serviceMix?.ready
+        ? "Model shifting a share of current bookings toward " + baseline.serviceMix.targetServiceTitle + " at its observed average booked value."
+        : "This scenario needs at least two services with enough completed booking history."
+    },
+    "additional-capacity": {
+      label: "Additional appointment hours per week",
+      suffix: "h",
+      placeholder: "e.g. 8",
+      min: "0.1",
+      max: "168",
+      step: "0.5",
+      help: "Models extra appointment capacity at the current utilisation and booked-value-per-hour rates. Staffing costs are not included."
     }
   };
   const config = configs[type];
@@ -684,7 +1015,7 @@ function syncGrowthScenarioControls(resetResult = true) {
     input.step = config.step;
     label.textContent = config.label;
     suffix.textContent = config.suffix;
-    help.textContent = baseline?.ready ? config.help : "A scenario needs at least one non-cancelled booking with booked value in the selected period.";
+    help.textContent = config.help;
   }
 
   $("growthScenarioRunBtn").disabled = !growthScenarioInputValid();
@@ -701,6 +1032,7 @@ function renderGrowthScenarioBaseline() {
 
   const baseline = growthScenarioBaseline();
   growthViewState.scenarioBaseline = baseline;
+  renderGrowthScenarioOptions(baseline);
 
   $("growthScenarioBaselineRevenue").textContent = baseline.ready ? growthScenarioMoney(baseline.monthlyRevenue) : "—";
   $("growthScenarioBaselineAverage").textContent = baseline.ready ? growthScenarioMoney(baseline.averageBooking) : "—";
@@ -759,7 +1091,7 @@ function runGrowthScenario() {
     if (validation) {
       validation.textContent = !baseline?.ready
         ? "There is not enough booked-value data in this period to run a scenario."
-        : "Enter a valid positive assumption before running the scenario.";
+        : "Enter an assumption within the valid range shown for this scenario.";
       validation.classList.remove("hidden");
     }
     return;
@@ -814,6 +1146,88 @@ function runGrowthScenario() {
       "Average booking value changes from " + growthScenarioMoney(baseline.averageBooking) + " to " + growthScenarioMoney(assumption) + ".",
       "Monthly-equivalent booking volume stays unchanged.",
       "The model does not predict how a different average booking value would affect customer demand or service mix."
+    ];
+  } else if (type === "retention") {
+    const retention = baseline.retention;
+    const rebookedCustomers = retention.attentionCustomers * assumption / 100;
+    const extraRevenue = rebookedCustomers * retention.averageAttentionValue;
+    projected = current + extraRevenue;
+    title = Math.round(assumption * 10) / 10 + "% retention recovery scenario";
+    projectedHelp = "If that share of current attention customers rebooked once";
+    secondaryLabel = "Additional rebookings";
+    secondaryValue = (Math.round(rebookedCustomers * 10) / 10).toFixed(1);
+    assumptions = [
+      retention.attentionCustomers + " established customers are currently due back, slipping or lapsed based on their own booking patterns.",
+      Math.round(assumption * 10) / 10 + "% of that current attention group is assumed to make one additional booking in the modelled month.",
+      "Those rebookings use the attention group's observed average completed-booking value of " + growthScenarioMoney(retention.averageAttentionValue) + ".",
+      "The current monthly booked-value baseline otherwise stays unchanged.",
+      "This does not predict which customers will return or guarantee that outreach will create these bookings."
+    ];
+  } else if (type === "capacity") {
+    const capacity = baseline.capacity;
+    const extraBookedMinutes = capacity.availabilityMinutes * ((assumption - capacity.utilisation) / 100);
+    const extraRevenue = (extraBookedMinutes / 60) * capacity.valuePerBookedHour * baseline.monthlyFactor;
+    projected = current + extraRevenue;
+    title = Math.round(assumption * 10) / 10 + "% utilisation scenario";
+    projectedHelp = "Filling more of the appointment time already offered";
+    secondaryLabel = "Additional booked hours / month";
+    secondaryValue = (Math.round((extraBookedMinutes / 60 * baseline.monthlyFactor) * 10) / 10).toFixed(1) + "h";
+    assumptions = [
+      "Current utilisation is " + (Math.round(capacity.utilisation * 10) / 10).toFixed(1) + "% across " + capacity.sourceBlocks + " usable availability blocks.",
+      "Offered appointment capacity stays unchanged while utilisation rises to " + (Math.round(assumption * 10) / 10).toFixed(1) + "%.",
+      "Additional booked time is valued at the current observed rate of " + growthScenarioMoney(capacity.valuePerBookedHour) + " per booked hour.",
+      "The selected-period capacity and booked value are normalised to a monthly equivalent.",
+      "The model does not predict that sufficient customer demand exists to fill the extra time."
+    ];
+  } else if (type === "quiet-period") {
+    const quiet = baseline.quietPeriod;
+    const extraBookedMinutes = quiet.availabilityMinutes * ((assumption - quiet.utilisation) / 100);
+    const extraRevenue = (extraBookedMinutes / 60) * baseline.capacity.valuePerBookedHour * baseline.monthlyFactor;
+    projected = current + extraRevenue;
+    title = "Fill quieter " + quiet.day + "s";
+    projectedHelp = "If " + quiet.day + " utilisation reached " + (Math.round(assumption * 10) / 10).toFixed(1) + "%";
+    secondaryLabel = quiet.day + " utilisation";
+    secondaryValue = (Math.round(quiet.utilisation * 10) / 10).toFixed(1) + "% → " + (Math.round(assumption * 10) / 10).toFixed(1) + "%";
+    assumptions = [
+      quiet.day + " is the quietest weekday with at least 3 usable availability blocks in the selected period.",
+      "Observed " + quiet.day + " utilisation is " + (Math.round(quiet.utilisation * 10) / 10).toFixed(1) + "% across " + growthCompactHours(quiet.availabilityMinutes) + " of offered time.",
+      "Only the additional filled " + quiet.day + " time is added; other days stay unchanged.",
+      "Additional booked time uses the business-wide observed value of " + growthScenarioMoney(baseline.capacity.valuePerBookedHour) + " per booked hour.",
+      "This does not predict that demand can be shifted to " + quiet.day + " or that every extra slot will be suitable."
+    ];
+  } else if (type === "service-mix") {
+    const mix = baseline.serviceMix;
+    const shiftedMonthlyBookings = baseline.monthlyBookings * assumption / 100;
+    const upliftPerShiftedBooking = mix.targetServiceAverage - baseline.averageBooking;
+    const extraRevenue = shiftedMonthlyBookings * upliftPerShiftedBooking;
+    projected = current + extraRevenue;
+    title = "Service-mix scenario";
+    projectedHelp = "Shifting " + (Math.round(assumption * 10) / 10).toFixed(1) + "% of bookings toward " + mix.targetServiceTitle;
+    secondaryLabel = mix.targetServiceTitle + " avg value";
+    secondaryValue = growthScenarioMoney(mix.targetServiceAverage);
+    assumptions = [
+      mix.qualifiedServices + " services have enough booking history to support this comparison.",
+      mix.targetServiceTitle + " has the highest observed average booked value among those services at " + growthScenarioMoney(mix.targetServiceAverage) + ".",
+      (Math.round(assumption * 10) / 10).toFixed(1) + "% of monthly-equivalent bookings are shifted from the current overall average mix toward that observed service value.",
+      "Total booking volume stays unchanged.",
+      "The model does not predict customer preference, service suitability, duration, margin or whether this mix can actually be achieved."
+    ];
+  } else if (type === "additional-capacity") {
+    const capacity = baseline.capacity;
+    const extraAvailableHoursMonthly = assumption * 52 / 12;
+    const extraBookedHoursMonthly = extraAvailableHoursMonthly * capacity.utilisation / 100;
+    const extraRevenue = extraBookedHoursMonthly * capacity.valuePerBookedHour;
+    projected = current + extraRevenue;
+    title = "+" + (Math.round(assumption * 10) / 10).toFixed(1) + " appointment hours / week";
+    projectedHelp = "At current utilisation and booked value per hour";
+    secondaryLabel = "Expected filled hours / month";
+    secondaryValue = (Math.round(extraBookedHoursMonthly * 10) / 10).toFixed(1) + "h";
+    assumptions = [
+      "The business currently uses " + (Math.round(capacity.utilisation * 10) / 10).toFixed(1) + "% of measured offered appointment time.",
+      (Math.round(assumption * 10) / 10).toFixed(1) + " additional appointment hours are added each week.",
+      "New capacity is filled at the current observed utilisation rate and valued at " + growthScenarioMoney(capacity.valuePerBookedHour) + " per booked hour.",
+      "This is an appointment-capacity scenario, not a hiring-profitability calculation.",
+      "Wages, employer costs, room/equipment limits and any change in customer demand are not included."
     ];
   }
 
