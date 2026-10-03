@@ -7,7 +7,9 @@ const growthViewState = {
   channelRows: [],
   periodComparison: null,
   funnelSummary: null,
-  scenarioBaseline: null
+  scenarioBaseline: null,
+  healthPriority: null,
+  healthMetrics: []
 };
 
 function growthAnalyticsDays() {
@@ -846,6 +848,127 @@ function renderGrowthScenarioOptions(baseline) {
   }
 }
 
+function growthHealthScenarioRecommendations(priority, baseline) {
+  if (!priority || !baseline?.ready) return [];
+  const suggestions = [];
+
+  if (priority.key === "Demand") {
+    [3, 5, 10].forEach(function (value) {
+      suggestions.push({
+        type: "bookings",
+        assumption: value,
+        label: "What would +" + value + " bookings / week mean?"
+      });
+    });
+  } else if (priority.key === "Retention" && baseline.retention?.ready) {
+    const available = baseline.retention.attentionCustomers;
+    const candidates = [3, 5].filter(function (value) { return value <= available; });
+    if (!candidates.length && available > 0) candidates.push(Math.min(available, 2));
+    candidates.forEach(function (value) {
+      suggestions.push({
+        type: "retention",
+        assumption: value,
+        label: "What if " + value + " customer" + (value === 1 ? "" : "s") + " returned this month?"
+      });
+    });
+  } else if (priority.key === "Capacity") {
+    [5, 10, 15].forEach(function (value) {
+      suggestions.push({
+        type: "price",
+        assumption: value,
+        label: "Explore a +" + value + "% price scenario"
+      });
+    });
+    if (growthScenarioAdvancedOptions(baseline).some(function (item) { return item.value === "additional-capacity"; })) {
+      suggestions.push({
+        type: "additional-capacity",
+        assumption: null,
+        label: "Explore adding appointment capacity"
+      });
+    }
+  } else if (priority.key === "Revenue efficiency") {
+    [5, 10].forEach(function (value) {
+      suggestions.push({
+        type: "price",
+        assumption: value,
+        label: "Explore a +" + value + "% price scenario"
+      });
+    });
+    if (growthScenarioAdvancedOptions(baseline).some(function (item) { return item.value === "service-mix"; })) {
+      suggestions.push({
+        type: "service-mix",
+        assumption: 10,
+        label: "Explore shifting 10% of service mix"
+      });
+    }
+  }
+
+  return suggestions;
+}
+
+function renderGrowthHealthScenarioGuide() {
+  const guide = $("growthHealthScenarioGuide");
+  const container = $("growthHealthScenarioSuggestions");
+  const title = $("growthHealthScenarioGuideTitle");
+  const copy = $("growthHealthScenarioGuideCopy");
+  if (!guide || !container || !title || !copy) return;
+
+  const priority = growthViewState.healthPriority;
+  const baseline = growthViewState.scenarioBaseline;
+  const suggestions = growthHealthScenarioRecommendations(priority, baseline);
+
+  if (!priority || !suggestions.length) {
+    guide.classList.add("hidden");
+    container.innerHTML = "";
+    return;
+  }
+
+  title.textContent = priority.key + " · explore the numbers";
+  copy.textContent = priority.key === "Capacity"
+    ? "Business Health says capacity is becoming a constraint. Test pricing or additional appointment capacity before deciding what action makes sense."
+    : priority.key === "Retention"
+      ? "Business Health has found an established-customer retention signal. Test what a small number of additional returning customers could mean."
+      : priority.key === "Demand"
+        ? "Business Health has identified demand as the main constraint. Test what a realistic increase in weekly bookings would mean at the current average booking value."
+        : "Business Health has highlighted revenue efficiency. Test pricing or service-mix changes using the current business baseline.";
+
+  container.innerHTML = "";
+  suggestions.forEach(function (suggestion) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "rounded-xl border border-brand-200 bg-white px-3 py-2 text-xs font-bold text-brand-700 transition hover:border-brand-400 hover:bg-brand-50";
+    button.textContent = suggestion.label;
+    button.dataset.healthScenarioType = suggestion.type;
+    if (suggestion.assumption != null) button.dataset.healthScenarioAssumption = String(suggestion.assumption);
+    container.appendChild(button);
+  });
+
+  guide.classList.remove("hidden");
+}
+
+function openGrowthScenarioFromHealth(type, assumption) {
+  const select = $("growthScenarioType");
+  const input = $("growthScenarioAssumption");
+  const lab = $("growthScenarioLab");
+  if (!select || !input || !lab) return;
+
+  const available = Array.from(select.options).some(function (option) { return option.value === type; });
+  if (!available) return;
+
+  select.value = type;
+  syncGrowthScenarioControls(true);
+
+  if (assumption != null && assumption !== "" && !input.disabled) {
+    input.value = String(assumption);
+    handleGrowthScenarioAssumptionInput();
+  }
+
+  lab.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.setTimeout(function () {
+    if (!input.disabled) input.focus({ preventScroll: true });
+  }, 450);
+}
+
 function growthScenarioMoney(value) {
   return money(Math.round(Number(value || 0) * 100) / 100);
 }
@@ -892,7 +1015,7 @@ function growthScenarioInputValid() {
   if (type === "price") return value > 0 && value <= 100;
   if (type === "bookings") return value > 0 && value <= 500;
   if (type === "average-value") return value > 0 && value <= 100000;
-  if (type === "retention") return baseline.retention?.ready && value > 0 && value <= 100;
+  if (type === "retention") return baseline.retention?.ready && value > 0 && value <= baseline.retention.attentionCustomers;
   if (type === "capacity") return baseline.capacity?.ready && value > baseline.capacity.utilisation && value <= 100;
   if (type === "quiet-period") return baseline.quietPeriod?.ready && value > baseline.quietPeriod.utilisation && value <= 100;
   if (type === "service-mix") return baseline.serviceMix?.ready && value > 0 && value <= 100;
@@ -940,14 +1063,14 @@ function syncGrowthScenarioControls(resetResult = true) {
       help: "Enter the average value you want to model. Booking volume stays at the current monthly equivalent."
     },
     retention: {
-      label: "Attention customers who rebook",
-      suffix: "%",
-      placeholder: "e.g. 30",
+      label: "Additional customers who return",
+      suffix: "",
+      placeholder: baseline?.retention?.attentionCustomers >= 5 ? "e.g. 5" : "e.g. " + Math.max(1, baseline?.retention?.attentionCustomers || 1),
       min: "1",
-      max: "100",
+      max: String(Math.max(1, baseline?.retention?.attentionCustomers || 1)),
       step: "1",
       help: baseline?.retention?.ready
-        ? "Model one additional booking from a percentage of the " + baseline.retention.attentionCustomers + " established customers currently due back, slipping or lapsed."
+        ? "Model one additional booking from a chosen number of the " + baseline.retention.attentionCustomers + " established customers currently due back, slipping or lapsed."
         : "This scenario needs reliable CRM retention history."
     },
     capacity: {
@@ -1033,6 +1156,7 @@ function renderGrowthScenarioBaseline() {
   const baseline = growthScenarioBaseline();
   growthViewState.scenarioBaseline = baseline;
   renderGrowthScenarioOptions(baseline);
+  renderGrowthHealthScenarioGuide();
 
   $("growthScenarioBaselineRevenue").textContent = baseline.ready ? growthScenarioMoney(baseline.monthlyRevenue) : "—";
   $("growthScenarioBaselineAverage").textContent = baseline.ready ? growthScenarioMoney(baseline.averageBooking) : "—";
@@ -1149,16 +1273,16 @@ function runGrowthScenario() {
     ];
   } else if (type === "retention") {
     const retention = baseline.retention;
-    const rebookedCustomers = retention.attentionCustomers * assumption / 100;
+    const rebookedCustomers = Math.round(assumption);
     const extraRevenue = rebookedCustomers * retention.averageAttentionValue;
     projected = current + extraRevenue;
-    title = Math.round(assumption * 10) / 10 + "% retention recovery scenario";
-    projectedHelp = "If that share of current attention customers rebooked once";
+    title = rebookedCustomers + " additional customer" + (rebookedCustomers === 1 ? "" : "s") + " returning";
+    projectedHelp = "If that many current attention customers rebooked once";
     secondaryLabel = "Additional rebookings";
-    secondaryValue = (Math.round(rebookedCustomers * 10) / 10).toFixed(1);
+    secondaryValue = String(rebookedCustomers);
     assumptions = [
       retention.attentionCustomers + " established customers are currently due back, slipping or lapsed based on their own booking patterns.",
-      Math.round(assumption * 10) / 10 + "% of that current attention group is assumed to make one additional booking in the modelled month.",
+      rebookedCustomers + " of that current attention group " + (rebookedCustomers === 1 ? "is" : "are") + " assumed to make one additional booking in the modelled month.",
       "Those rebookings use the attention group's observed average completed-booking value of " + growthScenarioMoney(retention.averageAttentionValue) + ".",
       "The current monthly booked-value baseline otherwise stays unchanged.",
       "This does not predict which customers will return or guarantee that outreach will create these bookings."
@@ -1810,6 +1934,7 @@ function renderGrowthBusinessHealthMetrics() {
     setGrowthHealthMetric(metricKeys[index], metric);
   });
 
+  growthViewState.healthMetrics = metrics;
   const readyMetrics = metrics.filter(function (metric) { return metric.status !== "learning"; });
   const readyCount = readyMetrics.length;
   const dataStatus = $("growthHealthDataStatus");
@@ -1827,6 +1952,7 @@ function renderGrowthBusinessHealthMetrics() {
       return (statusWeight[b.status] - statusWeight[a.status]) || (b.score - a.score);
     })[0] || null;
 
+  growthViewState.healthPriority = priority;
   const primaryTitle = $("growthHealthPrimaryTitle");
   const primaryReason = $("growthHealthPrimaryReason");
   const whyBtn = $("growthHealthWhyBtn");
