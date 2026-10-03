@@ -28,6 +28,35 @@
     .preview-nav-active{background:#fff;color:#172033;box-shadow:0 1px 3px rgba(15,23,42,.08)}
     .preview-panel{display:none}.preview-panel.is-active{display:block}
     .preview-disabled{pointer-events:none;opacity:.58}
+
+    html[data-preview-accent="emerald"] .text-brand-600{color:#059669!important}
+    html[data-preview-accent="emerald"] .bg-brand-50{background-color:#ecfdf5!important}
+    html[data-preview-accent="violet"] .text-brand-600{color:#7c3aed!important}
+    html[data-preview-accent="violet"] .bg-brand-50{background-color:#f5f3ff!important}
+    html[data-preview-accent="graphite"] .text-brand-600{color:#475569!important}
+    html[data-preview-accent="graphite"] .bg-brand-50{background-color:#f1f5f9!important}
+
+    body.preview-compact main .card.p-5,
+    body.preview-compact main .card.p-6{padding:.9rem!important}
+    body.preview-compact main .space-y-6>:not([hidden])~:not([hidden]){margin-top:1rem!important}
+    body.preview-compact main table th{padding-top:.55rem!important;padding-bottom:.55rem!important}
+    body.preview-compact main table td{padding-top:.65rem!important;padding-bottom:.65rem!important}
+
+    body.preview-dark{background:#0f172a!important;color:#e2e8f0}
+    body.preview-dark header,
+    body.preview-dark main .card,
+    body.preview-dark main .bg-white{background:#111827!important;border-color:#334155!important}
+    body.preview-dark main .bg-slate-50,
+    body.preview-dark main .bg-slate-50\/60,
+    body.preview-dark main thead{background:#1e293b!important}
+    body.preview-dark main .text-ink,
+    body.preview-dark main .text-slate-700{color:#f8fafc!important}
+    body.preview-dark main .text-slate-500,
+    body.preview-dark main .text-slate-400{color:#94a3b8!important}
+    body.preview-dark main .border-slate-100,
+    body.preview-dark main .border-slate-200{border-color:#334155!important}
+    body.preview-dark .preview-nav-active{background:#1e293b!important;color:#f8fafc!important}
+    body.preview-dark aside .card{background:#111827!important;border-color:#334155!important}
   </style>
 </head>
 <body class="app-bg min-h-screen font-sans text-slate-800">
