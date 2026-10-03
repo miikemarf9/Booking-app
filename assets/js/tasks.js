@@ -247,6 +247,8 @@ async function saveWorkspaceTask(event) {
     source_type: $("workspaceTaskSourceType").value || null,
     source_id: $("workspaceTaskSourceId").value || null,
     source_label: $("workspaceTaskSourceLabel").value || null,
+    status: "open",
+    completed_at: null,
     updated_at: new Date().toISOString()
   };
 
