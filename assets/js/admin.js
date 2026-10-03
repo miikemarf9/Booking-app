@@ -325,7 +325,7 @@ function renderCrmInspector(crm) {
       ${metricCard("Active customers", number(crm.active_customers))}
       ${metricCard("Archived customers", number(crm.archived_customers))}
       ${metricCard("Marketing opted in", number(crm.marketing_opted_in), optInRate + " of active customers")}
-      ${metricCard("Tagged customers", number(crm.tagged_customers))}
+      ${metricCard("Tagged customers", number(crm.tagged_customers), crm.tagged_sample_limited ? "Recent sample capped at 1,000 customers" : "")}
     </div>
     <div class="mt-6 rounded-2xl border border-slate-200 p-4 sm:p-5">
       <p class="text-sm font-bold text-ink">CRM automation</p>
@@ -434,6 +434,8 @@ function renderIntegrationsInspector(integrations) {
       ${integrationCard("Google Calendar", calendar, [
         ["Provider", titleCase(calendar.provider)],
         ["Account", calendar.account_email],
+        ["Add bookings to calendar", yesNo(calendar.add_bookings_enabled)],
+        ["Block external busy time", yesNo(calendar.block_busy_enabled)],
         ["Token expires", dateTime(calendar.token_expires_at)],
         ["Last updated", dateTime(calendar.updated_at || calendar.connected_at)]
       ])}
