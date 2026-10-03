@@ -1965,6 +1965,8 @@ function renderGrowthBusinessHealthMetrics() {
   const primaryTitle = $("growthHealthPrimaryTitle");
   const primaryReason = $("growthHealthPrimaryReason");
   const whyBtn = $("growthHealthWhyBtn");
+  const actionBtn = $("growthHealthActionBtn");
+  const campaignBtn = $("growthHealthCampaignBtn");
 
   if (!readyCount) {
     if (primaryTitle) primaryTitle.textContent = "Building your business baseline";
@@ -1973,6 +1975,8 @@ function renderGrowthBusinessHealthMetrics() {
       whyBtn.disabled = true;
       whyBtn.dataset.healthReason = "";
     }
+    actionBtn?.classList.add("hidden");
+    campaignBtn?.classList.add("hidden");
     hideGrowthHealthWhy();
     return;
   }
@@ -1999,6 +2003,8 @@ function renderGrowthBusinessHealthMetrics() {
     whyBtn.disabled = true;
     whyBtn.dataset.healthReason = "";
   }
+  actionBtn?.classList.add("hidden");
+  campaignBtn?.classList.add("hidden");
   hideGrowthHealthWhy();
 }
 
