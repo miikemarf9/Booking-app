@@ -162,6 +162,9 @@ function renderGrowthPlanner() {
       const channel = item.channel_key
         ? (item.channel_label || growthPlannerState.channels.get(item.channel_key) || item.channel_key)
         : "General Growth";
+      const priorityTask = typeof workspaceTaskForSource === "function"
+        ? workspaceTaskForSource("growth_planner", item.id)
+        : null;
 
       return (
         '<article class="rounded-2xl border border-slate-200 bg-white p-4 ' + (done ? "opacity-65" : "") + '">' +
@@ -181,6 +184,7 @@ function renderGrowthPlanner() {
               '</div>' +
             '</div>' +
             '<div class="flex shrink-0 flex-wrap gap-2">' +
+              (!done ? '<button class="btn ' + (priorityTask ? 'btn-light' : 'btn-primary') + ' !px-3 !py-2 text-xs" type="button" data-planner-priority="' + item.id + '">' + (priorityTask ? 'Edit reminder' : 'Add to priorities') + '</button>' : '') +
               '<button class="btn btn-light !px-3 !py-2 text-xs" type="button" data-planner-toggle="' + item.id + '">' + (done ? "Reopen" : "Done") + '</button>' +
               '<button class="btn btn-light !px-3 !py-2 text-xs" type="button" data-planner-edit="' + item.id + '">Edit</button>' +
               '<button class="btn btn-light !px-3 !py-2 text-xs" type="button" data-planner-delete="' + item.id + '">Delete</button>' +
