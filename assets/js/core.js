@@ -24,6 +24,8 @@
       customers: [],
       selectedCustomerId: "",
       marketingTargetCustomerId: "",
+      marketingCampaignCustomerIds: [],
+      marketingCampaignSource: "",
       customerTimelineEvents: {},
       customerTimelineLoading: {},
       questions: [],
@@ -736,6 +738,9 @@
       $("growthHealthActionBtn")?.addEventListener("click", () => {
         if (typeof runGrowthHealthAction === "function") runGrowthHealthAction();
       });
+      $("growthHealthCampaignBtn")?.addEventListener("click", () => {
+        if (typeof createRetentionCampaignFromHealth === "function") createRetentionCampaignFromHealth();
+      });
 
       $("growthScenarioType")?.addEventListener("change", () => {
         if (typeof handleGrowthScenarioTypeChange === "function") handleGrowthScenarioTypeChange();
@@ -865,6 +870,7 @@
         $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
       $("clearMarketingTargetBtn").addEventListener("click", clearMarketingTarget);
+      $("clearMarketingCampaignBtn")?.addEventListener("click", () => clearMarketingCampaignContext());
       $("saveCustomerNotesBtn").addEventListener("click", saveCustomerNotes);
       $("businessDetailsForm").addEventListener("submit", saveBusinessDetails);
       $("brandingForm").addEventListener("submit", saveBranding);
