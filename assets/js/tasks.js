@@ -204,6 +204,30 @@ function openWorkspaceTaskFromPlanner(item) {
   });
 }
 
+async function syncWorkspaceTaskSourceStatus(sourceType, sourceId, sourceStatus) {
+  const item = workspaceTaskForSource(sourceType, sourceId);
+  if (!item || !state.profile) return;
+
+  const nextStatus = sourceStatus === "done" ? "done" : "open";
+  const { data, error } = await supabaseClient.from("workspace_tasks")
+    .update({
+      status: nextStatus,
+      completed_at: nextStatus === "done" ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", item.id)
+    .eq("profile_id", state.profile.id)
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("Linked task status sync failed", error);
+    return;
+  }
+  workspaceTaskState.items = workspaceTaskState.items.map(entry => entry.id === data.id ? data : entry);
+  renderWorkspaceTasks();
+}
+
 async function saveWorkspaceTask(event) {
   event.preventDefault();
   if (!state.profile) return;
