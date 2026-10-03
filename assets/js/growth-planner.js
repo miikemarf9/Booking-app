@@ -349,6 +349,9 @@ async function toggleGrowthPlannerItem(itemId) {
   growthPlannerState.items = growthPlannerState.items.map(function (entry) {
     return entry.id === data.id ? data : entry;
   });
+  if (typeof syncWorkspaceTaskSourceStatus === "function") {
+    await syncWorkspaceTaskSourceStatus("growth_planner", item.id, status);
+  }
   renderGrowthPlanner();
 }
 
