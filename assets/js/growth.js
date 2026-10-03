@@ -6,7 +6,8 @@ const growthViewState = {
   channelType: "all",
   channelRows: [],
   periodComparison: null,
-  funnelSummary: null
+  funnelSummary: null,
+  scenarioBaseline: null
 };
 
 function growthAnalyticsDays() {
@@ -541,6 +542,295 @@ function growthBookingValue(booking) {
     return item.id === booking?.service_id;
   }) || {};
   return Math.max(0, Number(booking?.booked_price ?? service.price ?? 0));
+}
+
+function growthScenarioMonthlyFactor(days) {
+  return (365.25 / 12) / Math.max(1, Number(days || 30));
+}
+
+function growthScenarioBaseline() {
+  const days = growthAnalyticsDays();
+  const bounds = growthPeriodBounds(days);
+  const bookings = growthActiveBookingsBetween(bounds.currentStart, bounds.currentEnd);
+  const totalRevenue = bookings.reduce(function (sum, booking) {
+    return sum + growthBookingValue(booking);
+  }, 0);
+  const bookingCount = bookings.length;
+  const monthlyFactor = growthScenarioMonthlyFactor(days);
+  const monthlyRevenue = totalRevenue * monthlyFactor;
+  const averageBooking = bookingCount ? totalRevenue / bookingCount : 0;
+  const weeklyBookings = bookingCount / days * 7;
+  const monthlyBookings = bookingCount * monthlyFactor;
+
+  return {
+    days,
+    bookingCount,
+    totalRevenue,
+    monthlyRevenue,
+    averageBooking,
+    weeklyBookings,
+    monthlyBookings,
+    ready: bookingCount > 0 && totalRevenue > 0
+  };
+}
+
+function growthScenarioMoney(value) {
+  return money(Math.round(Number(value || 0) * 100) / 100);
+}
+
+function growthScenarioPercent(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "—";
+  const rounded = Math.round(number * 10) / 10;
+  return (rounded > 0 ? "+" : "") + rounded.toFixed(1) + "%";
+}
+
+function resetGrowthScenarioResult() {
+  if (!$("growthScenarioResultTitle")) return;
+  $("growthScenarioResultTitle").textContent = $("growthScenarioType")?.value ? "Enter an assumption to calculate" : "Choose a scenario to begin";
+  $("growthScenarioResultStatus").textContent = "Waiting";
+  $("growthScenarioResultStatus").className = "rounded-full bg-white px-2.5 py-1 text-[.68rem] font-bold text-slate-500";
+  $("growthScenarioResultCurrent").textContent = "—";
+  $("growthScenarioResultProjected").textContent = "—";
+  $("growthScenarioResultDifference").textContent = "—";
+  $("growthScenarioSecondaryLabel").textContent = "Additional context";
+  $("growthScenarioSecondaryValue").textContent = "—";
+  $("growthScenarioResultCurrentHelp").textContent = "No calculation yet";
+  $("growthScenarioResultProjectedHelp").textContent = "No calculation yet";
+  $("growthScenarioAssumptionsList").innerHTML = "<li>Run a scenario to see every assumption used in the calculation.</li>";
+}
+
+function setGrowthScenarioAssumptions(items) {
+  const list = $("growthScenarioAssumptionsList");
+  if (!list) return;
+  list.innerHTML = "";
+  items.forEach(function (item) {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
+}
+
+function growthScenarioInputValid() {
+  const baseline = growthViewState.scenarioBaseline;
+  const type = $("growthScenarioType")?.value || "";
+  const value = Number($("growthScenarioAssumption")?.value);
+  if (!baseline?.ready || !type || !Number.isFinite(value)) return false;
+  if (type === "price") return value > 0 && value <= 100;
+  if (type === "bookings") return value > 0 && value <= 500;
+  if (type === "average-value") return value > 0 && value <= 100000;
+  return false;
+}
+
+function syncGrowthScenarioControls(resetResult = true) {
+  if (!$("growthScenarioType")) return;
+
+  const type = $("growthScenarioType").value || "";
+  const baseline = growthViewState.scenarioBaseline;
+  const input = $("growthScenarioAssumption");
+  const label = $("growthScenarioAssumptionLabel");
+  const suffix = $("growthScenarioAssumptionSuffix");
+  const help = $("growthScenarioAssumptionHelp");
+  const presets = $("growthScenarioPricePresets");
+
+  const configs = {
+    price: {
+      label: "Price increase",
+      suffix: "%",
+      placeholder: "e.g. 10",
+      min: "0.1",
+      max: "100",
+      step: "0.1",
+      help: "Enter a percentage increase, or use 5%, 10% or 15%. The headline scenario holds booking volume constant."
+    },
+    bookings: {
+      label: "Additional bookings per week",
+      suffix: "",
+      placeholder: "e.g. 5",
+      min: "0.1",
+      max: "500",
+      step: "0.1",
+      help: "Enter the extra weekly bookings you want to model. Their value uses your current average booking value."
+    },
+    "average-value": {
+      label: "New average booking value",
+      suffix: "£",
+      placeholder: baseline?.averageBooking ? growthScenarioMoney(baseline.averageBooking).replace(/[^0-9.,]/g, "") : "e.g. 75",
+      min: "0.01",
+      max: "100000",
+      step: "0.01",
+      help: "Enter the average value you want to model. Booking volume stays at the current monthly equivalent."
+    }
+  };
+  const config = configs[type];
+
+  if (presets) {
+    presets.classList.toggle("hidden", type !== "price");
+    presets.classList.toggle("flex", type === "price");
+  }
+
+  if (!config) {
+    input.disabled = true;
+    input.value = "";
+    input.placeholder = "—";
+    label.textContent = "Choose a scenario first";
+    suffix.textContent = "";
+    help.textContent = "Choose one change at a time so the calculation and assumptions stay clear.";
+  } else {
+    input.disabled = !baseline?.ready;
+    input.placeholder = config.placeholder;
+    input.min = config.min;
+    input.max = config.max;
+    input.step = config.step;
+    label.textContent = config.label;
+    suffix.textContent = config.suffix;
+    help.textContent = baseline?.ready ? config.help : "A scenario needs at least one non-cancelled booking with booked value in the selected period.";
+  }
+
+  $("growthScenarioRunBtn").disabled = !growthScenarioInputValid();
+  const validation = $("growthScenarioValidation");
+  if (validation) {
+    validation.classList.add("hidden");
+    validation.textContent = "";
+  }
+  if (resetResult) resetGrowthScenarioResult();
+}
+
+function renderGrowthScenarioBaseline() {
+  if (!$("growthScenarioLab")) return;
+
+  const baseline = growthScenarioBaseline();
+  growthViewState.scenarioBaseline = baseline;
+
+  $("growthScenarioBaselineRevenue").textContent = baseline.ready ? growthScenarioMoney(baseline.monthlyRevenue) : "—";
+  $("growthScenarioBaselineAverage").textContent = baseline.ready ? growthScenarioMoney(baseline.averageBooking) : "—";
+  $("growthScenarioBaselineWeekly").textContent = baseline.ready ? (Math.round(baseline.weeklyBookings * 10) / 10).toFixed(1) : "—";
+  $("growthScenarioBaselinePeriod").textContent = baseline.ready
+    ? "Monthly equivalent based on " + baseline.bookingCount + " non-cancelled booking" + (baseline.bookingCount === 1 ? "" : "s") + " from the selected last " + baseline.days + " days."
+    : "No usable booked value was found in the selected last " + baseline.days + " days.";
+
+  const status = $("growthScenarioBaselineStatus");
+  if (status) {
+    if (!baseline.ready) {
+      status.textContent = "No baseline";
+      status.className = "rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500";
+    } else if (baseline.bookingCount < 3) {
+      status.textContent = "Limited data";
+      status.className = "rounded-full bg-amber-100 px-2.5 py-1 text-[.68rem] font-bold text-amber-800";
+    } else {
+      status.textContent = "Ready";
+      status.className = "rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700";
+    }
+  }
+
+  syncGrowthScenarioControls(true);
+}
+
+function handleGrowthScenarioTypeChange() {
+  const input = $("growthScenarioAssumption");
+  if (input) input.value = "";
+  syncGrowthScenarioControls(true);
+}
+
+function handleGrowthScenarioAssumptionInput() {
+  const validation = $("growthScenarioValidation");
+  if (validation) {
+    validation.classList.add("hidden");
+    validation.textContent = "";
+  }
+  $("growthScenarioRunBtn").disabled = !growthScenarioInputValid();
+}
+
+function setGrowthScenarioPricePreset(value) {
+  if ($("growthScenarioType")?.value !== "price") return;
+  const input = $("growthScenarioAssumption");
+  if (!input || input.disabled) return;
+  input.value = String(value);
+  handleGrowthScenarioAssumptionInput();
+}
+
+function runGrowthScenario() {
+  const baseline = growthViewState.scenarioBaseline;
+  const type = $("growthScenarioType")?.value || "";
+  const assumption = Number($("growthScenarioAssumption")?.value);
+  const validation = $("growthScenarioValidation");
+
+  if (!growthScenarioInputValid()) {
+    if (validation) {
+      validation.textContent = !baseline?.ready
+        ? "There is not enough booked-value data in this period to run a scenario."
+        : "Enter a valid positive assumption before running the scenario.";
+      validation.classList.remove("hidden");
+    }
+    return;
+  }
+
+  const current = baseline.monthlyRevenue;
+  let projected = current;
+  let title = "";
+  let projectedHelp = "";
+  let secondaryLabel = "";
+  let secondaryValue = "";
+  let assumptions = [];
+
+  if (type === "price") {
+    projected = current * (1 + assumption / 100);
+    const breakEvenLoss = assumption / (100 + assumption) * 100;
+    title = "+" + (Math.round(assumption * 10) / 10).toLocaleString("en-GB") + "% price scenario";
+    projectedHelp = "If booking volume and service mix stayed the same";
+    secondaryLabel = "Break-even volume loss";
+    secondaryValue = (Math.round(breakEvenLoss * 10) / 10).toFixed(1) + "%";
+    assumptions = [
+      "Current monthly booked value is normalised from the selected last " + baseline.days + " days.",
+      "Every booked price increases by " + (Math.round(assumption * 10) / 10).toLocaleString("en-GB") + "%.",
+      "The headline result holds booking volume and service mix constant.",
+      "The break-even figure is the approximate booking-volume reduction that would return booked value to the current baseline.",
+      "No change in customer demand or price sensitivity is predicted."
+    ];
+  } else if (type === "bookings") {
+    const extraMonthlyBookings = assumption * 52 / 12;
+    const extraRevenue = extraMonthlyBookings * baseline.averageBooking;
+    projected = current + extraRevenue;
+    title = "+" + (Math.round(assumption * 10) / 10).toLocaleString("en-GB") + " bookings per week";
+    projectedHelp = "Using the current average booking value";
+    secondaryLabel = "Scenario bookings / week";
+    secondaryValue = (Math.round((baseline.weeklyBookings + assumption) * 10) / 10).toFixed(1);
+    assumptions = [
+      "Current monthly booked value is normalised from the selected last " + baseline.days + " days.",
+      "Each additional booking is valued at the current average of " + growthScenarioMoney(baseline.averageBooking) + ".",
+      "The model adds " + (Math.round(assumption * 10) / 10).toLocaleString("en-GB") + " bookings each week using 52 weeks ÷ 12 months.",
+      "Existing booking volume and average booking value otherwise stay unchanged.",
+      "The calculation does not predict whether the additional demand or capacity will be available."
+    ];
+  } else if (type === "average-value") {
+    projected = baseline.monthlyBookings * assumption;
+    const perBookingChange = assumption - baseline.averageBooking;
+    title = growthScenarioMoney(assumption) + " average booking value";
+    projectedHelp = "At the current monthly-equivalent booking volume";
+    secondaryLabel = "Change per booking";
+    secondaryValue = (perBookingChange >= 0 ? "+" : "−") + growthScenarioMoney(Math.abs(perBookingChange));
+    assumptions = [
+      "Current monthly booking volume is normalised from the selected last " + baseline.days + " days.",
+      "Average booking value changes from " + growthScenarioMoney(baseline.averageBooking) + " to " + growthScenarioMoney(assumption) + ".",
+      "Monthly-equivalent booking volume stays unchanged.",
+      "The model does not predict how a different average booking value would affect customer demand or service mix."
+    ];
+  }
+
+  const difference = projected - current;
+  const differencePercent = current ? difference / current * 100 : 0;
+
+  $("growthScenarioResultTitle").textContent = title;
+  $("growthScenarioResultStatus").textContent = "Calculated";
+  $("growthScenarioResultStatus").className = "rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700";
+  $("growthScenarioResultCurrent").textContent = growthScenarioMoney(current);
+  $("growthScenarioResultProjected").textContent = growthScenarioMoney(projected);
+  $("growthScenarioResultDifference").textContent = (difference >= 0 ? "+" : "−") + growthScenarioMoney(Math.abs(difference)) + " (" + growthScenarioPercent(differencePercent) + ")";
+  $("growthScenarioSecondaryLabel").textContent = secondaryLabel;
+  $("growthScenarioSecondaryValue").textContent = secondaryValue;
+  $("growthScenarioResultCurrentHelp").textContent = "Monthly equivalent from last " + baseline.days + " days";
+  $("growthScenarioResultProjectedHelp").textContent = projectedHelp;
+  setGrowthScenarioAssumptions(assumptions);
 }
 
 function growthTimeMinutes(value) {
@@ -1197,6 +1487,7 @@ async function loadGrowthAnalytics(showToast = false) {
   await Promise.all(tasks);
 
   renderGrowthBusinessHealthMetrics();
+  renderGrowthScenarioBaseline();
 
   if (typeof loadGrowthOpportunityEngine === "function") {
     await loadGrowthOpportunityEngine(false);
