@@ -3083,6 +3083,75 @@
             </form>
           </article>
         </div>
+
+        <article class="card mt-6 p-5 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Appearance</p>
+              <h3 class="mt-1 text-xl font-bold text-ink">Make the dashboard feel like yours</h3>
+              <p class="mt-2 max-w-xl text-sm leading-6 text-slate-500">Choose how your Grab&Book dashboard looks. These settings only affect your private owner workspace — your customer booking page keeps the colours set under Branding.</p>
+              <div class="mt-5 rounded-2xl bg-slate-50 p-4">
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Dashboard only</p>
+                <p class="mt-1 text-xs leading-5 text-slate-600">Theme and accent colour do not change your logo, booking page or customer-facing brand.</p>
+              </div>
+            </div>
+
+            <form id="dashboardAppearanceForm" class="space-y-6">
+              <fieldset>
+                <legend class="label">Theme</legend>
+                <div class="grid gap-3 sm:grid-cols-3">
+                  <label class="dashboard-theme-option cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-300">
+                    <input class="sr-only" type="radio" name="dashboardTheme" value="light">
+                    <span class="block text-sm font-bold text-ink">Light</span>
+                    <span class="mt-1 block text-xs leading-5 text-slate-500">Always use the light dashboard.</span>
+                  </label>
+                  <label class="dashboard-theme-option cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-300">
+                    <input class="sr-only" type="radio" name="dashboardTheme" value="dark">
+                    <span class="block text-sm font-bold text-ink">Dark</span>
+                    <span class="mt-1 block text-xs leading-5 text-slate-500">Use a darker workspace throughout.</span>
+                  </label>
+                  <label class="dashboard-theme-option cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-300">
+                    <input class="sr-only" type="radio" name="dashboardTheme" value="system">
+                    <span class="block text-sm font-bold text-ink">Use device</span>
+                    <span class="mt-1 block text-xs leading-5 text-slate-500">Follow your device light or dark setting.</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend class="label">Dashboard accent</legend>
+                <p class="mb-3 text-xs leading-5 text-slate-500">Used for active navigation, primary actions and dashboard highlights.</p>
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <label class="dashboard-accent-option flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-300">
+                    <input class="sr-only" type="radio" name="dashboardAccent" value="blue">
+                    <span class="h-7 w-7 shrink-0 rounded-full border-4 border-white shadow ring-1 ring-slate-200" style="background:#0872bd"></span>
+                    <span><span class="block text-sm font-bold text-ink">Grab&Book Blue</span><span class="mt-0.5 block text-xs text-slate-500">The standard dashboard.</span></span>
+                  </label>
+                  <label class="dashboard-accent-option flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-300">
+                    <input class="sr-only" type="radio" name="dashboardAccent" value="emerald">
+                    <span class="h-7 w-7 shrink-0 rounded-full border-4 border-white shadow ring-1 ring-slate-200" style="background:#047857"></span>
+                    <span><span class="block text-sm font-bold text-ink">Emerald</span><span class="mt-0.5 block text-xs text-slate-500">Calm and operational.</span></span>
+                  </label>
+                  <label class="dashboard-accent-option flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-300">
+                    <input class="sr-only" type="radio" name="dashboardAccent" value="violet">
+                    <span class="h-7 w-7 shrink-0 rounded-full border-4 border-white shadow ring-1 ring-slate-200" style="background:#6d28d9"></span>
+                    <span><span class="block text-sm font-bold text-ink">Violet</span><span class="mt-0.5 block text-xs text-slate-500">A little more distinctive.</span></span>
+                  </label>
+                  <label class="dashboard-accent-option flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-300">
+                    <input class="sr-only" type="radio" name="dashboardAccent" value="graphite">
+                    <span class="h-7 w-7 shrink-0 rounded-full border-4 border-white shadow ring-1 ring-slate-200" style="background:#475467"></span>
+                    <span><span class="block text-sm font-bold text-ink">Graphite</span><span class="mt-0.5 block text-xs text-slate-500">Neutral and understated.</span></span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5">
+                <p id="dashboardAppearanceSummary" class="text-xs leading-5 text-slate-500">Use device theme · Grab&Book Blue</p>
+                <button id="dashboardAppearanceSaveBtn" type="submit" class="btn btn-primary">Save appearance</button>
+              </div>
+            </form>
+          </div>
+        </article>
       </section>
 
       <!-- Team Tab -->
