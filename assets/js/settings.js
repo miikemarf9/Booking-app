@@ -20,6 +20,7 @@ const WORKSPACE_AREA_START_PAGES = {
 };
 const DASHBOARD_THEMES = ["light", "dark", "system"];
 const DASHBOARD_ACCENTS = ["blue", "emerald", "violet", "graphite"];
+const DASHBOARD_DENSITIES = ["comfortable", "compact"];
 
 function defaultDashboardPreferences() {
   return {
@@ -27,7 +28,8 @@ function defaultDashboardPreferences() {
     workspace_preset: "full",
     start_page: "overview",
     theme_preference: "system",
-    accent_color: "blue"
+    accent_color: "blue",
+    dashboard_density: "comfortable"
   };
 }
 
@@ -51,6 +53,14 @@ function normaliseDashboardTheme(theme) {
 
 function normaliseDashboardAccent(accent) {
   return DASHBOARD_ACCENTS.includes(accent) ? accent : "blue";
+}
+
+function normaliseDashboardDensity(density) {
+  return DASHBOARD_DENSITIES.includes(density) ? density : "comfortable";
+}
+
+function dashboardDensityLabel(density) {
+  return normaliseDashboardDensity(density) === "compact" ? "Compact" : "Comfortable";
 }
 
 function resolvedDashboardTheme(preference) {
@@ -79,16 +89,19 @@ function applyDashboardAppearance(preferences) {
   const source = preferences || state.dashboardPreferences || defaultDashboardPreferences();
   const themePreference = normaliseDashboardTheme(source.theme_preference);
   const accent = normaliseDashboardAccent(source.accent_color);
+  const density = normaliseDashboardDensity(source.dashboard_density);
 
   dashboard.dataset.dashboardTheme = resolvedDashboardTheme(themePreference);
   dashboard.dataset.dashboardThemePreference = themePreference;
   dashboard.dataset.dashboardAccent = accent;
+  dashboard.dataset.dashboardDensity = density;
 }
 
 function syncDashboardAppearanceForm() {
   if (!$("dashboardAppearanceForm")) return;
   const selectedTheme = document.querySelector('input[name="dashboardTheme"]:checked')?.value || "system";
   const selectedAccent = document.querySelector('input[name="dashboardAccent"]:checked')?.value || "blue";
+  const selectedDensity = document.querySelector('input[name="dashboardDensity"]:checked')?.value || "comfortable";
 
   document.querySelectorAll(".dashboard-theme-option").forEach(function (label) {
     label.classList.toggle("appearance-selected", label.querySelector("input")?.checked);
@@ -96,9 +109,12 @@ function syncDashboardAppearanceForm() {
   document.querySelectorAll(".dashboard-accent-option").forEach(function (label) {
     label.classList.toggle("appearance-selected", label.querySelector("input")?.checked);
   });
+  document.querySelectorAll(".dashboard-density-option").forEach(function (label) {
+    label.classList.toggle("appearance-selected", label.querySelector("input")?.checked);
+  });
 
   if ($("dashboardAppearanceSummary")) {
-    $("dashboardAppearanceSummary").textContent = dashboardThemeLabel(selectedTheme) + " theme · " + dashboardAccentLabel(selectedAccent);
+    $("dashboardAppearanceSummary").textContent = dashboardThemeLabel(selectedTheme) + " theme · " + dashboardAccentLabel(selectedAccent) + " · " + dashboardDensityLabel(selectedDensity);
   }
 }
 
@@ -107,17 +123,21 @@ function populateDashboardAppearance() {
   const preferences = state.dashboardPreferences || defaultDashboardPreferences();
   const theme = normaliseDashboardTheme(preferences.theme_preference);
   const accent = normaliseDashboardAccent(preferences.accent_color);
+  const density = normaliseDashboardDensity(preferences.dashboard_density);
   const themeInput = document.querySelector('input[name="dashboardTheme"][value="' + theme + '"]');
   const accentInput = document.querySelector('input[name="dashboardAccent"][value="' + accent + '"]');
+  const densityInput = document.querySelector('input[name="dashboardDensity"][value="' + density + '"]');
   if (themeInput) themeInput.checked = true;
   if (accentInput) accentInput.checked = true;
+  if (densityInput) densityInput.checked = true;
   syncDashboardAppearanceForm();
 }
 
 function previewDashboardAppearance() {
   const theme = document.querySelector('input[name="dashboardTheme"]:checked')?.value || "system";
   const accent = document.querySelector('input[name="dashboardAccent"]:checked')?.value || "blue";
-  applyDashboardAppearance({ theme_preference: theme, accent_color: accent });
+  const density = document.querySelector('input[name="dashboardDensity"]:checked')?.value || "comfortable";
+  applyDashboardAppearance({ theme_preference: theme, accent_color: accent, dashboard_density: density });
   syncDashboardAppearanceForm();
 }
 
@@ -129,6 +149,7 @@ async function saveDashboardAppearance(event) {
   const visibleAreas = normaliseWorkspaceAreas(current.visible_areas);
   const theme = normaliseDashboardTheme(document.querySelector('input[name="dashboardTheme"]:checked')?.value);
   const accent = normaliseDashboardAccent(document.querySelector('input[name="dashboardAccent"]:checked')?.value);
+  const density = normaliseDashboardDensity(document.querySelector('input[name="dashboardDensity"]:checked')?.value);
   const startPage = normaliseWorkspaceStartPage(current.start_page, visibleAreas);
   const btn = $("dashboardAppearanceSaveBtn");
   setBusy(btn, true, "Saving…");
@@ -142,9 +163,10 @@ async function saveDashboardAppearance(event) {
       start_page: startPage,
       theme_preference: theme,
       accent_color: accent,
+      dashboard_density: density,
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id" })
-    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color")
+    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color, dashboard_density")
     .single();
 
   setBusy(btn, false);
@@ -159,7 +181,8 @@ async function saveDashboardAppearance(event) {
     workspace_preset: workspacePresetForAreas(data.visible_areas),
     start_page: normaliseWorkspaceStartPage(data.start_page, data.visible_areas),
     theme_preference: normaliseDashboardTheme(data.theme_preference),
-    accent_color: normaliseDashboardAccent(data.accent_color)
+    accent_color: normaliseDashboardAccent(data.accent_color),
+    dashboard_density: normaliseDashboardDensity(data.dashboard_density)
   };
 
   applyDashboardAppearance();
@@ -200,7 +223,7 @@ async function loadDashboardPreferences() {
 
   const { data, error } = await supabaseClient
     .from("dashboard_preferences")
-    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color")
+    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color, dashboard_density")
     .eq("user_id", state.user.id)
     .maybeSingle();
 
@@ -220,7 +243,8 @@ async function loadDashboardPreferences() {
       workspace_preset: workspacePresetForAreas(visibleAreas),
       start_page: normaliseWorkspaceStartPage(data.start_page, visibleAreas),
       theme_preference: normaliseDashboardTheme(data.theme_preference),
-      accent_color: normaliseDashboardAccent(data.accent_color)
+      accent_color: normaliseDashboardAccent(data.accent_color),
+      dashboard_density: normaliseDashboardDensity(data.dashboard_density)
     };
   }
 
@@ -348,9 +372,10 @@ async function saveWorkspacePersonalisation(event) {
       start_page: startPage,
       theme_preference: normaliseDashboardTheme(state.dashboardPreferences?.theme_preference),
       accent_color: normaliseDashboardAccent(state.dashboardPreferences?.accent_color),
+      dashboard_density: normaliseDashboardDensity(state.dashboardPreferences?.dashboard_density),
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id" })
-    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color")
+    .select("visible_areas, workspace_preset, start_page, theme_preference, accent_color, dashboard_density")
     .single();
 
   setBusy(btn, false);
@@ -362,7 +387,8 @@ async function saveWorkspacePersonalisation(event) {
     workspace_preset: workspacePresetForAreas(savedAreas),
     start_page: normaliseWorkspaceStartPage(data?.start_page || startPage, savedAreas),
     theme_preference: normaliseDashboardTheme(data?.theme_preference || state.dashboardPreferences?.theme_preference),
-    accent_color: normaliseDashboardAccent(data?.accent_color || state.dashboardPreferences?.accent_color)
+    accent_color: normaliseDashboardAccent(data?.accent_color || state.dashboardPreferences?.accent_color),
+    dashboard_density: normaliseDashboardDensity(data?.dashboard_density || state.dashboardPreferences?.dashboard_density)
   };
 
   applyDashboardWorkspacePreferences();
