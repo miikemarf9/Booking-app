@@ -2866,6 +2866,17 @@
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="personalisation">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Your workspace</p>
+                <h3 class="mt-1 text-lg font-bold text-ink">Personalisation</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Keep Grab&Book focused by choosing which main areas appear in your dashboard.</p>
+              </div>
+              <span class="text-xl text-slate-300">→</span>
+            </div>
+          </button>
+
           <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="team">
             <div class="flex items-start justify-between gap-4">
               <div>
@@ -2953,6 +2964,103 @@
               <span class="text-xl text-slate-300">→</span>
             </div>
           </button>
+        </div>
+      </section>
+
+      <!-- Personalisation Tab -->
+      <section id="tab-personalisation" class="dashboard-tab hidden">
+        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+
+        <div class="mb-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Your workspace</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Personalisation</h2>
+          <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Choose how much of Grab&Book you want in your day-to-day workspace. Hidden areas stay fully intact and can be switched back on here at any time.</p>
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-[.95fr_1.05fr]">
+          <article class="card p-5 sm:p-6">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Quick setup</p>
+              <h3 class="mt-1 text-xl font-bold text-ink">Choose a workspace</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-500">Start with a simple preset, then fine-tune the areas below if you want.</p>
+            </div>
+
+            <div id="workspacePresetButtons" class="mt-5 grid gap-3 sm:grid-cols-2">
+              <button type="button" class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:bg-brand-50/40" data-workspace-preset="bookings">
+                <span class="block text-sm font-bold text-ink">Just bookings</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-500">A focused diary and booking workspace.</span>
+              </button>
+              <button type="button" class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:bg-brand-50/40" data-workspace-preset="bookings_crm">
+                <span class="block text-sm font-bold text-ink">Bookings + customers</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-500">Booking tools plus CRM and retention.</span>
+              </button>
+              <button type="button" class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:bg-brand-50/40" data-workspace-preset="full">
+                <span class="block text-sm font-bold text-ink">Full business view</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-500">Home, Booking, CRM and Growth.</span>
+              </button>
+              <button type="button" class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:bg-brand-50/40" data-workspace-preset="custom">
+                <span class="block text-sm font-bold text-ink">Custom</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-500">Choose exactly which areas appear.</span>
+              </button>
+            </div>
+
+            <div class="mt-6 rounded-2xl bg-slate-50 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Important</p>
+              <p class="mt-1 text-xs leading-5 text-slate-600">This only changes your dashboard navigation. It does not delete customers, bookings, analytics or settings. Settings always remains available.</p>
+            </div>
+          </article>
+
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Main navigation</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">What do you want to see?</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Switch off anything you do not need in your normal workflow.</p>
+              </div>
+              <span id="workspacePresetStatus" class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">Full business view</span>
+            </div>
+
+            <form id="workspacePersonalisationForm" class="mt-5 space-y-3">
+              <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4 transition hover:border-brand-200">
+                <span>
+                  <span class="block text-sm font-bold text-ink">Home</span>
+                  <span class="mt-1 block text-xs leading-5 text-slate-500">Overview and at-a-glance business summary.</span>
+                </span>
+                <input id="workspaceAreaHome" type="checkbox" value="home" class="h-5 w-5 accent-brand-600" data-workspace-area>
+              </label>
+
+              <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4 transition hover:border-brand-200">
+                <span>
+                  <span class="block text-sm font-bold text-ink">Booking</span>
+                  <span class="mt-1 block text-xs leading-5 text-slate-500">Diary, services, availability and payments.</span>
+                </span>
+                <input id="workspaceAreaBooking" type="checkbox" value="booking" class="h-5 w-5 accent-brand-600" data-workspace-area>
+              </label>
+
+              <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4 transition hover:border-brand-200">
+                <span>
+                  <span class="block text-sm font-bold text-ink">CRM</span>
+                  <span class="mt-1 block text-xs leading-5 text-slate-500">Customers, retention, campaigns and CRM analytics.</span>
+                </span>
+                <input id="workspaceAreaCrm" type="checkbox" value="crm" class="h-5 w-5 accent-brand-600" data-workspace-area>
+              </label>
+
+              <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4 transition hover:border-brand-200">
+                <span>
+                  <span class="block text-sm font-bold text-ink">Growth</span>
+                  <span class="mt-1 block text-xs leading-5 text-slate-500">Acquisition, Business Health, Scenario Lab and growth planning.</span>
+                </span>
+                <input id="workspaceAreaGrowth" type="checkbox" value="growth" class="h-5 w-5 accent-brand-600" data-workspace-area>
+              </label>
+
+              <p id="workspacePersonalisationError" class="hidden rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">Keep at least one main area visible.</p>
+
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <p id="workspacePersonalisationSummary" class="text-xs leading-5 text-slate-500">Home, Booking, CRM and Growth are visible.</p>
+                <button id="workspacePersonalisationSaveBtn" type="submit" class="btn btn-primary">Save workspace</button>
+              </div>
+            </form>
+          </article>
         </div>
       </section>
 
