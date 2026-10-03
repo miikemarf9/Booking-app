@@ -247,9 +247,94 @@ function setInspectorTab(tab) {
   renderInspector();
 }
 
+function diagnosticStatusMeta(status) {
+  if (status === "action_required") return {
+    label:"Action required",
+    badge:"bg-red-100 text-red-700",
+    panel:"border-red-200 bg-red-50/70",
+    dot:"bg-red-500",
+    copy:"One or more problems could stop part of the client setup working as intended."
+  };
+  if (status === "needs_attention") return {
+    label:"Needs attention",
+    badge:"bg-amber-100 text-amber-700",
+    panel:"border-amber-200 bg-amber-50/70",
+    dot:"bg-amber-500",
+    copy:"Core setup is usable, but there are configuration or data issues worth checking."
+  };
+  return {
+    label:"Healthy",
+    badge:"bg-emerald-100 text-emerald-700",
+    panel:"border-emerald-200 bg-emerald-50/70",
+    dot:"bg-emerald-500",
+    copy:"No configuration or system problems were detected by the current checks."
+  };
+}
+
+function renderDiagnosticsSummary(diagnostics) {
+  const host = $("adminInspectorHealth");
+  if (!host) return;
+  if (!diagnostics) {
+    host.innerHTML = '<p class="text-sm font-semibold text-slate-400">Diagnostics are unavailable for this client.</p>';
+    return;
+  }
+
+  const meta = diagnosticStatusMeta(diagnostics.status);
+  const issues = Array.isArray(diagnostics.issues) ? diagnostics.issues : [];
+  const issueCards = issues.length ? issues.map(issue => {
+    const critical = issue.severity === "critical";
+    const severityClass = critical ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700";
+    const borderClass = critical ? "border-red-200 hover:border-red-300" : "border-amber-200 hover:border-amber-300";
+    return `<button type="button" data-diagnostic-tab="${escapeHtml(issue.inspector_tab || "book")}" class="w-full rounded-2xl border bg-white p-4 text-left transition hover:shadow-sm ${borderClass}">
+      <div class="flex flex-wrap items-start justify-between gap-2">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="rounded-full px-2 py-0.5 text-[.65rem] font-bold uppercase tracking-wide ${severityClass}">${critical ? "Action" : "Check"}</span>
+            <span class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">${escapeHtml(issue.area || "System")}</span>
+          </div>
+          <p class="mt-2 font-bold text-ink">${escapeHtml(issue.title || "Configuration issue")}</p>
+          <p class="mt-1 text-sm leading-6 text-slate-500">${escapeHtml(issue.detail || "")}</p>
+        </div>
+        <span class="text-sm font-bold text-brand-600">Inspect →</span>
+      </div>
+    </button>`;
+  }).join("") : `<div class="rounded-2xl border border-emerald-200 bg-white p-4">
+    <p class="font-bold text-emerald-700">All current diagnostic checks are clear.</p>
+    <p class="mt-1 text-sm leading-6 text-slate-500">Grab&Book did not detect a booking, payment, messaging, integration or growth-data configuration problem.</p>
+  </div>`;
+
+  host.innerHTML = `
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <div class="flex flex-wrap items-center gap-2">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Diagnostics</p>
+          <span class="rounded-full px-2.5 py-1 text-[.68rem] font-bold ${meta.badge}">${meta.label}</span>
+        </div>
+        <h3 class="mt-2 text-xl font-bold text-ink">Client health: ${number(diagnostics.score)}/100</h3>
+        <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">${escapeHtml(meta.copy)}</p>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-xl bg-white px-3 py-2 shadow-sm"><p class="text-lg font-bold text-ink">${number(diagnostics.critical_count)}</p><p class="text-[.65rem] font-bold uppercase tracking-wide text-slate-400">Action</p></div>
+        <div class="rounded-xl bg-white px-3 py-2 shadow-sm"><p class="text-lg font-bold text-ink">${number(diagnostics.warning_count)}</p><p class="text-[.65rem] font-bold uppercase tracking-wide text-slate-400">Checks</p></div>
+        <div class="rounded-xl bg-white px-3 py-2 shadow-sm"><p class="text-lg font-bold text-ink">${number(diagnostics.checks_clear)}</p><p class="text-[.65rem] font-bold uppercase tracking-wide text-slate-400">Clear</p></div>
+      </div>
+    </div>
+    <div class="mt-4 grid gap-3 lg:grid-cols-2">${issueCards}</div>
+    <p class="mt-3 text-[.68rem] text-slate-400">${number(diagnostics.checks_run)} checks run · Last checked ${escapeHtml(dateTime(diagnostics.checked_at))}</p>
+  `;
+
+  host.querySelectorAll("[data-diagnostic-tab]").forEach(button => {
+    button.addEventListener("click", () => {
+      setInspectorTab(button.dataset.diagnosticTab);
+      $("adminInspectorContent")?.scrollIntoView({ behavior:"smooth", block:"start" });
+    });
+  });
+}
+
 function renderInspector() {
   const data = adminState.inspectors[adminState.selectedId];
   if (!data) return;
+  renderDiagnosticsSummary(data.diagnostics);
   const renderers = {
     book: renderBookInspector,
     crm: renderCrmInspector,
@@ -283,7 +368,7 @@ function renderBookInspector(book) {
     <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       ${metricCard("Services", number(book.service_count))}
       ${metricCard("Future bookings", number(book.future_bookings))}
-      ${metricCard("Active availability blocks", number(book.active_schedule_blocks), number(book.schedule_blocks) + " total blocks")}
+      ${metricCard("Future availability", number(book.future_active_schedule_blocks), number(book.active_schedule_blocks) + " active · " + number(book.schedule_blocks) + " total")}
       ${metricCard("Cancelled bookings", number(book.cancelled_bookings), number(book.booking_count) + " bookings overall")}
       ${metricCard("Payment not marked complete", number(book.unpaid_bookings))}
       ${metricCard("Confirmation not marked sent", number(book.confirmations_missing))}
