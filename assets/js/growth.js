@@ -960,6 +960,122 @@ function growthRevenueHealthMetric(currentBookings, previousBookings) {
   };
 }
 
+function growthHealthActionConfig(metricKey) {
+  const actions = {
+    "Demand": {
+      label: "Review acquisition channels",
+      type: "section",
+      target: "growth-channels-section",
+      help: "See which sources are already producing visits, bookings and customer value before deciding where to generate more demand."
+    },
+    "Booking conversion": {
+      label: "Review booking journey",
+      type: "section",
+      target: "growth-journey-section",
+      help: "Open the booking journey to see where tracked visitors stop before completing an appointment."
+    },
+    "Retention": {
+      label: "Review retention",
+      type: "section",
+      target: "crm-retention-section",
+      help: "Open CRM Retention to see the customers behind the signal, including who is due back, slipping away or lapsed."
+    },
+    "Capacity": {
+      label: "Review diary",
+      type: "tab",
+      target: "calendar",
+      help: "Open the diary to review booked time, free time and where additional capacity could realistically come from."
+    },
+    "Revenue efficiency": {
+      label: "Review services",
+      type: "tab",
+      target: "services",
+      help: "Review service prices and durations before deciding whether pricing or service mix deserves further investigation."
+    }
+  };
+  return actions[metricKey] || null;
+}
+
+function hideGrowthHealthWhy() {
+  const panel = $("growthHealthWhyPanel");
+  if (panel) panel.classList.add("hidden");
+}
+
+function toggleGrowthHealthWhy() {
+  const panel = $("growthHealthWhyPanel");
+  if (!panel || !$("growthHealthWhyBtn") || $("growthHealthWhyBtn").disabled) return;
+  panel.classList.toggle("hidden");
+  if (!panel.classList.contains("hidden")) {
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+function runGrowthHealthAction() {
+  const btn = $("growthHealthActionBtn");
+  if (!btn) return;
+  const type = btn.dataset.actionType || "";
+  const target = btn.dataset.actionTarget || "";
+  if (!target) return;
+
+  if (type === "section" && typeof goDashboardSection === "function") {
+    goDashboardSection(target);
+    return;
+  }
+  if (type === "tab" && typeof switchTab === "function") {
+    switchTab(target);
+  }
+}
+
+function populateGrowthHealthWhy(priority, metrics) {
+  const panel = $("growthHealthWhyPanel");
+  const title = $("growthHealthWhyTitle");
+  const explanation = $("growthHealthWhyExplanation");
+  const list = $("growthHealthEvidenceList");
+  const actionHelp = $("growthHealthActionHelp");
+  const actionBtn = $("growthHealthActionBtn");
+  if (!panel || !title || !explanation || !list || !actionHelp || !actionBtn) return;
+
+  title.textContent = priority.key + " · " + growthHealthStatusLabel(priority.status);
+  explanation.textContent = priority.reason;
+
+  list.innerHTML = "";
+  const evidence = [
+    priority.key + ": " + priority.detail
+  ];
+  metrics
+    .filter(function (metric) {
+      return metric.key !== priority.key && metric.status !== "learning";
+    })
+    .forEach(function (metric) {
+      evidence.push(metric.key + ": " + growthHealthStatusLabel(metric.status) + " — " + metric.detail);
+    });
+
+  evidence.forEach(function (item) {
+    const li = document.createElement("li");
+    li.className = "flex gap-2 rounded-xl bg-slate-50 px-3 py-2.5";
+    const dot = document.createElement("span");
+    dot.className = "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500";
+    const copy = document.createElement("span");
+    copy.textContent = item;
+    li.append(dot, copy);
+    list.appendChild(li);
+  });
+
+  const action = growthHealthActionConfig(priority.key);
+  if (action) {
+    actionHelp.textContent = action.help;
+    actionBtn.textContent = action.label;
+    actionBtn.dataset.actionType = action.type;
+    actionBtn.dataset.actionTarget = action.target;
+    actionBtn.classList.remove("hidden");
+  } else {
+    actionHelp.textContent = "";
+    actionBtn.dataset.actionType = "";
+    actionBtn.dataset.actionTarget = "";
+    actionBtn.classList.add("hidden");
+  }
+}
+
 function renderGrowthBusinessHealthMetrics() {
   if (!$("growthBusinessHealth")) return;
 
@@ -1018,16 +1134,18 @@ function renderGrowthBusinessHealthMetrics() {
       whyBtn.disabled = true;
       whyBtn.dataset.healthReason = "";
     }
+    hideGrowthHealthWhy();
     return;
   }
 
   if (priority) {
     if (primaryTitle) primaryTitle.textContent = priority.key;
     if (primaryReason) primaryReason.textContent = priority.reason;
+    populateGrowthHealthWhy(priority, metrics);
     if (whyBtn) {
-      whyBtn.disabled = true;
+      whyBtn.disabled = false;
       whyBtn.dataset.healthReason = priority.reason;
-      whyBtn.title = "Detailed evidence and actions are added in Step 4.";
+      whyBtn.title = "See the evidence behind this diagnosis";
     }
     return;
   }
@@ -1042,6 +1160,7 @@ function renderGrowthBusinessHealthMetrics() {
     whyBtn.disabled = true;
     whyBtn.dataset.healthReason = "";
   }
+  hideGrowthHealthWhy();
 }
 
 async function loadGrowthAnalytics(showToast = false) {
