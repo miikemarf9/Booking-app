@@ -3,7 +3,12 @@
 const ADMIN_SUPABASE_URL = "https://ianascnxkxrpeybudjai.supabase.co";
 const ADMIN_SUPABASE_KEY = "sb_publishable_T9d9Q6e7pkjIOfgq2gzPHg_FzSYut1p";
 const adminClient = supabase.createClient(ADMIN_SUPABASE_URL, ADMIN_SUPABASE_KEY);
-const adminState = { businesses: [], selectedId: "", inspectorTab: "book", inspectors: {} };
+const adminState = {
+  businesses: [],
+  selectedId: new URLSearchParams(window.location.search).get("business") || "",
+  inspectorTab: "book",
+  inspectors: {}
+};
 const $ = id => document.getElementById(id);
 
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, char => ({
