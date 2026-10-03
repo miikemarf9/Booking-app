@@ -714,6 +714,21 @@
         if (typeof runGrowthHealthAction === "function") runGrowthHealthAction();
       });
 
+      $("growthScenarioType")?.addEventListener("change", () => {
+        if (typeof handleGrowthScenarioTypeChange === "function") handleGrowthScenarioTypeChange();
+      });
+      $("growthScenarioAssumption")?.addEventListener("input", () => {
+        if (typeof handleGrowthScenarioAssumptionInput === "function") handleGrowthScenarioAssumptionInput();
+      });
+      $("growthScenarioRunBtn")?.addEventListener("click", () => {
+        if (typeof runGrowthScenario === "function") runGrowthScenario();
+      });
+      document.querySelectorAll("[data-scenario-price]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (typeof setGrowthScenarioPricePreset === "function") setGrowthScenarioPricePreset(Number(btn.dataset.scenarioPrice));
+        });
+      });
+
       $("serviceForm").addEventListener("submit", saveService);
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
       $("staffForm").addEventListener("submit", saveStaff);
