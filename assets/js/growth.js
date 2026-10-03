@@ -692,7 +692,7 @@ function growthScenarioQuietPeriodData(bookings, bounds) {
   return candidates[0] || { ready: false };
 }
 
-function growthScenarioServiceMixData(bookings) {
+function growthScenarioServiceMixData(bookings, overallAverageBooking) {
   const byService = new Map();
   bookings.forEach(function (booking) {
     if (!booking.service_id) return;
@@ -725,7 +725,7 @@ function growthScenarioServiceMixData(bookings) {
   const target = qualified[0];
 
   return {
-    ready: totalBookings >= 8 && qualifiedAverage > 0 && target.averageValue >= qualifiedAverage * 1.05,
+    ready: totalBookings >= 8 && qualifiedAverage > 0 && target.averageValue >= Math.max(qualifiedAverage, Number(overallAverageBooking || 0)) * 1.05,
     qualifiedServices: qualified.length,
     qualifiedBookings: totalBookings,
     qualifiedAverage,
@@ -750,7 +750,7 @@ function growthScenarioBaseline() {
   const monthlyBookings = bookingCount * monthlyFactor;
   const capacity = growthScenarioCapacityData(bookings, bounds);
   const quietPeriod = growthScenarioQuietPeriodData(bookings, bounds);
-  const serviceMix = growthScenarioServiceMixData(bookings);
+  const serviceMix = growthScenarioServiceMixData(bookings, averageBooking);
   const retention = growthScenarioRetentionData();
 
   if (quietPeriod?.day) quietPeriod.ready = capacity.ready && quietPeriod.utilisation != null && quietPeriod.utilisation < 70;
