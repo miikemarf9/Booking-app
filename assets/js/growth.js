@@ -4,7 +4,9 @@ const growthViewState = {
   days: 30,
   compare: true,
   channelType: "all",
-  channelRows: []
+  channelRows: [],
+  periodComparison: null,
+  funnelSummary: null
 };
 
 function growthAnalyticsDays() {
@@ -61,6 +63,8 @@ function renderGrowthPeriodComparison(rows) {
   const current = (rows || []).find(row => row.period_key === "current") || {};
   const previous = (rows || []).find(row => row.period_key === "previous") || {};
   const days = growthAnalyticsDays();
+
+  growthViewState.periodComparison = { current, previous };
 
   $("growthOverviewVisits").textContent = Number(current.tracked_visits || 0).toLocaleString("en-GB");
   $("growthOverviewBookings").textContent = Number(current.completed_bookings || 0).toLocaleString("en-GB");
@@ -489,6 +493,286 @@ async function loadGrowthChannelAreaAnalytics(showToast = false) {
   if (showToast) toast("Growth channels refreshed.");
 }
 
+
+function growthShiftDateKey(dateKey, days) {
+  const date = new Date(dateKey + "T12:00:00Z");
+  date.setUTCDate(date.getUTCDate() + Number(days || 0));
+  return date.toISOString().slice(0, 10);
+}
+
+function growthPeriodBounds(days = growthAnalyticsDays()) {
+  const currentEnd = todayKey();
+  const currentStart = growthShiftDateKey(currentEnd, -(days - 1));
+  const previousEnd = growthShiftDateKey(currentStart, -1);
+  const previousStart = growthShiftDateKey(previousEnd, -(days - 1));
+  return { currentStart, currentEnd, previousStart, previousEnd };
+}
+
+function growthBookingDateKey(booking) {
+  if (!booking?.start_time) return "";
+  return dateKeyInZone(new Date(booking.start_time));
+}
+
+function growthActiveBookingsBetween(startKey, endKey) {
+  const now = Date.now();
+  return (state.bookings || []).filter(function (booking) {
+    if (booking.status === "cancelled" || !booking.start_time) return false;
+    const start = new Date(booking.start_time).getTime();
+    if (!Number.isFinite(start) || start > now) return false;
+    const key = growthBookingDateKey(booking);
+    return key >= startKey && key <= endKey;
+  });
+}
+
+function growthBookingMinutes(booking) {
+  const start = new Date(booking?.start_time).getTime();
+  const end = booking?.end_time ? new Date(booking.end_time).getTime() : NaN;
+  if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+    return Math.max(0, (end - start) / 60000);
+  }
+  const service = booking?.services || state.services.find(function (item) {
+    return item.id === booking?.service_id;
+  }) || {};
+  return Math.max(0, Number(service.duration_minutes || 0));
+}
+
+function growthBookingValue(booking) {
+  const service = booking?.services || state.services.find(function (item) {
+    return item.id === booking?.service_id;
+  }) || {};
+  return Math.max(0, Number(booking?.booked_price ?? service.price ?? 0));
+}
+
+function growthTimeMinutes(value) {
+  const parts = cleanTime(value || "").split(":").map(Number);
+  if (parts.length !== 2 || parts.some(function (part) { return !Number.isFinite(part); })) return null;
+  return parts[0] * 60 + parts[1];
+}
+
+function growthAvailabilitySummary(startKey, endKey) {
+  const groups = new Map();
+  let sourceBlocks = 0;
+
+  (state.blocks || []).forEach(function (block) {
+    if (block.is_active === false || block.block_date < startKey || block.block_date > endKey) return;
+    const start = growthTimeMinutes(block.start_time);
+    const end = growthTimeMinutes(block.end_time);
+    if (start == null || end == null || end <= start) return;
+
+    sourceBlocks += 1;
+    const resource = block.staff_id || "business";
+    const key = block.block_date + "|" + resource;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push([start, end]);
+  });
+
+  let minutes = 0;
+  groups.forEach(function (intervals) {
+    intervals.sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+    let current = null;
+    intervals.forEach(function (interval) {
+      if (!current) {
+        current = interval.slice();
+        return;
+      }
+      if (interval[0] <= current[1]) {
+        current[1] = Math.max(current[1], interval[1]);
+      } else {
+        minutes += current[1] - current[0];
+        current = interval.slice();
+      }
+    });
+    if (current) minutes += current[1] - current[0];
+  });
+
+  return { minutes, sourceBlocks };
+}
+
+function growthPercentChange(current, previous) {
+  const now = Number(current);
+  const before = Number(previous);
+  if (!Number.isFinite(now) || !Number.isFinite(before) || before === 0) return null;
+  return ((now - before) / Math.abs(before)) * 100;
+}
+
+function growthCompactHours(minutes) {
+  const hours = Number(minutes || 0) / 60;
+  return (Math.round(hours * 10) / 10).toLocaleString("en-GB", { maximumFractionDigits: 1 }) + "h";
+}
+
+function setGrowthHealthMetric(key, ready, detail) {
+  const status = $("growthHealth" + key + "Status");
+  const detailEl = $("growthHealth" + key + "Detail");
+  if (!status || !detailEl) return;
+
+  status.textContent = ready ? "Measured" : "Learning";
+  status.className = ready
+    ? "rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700"
+    : "rounded-full bg-slate-200 px-2.5 py-1 text-[.68rem] font-bold text-slate-600";
+  detailEl.textContent = detail;
+}
+
+function growthRetentionHealthMetric() {
+  if (typeof customerMetrics !== "function" || typeof customerRetentionInsight !== "function") {
+    return { ready: false, detail: "Waiting for CRM customer intelligence." };
+  }
+
+  const activeCustomers = (state.customers || []).filter(function (customer) {
+    return !customer.archived_at;
+  });
+  const rows = activeCustomers.map(function (customer) {
+    const metrics = customerMetrics(customer);
+    return {
+      customer,
+      metrics,
+      retention: customerRetentionInsight(customer, metrics)
+    };
+  });
+  const completed = rows.filter(function (row) { return row.metrics.past.length >= 1; });
+  const repeat = completed.filter(function (row) { return row.metrics.past.length >= 2; });
+  const attention = rows.filter(function (row) {
+    return ["due_back", "slipping", "lapsed"].includes(row.retention.status);
+  });
+  const repeatRate = completed.length ? Math.round((repeat.length / completed.length) * 100) : null;
+
+  if (completed.length < 3) {
+    return {
+      ready: false,
+      detail: completed.length
+        ? completed.length + " completed customer" + (completed.length === 1 ? "" : "s") + " · needs more CRM history"
+        : "Waiting for completed customer history."
+    };
+  }
+
+  return {
+    ready: true,
+    detail: repeatRate + "% repeat rate · " + attention.length + " customer" + (attention.length === 1 ? "" : "s") + " need attention"
+  };
+}
+
+function renderGrowthBusinessHealthMetrics() {
+  if (!$("growthBusinessHealth")) return;
+
+  const days = growthAnalyticsDays();
+  const bounds = growthPeriodBounds(days);
+  const currentBookings = growthActiveBookingsBetween(bounds.currentStart, bounds.currentEnd);
+  const previousBookings = growthActiveBookingsBetween(bounds.previousStart, bounds.previousEnd);
+
+  const demandSample = currentBookings.length + previousBookings.length;
+  const demandChange = growthPercentChange(currentBookings.length, previousBookings.length);
+  let demandDetail = currentBookings.length + " booking" + (currentBookings.length === 1 ? "" : "s") + " in the last " + days + " days";
+  if (previousBookings.length && demandChange != null) {
+    const rounded = Math.round(demandChange);
+    demandDetail += " · " + (rounded > 0 ? "+" : "") + rounded + "% vs previous period";
+  } else if (currentBookings.length && previousBookings.length === 0) {
+    demandDetail += " · no bookings in previous period";
+  }
+  setGrowthHealthMetric(
+    "Demand",
+    demandSample >= 5,
+    demandSample >= 5 ? demandDetail : demandDetail + " · needs more history"
+  );
+
+  const period = growthViewState.periodComparison || {};
+  const currentPeriod = period.current || {};
+  const trackedVisits = Number(currentPeriod.tracked_visits || 0);
+  const conversion = currentPeriod.conversion_rate == null ? null : Number(currentPeriod.conversion_rate);
+  setGrowthHealthMetric(
+    "Conversion",
+    trackedVisits >= 20 && conversion != null,
+    trackedVisits >= 20 && conversion != null
+      ? conversion + "% booking conversion · " + trackedVisits + " tracked visits"
+      : trackedVisits + " tracked visit" + (trackedVisits === 1 ? "" : "s") + " · needs at least 20"
+  );
+
+  const retention = growthRetentionHealthMetric();
+  setGrowthHealthMetric("Retention", retention.ready, retention.detail);
+
+  const availability = growthAvailabilitySummary(bounds.currentStart, bounds.currentEnd);
+  const bookedMinutes = currentBookings.reduce(function (sum, booking) {
+    return sum + growthBookingMinutes(booking);
+  }, 0);
+  const capacityHistoryComplete = availability.minutes > 0 && bookedMinutes <= availability.minutes * 1.1;
+  const capacityReady = availability.sourceBlocks >= 5 && capacityHistoryComplete;
+  const utilisation = capacityReady
+    ? Math.min(100, Math.round((bookedMinutes / availability.minutes) * 100))
+    : null;
+
+  let capacityDetail = "Waiting for enough availability history.";
+  if (availability.sourceBlocks > 0 && !capacityHistoryComplete) {
+    capacityDetail = "Availability history is incomplete for the bookings in this period.";
+  } else if (capacityReady) {
+    capacityDetail = utilisation + "% utilised · " + growthCompactHours(bookedMinutes) + " booked of " + growthCompactHours(availability.minutes) + " offered";
+  } else if (availability.sourceBlocks > 0) {
+    capacityDetail = availability.sourceBlocks + " availability slot" + (availability.sourceBlocks === 1 ? "" : "s") + " · needs at least 5";
+  }
+  setGrowthHealthMetric("Capacity", capacityReady, capacityDetail);
+
+  const bookingsWithDuration = currentBookings.filter(function (booking) {
+    return growthBookingMinutes(booking) > 0;
+  });
+  const revenueMinutes = bookingsWithDuration.reduce(function (sum, booking) {
+    return sum + growthBookingMinutes(booking);
+  }, 0);
+  const revenue = bookingsWithDuration.reduce(function (sum, booking) {
+    return sum + growthBookingValue(booking);
+  }, 0);
+
+  const previousWithDuration = previousBookings.filter(function (booking) {
+    return growthBookingMinutes(booking) > 0;
+  });
+  const previousMinutes = previousWithDuration.reduce(function (sum, booking) {
+    return sum + growthBookingMinutes(booking);
+  }, 0);
+  const previousRevenue = previousWithDuration.reduce(function (sum, booking) {
+    return sum + growthBookingValue(booking);
+  }, 0);
+
+  const valuePerHour = revenueMinutes ? revenue / (revenueMinutes / 60) : null;
+  const previousValuePerHour = previousMinutes ? previousRevenue / (previousMinutes / 60) : null;
+  const efficiencyChange = valuePerHour != null && previousValuePerHour
+    ? growthPercentChange(valuePerHour, previousValuePerHour)
+    : null;
+  const efficiencyReady = bookingsWithDuration.length >= 3 && valuePerHour != null;
+
+  let efficiencyDetail = bookingsWithDuration.length
+    ? bookingsWithDuration.length + " booking" + (bookingsWithDuration.length === 1 ? "" : "s") + " with usable duration data · needs at least 3"
+    : "Waiting for completed booking value and duration data.";
+  if (efficiencyReady) {
+    efficiencyDetail = money(valuePerHour) + " booked value per booked hour";
+    if (efficiencyChange != null) {
+      const rounded = Math.round(efficiencyChange);
+      efficiencyDetail += " · " + (rounded > 0 ? "+" : "") + rounded + "% vs previous period";
+    }
+  }
+  setGrowthHealthMetric("Revenue", efficiencyReady, efficiencyDetail);
+
+  const readiness = [
+    demandSample >= 5,
+    trackedVisits >= 20 && conversion != null,
+    retention.ready,
+    capacityReady,
+    efficiencyReady
+  ];
+  const readyCount = readiness.filter(Boolean).length;
+  const dataStatus = $("growthHealthDataStatus");
+  if (dataStatus) {
+    dataStatus.textContent = readyCount + "/5 metrics ready";
+    dataStatus.className = readyCount === 5
+      ? "rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700"
+      : "rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600";
+  }
+
+  const primaryTitle = $("growthHealthPrimaryTitle");
+  const primaryReason = $("growthHealthPrimaryReason");
+  if (primaryTitle) primaryTitle.textContent = readyCount ? "Business health data connected" : "Building your business baseline";
+  if (primaryReason) {
+    primaryReason.textContent = readyCount
+      ? "Grab&Book can currently measure " + readyCount + " of 5 health areas. It will only judge which area deserves attention once enough reliable evidence is available."
+      : "Once there is enough reliable data, Grab&Book will explain which area appears to deserve attention and why. Until then, no issue will be assumed.";
+  }
+}
+
 async function loadGrowthAnalytics(showToast = false) {
   const tasks = [
     loadGrowthPeriodComparison(),
@@ -522,6 +806,8 @@ async function loadGrowthAnalytics(showToast = false) {
 
   await Promise.all(tasks);
 
+  renderGrowthBusinessHealthMetrics();
+
   if (typeof loadGrowthOpportunityEngine === "function") {
     await loadGrowthOpportunityEngine(false);
   }
@@ -550,6 +836,8 @@ function renderGrowthFunnelSummary(rows) {
   const sessions = counts.get("page_view") || 0;
   const completed = counts.get("booking_completed") || 0;
   const conversion = sessions ? Math.round((completed / sessions) * 1000) / 10 : null;
+
+  growthViewState.funnelSummary = { sessions, completed, conversion };
 
   $("growthFunnelSessions").textContent = sessions;
   $("growthFunnelCompleted").textContent = completed;
