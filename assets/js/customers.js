@@ -565,12 +565,111 @@ function customerBookings(customer) {
         });
     }
 
+    function retentionAttentionCustomers() {
+      return state.customers.filter(function (customer) {
+        if (customer.archived_at) return false;
+        const metrics = customerMetrics(customer);
+        return ["due_back", "slipping", "lapsed"].includes(customerRetentionInsight(customer, metrics).status);
+      });
+    }
+
+    function preparedMarketingCampaignCustomers() {
+      const ids = Array.isArray(state.marketingCampaignCustomerIds) ? state.marketingCampaignCustomerIds : [];
+      if (!ids.length) return [];
+      const idSet = new Set(ids);
+      return state.customers.filter(customer => idSet.has(customer.id) && !customer.archived_at);
+    }
+
     function marketingEligibleCustomers() {
       if (state.marketingTargetCustomerId) {
         const customer = state.customers.find(c => c.id === state.marketingTargetCustomerId);
         return customer?.marketing_email_opt_in && !customer.archived_at ? [customer] : [];
       }
+
+      const prepared = preparedMarketingCampaignCustomers();
+      if (prepared.length) {
+        return prepared.filter(customer => Boolean(customer.marketing_email_opt_in));
+      }
+
       return filteredCustomersForCrm().filter(customer => Boolean(customer.marketing_email_opt_in) && !customer.archived_at);
+    }
+
+    function renderMarketingCampaignAudienceSummary() {
+      const panel = $("marketingCampaignAudienceSummary");
+      if (!panel) return;
+
+      const prepared = preparedMarketingCampaignCustomers();
+      const active = state.marketingCampaignSource === "business-health-retention" && prepared.length > 0;
+      panel.classList.toggle("hidden", !active);
+      if (!active) return;
+
+      const eligible = prepared.filter(customer => Boolean(customer.marketing_email_opt_in));
+      const excluded = prepared.length - eligible.length;
+      $("marketingCampaignIdentified").textContent = prepared.length;
+      $("marketingCampaignEligible").textContent = eligible.length;
+      $("marketingCampaignExcluded").textContent = excluded;
+      $("marketingCampaignAudienceTitle").textContent =
+        prepared.length + " customer" + (prepared.length === 1 ? "" : "s") + " need retention attention";
+    }
+
+    function clearMarketingCampaignContext(render = true) {
+      state.marketingCampaignCustomerIds = [];
+      state.marketingCampaignSource = "";
+      renderMarketingCampaignAudienceSummary();
+      if (render) renderCustomers();
+    }
+
+    function openRetentionAttentionCustomers() {
+      clearMarketingCampaignContext(false);
+      clearMarketingTarget(false);
+      if ($("customerSearch")) $("customerSearch").value = "";
+      if ($("customerFilter")) $("customerFilter").value = "retention_attention";
+      syncCustomerFilters(true);
+      if (typeof goDashboardSection === "function") {
+        goDashboardSection("crm-customers-section");
+      } else {
+        $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function createRetentionCampaignFromHealth() {
+      if (!state.profile) return;
+
+      const affected = retentionAttentionCustomers();
+      if (!affected.length) {
+        return toast("There are no established customers who currently need retention attention.", "info");
+      }
+
+      clearMarketingTarget(false);
+      if ($("customerSearch")) $("customerSearch").value = "";
+      if ($("customerFilter")) $("customerFilter").value = "retention_attention";
+      syncCustomerFilters(true);
+
+      state.marketingCampaignCustomerIds = affected.map(customer => customer.id);
+      state.marketingCampaignSource = "business-health-retention";
+
+      const bookingUrl = buildPublicUrl(state.profile.id);
+      $("marketingSubject").value = "Time to book your next visit?";
+      $("marketingMessage").value = `It may be about time for your next appointment. If you'd like to get something in the diary, you can choose a time that suits you here:
+
+${bookingUrl}`;
+
+      renderMarketingCampaignAudienceSummary();
+      renderCustomers();
+
+      if (typeof goDashboardSection === "function") {
+        goDashboardSection("crm-campaigns-section");
+      } else {
+        $("marketingEmailForm")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      const eligible = affected.filter(customer => Boolean(customer.marketing_email_opt_in)).length;
+      const excluded = affected.length - eligible;
+      toast(
+        `Rebooking campaign prepared: ${affected.length} identified · ${eligible} eligible · ${excluded} excluded. Nothing has been sent.`,
+        "info"
+      );
+      window.setTimeout(() => $("marketingMessage")?.focus({ preventScroll: true }), 450);
     }
 
     function syncMarketingTargetUi() {
@@ -587,8 +686,9 @@ function customerBookings(customer) {
       if (render) renderCustomers();
     }
 
-    function syncCustomerFilters() {
+    function syncCustomerFilters(preservePreparedCampaign = false) {
       if (state.marketingTargetCustomerId) clearMarketingTarget(false);
+      if (!preservePreparedCampaign && state.marketingCampaignSource) clearMarketingCampaignContext(false);
       const filter = currentCustomerFilter();
       const serviceMode = filter === "service";
       const tagMode = filter === "tag";
@@ -642,6 +742,7 @@ function customerBookings(customer) {
 
         recipients.forEach(customer => { delete state.customerTimelineEvents[customer.id]; });
         if (state.marketingTargetCustomerId) clearMarketingTarget(false);
+        if (state.marketingCampaignSource) clearMarketingCampaignContext(false);
         renderCustomers();
 
         if (failed) {
@@ -697,6 +798,7 @@ function customerBookings(customer) {
       $("crmRetentionAttention").textContent = retentionAttention;
       $("customerCountBadge").textContent = currentCustomerFilter() === "archived" ? `${customers.length} archived` : `${customers.length} shown · ${activeCustomers.length} active${archivedCount ? ` · ${archivedCount} archived` : ""}`;
       syncMarketingTargetUi();
+      renderMarketingCampaignAudienceSummary();
       const eligible = marketingEligibleCustomers();
       $("marketingEligibleBadge").textContent = state.marketingTargetCustomerId
         ? (eligible.length ? "1 direct recipient" : "Not eligible")
