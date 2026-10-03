@@ -2451,3 +2451,10 @@
       border-color: #334155;
       background: #111827;
     }
+
+    #dashboardView[data-dashboard-theme="dark"] .dashboard-theme-option.appearance-selected,
+    #dashboardView[data-dashboard-theme="dark"] .dashboard-accent-option.appearance-selected {
+      border-color: var(--dash-accent) !important;
+      background: color-mix(in srgb, var(--dash-accent) 16%, #111827) !important;
+      box-shadow: 0 0 0 3px var(--dash-accent-ring);
+    }
