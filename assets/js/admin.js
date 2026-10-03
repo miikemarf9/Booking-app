@@ -173,6 +173,7 @@ function selectBusiness(profileId) {
 
     <div class="mt-6 flex flex-wrap gap-2">
       <a class="btn btn-primary" href="${bookingUrl}" target="_blank" rel="noopener">Open booking page ↗</a>
+      <a class="btn btn-light" href="client-view.html?business=${encodeURIComponent(profileId)}" target="_blank" rel="noopener">View as client ↗</a>
       <button class="btn btn-light" type="button" data-scroll-inspector>Inspect setup ↓</button>
     </div>
     <p class="mt-3 text-xs leading-5 text-slate-400">Admin access is read-only. Client data cannot be edited from this console.</p>
