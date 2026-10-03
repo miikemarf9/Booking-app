@@ -922,6 +922,25 @@
                 <button id="growthHealthWhyBtn" type="button" class="btn btn-light" disabled>See why</button>
               </div>
             </div>
+
+            <div id="growthHealthWhyPanel" class="mt-4 hidden rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Why Grab&Book picked this</p>
+                  <h4 id="growthHealthWhyTitle" class="mt-1 text-base font-bold text-ink">Evidence</h4>
+                </div>
+                <button id="growthHealthWhyCloseBtn" type="button" class="text-xs font-bold text-slate-500 hover:text-ink">Close</button>
+              </div>
+              <p id="growthHealthWhyExplanation" class="mt-3 max-w-3xl text-sm leading-6 text-slate-600"></p>
+              <div class="mt-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Evidence used</p>
+                <ul id="growthHealthEvidenceList" class="mt-2 space-y-2 text-sm text-slate-600"></ul>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                <p id="growthHealthActionHelp" class="max-w-2xl text-xs leading-5 text-slate-500"></p>
+                <button id="growthHealthActionBtn" type="button" class="btn btn-primary">Review this area</button>
+              </div>
+            </div>
           </article>
 
           <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
