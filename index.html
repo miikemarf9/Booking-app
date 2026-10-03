@@ -1015,7 +1015,11 @@
                   <p id="growthHealthPrimaryTitle" class="text-lg font-bold text-ink">Building your business baseline</p>
                   <p id="growthHealthPrimaryReason" class="mt-1 max-w-3xl text-sm leading-6 text-slate-600">Once there is enough reliable data, Grab&Book will explain which area appears to deserve attention and why. Until then, no issue will be assumed.</p>
                 </div>
-                <button id="growthHealthWhyBtn" type="button" class="btn btn-light" disabled>See why</button>
+                <div class="flex flex-wrap gap-2">
+                  <button id="growthHealthWhyBtn" type="button" class="btn btn-light" disabled>See why</button>
+                  <button id="growthHealthActionBtn" type="button" class="btn btn-light hidden">Review this area</button>
+                  <button id="growthHealthCampaignBtn" type="button" class="btn btn-primary hidden">Create rebooking campaign</button>
+                </div>
               </div>
             </div>
 
@@ -1032,12 +1036,8 @@
                 <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Evidence used</p>
                 <ul id="growthHealthEvidenceList" class="mt-2 space-y-2 text-sm text-slate-600"></ul>
               </div>
-              <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                <p id="growthHealthActionHelp" class="max-w-2xl text-xs leading-5 text-slate-500"></p>
-                <div class="flex flex-wrap gap-2">
-                  <button id="growthHealthActionBtn" type="button" class="btn btn-light">Review this area</button>
-                  <button id="growthHealthCampaignBtn" type="button" class="btn btn-primary hidden">Create rebooking campaign</button>
-                </div>
+              <div class="mt-4 border-t border-slate-100 pt-4">
+                <p id="growthHealthActionHelp" class="max-w-3xl text-xs leading-5 text-slate-500"></p>
               </div>
             </div>
           </article>
