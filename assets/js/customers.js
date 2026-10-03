@@ -687,8 +687,9 @@ ${bookingUrl}`;
     }
 
     function syncCustomerFilters(preservePreparedCampaign = false) {
+      const preserveCampaign = preservePreparedCampaign === true;
       if (state.marketingTargetCustomerId) clearMarketingTarget(false);
-      if (!preservePreparedCampaign && state.marketingCampaignSource) clearMarketingCampaignContext(false);
+      if (!preserveCampaign && state.marketingCampaignSource) clearMarketingCampaignContext(false);
       const filter = currentCustomerFilter();
       const serviceMode = filter === "service";
       const tagMode = filter === "tag";
