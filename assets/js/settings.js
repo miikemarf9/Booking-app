@@ -1,5 +1,203 @@
 "use strict";
 
+const WORKSPACE_AREA_ORDER = ["home", "booking", "crm", "growth"];
+const WORKSPACE_PRESETS = {
+  bookings: ["booking"],
+  bookings_crm: ["booking", "crm"],
+  full: ["home", "booking", "crm", "growth"]
+};
+
+function defaultDashboardPreferences() {
+  return {
+    visible_areas: [...WORKSPACE_PRESETS.full],
+    workspace_preset: "full"
+  };
+}
+
+function normaliseWorkspaceAreas(areas) {
+  const clean = WORKSPACE_AREA_ORDER.filter(function (area) {
+    return Array.isArray(areas) && areas.includes(area);
+  });
+  return clean.length ? clean : [...WORKSPACE_PRESETS.full];
+}
+
+function workspacePresetForAreas(areas) {
+  const clean = normaliseWorkspaceAreas(areas);
+  for (const [preset, presetAreas] of Object.entries(WORKSPACE_PRESETS)) {
+    if (clean.length === presetAreas.length && clean.every(function (area, index) { return area === presetAreas[index]; })) {
+      return preset;
+    }
+  }
+  return "custom";
+}
+
+function workspacePresetLabel(preset) {
+  if (preset === "bookings") return "Just bookings";
+  if (preset === "bookings_crm") return "Bookings + customers";
+  if (preset === "full") return "Full business view";
+  return "Custom workspace";
+}
+
+async function loadDashboardPreferences() {
+  state.dashboardPreferences = defaultDashboardPreferences();
+  if (!state.user?.id) return state.dashboardPreferences;
+
+  const { data, error } = await supabaseClient
+    .from("dashboard_preferences")
+    .select("visible_areas, workspace_preset")
+    .eq("user_id", state.user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.warn("Dashboard preferences could not be loaded:", error.message || error);
+    applyDashboardWorkspacePreferences();
+    return state.dashboardPreferences;
+  }
+
+  if (data) {
+    const visibleAreas = normaliseWorkspaceAreas(data.visible_areas);
+    state.dashboardPreferences = {
+      visible_areas: visibleAreas,
+      workspace_preset: workspacePresetForAreas(visibleAreas)
+    };
+  }
+
+  applyDashboardWorkspacePreferences();
+  populateWorkspacePersonalisation();
+  return state.dashboardPreferences;
+}
+
+function applyDashboardWorkspacePreferences() {
+  const preferences = state.dashboardPreferences || defaultDashboardPreferences();
+  const visibleAreas = normaliseWorkspaceAreas(preferences.visible_areas);
+
+  document.querySelectorAll(".area-tab[data-area]").forEach(function (button) {
+    button.classList.toggle("hidden", !visibleAreas.includes(button.dataset.area));
+  });
+
+  const nav = document.querySelector(".dashboard-area-nav");
+  if (nav) nav.style.gridTemplateColumns = "repeat(" + visibleAreas.length + ", minmax(0, 1fr))";
+}
+
+function workspaceAreasFromForm() {
+  return Array.from(document.querySelectorAll("[data-workspace-area]"))
+    .filter(function (input) { return input.checked; })
+    .map(function (input) { return input.value; });
+}
+
+function setWorkspaceFormAreas(areas) {
+  const visibleAreas = normaliseWorkspaceAreas(areas);
+  document.querySelectorAll("[data-workspace-area]").forEach(function (input) {
+    input.checked = visibleAreas.includes(input.value);
+  });
+  syncWorkspacePersonalisationForm();
+}
+
+function syncWorkspacePersonalisationForm() {
+  if (!$("workspacePersonalisationForm")) return;
+
+  const areas = workspaceAreasFromForm();
+  const preset = areas.length ? workspacePresetForAreas(areas) : "custom";
+  const labels = {
+    home: "Home",
+    booking: "Booking",
+    crm: "CRM",
+    growth: "Growth"
+  };
+
+  document.querySelectorAll("[data-workspace-preset]").forEach(function (button) {
+    const active = button.dataset.workspacePreset === preset;
+    button.classList.toggle("border-brand-400", active);
+    button.classList.toggle("bg-brand-50", active);
+    button.classList.toggle("ring-2", active);
+    button.classList.toggle("ring-brand-100", active);
+    button.classList.toggle("border-slate-200", !active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+
+  if ($("workspacePresetStatus")) $("workspacePresetStatus").textContent = workspacePresetLabel(preset);
+  if ($("workspacePersonalisationSummary")) {
+    $("workspacePersonalisationSummary").textContent = areas.length
+      ? areas.map(function (area) { return labels[area]; }).join(", ") + (areas.length === 1 ? " is visible." : " are visible.")
+      : "Choose at least one main area.";
+  }
+
+  const error = $("workspacePersonalisationError");
+  if (error && areas.length) error.classList.add("hidden");
+  if ($("workspacePersonalisationSaveBtn")) $("workspacePersonalisationSaveBtn").disabled = areas.length === 0;
+}
+
+function populateWorkspacePersonalisation() {
+  if (!$("workspacePersonalisationForm")) return;
+  const preferences = state.dashboardPreferences || defaultDashboardPreferences();
+  setWorkspaceFormAreas(preferences.visible_areas);
+}
+
+function chooseWorkspacePreset(preset) {
+  if (preset === "custom") {
+    syncWorkspacePersonalisationForm();
+    const first = document.querySelector("[data-workspace-area]");
+    if (first) first.focus();
+    return;
+  }
+  const areas = WORKSPACE_PRESETS[preset];
+  if (!areas) return;
+  setWorkspaceFormAreas(areas);
+}
+
+async function saveWorkspacePersonalisation(event) {
+  event.preventDefault();
+  if (!state.user?.id) return;
+
+  const visibleAreas = workspaceAreasFromForm();
+  const error = $("workspacePersonalisationError");
+  if (!visibleAreas.length) {
+    if (error) error.classList.remove("hidden");
+    return;
+  }
+
+  const preset = workspacePresetForAreas(visibleAreas);
+  const btn = $("workspacePersonalisationSaveBtn");
+  setBusy(btn, true, "Saving…");
+
+  const { data, error: saveError } = await supabaseClient
+    .from("dashboard_preferences")
+    .upsert({
+      user_id: state.user.id,
+      visible_areas: visibleAreas,
+      workspace_preset: preset,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" })
+    .select("visible_areas, workspace_preset")
+    .single();
+
+  setBusy(btn, false);
+  if (saveError) return toast(friendlyDbError(saveError, "save workspace preferences"), "error");
+
+  const savedAreas = normaliseWorkspaceAreas(data?.visible_areas || visibleAreas);
+  state.dashboardPreferences = {
+    visible_areas: savedAreas,
+    workspace_preset: workspacePresetForAreas(savedAreas)
+  };
+
+  applyDashboardWorkspacePreferences();
+  populateWorkspacePersonalisation();
+  toast("Workspace updated.");
+}
+
+function ensureVisibleWorkspaceLanding() {
+  const preferences = state.dashboardPreferences || defaultDashboardPreferences();
+  const visibleAreas = normaliseWorkspaceAreas(preferences.visible_areas);
+  const currentVisibleTab = Array.from(document.querySelectorAll(".dashboard-tab")).find(function (tab) {
+    return !tab.classList.contains("hidden");
+  });
+  const currentTabId = currentVisibleTab?.id?.replace(/^tab-/, "") || "overview";
+  const currentArea = typeof dashboardAreaForTab === "function" ? dashboardAreaForTab(currentTabId) : "home";
+
+  if (visibleAreas.includes(currentArea)) return;
+  if (typeof switchArea === "function") switchArea(visibleAreas[0]);
+}
+
 function syncReminderFields() {
       $("followupTimingWrap").classList.toggle("hidden", !$("followupEnabled").checked);
     }
