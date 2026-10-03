@@ -2,7 +2,9 @@
 
 const workspaceTaskState = {
   items: [],
+  mentions: [],
   showAll: false,
+  assignmentFilter: "all",
   loaded: false
 };
 
@@ -78,23 +80,86 @@ function workspaceTaskForSource(sourceType, sourceId) {
   return workspaceTaskState.items.find(item => item.source_type === sourceType && item.source_id === sourceId) || null;
 }
 
+function workspaceStaffMember(staffId) {
+  return (state.staff || []).find(member => member.id === staffId) || null;
+}
+
+function workspaceAssigneeLabel(item) {
+  if (!item.assignee_staff_id) return "Owner · you";
+  const member = workspaceStaffMember(item.assignee_staff_id);
+  return member?.name || "Team member";
+}
+
+function workspaceMentionedStaff(taskId) {
+  const ids = new Set(
+    workspaceTaskState.mentions
+      .filter(mention => mention.task_id === taskId)
+      .map(mention => mention.staff_id)
+  );
+  return (state.staff || []).filter(member => ids.has(member.id));
+}
+
+function workspaceMentionIdsFromDetail(detail) {
+  const text = String(detail || "").toLowerCase();
+  if (!text) return [];
+
+  return (state.staff || []).filter(member => {
+    const token = "@" + String(member.name || "").trim().toLowerCase();
+    if (token.length <= 1) return false;
+
+    let from = 0;
+    while (from < text.length) {
+      const index = text.indexOf(token, from);
+      if (index < 0) return false;
+      const before = index === 0 ? "" : text[index - 1];
+      const afterIndex = index + token.length;
+      const after = afterIndex >= text.length ? "" : text[afterIndex];
+      const beforeOk = !before || /[\s([{]/.test(before);
+      const afterOk = !after || /[\s.,!?;:)\]}]/.test(after);
+      if (beforeOk && afterOk) return true;
+      from = index + token.length;
+    }
+    return false;
+  }).map(member => member.id);
+}
+
+function workspaceFilteredOpenItems() {
+  const open = workspaceTaskState.items.filter(item => item.status === "open");
+  if (workspaceTaskState.assignmentFilter === "mine") return open.filter(item => !item.assignee_staff_id);
+  if (workspaceTaskState.assignmentFilter === "team") return open.filter(item => Boolean(item.assignee_staff_id));
+  return open;
+}
+
+function renderWorkspaceAssignmentFilters() {
+  document.querySelectorAll("[data-workspace-assignment-filter]").forEach(button => {
+    const active = button.dataset.workspaceAssignmentFilter === workspaceTaskState.assignmentFilter;
+    button.className = active
+      ? "workspace-assignment-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white"
+      : "workspace-assignment-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600";
+  });
+}
+
 function renderWorkspaceTasks() {
   const list = $("workspacePriorityList");
   if (!list) return;
 
-  const open = workspaceTaskState.items
-    .filter(item => item.status === "open")
-    .sort(workspaceTaskSort);
-  const todayCount = open.filter(item => workspaceTaskGroup(item) === 0).length;
-  const overdueCount = open.filter(item => workspaceTaskGroup(item) === 1).length;
-  const upcomingCount = open.filter(item => workspaceTaskGroup(item) === 2).length;
+  const allOpen = workspaceTaskState.items.filter(item => item.status === "open");
+  const open = workspaceFilteredOpenItems().sort(workspaceTaskSort);
+  const todayCount = allOpen.filter(item => workspaceTaskGroup(item) === 0).length;
+  const overdueCount = allOpen.filter(item => workspaceTaskGroup(item) === 1).length;
+  const upcomingCount = allOpen.filter(item => workspaceTaskGroup(item) === 2).length;
 
   if ($("workspacePriorityTodayCount")) $("workspacePriorityTodayCount").textContent = String(todayCount);
   if ($("workspacePriorityOverdueCount")) $("workspacePriorityOverdueCount").textContent = String(overdueCount);
   if ($("workspacePriorityUpcomingCount")) $("workspacePriorityUpcomingCount").textContent = String(upcomingCount);
+  renderWorkspaceAssignmentFilters();
 
   if (!open.length) {
-    list.innerHTML = '<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center"><p class="font-bold text-slate-600">Nothing needs your attention</p><p class="mt-1 text-sm text-slate-400">Add a task or turn a note into a reminder and it will appear here.</p></div>';
+    const filtered = workspaceTaskState.assignmentFilter !== "all";
+    list.innerHTML = '<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center">' +
+      '<p class="font-bold text-slate-600">' + (filtered ? "No open tasks in this assignment view" : "Nothing needs your attention") + '</p>' +
+      '<p class="mt-1 text-sm text-slate-400">' + (filtered ? "Switch assignment filters or add a new task." : "Add a task or turn a note into a reminder and it will appear here.") + '</p>' +
+    '</div>';
     $("workspaceTasksShowAllBtn")?.classList.add("hidden");
     return;
   }
@@ -104,7 +169,9 @@ function renderWorkspaceTasks() {
   list.innerHTML = visible.map(item => {
     const group = workspaceTaskGroup(item);
     const timing = workspaceTaskTiming(item);
-    const source = item.source_label || (item.source_type === "growth_planner" ? "Growth planner" : "Personal task");
+    const source = item.source_label || (item.source_type === "growth_planner" ? "Growth planner" : "Task");
+    const assignee = workspaceAssigneeLabel(item);
+    const mentioned = workspaceMentionedStaff(item.id);
     const groupHeader = group !== lastGroup
       ? '<div class="pt-2 first:pt-0"><p class="text-[.68rem] font-bold uppercase tracking-[.14em] text-slate-400">' + escapeHtml(workspaceTaskGroupLabel(group)) + '</p></div>'
       : "";
@@ -116,10 +183,12 @@ function renderWorkspaceTasks() {
           '<div class="min-w-0 flex-1">' +
             '<div class="flex flex-wrap items-center gap-2">' +
               '<span class="rounded-full px-2.5 py-1 text-[.68rem] font-bold ' + workspacePriorityTone(item.priority) + '">' + escapeHtml(workspacePriorityLabel(item.priority)) + ' priority</span>' +
+              '<span class="rounded-full ' + (item.assignee_staff_id ? "bg-violet-50 text-violet-700" : "bg-brand-50 text-brand-700") + ' px-2.5 py-1 text-[.68rem] font-bold">Assigned · ' + escapeHtml(assignee) + '</span>' +
               '<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500">' + escapeHtml(source) + '</span>' +
             '</div>' +
             '<h3 class="mt-2 font-bold text-ink">' + escapeHtml(item.title) + '</h3>' +
             (item.detail ? '<p class="mt-1 line-clamp-2 text-sm leading-6 text-slate-500">' + escapeHtml(item.detail) + '</p>' : '') +
+            (mentioned.length ? '<div class="mt-2 flex flex-wrap gap-1.5">' + mentioned.map(member => '<span class="rounded-full bg-violet-50 px-2 py-1 text-[.68rem] font-bold text-violet-700">@' + escapeHtml(member.name) + '</span>').join('') + '</div>' : '') +
             (timing.length ? '<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">' + timing.map(x => '<span class="' + x.tone + '">' + escapeHtml(x.text) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="flex shrink-0 gap-2">' +
@@ -140,20 +209,84 @@ function renderWorkspaceTasks() {
 async function loadWorkspaceTasks() {
   if (!state.profile || !$("workspacePriorityList")) return;
   try {
-    const { data, error } = await supabaseClient
-      .from("workspace_tasks")
-      .select("id,profile_id,created_by,title,detail,priority,due_date,reminder_date,status,source_type,source_id,source_label,completed_at,created_at,updated_at")
-      .eq("profile_id", state.profile.id)
-      .order("updated_at", { ascending: false });
-    if (error) throw error;
-    workspaceTaskState.items = data || [];
+    const [taskResult, mentionResult] = await Promise.all([
+      supabaseClient
+        .from("workspace_tasks")
+        .select("id,profile_id,created_by,title,detail,priority,due_date,reminder_date,status,source_type,source_id,source_label,assignee_staff_id,completed_at,created_at,updated_at")
+        .eq("profile_id", state.profile.id)
+        .order("updated_at", { ascending: false }),
+      supabaseClient
+        .from("workspace_task_mentions")
+        .select("task_id,profile_id,staff_id,created_at")
+        .eq("profile_id", state.profile.id)
+    ]);
+
+    if (taskResult.error) throw taskResult.error;
+    if (mentionResult.error) throw mentionResult.error;
+    workspaceTaskState.items = taskResult.data || [];
+    workspaceTaskState.mentions = mentionResult.data || [];
     workspaceTaskState.loaded = true;
     renderWorkspaceTasks();
     if (typeof renderGrowthPlanner === "function") renderGrowthPlanner();
   } catch (error) {
     console.error("Workspace tasks load error", error);
-    $("workspacePriorityList").innerHTML = '<div class="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">Tasks and reminders could not be loaded.</div>';
+    $("workspacePriorityList").innerHTML = '<div class="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">Tasks, assignments and reminders could not be loaded.</div>';
   }
+}
+
+function renderWorkspaceAssigneeOptions(selectedId = "") {
+  const select = $("workspaceTaskAssignee");
+  if (!select) return;
+  select.innerHTML = '<option value="">Owner (you)</option>' +
+    (state.staff || []).map(member =>
+      '<option value="' + member.id + '"' + (member.id === selectedId ? ' selected' : '') + '>' +
+        escapeHtml(member.name) + (member.job_title ? ' · ' + escapeHtml(member.job_title) : '') + (member.is_active ? '' : ' · inactive') +
+      '</option>'
+    ).join("");
+  select.value = selectedId || "";
+}
+
+function renderWorkspaceMentionPicker() {
+  const picker = $("workspaceTaskMentionPicker");
+  if (!picker) return;
+  const staff = (state.staff || []).filter(member => member.is_active);
+  const mentionedIds = new Set(workspaceMentionIdsFromDetail($("workspaceTaskDetail")?.value || ""));
+
+  if (!staff.length) {
+    picker.innerHTML = '<span class="text-xs text-slate-400">No active team members to mention yet.</span>';
+    return;
+  }
+
+  picker.innerHTML = staff.map(member =>
+    '<button class="rounded-full border px-2.5 py-1 text-xs font-bold ' +
+      (mentionedIds.has(member.id) ? 'border-violet-200 bg-violet-50 text-violet-700' : 'border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:text-violet-700') +
+      '" type="button" data-workspace-mention-staff="' + member.id + '">@' + escapeHtml(member.name) + '</button>'
+  ).join("");
+}
+
+function insertWorkspaceMention(staffId) {
+  const member = workspaceStaffMember(staffId);
+  const field = $("workspaceTaskDetail");
+  if (!member || !field) return;
+
+  const token = "@" + member.name;
+  const current = field.value || "";
+  if (workspaceMentionIdsFromDetail(current).includes(member.id)) {
+    field.focus();
+    return;
+  }
+
+  const start = Number.isInteger(field.selectionStart) ? field.selectionStart : current.length;
+  const end = Number.isInteger(field.selectionEnd) ? field.selectionEnd : start;
+  const before = current.slice(0, start);
+  const after = current.slice(end);
+  const prefix = before && !/\s$/.test(before) ? " " : "";
+  const suffix = after && !/^\s/.test(after) ? " " : " ";
+  field.value = (before + prefix + token + suffix + after).slice(0, 5000);
+  const cursor = Math.min((before + prefix + token + suffix).length, field.value.length);
+  field.setSelectionRange(cursor, cursor);
+  field.focus();
+  renderWorkspaceMentionPicker();
 }
 
 function openWorkspaceTaskModal(options = {}) {
@@ -168,6 +301,8 @@ function openWorkspaceTaskModal(options = {}) {
   $("workspaceTaskPriority").value = existing?.priority || options.priority || "normal";
   $("workspaceTaskDueDate").value = existing?.due_date || options.dueDate || "";
   $("workspaceTaskReminderDate").value = existing?.reminder_date || options.reminderDate || "";
+  renderWorkspaceAssigneeOptions(existing?.assignee_staff_id || options.assigneeStaffId || "");
+  renderWorkspaceMentionPicker();
   $("workspaceTaskSaveBtn").textContent = existing ? "Save changes" : "Add to priorities";
   $("workspaceTaskDeleteBtn")?.classList.toggle("hidden", !existing);
 
@@ -184,6 +319,8 @@ function closeWorkspaceTaskModal() {
   modal.classList.remove("flex");
   $("workspaceTaskForm")?.reset();
   ["workspaceTaskId","workspaceTaskSourceType","workspaceTaskSourceId","workspaceTaskSourceLabel"].forEach(id => { if ($(id)) $(id).value = ""; });
+  renderWorkspaceAssigneeOptions("");
+  renderWorkspaceMentionPicker();
 }
 
 function openWorkspaceTaskFromPlanner(item) {
@@ -228,6 +365,50 @@ async function syncWorkspaceTaskSourceStatus(sourceType, sourceId, sourceStatus)
   renderWorkspaceTasks();
 }
 
+async function syncWorkspaceTaskMentions(taskId, desiredIds) {
+  const desired = new Set(desiredIds || []);
+  const current = new Set(
+    workspaceTaskState.mentions
+      .filter(mention => mention.task_id === taskId)
+      .map(mention => mention.staff_id)
+  );
+
+  const removeIds = [...current].filter(id => !desired.has(id));
+  const addIds = [...desired].filter(id => !current.has(id));
+
+  if (removeIds.length) {
+    const { error } = await supabaseClient
+      .from("workspace_task_mentions")
+      .delete()
+      .eq("profile_id", state.profile.id)
+      .eq("task_id", taskId)
+      .in("staff_id", removeIds);
+    if (error) throw error;
+  }
+
+  if (addIds.length) {
+    const rows = addIds.map(staffId => ({
+      task_id: taskId,
+      profile_id: state.profile.id,
+      staff_id: staffId
+    }));
+    const { error } = await supabaseClient.from("workspace_task_mentions").insert(rows);
+    if (error) throw error;
+  }
+
+  workspaceTaskState.mentions = workspaceTaskState.mentions
+    .filter(mention => mention.task_id !== taskId || desired.has(mention.staff_id));
+
+  addIds.forEach(staffId => {
+    workspaceTaskState.mentions.push({
+      task_id: taskId,
+      profile_id: state.profile.id,
+      staff_id: staffId,
+      created_at: new Date().toISOString()
+    });
+  });
+}
+
 async function saveWorkspaceTask(event) {
   event.preventDefault();
   if (!state.profile) return;
@@ -236,17 +417,24 @@ async function saveWorkspaceTask(event) {
   const title = $("workspaceTaskTitle").value.trim().slice(0, 200);
   if (!title) return toast("Add a title for this task.", "error");
 
+  const assigneeStaffId = $("workspaceTaskAssignee")?.value || null;
+  if (assigneeStaffId && !workspaceStaffMember(assigneeStaffId)) {
+    return toast("Choose a team member from this business.", "error");
+  }
+
+  const detail = $("workspaceTaskDetail").value.trim().slice(0, 5000) || null;
   const payload = {
     profile_id: state.profile.id,
     created_by: state.user.id,
     title,
-    detail: $("workspaceTaskDetail").value.trim().slice(0, 5000) || null,
+    detail,
     priority: $("workspaceTaskPriority").value,
     due_date: $("workspaceTaskDueDate").value || null,
     reminder_date: $("workspaceTaskReminderDate").value || null,
     source_type: $("workspaceTaskSourceType").value || null,
     source_id: $("workspaceTaskSourceId").value || null,
     source_label: $("workspaceTaskSourceLabel").value || null,
+    assignee_staff_id: assigneeStaffId,
     status: "open",
     completed_at: null,
     updated_at: new Date().toISOString()
@@ -271,10 +459,23 @@ async function saveWorkspaceTask(event) {
     if (existingIndex >= 0) workspaceTaskState.items.splice(existingIndex, 1, result.data);
     else workspaceTaskState.items.unshift(result.data);
 
+    let mentionWarning = false;
+    try {
+      await syncWorkspaceTaskMentions(result.data.id, workspaceMentionIdsFromDetail(detail));
+    } catch (mentionError) {
+      mentionWarning = true;
+      console.error("Workspace mention sync error", mentionError);
+    }
+
     closeWorkspaceTaskModal();
     renderWorkspaceTasks();
     if (typeof renderGrowthPlanner === "function") renderGrowthPlanner();
-    toast(id ? "Task updated." : "Added to your priorities.");
+    toast(
+      mentionWarning
+        ? "Task saved, but its @mentions could not be fully updated."
+        : (id ? "Task updated." : (assigneeStaffId ? "Task assigned to " + workspaceAssigneeLabel(result.data) + "." : "Added to your priorities.")),
+      mentionWarning ? "error" : undefined
+    );
   } catch (error) {
     console.error("Workspace task save error", error);
     toast(friendlyDbError(error, "save this task"), "error");
@@ -309,6 +510,7 @@ async function deleteWorkspaceTask() {
   const { error } = await supabaseClient.from("workspace_tasks").delete().eq("id", id).eq("profile_id", state.profile.id);
   if (error) return toast(friendlyDbError(error, "delete this task"), "error");
   workspaceTaskState.items = workspaceTaskState.items.filter(entry => entry.id !== id);
+  workspaceTaskState.mentions = workspaceTaskState.mentions.filter(mention => mention.task_id !== id);
   closeWorkspaceTaskModal();
   renderWorkspaceTasks();
   if (typeof renderGrowthPlanner === "function") renderGrowthPlanner();
@@ -324,12 +526,24 @@ $("workspaceTasksShowAllBtn")?.addEventListener("click", () => {
   workspaceTaskState.showAll = !workspaceTaskState.showAll;
   renderWorkspaceTasks();
 });
+document.querySelectorAll("[data-workspace-assignment-filter]").forEach(button => {
+  button.addEventListener("click", () => {
+    workspaceTaskState.assignmentFilter = button.dataset.workspaceAssignmentFilter || "all";
+    workspaceTaskState.showAll = false;
+    renderWorkspaceTasks();
+  });
+});
 $("workspacePriorityList")?.addEventListener("click", event => {
   const done = event.target.closest("[data-workspace-task-done]");
   if (done) return completeWorkspaceTask(done.dataset.workspaceTaskDone);
   const edit = event.target.closest("[data-workspace-task-edit]");
   if (edit) return editWorkspaceTask(edit.dataset.workspaceTaskEdit);
 });
+$("workspaceTaskMentionPicker")?.addEventListener("click", event => {
+  const button = event.target.closest("[data-workspace-mention-staff]");
+  if (button) insertWorkspaceMention(button.dataset.workspaceMentionStaff);
+});
+$("workspaceTaskDetail")?.addEventListener("input", renderWorkspaceMentionPicker);
 $("workspaceTaskModal")?.addEventListener("click", event => {
   if (event.target === $("workspaceTaskModal")) closeWorkspaceTaskModal();
 });
