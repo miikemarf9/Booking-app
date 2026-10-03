@@ -2458,3 +2458,75 @@
       background: color-mix(in srgb, var(--dash-accent) 16%, #111827) !important;
       box-shadow: 0 0 0 3px var(--dash-accent-ring);
     }
+
+
+    #dashboardView .dashboard-density-option.appearance-selected {
+      border-color: var(--dash-accent) !important;
+      background: var(--dash-accent-soft) !important;
+      box-shadow: 0 0 0 3px var(--dash-accent-ring);
+    }
+    #dashboardView[data-dashboard-theme="dark"] .dashboard-density-option {
+      border-color: #334155;
+      background: #111827;
+    }
+    #dashboardView[data-dashboard-theme="dark"] .dashboard-density-option.appearance-selected {
+      border-color: var(--dash-accent) !important;
+      background: color-mix(in srgb, var(--dash-accent) 16%, #111827) !important;
+      box-shadow: 0 0 0 3px var(--dash-accent-ring);
+    }
+
+    /* Dashboard density: compact keeps type readable and reduces surrounding chrome on working screens. */
+    @media (min-width: 768px) {
+      #dashboardView[data-dashboard-density="compact"] > header > div {
+        padding-top: .65rem !important;
+        padding-bottom: .65rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] > div.mx-auto {
+        padding-top: 1rem !important;
+        padding-bottom: 1.25rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .dashboard-area-nav {
+        padding: .25rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .area-tab {
+        padding-top: .5rem !important;
+        padding-bottom: .5rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .subnav-tab {
+        padding-top: .4rem !important;
+        padding-bottom: .4rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .dashboard-tab > .grid.gap-6,
+      #dashboardView[data-dashboard-density="compact"] .dashboard-tab .grid.gap-6 {
+        gap: 1rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .dashboard-tab > .grid.gap-4,
+      #dashboardView[data-dashboard-density="compact"] .dashboard-tab .grid.gap-4 {
+        gap: .75rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .dashboard-tab.space-y-6 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .dashboard-tab.space-y-5 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: .85rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .card.p-6,
+      #dashboardView[data-dashboard-density="compact"] .card.p-5,
+      #dashboardView[data-dashboard-density="compact"] .card[class~="p-6"],
+      #dashboardView[data-dashboard-density="compact"] .card[class~="p-5"] {
+        padding: 1rem !important;
+      }
+      #dashboardView[data-dashboard-density="compact"] .field {
+        padding-top: .58rem;
+        padding-bottom: .58rem;
+      }
+      #dashboardView[data-dashboard-density="compact"] .btn {
+        padding-top: .55rem;
+        padding-bottom: .55rem;
+      }
+      #dashboardView[data-dashboard-density="compact"] table th,
+      #dashboardView[data-dashboard-density="compact"] table td {
+        padding-top: .55rem !important;
+        padding-bottom: .55rem !important;
+      }
+    }
