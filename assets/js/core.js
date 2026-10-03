@@ -728,6 +728,15 @@
           if (typeof setGrowthScenarioPricePreset === "function") setGrowthScenarioPricePreset(Number(btn.dataset.scenarioPrice));
         });
       });
+      $("growthHealthScenarioSuggestions")?.addEventListener("click", event => {
+        const btn = event.target.closest("[data-health-scenario-type]");
+        if (!btn || typeof openGrowthScenarioFromHealth !== "function") return;
+        const raw = btn.dataset.healthScenarioAssumption;
+        openGrowthScenarioFromHealth(
+          btn.dataset.healthScenarioType,
+          raw === undefined || raw === "" ? null : Number(raw)
+        );
+      });
 
       $("serviceForm").addEventListener("submit", saveService);
       $("serviceCancelEditBtn").addEventListener("click", resetServiceForm);
