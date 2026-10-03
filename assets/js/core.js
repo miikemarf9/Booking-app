@@ -1223,6 +1223,20 @@
       return inserted.data;
     }
 
+    async function syncAdminConsoleAccess() {
+      const button = $("adminConsoleBtn");
+      if (!button || !state.user?.id) return;
+
+      button.classList.add("hidden");
+      const { data, error } = await supabaseClient
+        .from("admin_users")
+        .select("role")
+        .eq("user_id", state.user.id)
+        .maybeSingle();
+
+      if (!error && data) button.classList.remove("hidden");
+    }
+
     async function loadOwner(userObj) {
       showOnly("loadingView");
       try {
@@ -1237,6 +1251,7 @@
         $("dashboardBusinessName").textContent = state.profile.business_name;
         $("publicBookingUrl").value = buildPublicUrl(state.profile.id);
         if (typeof loadDashboardPreferences === "function") await loadDashboardPreferences();
+        await syncAdminConsoleAccess();
         populateBusinessDetails();
         populateBookingRules();
         populateReminderSettings();
