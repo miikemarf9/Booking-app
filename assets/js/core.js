@@ -13,6 +13,7 @@
       authMode: "login",
       user: null,
       profile: null,
+      dashboardPreferences: null,
       subscription: null,
       plan: null,
       services: [],
@@ -704,6 +705,20 @@
       document.querySelectorAll("[data-go-tab]").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.goTab)));
       document.querySelectorAll("[data-go-section]").forEach(btn => btn.addEventListener("click", () => goDashboardSection(btn.dataset.goSection)));
 
+      $("workspacePersonalisationForm")?.addEventListener("submit", event => {
+        if (typeof saveWorkspacePersonalisation === "function") saveWorkspacePersonalisation(event);
+      });
+      document.querySelectorAll("[data-workspace-preset]").forEach(button => {
+        button.addEventListener("click", () => {
+          if (typeof chooseWorkspacePreset === "function") chooseWorkspacePreset(button.dataset.workspacePreset);
+        });
+      });
+      document.querySelectorAll("[data-workspace-area]").forEach(input => {
+        input.addEventListener("change", () => {
+          if (typeof syncWorkspacePersonalisationForm === "function") syncWorkspacePersonalisationForm();
+        });
+      });
+
       $("growthHealthWhyBtn")?.addEventListener("click", () => {
         if (typeof toggleGrowthHealthWhy === "function") toggleGrowthHealthWhy();
       });
@@ -1213,6 +1228,7 @@
 
         $("dashboardBusinessName").textContent = state.profile.business_name;
         $("publicBookingUrl").value = buildPublicUrl(state.profile.id);
+        if (typeof loadDashboardPreferences === "function") await loadDashboardPreferences();
         populateBusinessDetails();
         populateBookingRules();
         populateReminderSettings();
@@ -1222,6 +1238,8 @@
 
         await loadDashboardData();
         showOnly("dashboardView");
+        if (typeof applyDashboardWorkspacePreferences === "function") applyDashboardWorkspacePreferences();
+        if (typeof ensureVisibleWorkspaceLanding === "function") ensureVisibleWorkspaceLanding();
       } catch (err) {
         showOnly("authView");
         setAuthMessage(friendlyDbError(err, "load your account"), "error");
