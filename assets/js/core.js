@@ -1015,6 +1015,12 @@
         btn.addEventListener("click", () => setGrowthPlannerFilter(btn.dataset.plannerFilter));
       });
       $("growthPlannerList").addEventListener("click", e => {
+        const priority = e.target.closest("[data-planner-priority]");
+        if (priority && typeof openWorkspaceTaskFromPlanner === "function") {
+          const item = growthPlannerState.items.find(entry => entry.id === priority.dataset.plannerPriority);
+          if (item) return openWorkspaceTaskFromPlanner(item);
+        }
+
         const toggle = e.target.closest("[data-planner-toggle]");
         if (toggle) return toggleGrowthPlannerItem(toggle.dataset.plannerToggle);
 
