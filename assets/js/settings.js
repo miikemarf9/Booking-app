@@ -6,11 +6,24 @@ const WORKSPACE_PRESETS = {
   bookings_crm: ["booking", "crm"],
   full: ["home", "booking", "crm", "growth"]
 };
+const WORKSPACE_START_PAGE_AREAS = {
+  overview: "home",
+  calendar: "booking",
+  customers: "crm",
+  growth: "growth"
+};
+const WORKSPACE_AREA_START_PAGES = {
+  home: "overview",
+  booking: "calendar",
+  crm: "customers",
+  growth: "growth"
+};
 
 function defaultDashboardPreferences() {
   return {
     visible_areas: [...WORKSPACE_PRESETS.full],
-    workspace_preset: "full"
+    workspace_preset: "full",
+    start_page: "overview"
   };
 }
 
@@ -19,6 +32,13 @@ function normaliseWorkspaceAreas(areas) {
     return Array.isArray(areas) && areas.includes(area);
   });
   return clean.length ? clean : [...WORKSPACE_PRESETS.full];
+}
+
+function normaliseWorkspaceStartPage(startPage, areas) {
+  const visibleAreas = normaliseWorkspaceAreas(areas);
+  const requestedArea = WORKSPACE_START_PAGE_AREAS[startPage];
+  if (requestedArea && visibleAreas.includes(requestedArea)) return startPage;
+  return WORKSPACE_AREA_START_PAGES[visibleAreas[0]] || "overview";
 }
 
 function workspacePresetForAreas(areas) {
@@ -44,7 +64,7 @@ async function loadDashboardPreferences() {
 
   const { data, error } = await supabaseClient
     .from("dashboard_preferences")
-    .select("visible_areas, workspace_preset")
+    .select("visible_areas, workspace_preset, start_page")
     .eq("user_id", state.user.id)
     .maybeSingle();
 
@@ -58,7 +78,8 @@ async function loadDashboardPreferences() {
     const visibleAreas = normaliseWorkspaceAreas(data.visible_areas);
     state.dashboardPreferences = {
       visible_areas: visibleAreas,
-      workspace_preset: workspacePresetForAreas(visibleAreas)
+      workspace_preset: workspacePresetForAreas(visibleAreas),
+      start_page: normaliseWorkspaceStartPage(data.start_page, visibleAreas)
     };
   }
 
@@ -122,6 +143,15 @@ function syncWorkspacePersonalisationForm() {
       : "Choose at least one main area.";
   }
 
+  const startPageSelect = $("workspaceStartPage");
+  if (startPageSelect) {
+    Array.from(startPageSelect.options).forEach(function (option) {
+      const area = option.dataset.startArea || WORKSPACE_START_PAGE_AREAS[option.value];
+      option.disabled = Boolean(area) && !areas.includes(area);
+    });
+    if (areas.length) startPageSelect.value = normaliseWorkspaceStartPage(startPageSelect.value, areas);
+  }
+
   const error = $("workspacePersonalisationError");
   if (error && areas.length) error.classList.add("hidden");
   if ($("workspacePersonalisationSaveBtn")) $("workspacePersonalisationSaveBtn").disabled = areas.length === 0;
@@ -131,6 +161,10 @@ function populateWorkspacePersonalisation() {
   if (!$("workspacePersonalisationForm")) return;
   const preferences = state.dashboardPreferences || defaultDashboardPreferences();
   setWorkspaceFormAreas(preferences.visible_areas);
+  if ($("workspaceStartPage")) {
+    $("workspaceStartPage").value = normaliseWorkspaceStartPage(preferences.start_page, preferences.visible_areas);
+  }
+  syncWorkspacePersonalisationForm();
 }
 
 function chooseWorkspacePreset(preset) {
@@ -157,6 +191,7 @@ async function saveWorkspacePersonalisation(event) {
   }
 
   const preset = workspacePresetForAreas(visibleAreas);
+  const startPage = normaliseWorkspaceStartPage($("workspaceStartPage")?.value, visibleAreas);
   const btn = $("workspacePersonalisationSaveBtn");
   setBusy(btn, true, "Saving…");
 
@@ -166,9 +201,10 @@ async function saveWorkspacePersonalisation(event) {
       user_id: state.user.id,
       visible_areas: visibleAreas,
       workspace_preset: preset,
+      start_page: startPage,
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id" })
-    .select("visible_areas, workspace_preset")
+    .select("visible_areas, workspace_preset, start_page")
     .single();
 
   setBusy(btn, false);
@@ -177,7 +213,8 @@ async function saveWorkspacePersonalisation(event) {
   const savedAreas = normaliseWorkspaceAreas(data?.visible_areas || visibleAreas);
   state.dashboardPreferences = {
     visible_areas: savedAreas,
-    workspace_preset: workspacePresetForAreas(savedAreas)
+    workspace_preset: workspacePresetForAreas(savedAreas),
+    start_page: normaliseWorkspaceStartPage(data?.start_page || startPage, savedAreas)
   };
 
   applyDashboardWorkspacePreferences();
@@ -188,14 +225,15 @@ async function saveWorkspacePersonalisation(event) {
 function ensureVisibleWorkspaceLanding() {
   const preferences = state.dashboardPreferences || defaultDashboardPreferences();
   const visibleAreas = normaliseWorkspaceAreas(preferences.visible_areas);
-  const currentVisibleTab = Array.from(document.querySelectorAll(".dashboard-tab")).find(function (tab) {
-    return !tab.classList.contains("hidden");
-  });
-  const currentTabId = currentVisibleTab?.id?.replace(/^tab-/, "") || "overview";
-  const currentArea = typeof dashboardAreaForTab === "function" ? dashboardAreaForTab(currentTabId) : "home";
+  const startPage = normaliseWorkspaceStartPage(preferences.start_page, visibleAreas);
 
-  if (visibleAreas.includes(currentArea)) return;
-  if (typeof switchArea === "function") switchArea(visibleAreas[0]);
+  if (typeof switchTab === "function") {
+    switchTab(startPage);
+    return;
+  }
+
+  const fallbackArea = WORKSPACE_START_PAGE_AREAS[startPage] || visibleAreas[0];
+  if (typeof switchArea === "function") switchArea(fallbackArea);
 }
 
 function syncReminderFields() {
