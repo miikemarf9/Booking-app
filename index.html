@@ -853,7 +853,14 @@
             </div>
           </div>
 
-          <div id="workspacePriorityList" class="mt-5 space-y-3">
+          <div class="mt-5 flex flex-wrap items-center gap-2">
+            <span class="mr-1 text-xs font-bold uppercase tracking-wider text-slate-400">Assigned</span>
+            <button class="workspace-assignment-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white" data-workspace-assignment-filter="all" type="button">Everyone</button>
+            <button class="workspace-assignment-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-workspace-assignment-filter="mine" type="button">Owner · me</button>
+            <button class="workspace-assignment-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-workspace-assignment-filter="team" type="button">Team</button>
+          </div>
+
+          <div id="workspacePriorityList" class="mt-4 space-y-3">
             <div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center text-sm text-slate-400">Loading your priorities…</div>
           </div>
           <div class="mt-4 text-center">
@@ -4204,10 +4211,19 @@
 
         <div>
           <label class="label" for="workspaceTaskDetail">Notes</label>
-          <textarea id="workspaceTaskDetail" class="field min-h-28 resize-y" maxlength="5000" placeholder="Add useful context or the next step..."></textarea>
+          <textarea id="workspaceTaskDetail" class="field min-h-28 resize-y" maxlength="5000" placeholder="Add useful context or type @ to mention a team member..."></textarea>
+          <div id="workspaceTaskMentionPicker" class="mt-2 flex flex-wrap gap-2"></div>
+          <p id="workspaceTaskMentionHelp" class="mt-1 text-[.68rem] leading-4 text-slate-400">Use @mentions to keep the right person attached to the task.</p>
         </div>
 
-        <div class="grid gap-4 sm:grid-cols-3">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label" for="workspaceTaskAssignee">Assigned to</label>
+            <select id="workspaceTaskAssignee" class="field">
+              <option value="">Owner (you)</option>
+            </select>
+            <p class="mt-1 text-[.68rem] leading-4 text-slate-400">Team assignments use the people already set up under Book → Team.</p>
+          </div>
           <div>
             <label class="label" for="workspaceTaskPriority">Priority</label>
             <select id="workspaceTaskPriority" class="field">
@@ -4352,7 +4368,7 @@
   <script src="assets/js/google-ads.js"></script>
   <script src="assets/js/meta.js"></script>
   <script src="assets/js/growth-import.js"></script>
-  <script src="assets/js/tasks.js?v=2"></script>
+  <script src="assets/js/tasks.js?v=3"></script>
   <script src="assets/js/growth-planner.js?v=tasks2"></script>
   <script src="assets/js/growth-opportunities.js"></script>
   <script src="assets/js/customers.js"></script>
