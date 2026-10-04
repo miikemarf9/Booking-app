@@ -453,6 +453,21 @@ function syncReminderFields() {
 
 
 
+    function populateTimeOffTimeOptions() {
+      ["timeOffStartTime", "timeOffEndTime"].forEach(id => {
+        const select = $(id);
+        if (!select || select.options.length) return;
+        const options = [];
+        for (let minutes = 0; minutes < 24 * 60; minutes += 5) {
+          const hour = String(Math.floor(minutes / 60)).padStart(2, "0");
+          const minute = String(minutes % 60).padStart(2, "0");
+          const value = `${hour}:${minute}`;
+          options.push(`<option value="${value}">${value}</option>`);
+        }
+        select.innerHTML = options.join("");
+      });
+    }
+
     function syncTimeOffMode() {
       const allDay = $("timeOffMode")?.value !== "hours";
       $("timeOffAllDayFields")?.classList.toggle("hidden", !allDay);
@@ -496,7 +511,7 @@ function syncReminderFields() {
         ? upcoming.map(block => {
             const member = state.staff.find(item => item.id === block.staff_id);
             return `
-            <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="booking-record-row">
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="rounded-full bg-rose-50 px-2.5 py-1 text-[.68rem] font-bold text-rose-700">${block.is_all_day ? "Full day" : "Hours blocked"}</span>
@@ -505,7 +520,7 @@ function syncReminderFields() {
                 </div>
                 <p class="mt-2 font-bold text-ink">${escapeHtml(timeOffLabel(block))}</p>
               </div>
-              <button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button>
+              <div class="booking-record-actions"><button class="btn booking-danger-btn shrink-0 !px-3 !py-2" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button></div>
             </div>
           `;
           }).join("")
@@ -683,8 +698,8 @@ function syncReminderFields() {
             const service = state.services.find(s => s.id === q.service_id);
             const options = Array.isArray(q.options) ? q.options : [];
             return `
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div class="booking-record-row">
+                <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
                       <span class="rounded-full bg-brand-50 px-2.5 py-1 text-[.68rem] font-bold text-brand-700">${escapeHtml(service?.title || "Service")}</span>
@@ -696,9 +711,9 @@ function syncReminderFields() {
                       ? `<p class="mt-1 text-xs text-slate-500">${options.map(escapeHtml).join(" · ")}</p>`
                       : ""}
                   </div>
-                  <div class="flex shrink-0 gap-2">
+                  <div class="booking-record-actions">
                     <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-question-action="edit" data-id="${q.id}">Edit</button>
-                    <button class="btn !px-3 !py-2 text-sm bg-red-50 text-red-700 hover:bg-red-100" type="button" data-question-action="delete" data-id="${q.id}">Delete</button>
+                    <button class="btn booking-danger-btn !px-3 !py-2 text-sm" type="button" data-question-action="delete" data-id="${q.id}">Delete</button>
                   </div>
                 </div>
               </div>

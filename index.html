@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=stage5-overview-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=stage6-booking-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=2">
 
   <script type="application/ld+json">
@@ -2318,7 +2318,7 @@
             </div>
 
             <form id="crmAutomationForm" class="mt-5 grid gap-4 lg:grid-cols-2">
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">Automatic rebooking reminders</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">Send one email when a regular customer reaches their normal return point and has nothing booked.</span>
@@ -2326,7 +2326,7 @@
                 <input id="crmAutoRebooking" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
               </label>
 
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">Automatic win-back emails</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">Contact customers who move well beyond their normal booking rhythm with no future appointment.</span>
@@ -2643,7 +2643,7 @@
 
       <!-- Services Tab -->
       <section id="tab-services" class="dashboard-tab hidden">
-        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div class="booking-ops-page-head mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking setup</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Services</h2>
@@ -2651,12 +2651,12 @@
           </div>
           <button class="btn btn-light" data-go-tab="availability" type="button">Set availability</button>
         </div>
-        <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Service editor</p>
             <h2 id="serviceFormHeading" class="mt-1 text-xl font-bold text-ink">Add a service</h2>
             <p class="mt-2 text-sm text-slate-500">Create the treatments or appointments customers can book.</p>
-            <form id="serviceForm" class="mt-6 space-y-4">
+            <form id="serviceForm" class="booking-ops-form mt-6 space-y-4">
               <input id="serviceEditId" type="hidden">
               <div>
                 <label class="label" for="srvTitle">Service name</label>
@@ -2675,7 +2675,7 @@
                   </div>
                   <div id="srvDescription" class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Add useful details, what’s included, preparation notes or anything customers should know…"></div>
                 </div>
-                <p class="mt-1.5 text-xs leading-5 text-slate-400">Use bold, italic or underline for emphasis. Maximum 2,000 characters.</p>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Formatting is optional.</p>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -2696,7 +2696,7 @@
                 </div>
               </div>
 
-              <div id="srvPaymentCard" class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div id="srvPaymentCard" class="booking-option-card rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <span class="block text-sm font-bold text-slate-700">Payment at booking</span>
@@ -2739,7 +2739,7 @@
                 </div>
               </div>
 
-              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div class="booking-option-card rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <label class="flex cursor-pointer items-center justify-between gap-4">
                   <span>
                     <span class="block text-sm font-bold text-slate-700">Run a promotional offer</span>
@@ -2804,7 +2804,7 @@
                 </div>
               </div>
 
-              <div class="rounded-2xl border border-violet-200 bg-violet-50/60 p-4">
+              <div class="booking-option-card booking-option-card-violet rounded-2xl border border-violet-200 bg-violet-50/60 p-4">
                 <label class="flex cursor-pointer items-center justify-between gap-4">
                   <span>
                     <span class="block text-sm font-bold text-slate-700">Flexible team booking</span>
@@ -2827,10 +2827,7 @@
                       <input id="srvFlexibleDiscountValue" class="field" type="number" min="0" max="100" step="0.01" value="10">
                     </div>
                   </div>
-                  <div class="rounded-xl bg-white/75 p-3 text-xs leading-5 text-slate-600">
-                    <strong>How assignment works:</strong> only team members assigned to this service, available at that exact time and not already booked are considered. The person with the fewest upcoming bookings is assigned automatically. You can change the assigned person later from Bookings.
-                  </div>
-                  <p class="text-xs leading-5 text-slate-500">If a scheduled promotional offer also applies, this flexible-team discount is applied afterwards.</p>
+                  <div class="rounded-xl bg-white/75 p-3 text-xs leading-5 text-slate-600">Grab&Book chooses from qualified, available team members and favours the person with fewer upcoming bookings. You can change the assignment later.</div>
                 </div>
               </div>
 
@@ -2849,14 +2846,14 @@
               </div>
               <span id="serviceCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 services</span>
             </div>
-            <div id="servicesList" class="mt-5 space-y-3"></div>
+            <div id="servicesList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
 
       <!-- Availability Tab -->
       <section id="tab-availability" class="dashboard-tab hidden">
-        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div class="booking-ops-page-head mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking setup</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Availability</h2>
@@ -2864,12 +2861,12 @@
           </div>
           <button class="btn btn-light" data-go-tab="services" type="button">Manage services</button>
         </div>
-        <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
             <h2 id="blockFormHeading" class="mt-1 text-xl font-bold text-ink">Add availability</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Choose when this service can be booked. The finish time is calculated automatically from the service duration. Times use Europe/London.</p>
-            <form id="blockForm" class="mt-6 space-y-4">
+            <p class="mt-2 text-sm leading-6 text-slate-500">Choose the service, date and start time. Grab&Book calculates the finish time from the service duration.</p>
+            <form id="blockForm" class="booking-ops-form mt-6 space-y-4">
               <input id="blockEditId" type="hidden">
 
               <div>
@@ -2877,7 +2874,7 @@
                 <select id="blkService" class="field" required>
                   <option value="">Add a service first</option>
                 </select>
-                <p class="mt-1.5 text-xs leading-5 text-slate-400">This links the availability directly to a service from your Services page.</p>
+                
               </div>
 
               <div>
@@ -2932,7 +2929,7 @@
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                 </select>
-                <p class="mt-1.5 text-xs leading-5 text-slate-400">Recurring schedules are created as one series, so you can remove all future dates together later.</p>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Repeats stay grouped, so future dates can be removed together.</p>
               </div>
 
               <div id="blkRepeatOptions" class="hidden space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -2974,25 +2971,33 @@
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Published schedule</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Upcoming availability</h2>
               </div>
-              <label class="flex items-center gap-2 text-xs font-bold text-slate-500">
-                <input id="showPastBlocks" type="checkbox" class="rounded border-slate-300 text-brand-600"> Show past dates
-              </label>
+              <div class="flex flex-wrap items-center justify-end gap-3">
+                <span id="blocksCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 upcoming</span>
+                <label class="flex items-center gap-2 text-xs font-bold text-slate-500">
+                  <input id="showPastBlocks" type="checkbox" class="rounded border-slate-300 text-brand-600"> Show past
+                </label>
+              </div>
             </div>
-            <div id="blocksList" class="mt-5 space-y-3"></div>
+            <div id="blocksList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
 
       <!-- Booking Rules Tab -->
       <section id="tab-booking-rules" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="calendar" type="button">← Back to Booking</button>
-        <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Rules</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Booking rules</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Control notice periods, how far ahead customers can book, and when they can cancel or reschedule.</p>
+        </div>
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
           <article class="card h-fit p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 8A</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Booking window</h2>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer booking window</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">When customers can book</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Control how soon customers can book and how far into the future your booking page accepts appointments.</p>
 
-            <form id="bookingRulesForm" class="mt-6 space-y-5">
+            <form id="bookingRulesForm" class="booking-ops-form mt-6 space-y-5">
               <div>
                 <label class="label" for="minimumNoticeHours">Minimum notice</label>
                 <select id="minimumNoticeHours" class="field">
@@ -3070,41 +3075,39 @@
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer experience</p>
             <h2 class="mt-1 text-xl font-bold text-ink">What these rules do</h2>
-            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Stop last-minute bookings</strong>
+            <div class="booking-summary-list mt-5 text-sm leading-6 text-slate-500">
+              <div class="booking-summary-row">
+                <strong>Minimum notice</strong>
                 <span id="minimumNoticeSummary">Customers can currently book without a minimum notice period.</span>
               </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Limit future availability</strong>
+              <div class="booking-summary-row">
+                <strong>Advance booking</strong>
                 <span id="maximumBookingSummary">Customers can currently book up to 90 days ahead.</span>
               </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Cancellation cutoff</strong>
+              <div class="booking-summary-row">
+                <strong>Cancellation</strong>
                 <span id="cancellationCutoffSummary">Customers can currently cancel up to 24 hours before.</span>
               </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Reschedule cutoff</strong>
+              <div class="booking-summary-row">
+                <strong>Rescheduling</strong>
                 <span id="rescheduleCutoffSummary">Customers can currently reschedule up to 24 hours before.</span>
               </div>
-              <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-                These limits are enforced both in the interface and again in the database, so they cannot be bypassed by editing the page.
-              </div>
             </div>
+            <p class="mt-4 text-xs leading-5 text-slate-400">These limits are enforced again when the booking action is submitted.</p>
           </article>
         </div>
       </section>
 
       <!-- Diary List View -->
       <section id="tab-bookings" class="dashboard-tab hidden">
-        <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
+        <div class="booking-ops-page-head mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Diary</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Appointments</h2>
           </div>
-          <div class="inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
+          <div class="booking-view-switch inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
             <button class="rounded-lg px-4 py-2 text-slate-500" data-go-tab="calendar" type="button">Calendar</button>
-            <button class="rounded-lg bg-white px-4 py-2 text-ink shadow-sm" type="button">List</button>
+            <button class="rounded-lg bg-white px-4 py-2 text-ink shadow-sm" type="button" aria-current="page">List</button>
           </div>
         </div>
         <article class="card p-5 sm:p-6">
@@ -3120,7 +3123,7 @@
               <option value="all">All bookings</option>
             </select>
           </div>
-          <div id="bookingsList" class="mt-6 space-y-3"></div>
+          <div id="bookingsList" class="booking-record-list mt-6 space-y-3"></div>
         </article>
       </section>
 
@@ -3440,15 +3443,20 @@
 
       <!-- Team Tab -->
       <section id="tab-team" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">People</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Team</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Add the people customers can book with and connect each person to the services they provide.</p>
+        </div>
 
-        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Team member</p>
             <h2 id="staffFormHeading" class="mt-1 text-xl font-bold text-ink">Add a team member</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Create the people customers can book with and choose which services each person provides.</p>
 
-            <form id="staffForm" class="mt-6 space-y-4">
+            <form id="staffForm" class="booking-ops-form mt-6 space-y-4">
               <input id="staffEditId" type="hidden">
 
               <div>
@@ -3493,21 +3501,26 @@
               </div>
               <span id="staffCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 people</span>
             </div>
-            <div id="staffList" class="mt-5 space-y-3"></div>
+            <div id="staffList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
 
       <!-- Time Off Tab -->
       <section id="tab-time-off" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Schedule</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Time off</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Block holidays, days off or a few hours without changing your normal availability.</p>
+        </div>
 
-        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
           <article class="card h-fit p-5 sm:p-6">
                         <h2 class="mt-1 text-xl font-bold text-ink">Add time off</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Block a full day, several days, or just part of a day. Your normal availability stays intact underneath.</p>
 
-            <form id="timeOffForm" class="mt-6 space-y-4">
+            <form id="timeOffForm" class="booking-ops-form mt-6 space-y-4">
               <div>
                 <label class="label" for="timeOffStaff">Applies to</label>
                 <select id="timeOffStaff" class="field">
@@ -3544,11 +3557,11 @@
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="label" for="timeOffStartTime">From</label>
-                    <input id="timeOffStartTime" class="field" type="time" step="300">
+                    <select id="timeOffStartTime" class="field tabular-nums"></select>
                   </div>
                   <div>
                     <label class="label" for="timeOffEndTime">Until</label>
-                    <input id="timeOffEndTime" class="field" type="time" step="300">
+                    <select id="timeOffEndTime" class="field tabular-nums"></select>
                   </div>
                 </div>
               </div>
@@ -3572,7 +3585,7 @@
               <span id="timeOffCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 blocks</span>
             </div>
 
-            <div id="timeOffList" class="mt-5 space-y-3"></div>
+            <div id="timeOffList" class="booking-record-list mt-5 space-y-3"></div>
 
             <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
               Adding time off never deletes your normal availability. Remove the time-off block later and the underlying bookable times become available again automatically.
@@ -3583,14 +3596,19 @@
 
       <!-- Booking Questions Tab -->
       <section id="tab-booking-questions" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Customer form</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Booking questions</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Collect only the information a service genuinely needs before the appointment.</p>
+        </div>
 
-        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
           <article class="card h-fit p-5 sm:p-6">
                         <h2 id="bookingQuestionFormHeading" class="mt-1 text-xl font-bold text-ink">Add a booking question</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Questions are attached to a service and appear after the customer chooses an appointment time.</p>
 
-            <form id="bookingQuestionForm" class="mt-6 space-y-4">
+            <form id="bookingQuestionForm" class="booking-ops-form mt-6 space-y-4">
               <input id="bookingQuestionEditId" type="hidden">
 
               <div>
@@ -3619,7 +3637,7 @@
                 <p class="mt-1.5 text-xs leading-5 text-slate-400">Enter one choice per line. Up to 20 choices.</p>
               </div>
 
-              <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
                 <input id="bookingQuestionRequired" class="mt-1 h-5 w-5 accent-slate-900" type="checkbox">
                 <span>
                   <span class="block font-bold text-ink">Required answer</span>
@@ -3642,7 +3660,7 @@
               </div>
               <span id="bookingQuestionCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 questions</span>
             </div>
-            <div id="bookingQuestionsList" class="mt-5 space-y-3"></div>
+            <div id="bookingQuestionsList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
@@ -3760,15 +3778,20 @@
 
       <!-- Reminders Tab -->
       <section id="tab-reminders" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
-        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Messages</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Reminders</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Choose which appointment emails are sent automatically and when.</p>
+        </div>
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Automated customer messages</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Reminders & follow-up</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Choose which emails customers receive automatically around their appointment.</p>
 
-            <form id="reminderSettingsForm" class="mt-6 space-y-4">
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+            <form id="reminderSettingsForm" class="booking-ops-form mt-6 space-y-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">24 hours before</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">A reminder the day before the appointment.</span>
@@ -3776,7 +3799,7 @@
                 <input id="reminder24h" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
               </label>
 
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">2 hours before</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">A final reminder shortly before the appointment.</span>
@@ -3810,15 +3833,10 @@
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">How it works</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Automatic once enabled</h2>
-            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
-              <p>Only <strong class="text-slate-700">confirmed</strong> bookings receive reminders.</p>
-              <p>If a customer cancels, future reminders stop automatically.</p>
-              <p>If a customer reschedules, reminder timing follows the new appointment time.</p>
-              <p>Emails include the service, date, time, business contact details and secure Reschedule / Cancel links.</p>
-              <p>Each reminder is logged so the same reminder is not intentionally sent twice.</p>
-            </div>
-            <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-500">
-              This reminder engine is structured so SMS and WhatsApp can be added later without changing the booking model.
+            <div class="booking-summary-list mt-5 text-sm leading-6 text-slate-500">
+              <div class="booking-summary-row"><strong>Confirmed bookings only</strong><span>Cancelled appointments stop receiving future reminders.</span></div>
+              <div class="booking-summary-row"><strong>Reschedules stay in sync</strong><span>Reminder timing follows the customer's new appointment time.</span></div>
+              <div class="booking-summary-row"><strong>Useful links included</strong><span>Emails contain appointment details plus secure Reschedule / Cancel links, and each send is logged.</span></div>
             </div>
           </article>
         </div>
@@ -3826,8 +3844,12 @@
 
       <!-- Payments Tab -->
       <section id="tab-payments" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
-        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+        <div class="booking-ops-page-head mb-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking payments</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Payments & plan</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Connect Stripe, understand what each fee covers and manage the plan that fits your booking volume.</p>
+        </div>
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Online payments</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Stripe payments</h2>
@@ -3853,19 +3875,10 @@
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">How money moves</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Simple for the customer</h2>
-            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Customer pays your advertised price</strong>
-                <span>No Grab&Book surcharge is added at checkout.</span>
-              </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Stripe processes the payment</strong>
-                <span>Stripe charges its processing fee separately on both Free and Pro. Standard UK cards are currently 1.5% + 20p; other cards and payment methods may cost more.</span>
-              </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Grab&Book keeps its platform fee</strong>
-                <span>Free is 2% per paid booking. Pro removes the Grab&Book platform fee only; Stripe processing fees still apply when a payment is processed online.</span>
-              </div>
+            <div class="booking-summary-list mt-5 text-sm leading-6 text-slate-500">
+              <div class="booking-summary-row"><strong>1 · Customer pays your price</strong><span>No Grab&Book surcharge is added at checkout.</span></div>
+              <div class="booking-summary-row"><strong>2 · Stripe processes it</strong><span>Stripe processing is separate on Free and Pro. Standard UK cards are currently 1.5% + 20p; other payments can cost more.</span></div>
+              <div class="booking-summary-row"><strong>3 · Grab&Book applies its fee</strong><span>Free is 2% per paid booking. Pro removes only the Grab&Book platform fee.</span></div>
             </div>
           </article>
 
@@ -3874,7 +3887,7 @@
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Grab&Book plan</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Free or Pro</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-500">Upgrade when the 2% Free-plan fee starts costing more than the monthly subscription.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">At about £1,450/month in paid bookings, Free&apos;s 2% Grab&Book fee equals the £29 Pro subscription.</p>
               </div>
               <span id="planStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Free</span>
             </div>
@@ -3925,13 +3938,13 @@
 
       <!-- Diary Calendar View -->
       <section id="tab-calendar" class="dashboard-tab hidden space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="booking-ops-page-head flex flex-wrap items-center justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Diary</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Appointments</h2>
           </div>
-          <div class="inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
-            <button class="rounded-lg bg-white px-4 py-2 text-ink shadow-sm" type="button">Calendar</button>
+          <div class="booking-view-switch inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
+            <button class="rounded-lg bg-white px-4 py-2 text-ink shadow-sm" type="button" aria-current="page">Calendar</button>
             <button class="rounded-lg px-4 py-2 text-slate-500" data-go-tab="bookings" type="button">List</button>
           </div>
         </div>
@@ -3955,9 +3968,9 @@
                 <select id="calendarStaffFilter" class="field !w-auto min-w-40 !py-2 text-xs">
                   <option value="all">All team members</option>
                 </select>
-                <div class="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
-                  <button id="calendarMonthViewBtn" class="rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm" type="button">Month</button>
-                  <button id="calendarWeekViewBtn" class="rounded-lg px-3 py-1.5 text-slate-500" type="button">Week</button>
+                <div class="booking-view-switch flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+                  <button id="calendarMonthViewBtn" class="rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm" type="button" aria-pressed="true">Month</button>
+                  <button id="calendarWeekViewBtn" class="rounded-lg px-3 py-1.5 text-slate-500" type="button" aria-pressed="false">Week</button>
                 </div>
                 <div class="flex flex-wrap gap-3 text-xs font-semibold text-slate-500">
                   <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span>Booking</span>
@@ -4582,7 +4595,7 @@
   </div>
 
   <!-- JavaScript Application Logic -->
-  <script src="assets/js/core.js"></script>
+  <script src="assets/js/core.js?v=stage6-booking-1"></script>
   <script src="assets/js/acquisition.js"></script>
   <script src="assets/js/growth-tracking.js"></script>
   <script src="assets/js/growth.js"></script>
@@ -4597,9 +4610,9 @@
   <script src="assets/js/customers.js"></script>
   <script src="assets/js/campaign-history.js"></script>
   <script src="assets/js/customer-management.js"></script>
-  <script src="assets/js/settings.js"></script>
-  <script src="assets/js/diary.js"></script>
-  <script src="assets/js/services.js"></script>
+  <script src="assets/js/settings.js?v=stage6-booking-1"></script>
+  <script src="assets/js/diary.js?v=stage6-booking-1"></script>
+  <script src="assets/js/services.js?v=stage6-booking-1"></script>
   <script src="assets/js/bookings.js"></script>
   <script src="assets/js/public-booking.js"></script>
   <script src="assets/js/landing-preview.js"></script>
