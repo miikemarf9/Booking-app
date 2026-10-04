@@ -701,7 +701,7 @@
               <div class="mt-6 space-y-3 text-sm text-slate-600">
                 <p>✓ Core booking and business dashboard</p>
                 <p>✓ Full online payment at booking</p>
-                <p>✓ 3% Grab&Book platform fee per booking</p>
+                <p>✓ 2% Grab&Book platform fee per paid booking</p>
                 <p>✓ £10 minimum service price</p>
               </div>
               <button id="landingPricingStartBtn" data-cta="start-free" type="button" class="btn btn-light mt-7 w-full">Start free</button>
@@ -710,16 +710,23 @@
             <article class="relative overflow-hidden rounded-[1.25rem] border border-brand-500 bg-brand-50/55 p-7 shadow-[0_16px_45px_rgba(8,114,189,.12)]">
               <span class="absolute right-5 top-5 rounded-full bg-brand-600 px-3 py-1 text-[.68rem] font-black uppercase tracking-wider text-white">Best value</span>
               <p class="text-sm font-black text-ink">Pro</p>
-              <div class="mt-3 flex items-end gap-1"><span class="text-4xl font-black text-ink">£29</span><span class="pb-1 text-sm font-semibold text-slate-400">/month</span></div>
-              <p class="mt-4 text-sm leading-6 text-slate-600">Manage bookings, understand your customers and see what drives growth — with flexible payments and no Grab&Book transaction fee.</p>
+              <div class="mt-3 flex items-end gap-1"><span class="text-4xl font-black text-ink">£14.99</span><span class="pb-1 text-sm font-semibold text-slate-400">/month</span></div>
+              <p class="mt-4 text-sm leading-6 text-slate-600">Manage bookings, understand your customers and see what drives growth — with flexible payments and no Grab&Book platform fee.</p>
               <div class="mt-6 space-y-3 text-sm text-slate-700">
-                <p>✓ 0% Grab&Book transaction fee</p>
+                <p>✓ 0% Grab&Book platform fee</p>
                 <p>✓ Pay later, fixed deposit, percentage deposit or full payment</p>
                 <p>✓ No Grab&Book minimum service price</p>
                 <p>✓ Everything in the core booking system</p>
               </div>
               <button id="landingProStartBtn" data-cta="start-free" type="button" class="btn btn-primary mt-7 w-full">Create your account</button>
             </article>
+          </div>
+
+          <div class="saas-reveal mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-600">
+            <p class="font-black text-ink">How payment fees work</p>
+            <p class="mt-2"><strong class="text-slate-800">Grab&Book:</strong> Free takes a 2% platform fee from each paid booking. Pro reduces the Grab&Book platform fee to 0%.</p>
+            <p class="mt-1"><strong class="text-slate-800">Stripe:</strong> payment-processing fees apply separately on both plans. Stripe currently lists standard UK card payments at 1.5% + 20p; other card types and payment methods can cost more.</p>
+            <p class="mt-2 text-xs text-slate-400">The customer pays the service price you set. These fees are deducted from the business proceeds; Grab&Book does not add a separate customer surcharge at checkout. Stripe rates can change.</p>
           </div>
         </div>
       </section>
@@ -2668,18 +2675,18 @@
                 </div>
 
                 <div id="srvFreePlanFeeNote" class="mt-4 hidden rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-xs leading-5 text-blue-800">
-                  <strong>Free plan:</strong> services must be at least £10 and customers pay the exact price you set. Grab&Book deducts a 3% platform fee from your proceeds.
+                  <strong>Free plan:</strong> services must be at least £10 and customers pay the exact price you set. Grab&Book deducts a 2% platform fee from your proceeds. Stripe processing fees are separate.
                   <div class="mt-3 grid gap-1.5 rounded-lg bg-white/70 p-3 text-slate-700">
                     <div class="flex items-center justify-between gap-3">
                       <span>Customer pays</span>
                       <strong id="srvFeeCustomerPays">£0.00</strong>
                     </div>
                     <div class="flex items-center justify-between gap-3">
-                      <span>Grab&Book platform fee (3%)</span>
+                      <span id="srvFeePlatformLabel">Grab&Book platform fee (2%)</span>
                       <strong id="srvFeePlatform">£0.00</strong>
                     </div>
                     <div class="flex items-center justify-between gap-3 border-t border-blue-100 pt-1.5">
-                      <span>You receive before payment-processing fees</span>
+                      <span>You receive before Stripe processing fees</span>
                       <strong id="srvFeeBusinessReceives">£0.00</strong>
                     </div>
                   </div>
@@ -3793,11 +3800,11 @@
               </div>
               <div class="rounded-2xl border border-slate-200 p-4">
                 <strong class="block text-slate-700">Stripe processes the payment</strong>
-                <span>Stripe's processing fee is handled against the connected business account.</span>
+                <span>Stripe charges its processing fee separately on both Free and Pro. Standard UK cards are currently 1.5% + 20p; other cards and payment methods may cost more.</span>
               </div>
               <div class="rounded-2xl border border-slate-200 p-4">
                 <strong class="block text-slate-700">Grab&Book keeps its platform fee</strong>
-                <span>Free is 3% per booking. Pro removes the Grab&Book transaction fee.</span>
+                <span>Free is 2% per paid booking. Pro removes the Grab&Book platform fee only; Stripe processing fees still apply when a payment is processed online.</span>
               </div>
             </div>
           </article>
@@ -3807,7 +3814,7 @@
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Grab&Book plan</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Free or Pro</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-500">Upgrade when the 3% Free-plan fee starts costing more than the monthly subscription.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Upgrade when the 2% Free-plan fee starts costing more than the monthly subscription.</p>
               </div>
               <span id="planStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Free</span>
             </div>
@@ -3819,7 +3826,7 @@
                   <span class="text-sm font-bold text-slate-500">£0/month</span>
                 </div>
                 <div class="mt-4 space-y-2 text-sm leading-6 text-slate-500">
-                  <p>3% Grab&Book fee on each booking</p>
+                  <p>2% Grab&Book platform fee on each paid booking</p>
                   <p>Minimum service price £10</p>
                   <p>Full online payment required</p>
                 </div>
@@ -3831,7 +3838,7 @@
                   <span class="text-sm font-bold text-brand-700">£14.99/month</span>
                 </div>
                 <div class="mt-4 space-y-2 text-sm leading-6 text-slate-600">
-                  <p><strong class="text-slate-800">0% Grab&Book transaction fee</strong></p>
+                  <p><strong class="text-slate-800">0% Grab&Book platform fee</strong></p>
                   <p>Pay later, fixed deposit, percentage deposit or full payment</p>
                   <p>No Grab&Book minimum service price</p>
                 </div>
@@ -3850,7 +3857,7 @@
                   <button id="refreshPlanBtn" class="btn btn-light" type="button">Check plan</button>
                 </div>
               </div>
-              <p id="planStatusHelp" class="mt-3 text-xs leading-5 text-slate-500">You are currently on Free. Pro removes the 3% Grab&Book fee.</p>
+              <p id="planStatusHelp" class="mt-3 text-xs leading-5 text-slate-500">You are currently on Free. Pro removes the 2% Grab&Book platform fee. Stripe processing fees still apply to online card payments.</p>
             </div>
           </article>
         </div>

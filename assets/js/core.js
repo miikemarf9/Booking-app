@@ -1320,7 +1320,7 @@
       state.subscription = subRes.data || { plan_code: "free", status: "active" };
       state.plan = (planRes.data || []).find(p => p.code === state.subscription.plan_code)
         || (planRes.data || []).find(p => p.code === "free")
-        || { code: "free", platform_fee_percent: 3, minimum_service_price: 10, requires_online_payment: true };
+        || { code: "free", platform_fee_percent: 2, minimum_service_price: 10, requires_online_payment: true };
 
       renderDashboard();
     }
