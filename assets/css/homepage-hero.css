@@ -3594,3 +3594,207 @@
     border-top:1px solid rgba(221,228,234,.94);
   }
 }
+
+
+/* Open Scenario Lab chapter and strengthen editorial scale. */
+#landingView .home-chapter-questions{
+  position:relative;
+  overflow:hidden;
+  padding-top:0!important;
+  padding-bottom:7.5rem!important;
+  background:#fff;
+}
+#landingView .homepage-owner-inner{
+  max-width:1360px;
+}
+#landingView .homepage-scenario-showcase{
+  position:relative;
+  z-index:0;
+  display:grid;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:6.5rem;
+  align-items:center;
+  max-width:1280px;
+  margin:0 auto;
+  border:0!important;
+  border-radius:0!important;
+  padding:6.5rem 0 6.8rem!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+#landingView .homepage-scenario-showcase::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  top:0;
+  bottom:0;
+  left:50%;
+  width:100vw;
+  transform:translateX(-50%);
+  background:
+    radial-gradient(circle at 82% 18%,rgba(22,135,217,.10),transparent 32%),
+    radial-gradient(circle at 14% 82%,rgba(44,167,136,.11),transparent 34%),
+    linear-gradient(135deg,#eef7f8 0%,#edf7f4 48%,#f2f6fb 100%);
+}
+#landingView .homepage-scenario-copy{
+  max-width:610px;
+}
+#landingView .homepage-scenario-copy>p:first-child{
+  color:#0d7b72;
+  font-size:.72rem;
+  letter-spacing:.13em;
+}
+#landingView .homepage-scenario-copy h3{
+  max-width:600px;
+  margin-top:.9rem;
+  color:#132033;
+  font-size:clamp(2.55rem,4.4vw,4.1rem);
+  line-height:1.02;
+  letter-spacing:-.05em;
+  font-weight:900;
+}
+#landingView .homepage-scenario-copy>p:nth-of-type(2){
+  max-width:580px;
+  margin-top:1.55rem;
+  color:#526273;
+  font-size:1.08rem;
+  line-height:1.82;
+}
+#landingView .homepage-scenario-benefits{
+  grid-template-columns:1fr 1fr;
+  margin-top:2.3rem;
+  border-top:1px solid rgba(94,135,142,.22);
+  border-bottom:1px solid rgba(94,135,142,.22);
+}
+#landingView .homepage-scenario-benefits span{
+  padding:1.2rem 1.25rem 1.2rem 0;
+}
+#landingView .homepage-scenario-benefits span+span{
+  border-left:1px solid rgba(94,135,142,.18);
+  padding-left:1.25rem;
+}
+#landingView .homepage-scenario-benefits strong{
+  color:#203847;
+  font-size:.84rem;
+}
+#landingView .homepage-scenario-benefits small{
+  margin-top:.3rem;
+  color:#697a86;
+  font-size:.77rem;
+  line-height:1.55;
+}
+#landingView .homepage-scenario-disclaimer{
+  margin-top:1.2rem!important;
+  color:#788690!important;
+  font-size:.72rem!important;
+}
+#landingView .homepage-text-link{
+  margin-top:1.2rem;
+  font-size:.84rem;
+}
+#landingView .homepage-scenario-preview{
+  min-height:470px;
+  border:1px solid rgba(192,211,219,.9);
+  border-radius:1.2rem;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 28px 70px -42px rgba(27,58,72,.28);
+}
+#landingView .homepage-scenario-preview-head{
+  padding:1.55rem 1.65rem;
+}
+#landingView .homepage-scenario-preview-head strong{
+  font-size:1rem;
+}
+#landingView .homepage-scenario-baseline{
+  padding:1.65rem 1.65rem 1.3rem;
+}
+#landingView .homepage-scenario-baseline span{
+  padding:1.35rem;
+}
+#landingView .homepage-scenario-baseline strong{
+  font-size:1.55rem;
+}
+#landingView .homepage-scenario-change{
+  margin:0 1.65rem 1.5rem;
+  padding:1.3rem;
+}
+#landingView .homepage-scenario-change strong{
+  font-size:.93rem;
+}
+#landingView .homepage-scenario-note{
+  margin:0 1.65rem 1.55rem;
+  font-size:.74rem;
+}
+#landingView .homepage-priorities-showcase{
+  margin-top:6.9rem;
+}
+#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3{
+  max-width:540px;
+  font-size:clamp(2.45rem,3.9vw,3.45rem);
+  line-height:1.02;
+}
+#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy>p:nth-of-type(2){
+  max-width:520px;
+  font-size:1.04rem;
+  line-height:1.82;
+}
+#landingView .homepage-priorities-showcase .homepage-priority-benefits strong{
+  font-size:.85rem;
+}
+#landingView .homepage-priorities-showcase .homepage-priority-benefits small{
+  font-size:.8rem;
+}
+@media(max-width:1023px){
+  #landingView .homepage-scenario-showcase{
+    grid-template-columns:1fr;
+    gap:3.4rem;
+    padding:5rem 0 5.3rem!important;
+  }
+  #landingView .homepage-scenario-copy{
+    max-width:760px;
+  }
+  #landingView .homepage-scenario-copy h3{
+    max-width:760px;
+  }
+  #landingView .homepage-scenario-copy>p:nth-of-type(2){
+    max-width:700px;
+  }
+  #landingView .homepage-scenario-preview{
+    min-height:0;
+  }
+  #landingView .homepage-priorities-showcase{
+    margin-top:5.4rem;
+  }
+}
+@media(max-width:639px){
+  #landingView .home-chapter-questions{
+    padding-bottom:4.8rem!important;
+  }
+  #landingView .homepage-scenario-showcase{
+    padding:4rem 0 4.25rem!important;
+  }
+  #landingView .homepage-scenario-copy h3{
+    font-size:2.35rem;
+  }
+  #landingView .homepage-scenario-copy>p:nth-of-type(2){
+    font-size:.97rem;
+    line-height:1.72;
+  }
+  #landingView .homepage-scenario-benefits{
+    grid-template-columns:1fr;
+  }
+  #landingView .homepage-scenario-benefits span+span{
+    border-left:0;
+    border-top:1px solid rgba(94,135,142,.18);
+    padding-left:0;
+  }
+  #landingView .homepage-scenario-preview{
+    border-radius:1rem;
+  }
+  #landingView .homepage-priorities-showcase{
+    margin-top:4.2rem;
+  }
+  #landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3{
+    font-size:2.2rem;
+  }
+}
