@@ -1286,7 +1286,10 @@
         showOnly("dashboardView");
         if (typeof applyDashboardWorkspacePreferences === "function") applyDashboardWorkspacePreferences();
         if (typeof ensureVisibleWorkspaceLanding === "function") ensureVisibleWorkspaceLanding();
-        if (typeof refreshStripePayments === "function") refreshStripePayments(false);
+        const setup = firstRunSetupStatus();
+        if (typeof refreshStripePayments === "function" && (setup.requiresStripe || state.profile?.stripe_connect_id)) {
+          refreshStripePayments(false);
+        }
       } catch (err) {
         showOnly("authView");
         setAuthMessage(friendlyDbError(err, "load your account"), "error");
@@ -1375,7 +1378,7 @@
       if (!panel) return;
 
       const setup = firstRunSetupStatus();
-      const hasAnyBooking = state.bookings.some(booking => booking.status !== "cancelled");
+      const hasAnyBooking = Boolean(state.bookingsError) || state.bookings.some(booking => booking.status !== "cancelled");
       panel.classList.toggle("hidden", hasAnyBooking);
       if (hasAnyBooking) return;
 
