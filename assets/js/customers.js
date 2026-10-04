@@ -638,7 +638,7 @@ function customerBookings(customer) {
     function renderCrmAnalytics(allMetrics) {
       if (!$("crmRepeatRate")) return;
       $("crmAnalyticsPeriod").textContent = allMetrics.length
-        ? "All-time customer data"
+        ? "All-time + lifecycle cohorts"
         : "Waiting for customer data";
 
       renderCrmLifecycleAnalytics(allMetrics);
