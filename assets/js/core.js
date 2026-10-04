@@ -651,8 +651,7 @@
       const publicLandingAnchors = new Set([
         "#pricing",
         "#product-overview",
-        "#faq",
-        "#customer-proof"
+        "#faq"
       ]);
       const requestedLandingAnchor = publicLandingAnchors.has(window.location.hash)
         ? window.location.hash
