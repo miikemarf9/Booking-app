@@ -79,13 +79,19 @@
     }
     .field:focus {
       border-color: var(--gb-brand-bright);
+      outline: none;
       box-shadow: var(--gb-focus-ring);
     }
     .field:disabled,
     .field[readonly] {
-      cursor: not-allowed;
       background: #f3f5f8;
       color: #7d8797;
+    }
+    .field:disabled {
+      cursor: not-allowed;
+    }
+    .field[readonly] {
+      cursor: default;
     }
     select.field {
       cursor: pointer;
@@ -102,7 +108,6 @@
       cursor: not-allowed;
     }
     textarea.field {
-      min-height: 7rem;
       resize: vertical;
     }
     .rich-editor-shell {
@@ -209,9 +214,6 @@
       outline: none;
       box-shadow: var(--gb-focus-ring);
     }
-    .btn:active:not(:disabled) {
-      transform: translateY(0) scale(.99);
-    }
     .btn:disabled,
     .btn[aria-disabled="true"] {
       cursor: not-allowed;
@@ -246,6 +248,10 @@
       background: var(--gb-surface-subtle);
       border-color: #b8c2d1;
       transform: translateY(-1px);
+    }
+    .btn:active:not(:disabled) {
+      transform: translateY(0) scale(.99);
+      box-shadow: none;
     }
     .card {
       background: rgba(255, 255, 255, .96);
