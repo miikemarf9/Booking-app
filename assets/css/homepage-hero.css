@@ -470,3 +470,133 @@
     margin-top:38px;
   }
 }
+
+
+/* Homepage breathing transition and credibility rail. */
+#landingView .home-chapter-audience{
+  background:
+    linear-gradient(180deg,#f8fbfc 0%,#ffffff 24%,#ffffff 76%,#f8fbfa 100%);
+  border-color:rgba(214,225,230,.58);
+  padding-top:3.25rem;
+  padding-bottom:5.5rem;
+}
+#landingView .homepage-trust-rail{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  max-width:1080px;
+  margin:0 auto;
+  border-top:1px solid rgba(197,214,222,.72);
+  border-bottom:1px solid rgba(197,214,222,.72);
+}
+#landingView .homepage-trust-rail>span{
+  min-width:0;
+  padding:1.2rem 1.65rem;
+  text-align:center;
+}
+#landingView .homepage-trust-rail>span+span{
+  border-left:1px solid rgba(210,222,228,.72);
+}
+#landingView .homepage-trust-rail strong{
+  display:block;
+  color:#26364a;
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:-.01em;
+}
+#landingView .homepage-trust-rail small{
+  display:block;
+  max-width:18rem;
+  margin:.32rem auto 0;
+  color:#748193;
+  font-size:.68rem;
+  line-height:1.55;
+}
+#landingView .homepage-audience-intro{
+  margin-top:5.25rem;
+}
+#landingView .homepage-audience-intro .landing-section-eyebrow{
+  opacity:.86;
+}
+#landingView .homepage-audience-intro h2{
+  max-width:760px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#landingView .homepage-audience-intro>p:last-child{
+  max-width:650px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#landingView .homepage-audience-grid{
+  max-width:1120px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:3.5rem;
+  gap:0;
+}
+#landingView .homepage-audience-grid .landing-audience-point{
+  border-top:1px solid rgba(202,216,223,.76);
+  padding:1.55rem 1.5rem .35rem;
+  background:transparent;
+}
+#landingView .homepage-audience-grid .landing-audience-point+article{
+  border-left:1px solid rgba(225,232,236,.82);
+}
+#landingView .homepage-audience-grid .landing-audience-point p:first-child{
+  font-size:.64rem;
+  letter-spacing:.095em;
+}
+#landingView .homepage-audience-grid .landing-audience-point h3{
+  max-width:15rem;
+  font-size:1rem;
+  line-height:1.45;
+}
+#landingView .homepage-audience-grid .landing-audience-point p:last-child{
+  max-width:16rem;
+  color:#687587;
+}
+
+@media(max-width:1023px){
+  #landingView .homepage-audience-grid{
+    gap:1.5rem 0;
+  }
+  #landingView .homepage-audience-grid .landing-audience-point:nth-child(odd){
+    border-left:0;
+  }
+  #landingView .homepage-audience-grid .landing-audience-point:nth-child(even){
+    border-left:1px solid rgba(225,232,236,.82);
+  }
+}
+@media(max-width:767px){
+  #landingView .home-chapter-audience{
+    padding-top:2.5rem;
+    padding-bottom:4.25rem;
+  }
+  #landingView .homepage-trust-rail{
+    grid-template-columns:1fr;
+    max-width:520px;
+  }
+  #landingView .homepage-trust-rail>span{
+    padding:1rem .75rem;
+  }
+  #landingView .homepage-trust-rail>span+span{
+    border-left:0;
+    border-top:1px solid rgba(222,230,234,.82);
+  }
+  #landingView .homepage-audience-intro{
+    margin-top:4rem;
+  }
+  #landingView .homepage-audience-grid{
+    margin-top:2.75rem;
+    gap:1.35rem;
+  }
+  #landingView .homepage-audience-grid .landing-audience-point,
+  #landingView .homepage-audience-grid .landing-audience-point:nth-child(even){
+    border-left:0;
+    padding:1.2rem .15rem 0;
+  }
+  #landingView .homepage-audience-grid .landing-audience-point h3,
+  #landingView .homepage-audience-grid .landing-audience-point p:last-child{
+    max-width:none;
+  }
+}
