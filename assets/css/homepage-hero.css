@@ -4086,3 +4086,79 @@
   #landingView .homepage-priorities-backdrop::after{height:60px;background-size:14px 60px;}
   #landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3{font-size:2rem;}
 }
+
+/* Homepage colour roles: brand blue/teal, CRM mint, Growth lilac. */
+#landingView{
+  --home-brand:#0872bd;
+  --home-teal:#286d7d;
+  --home-mist:#f2f7f9;
+  --home-line:#dbe6eb;
+  --home-crm-ink:#28674f;
+  --home-crm-soft:#eaf5ef;
+  --home-growth-ink:#66528d;
+  --home-growth-soft:#f0edf7;
+  --home-assignee-bg:#e3eff2;
+  --home-assignee-ink:#285766;
+}
+#landingView .home-chapter-hero{
+  background:radial-gradient(ellipse at 86% 18%,#dceef6 0%,transparent 55%),linear-gradient(180deg,#f2f8fa,#f8fbfc);
+}
+#landingView .home-chapter-audience{background:linear-gradient(180deg,#fff,var(--home-mist));}
+#landingView .home-chapter-health{background:linear-gradient(145deg,#eef6f8,#e5f0f5);}
+#landingView .home-chapter-book{background:linear-gradient(180deg,#edf6fa,#f5f9fb);border-color:var(--home-line);}
+#landingView .home-chapter-crm{background:linear-gradient(180deg,#f7fbf9,var(--home-crm-soft),#f7fbf9);}
+#landingView .home-chapter-growth{background:linear-gradient(180deg,#faf9fc,var(--home-growth-soft),#faf9fc);border-color:#e4dfed;}
+#landingView .homepage-connected-card.product-card-book{
+  border-color:#bfd8e5;
+  background:linear-gradient(180deg,#b9dbea 0%,#dcecf4 48%,#fff 100%);
+}
+#landingView .homepage-connected-card.product-card-crm{
+  border-color:#c5dfd3;
+  background:linear-gradient(180deg,#c2e2d6 0%,#e1f0e9 48%,#fff 100%);
+}
+#landingView .homepage-connected-card.product-card-growth{
+  border-color:#d9d1e8;
+  background:linear-gradient(180deg,#d8d2eb 0%,#ede9f5 48%,#fff 100%);
+}
+#landingView .product-card-book .homepage-product-icon,
+#landingView .product-card-book .homepage-connected-explore{color:#075b98;}
+#landingView .product-card-crm .homepage-product-icon,
+#landingView .product-card-crm .homepage-connected-explore,
+#landingView #product-crm .landing-section-eyebrow{color:var(--home-crm-ink);}
+#landingView .product-card-growth .homepage-product-icon,
+#landingView .product-card-growth .homepage-connected-explore,
+#landingView #product-growth .landing-section-eyebrow{color:var(--home-growth-ink);}
+#landingView .product-card-crm .bg-violet-100,
+#landingView #product-crm .bg-violet-100,
+#landingView .gb-customer-avatar{
+  background:#dceee4;
+  color:var(--home-crm-ink);
+}
+#landingView #gb-panel-crm .gb-panel-insight{
+  background:var(--home-crm-soft);
+  color:var(--home-crm-ink);
+}
+#landingView .gb-demo-avatar{background:var(--home-assignee-bg);color:var(--home-assignee-ink);}
+#landingView .gb-source-icon{background:#e7e0f2;color:var(--home-growth-ink);}
+#landingView #gb-panel-growth .gb-value-chart span{background:#d9cfea;}
+#landingView #gb-panel-growth .gb-value-chart>div:last-child span{background:#806aa5;}
+#landingView .homepage-scenario-showcase::before{
+  background:linear-gradient(135deg,#edf5f7,#e9f3f3 48%,#f3f7fa);
+}
+#landingView .homepage-scenario-copy>p:first-child{color:var(--home-teal);}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-violet-50,
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-brand-50{
+  background:var(--home-assignee-bg);color:var(--home-assignee-ink);
+}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-slate-100{
+  background:var(--home-growth-soft);color:var(--home-growth-ink);
+}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-red-50{
+  background:#fbe5e0;color:#963e32;
+}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-amber-50{
+  background:#f8edcf;color:#795514;
+}
+#landingView .home-chapter-faq{background:linear-gradient(180deg,var(--home-mist),#fff 65%);}
+#landingView .home-chapter-pricing{background:linear-gradient(180deg,#fff,#edf5f9);}
+#landingView .home-chapter-final-shell{background:linear-gradient(180deg,#edf5f9,#f7fafc);}
