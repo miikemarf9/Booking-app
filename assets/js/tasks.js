@@ -5,6 +5,7 @@ const workspaceTaskState = {
   mentions: [],
   showAll: false,
   assignmentFilter: "all",
+  teamFilter: "all",
   loaded: false
 };
 
@@ -130,6 +131,136 @@ function workspaceFilteredOpenItems() {
   return open;
 }
 
+function teamWorkspaceFilteredOpenItems() {
+  const open = workspaceTaskState.items.filter(item => item.status === "open");
+  if (workspaceTaskState.teamFilter === "owner") return open.filter(item => !item.assignee_staff_id);
+  if (workspaceTaskState.teamFilter !== "all") return open.filter(item => item.assignee_staff_id === workspaceTaskState.teamFilter);
+  return open;
+}
+
+function teamWorkspaceTaskCard(item) {
+  const timing = workspaceTaskTiming(item);
+  const source = item.source_label || (item.source_type === "growth_planner" ? "Growth planner" : "");
+  const assignee = workspaceAssigneeLabel(item);
+  const mentioned = workspaceMentionedStaff(item.id);
+
+  return '<article class="rounded-2xl border border-slate-200 bg-white p-4">' +
+    '<div class="flex flex-wrap items-start justify-between gap-3">' +
+      '<div class="min-w-0 flex-1">' +
+        '<div class="flex flex-wrap items-center gap-2">' +
+          '<span class="rounded-full px-2.5 py-1 text-[.68rem] font-bold ' + workspacePriorityTone(item.priority) + '">' + escapeHtml(workspacePriorityLabel(item.priority)) + '</span>' +
+          '<span class="rounded-full bg-violet-50 px-2.5 py-1 text-[.68rem] font-bold text-violet-700">' + escapeHtml(assignee) + '</span>' +
+          (source ? '<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500">' + escapeHtml(source) + '</span>' : '') +
+        '</div>' +
+        '<h4 class="mt-2 font-bold text-ink">' + escapeHtml(item.title) + '</h4>' +
+        (item.detail ? '<p class="mt-1 line-clamp-2 text-sm leading-6 text-slate-500">' + escapeHtml(item.detail) + '</p>' : '') +
+        (mentioned.length ? '<div class="mt-2 flex flex-wrap gap-1.5">' + mentioned.map(member => '<span class="rounded-full bg-violet-50 px-2 py-1 text-[.68rem] font-bold text-violet-700">@' + escapeHtml(member.name) + '</span>').join('') + '</div>' : '') +
+        (timing.length ? '<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">' + timing.map(x => '<span class="' + x.tone + '">' + escapeHtml(x.text) + '</span>').join('') + '</div>' : '') +
+      '</div>' +
+      '<div class="flex shrink-0 gap-2">' +
+        '<button class="btn btn-light !px-3 !py-2 text-xs" type="button" data-workspace-task-done="' + item.id + '">Done</button>' +
+        '<button class="btn btn-light !px-3 !py-2 text-xs" type="button" data-workspace-task-edit="' + item.id + '">Edit</button>' +
+      '</div>' +
+    '</div>' +
+  '</article>';
+}
+
+function renderTeamWorkspace() {
+  const taskList = $("teamTaskList");
+  const todayList = $("teamTodayList");
+  const peopleList = $("teamPeopleList");
+  if (!taskList || !todayList || !peopleList) return;
+
+  const activeTeam = (state.staff || []).filter(member => member.is_active);
+  const activeIds = new Set(activeTeam.map(member => member.id));
+  if (workspaceTaskState.teamFilter !== "all" &&
+      workspaceTaskState.teamFilter !== "owner" &&
+      !activeIds.has(workspaceTaskState.teamFilter)) {
+    workspaceTaskState.teamFilter = "all";
+  }
+
+  const allOpen = workspaceTaskState.items.filter(item => item.status === "open").sort(workspaceTaskSort);
+  const today = allOpen.filter(item => workspaceTaskGroup(item) === 0);
+  const overdue = allOpen.filter(item => workspaceTaskGroup(item) === 1);
+  const assigned = allOpen.filter(item => item.assignee_staff_id && activeIds.has(item.assignee_staff_id));
+
+  if ($("teamActiveCount")) $("teamActiveCount").textContent = String(activeTeam.length);
+  if ($("teamTodayCount")) $("teamTodayCount").textContent = String(today.length);
+  if ($("teamOverdueCount")) $("teamOverdueCount").textContent = String(overdue.length);
+  if ($("teamAssignedCount")) $("teamAssignedCount").textContent = String(assigned.length);
+
+  const attention = [...today, ...overdue].sort(workspaceTaskSort).slice(0, 6);
+  todayList.innerHTML = attention.length
+    ? attention.map(teamWorkspaceTaskCard).join("")
+    : '<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center"><p class="font-bold text-slate-600">Nothing urgent right now</p><p class="mt-1 text-sm text-slate-400">Today and overdue work will appear here.</p></div>';
+
+  const filters = [
+    { value: "all", label: "Everyone" },
+    { value: "owner", label: "Owner" },
+    ...activeTeam.map(member => ({ value: member.id, label: member.name }))
+  ];
+  const filterWrap = $("teamTaskFilters");
+  if (filterWrap) {
+    filterWrap.innerHTML =
+      '<span class="mr-1 text-xs font-bold uppercase tracking-wider text-slate-400">Show</span>' +
+      filters.map(filter => {
+        const active = workspaceTaskState.teamFilter === filter.value;
+        return '<button class="rounded-full px-3 py-1.5 text-xs font-bold ' +
+          (active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600') +
+          '" data-team-task-filter="' + escapeHtml(filter.value) + '" type="button">' +
+          escapeHtml(filter.label) + '</button>';
+      }).join("");
+  }
+
+  const filtered = teamWorkspaceFilteredOpenItems().sort(workspaceTaskSort);
+  if (!filtered.length) {
+    taskList.innerHTML = '<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center"><p class="font-bold text-slate-600">No open tasks in this view</p><p class="mt-1 text-sm text-slate-400">Choose another person or add a task.</p></div>';
+  } else {
+    let lastGroup = null;
+    taskList.innerHTML = filtered.map(item => {
+      const group = workspaceTaskGroup(item);
+      const header = group !== lastGroup
+        ? '<div class="pt-2 first:pt-0"><p class="text-[.68rem] font-bold uppercase tracking-[.14em] text-slate-400">' + escapeHtml(workspaceTaskGroupLabel(group)) + '</p></div>'
+        : "";
+      lastGroup = group;
+      return header + teamWorkspaceTaskCard(item);
+    }).join("");
+  }
+
+  peopleList.innerHTML = activeTeam.length
+    ? activeTeam.map(member => {
+        const assignedTasks = allOpen.filter(item => item.assignee_staff_id === member.id);
+        const mentionedTaskIds = new Set(
+          workspaceTaskState.mentions
+            .filter(mention => mention.staff_id === member.id)
+            .map(mention => mention.task_id)
+        );
+        const mentionedOpen = allOpen.filter(item => mentionedTaskIds.has(item.id)).length;
+        const serviceCount = (state.serviceStaff || []).filter(link => link.staff_id === member.id).length;
+        const initial = String(member.name || "?").trim().slice(0, 1).toUpperCase();
+        return '<div class="rounded-2xl border border-slate-200 bg-white p-4">' +
+          '<div class="flex items-start gap-3">' +
+            '<div class="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-brand-50 font-black text-brand-700">' +
+              (member.photo_url ? '<img src="' + escapeHtml(member.photo_url) + '" alt="" class="h-full w-full object-cover">' : escapeHtml(initial)) +
+            '</div>' +
+            '<div class="min-w-0 flex-1">' +
+              '<div class="flex flex-wrap items-center justify-between gap-2">' +
+                '<div><p class="font-bold text-ink">' + escapeHtml(member.name) + '</p>' +
+                (member.job_title ? '<p class="mt-0.5 text-xs font-semibold text-slate-500">' + escapeHtml(member.job_title) + '</p>' : '') + '</div>' +
+                '<span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700">Active</span>' +
+              '</div>' +
+              '<div class="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">' +
+                '<span class="rounded-lg bg-slate-50 px-2.5 py-1.5"><strong class="text-ink">' + assignedTasks.length + '</strong> assigned</span>' +
+                '<span class="rounded-lg bg-slate-50 px-2.5 py-1.5"><strong class="text-ink">' + mentionedOpen + '</strong> mentioned</span>' +
+                '<span class="rounded-lg bg-slate-50 px-2.5 py-1.5"><strong class="text-ink">' + serviceCount + '</strong> service' + (serviceCount === 1 ? '' : 's') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join("")
+    : '<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center text-sm text-slate-400 md:col-span-2">Add an active team member in Settings to use the Team workspace.</div>';
+}
+
 function renderWorkspaceAssignmentFilters() {
   const activeTeam = (state.staff || []).filter(member => member.is_active);
   const wrap = $("workspaceAssignmentFilters");
@@ -152,6 +283,7 @@ function renderWorkspaceTasks() {
   if (!list) return;
 
   renderWorkspaceAssignmentFilters();
+  renderTeamWorkspace();
   const allOpen = workspaceTaskState.items.filter(item => item.status === "open");
   const open = workspaceFilteredOpenItems().sort(workspaceTaskSort);
   const todayCount = allOpen.filter(item => workspaceTaskGroup(item) === 0).length;
@@ -239,6 +371,8 @@ async function loadWorkspaceTasks() {
   } catch (error) {
     console.error("Workspace tasks load error", error);
     $("workspacePriorityList").innerHTML = '<div class="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">Tasks, assignments and reminders could not be loaded.</div>';
+    if ($("teamTodayList")) $("teamTodayList").innerHTML = '<div class="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">Team priorities could not be loaded.</div>';
+    if ($("teamTaskList")) $("teamTaskList").innerHTML = '<div class="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">Team tasks could not be loaded.</div>';
   }
 }
 
@@ -526,6 +660,8 @@ async function deleteWorkspaceTask() {
 }
 
 $("workspaceTaskAddBtn")?.addEventListener("click", () => openWorkspaceTaskModal());
+$("teamWorkspaceAddBtn")?.addEventListener("click", () => openWorkspaceTaskModal());
+$("teamWorkspaceAddTaskBtn")?.addEventListener("click", () => openWorkspaceTaskModal());
 $("workspaceTaskForm")?.addEventListener("submit", saveWorkspaceTask);
 $("workspaceTaskCloseBtn")?.addEventListener("click", closeWorkspaceTaskModal);
 $("workspaceTaskCancelBtn")?.addEventListener("click", closeWorkspaceTaskModal);
@@ -541,11 +677,21 @@ document.querySelectorAll("[data-workspace-assignment-filter]").forEach(button =
     renderWorkspaceTasks();
   });
 });
-$("workspacePriorityList")?.addEventListener("click", event => {
+function handleWorkspaceTaskActionClick(event) {
   const done = event.target.closest("[data-workspace-task-done]");
   if (done) return completeWorkspaceTask(done.dataset.workspaceTaskDone);
   const edit = event.target.closest("[data-workspace-task-edit]");
   if (edit) return editWorkspaceTask(edit.dataset.workspaceTaskEdit);
+}
+
+$("workspacePriorityList")?.addEventListener("click", handleWorkspaceTaskActionClick);
+$("teamTodayList")?.addEventListener("click", handleWorkspaceTaskActionClick);
+$("teamTaskList")?.addEventListener("click", handleWorkspaceTaskActionClick);
+$("teamTaskFilters")?.addEventListener("click", event => {
+  const button = event.target.closest("[data-team-task-filter]");
+  if (!button) return;
+  workspaceTaskState.teamFilter = button.dataset.teamTaskFilter || "all";
+  renderTeamWorkspace();
 });
 $("workspaceTaskMentionPicker")?.addEventListener("click", event => {
   const button = event.target.closest("[data-workspace-mention-staff]");
