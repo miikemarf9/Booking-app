@@ -64,6 +64,7 @@ async function loadPublicBookingPage(profileId) {
         $("publicDate").max = maxDate;
 
         renderPublicServices();
+        renderPublicQuickDates();
         applyCustomerBookingPrefill();
         showOnly("publicBookingView");
       } catch (err) {
@@ -80,9 +81,83 @@ async function loadPublicBookingPage(profileId) {
       }
     }
 
+    function renderPublicQuickDates() {
+      const wrap = $("publicQuickDates");
+      const input = $("publicDate");
+      if (!wrap || !input || !state.publicProfile) return;
+
+      const disabled = input.disabled;
+      const maxDate = addDaysToDateKey(todayKey(), Number(state.publicProfile.maximum_booking_days || 90));
+      const dates = [];
+      for (let offset = 0; offset < 7; offset += 1) {
+        const date = addDaysToDateKey(todayKey(), offset);
+        if (date > maxDate) break;
+        dates.push(date);
+      }
+
+      wrap.innerHTML = dates.map(date => {
+        const d = londonDate(date, "12:00");
+        const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const selected = state.selectedDate === date;
+        return `
+          <button type="button"
+            class="booking-date-choice${selected ? " selected" : ""}"
+            data-public-date="${date}"
+            aria-pressed="${selected ? "true" : "false"}"
+            ${disabled ? "disabled" : ""}>
+            <span>${escapeHtml(weekday)}</span>
+            <strong>${escapeHtml(day)}</strong>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function handlePublicQuickDateClick(e) {
+      const btn = e.target.closest("[data-public-date]");
+      if (!btn || btn.disabled) return;
+      $("publicDate").value = btn.dataset.publicDate;
+      handlePublicDateChange();
+    }
+
+    function currentPublicPrice() {
+      if (!state.selectedService) return 0;
+      const promo = state.selectedDate
+        ? promotionForDate(state.selectedService, state.selectedDate)
+        : { price: Number(state.selectedService.price || 0) };
+      const flexible = state.selectedStaffChoice === "flexible" && state.selectedService.flexible_staff_enabled;
+      return flexible ? flexibleStaffPrice(state.selectedService, promo.price) : Number(promo.price || 0);
+    }
+
+    function renderPublicPaymentNote() {
+      const note = $("publicPaymentNote");
+      if (!note || !state.selectedService) return;
+      const type = state.selectedService.deposit_type || "none";
+      const finalPrice = currentPublicPrice();
+      const rawAmount = Number(state.selectedService.deposit_amount || 0);
+
+      if (type === "none") {
+        note.textContent = "No online payment is due now. You’ll pay the business at the appointment.";
+        return;
+      }
+
+      if (type === "full") {
+        note.textContent = `Next: Stripe will open securely so you can pay ${money(finalPrice)}.`;
+        return;
+      }
+
+      const dueNow = type === "fixed"
+        ? Math.min(rawAmount, finalPrice)
+        : finalPrice * Math.max(0, Math.min(100, rawAmount)) / 100;
+      const remaining = Math.max(0, finalPrice - dueNow);
+      note.textContent = remaining > 0
+        ? `Next: Stripe will open securely for a ${money(dueNow)} deposit. ${money(remaining)} remains to pay to the business.`
+        : `Next: Stripe will open securely so you can pay ${money(dueNow)}.`;
+    }
+
     function renderPublicServices() {
       $("publicServices").innerHTML = state.publicServices.length ? state.publicServices.map(s => `
-        <button type="button" class="service-choice group rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-500 sm:p-5" data-service-id="${s.id}">
+        <button type="button" class="service-choice group rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-500 sm:p-5" data-service-id="${s.id}" aria-pressed="false">
           <span class="flex items-start justify-between gap-4">
             <span class="min-w-0">
               <span class="block text-base font-black text-ink">${escapeHtml(s.title)}</span>
@@ -103,8 +178,8 @@ async function loadPublicBookingPage(profileId) {
             ` : ""}
           </span>
           <span class="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs font-bold">
-            <span class="text-slate-500">${Number(s.duration_minutes)} minutes</span>
-            <span class="text-brand-700">Choose service →</span>
+            <span class="min-w-0 text-slate-500">${Number(s.duration_minutes)} min · ${escapeHtml(paymentRequirementLabel(s))}</span>
+            <span class="shrink-0 text-brand-700">Choose →</span>
           </span>
         </button>
       `).join("") : emptyState("No services available", "This business has not published any bookable services yet.");
@@ -187,9 +262,20 @@ async function loadPublicBookingPage(profileId) {
     }
 
     function updatePublicStepNumbers(hasStaff) {
-      $("dateStepNumber").textContent = hasStaff ? "3" : "2";
-      $("timeStepNumber").textContent = hasStaff ? "4" : "3";
-      $("detailsStepNumber").textContent = hasStaff ? "5" : "4";
+      const dateNumber = hasStaff ? "3" : "2";
+      const timeNumber = hasStaff ? "4" : "3";
+      const detailsNumber = hasStaff ? "5" : "4";
+
+      $("dateStepNumber").textContent = dateNumber;
+      $("timeStepNumber").textContent = timeNumber;
+      $("detailsStepNumber").textContent = detailsNumber;
+
+      const dateProgress = document.querySelector('[data-progress-key="date"] .progress-dot');
+      const timeProgress = document.querySelector('[data-progress-key="time"] .progress-dot');
+      const detailsProgress = document.querySelector('[data-progress-key="details"] .progress-dot');
+      if (dateProgress) dateProgress.textContent = dateNumber;
+      if (timeProgress) timeProgress.textContent = timeNumber;
+      if (detailsProgress) detailsProgress.textContent = detailsNumber;
     }
 
     function renderPublicStaffChoices() {
@@ -209,7 +295,7 @@ async function loadPublicBookingPage(profileId) {
 
       const anyChoice = state.selectedService?.flexible_staff_enabled
         ? `
-          <button type="button" class="staff-choice rounded-2xl border border-violet-200 bg-violet-50/50 p-4 text-left transition hover:border-violet-400" data-staff-choice="flexible">
+          <button type="button" class="staff-choice rounded-2xl border border-violet-200 bg-violet-50/50 p-4 text-left transition hover:border-violet-400" data-staff-choice="flexible" aria-pressed="false">
             <span class="flex items-center justify-between gap-3">
               <span class="block font-bold text-ink">Book any available team member</span>
               <span class="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700">${escapeHtml(flexibleStaffDiscountLabel(state.selectedService))}</span>
@@ -218,14 +304,14 @@ async function loadPublicBookingPage(profileId) {
           </button>
         `
         : `
-          <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="any">
+          <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="any" aria-pressed="false">
             <span class="block font-bold text-ink">Any available team member</span>
             <span class="mt-1 block text-sm text-slate-500">Show the earliest times across the whole team.</span>
           </button>
         `;
 
       list.innerHTML = anyChoice + members.map(member => `
-        <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="${member.id}">
+        <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="${member.id}" aria-pressed="false">
           <span class="flex items-start gap-3">
             <span class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-brand-50 font-black text-brand-700">
               ${member.photo_url ? `<img src="${escapeHtml(member.photo_url)}" alt="" class="h-full w-full object-cover">` : escapeHtml(String(member.name).slice(0,1).toUpperCase())}
@@ -252,10 +338,15 @@ async function loadPublicBookingPage(profileId) {
         const selectedStaffId = ["any", "flexible"].includes(state.selectedStaffChoice) ? null : state.selectedStaffChoice;
         trackBookingFunnelEvent("staff_selected", { staffId: selectedStaffId });
       }
-      document.querySelectorAll(".staff-choice").forEach(el => el.classList.toggle("selected", el === btn));
+      document.querySelectorAll(".staff-choice").forEach(el => {
+        const selected = el === btn;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       $("publicDate").disabled = false;
       $("publicDate").value = "";
+      renderPublicQuickDates();
       activateStep("dateStep");
       deactivateStep("timeStep");
       deactivateDetails();
@@ -284,10 +375,15 @@ async function loadPublicBookingPage(profileId) {
       renderPublicQuestions();
       const hasStaff = renderPublicStaffChoices();
 
-      document.querySelectorAll(".service-choice").forEach(el => el.classList.toggle("selected", el.dataset.serviceId === btn.dataset.serviceId));
+      document.querySelectorAll(".service-choice").forEach(el => {
+        const selected = el.dataset.serviceId === btn.dataset.serviceId;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       $("publicDate").disabled = hasStaff;
       $("publicDate").value = "";
+      renderPublicQuickDates();
       $("confirmBookingBtn").textContent = state.selectedService?.deposit_type === "none"
         ? "Confirm booking"
         : "Continue to secure payment";
@@ -309,6 +405,7 @@ async function loadPublicBookingPage(profileId) {
     async function handlePublicDateChange() {
       state.selectedDate = $("publicDate").value;
       state.selectedSlot = null;
+      renderPublicQuickDates();
 
       deactivateDetails();
       updateSummary();
@@ -443,7 +540,7 @@ async function loadPublicBookingPage(profileId) {
         $("publicSlots").innerHTML = slots.map((slot, idx) => {
           const member = slot.staffId ? state.publicStaff.find(item => item.id === slot.staffId) : null;
           return `
-            <button type="button" class="slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-slot-index="${idx}">
+            <button type="button" class="slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-slot-index="${idx}" aria-pressed="false">
               <span class="block">${escapeHtml(prettyTime(slot.start))}</span>
               ${state.selectedStaffChoice === "any" && member ? `<span class="mt-0.5 block truncate text-[.65rem] font-semibold text-slate-400">${escapeHtml(member.name)}</span>` : ""}
             </button>
@@ -543,7 +640,11 @@ async function loadPublicBookingPage(profileId) {
       const slots = $("publicSlots")._slots || [];
       state.selectedSlot = slots[Number(btn.dataset.slotIndex)] || null;
 
-      document.querySelectorAll(".slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
+      document.querySelectorAll(".slot-choice").forEach(el => {
+        const selected = el === btn;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       if (state.selectedSlot) {
         if (typeof trackBookingFunnelEvent === "function") {
@@ -567,14 +668,15 @@ async function loadPublicBookingPage(profileId) {
 
     function activateStep(stepId) {
       const el = $(stepId);
-      el.classList.remove("opacity-50");
+      el.classList.remove("hidden", "opacity-50");
       const badge = el.querySelector("span");
       if (badge) badge.className = "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white";
     }
 
     function deactivateStep(stepId) {
       const el = $(stepId);
-      el.classList.add("opacity-50");
+      el.classList.add("hidden");
+      el.classList.remove("opacity-50");
       const badge = el.querySelector("span");
       if (badge) badge.className = "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500";
     }
@@ -661,6 +763,8 @@ async function loadPublicBookingPage(profileId) {
         : (selectedStaff || (state.selectedStaffChoice === "any" ? "Any available" : "Not selected"));
       $("summaryDate").textContent = state.selectedDate ? prettyDate(state.selectedDate) : "Not selected";
       $("summaryTime").textContent = state.selectedSlot ? `${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}` : "Not selected";
+
+      renderPublicPaymentNote();
 
       const mobile = $("mobileBookingSummary");
       mobile.classList.toggle("hidden", !state.selectedService);
@@ -880,10 +984,8 @@ async function loadPublicBookingPage(profileId) {
       $("publicStaffChoices").innerHTML = "";
       updatePublicStepNumbers(false);
 
-      ["dateStep", "timeStep", "detailsStep"].forEach(id => {
-        $(id).classList.remove("hidden");
-        deactivateStep(id);
-      });
+      ["dateStep", "timeStep", "detailsStep"].forEach(id => deactivateStep(id));
+      renderPublicQuickDates();
 
       deactivateDetails();
       $("publicSlots").innerHTML = "";

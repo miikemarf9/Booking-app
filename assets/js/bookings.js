@@ -202,6 +202,7 @@ function bookingCard(b, allowCancel = false) {
 
       $("manageActionsCard").classList.toggle("hidden", cancelled);
       $("manageCancelledMessage").classList.toggle("hidden", !cancelled);
+      closeManageCancelConfirm();
 
       if (!cancelled) {
         const startMs = new Date(b.start_time).getTime();
@@ -232,13 +233,55 @@ function bookingCard(b, allowCancel = false) {
       if (cancelled) closeManageReschedule();
     }
 
+    function renderManageQuickDates() {
+      const wrap = $("manageQuickDates");
+      const input = $("manageDateInput");
+      const booking = state.manageBooking;
+      if (!wrap || !input || !booking) return;
+
+      const maxDate = addDaysToDateKey(todayKey(), Number(booking.maximum_booking_days || 90));
+      const selected = input.value;
+      const dates = [];
+      for (let offset = 0; offset < 7; offset += 1) {
+        const date = addDaysToDateKey(todayKey(), offset);
+        if (date > maxDate) break;
+        dates.push(date);
+      }
+
+      wrap.innerHTML = dates.map(date => {
+        const d = londonDate(date, "12:00");
+        const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const active = selected === date;
+        return `
+          <button type="button"
+            class="booking-date-choice${active ? " selected" : ""}"
+            data-manage-date="${date}"
+            aria-pressed="${active ? "true" : "false"}">
+            <span>${escapeHtml(weekday)}</span>
+            <strong>${escapeHtml(day)}</strong>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function handleManageQuickDateClick(e) {
+      const btn = e.target.closest("[data-manage-date]");
+      if (!btn) return;
+      $("manageDateInput").value = btn.dataset.manageDate;
+      renderManageQuickDates();
+      loadManageAvailableSlots();
+    }
+
     function openManageReschedule() {
       if (!state.manageBooking || state.manageBooking.booking_status !== "confirmed" || $("manageRescheduleBtn").disabled) return;
       state.manageSelectedSlot = null;
+      closeManageCancelConfirm();
       $("manageReschedulePanel").classList.remove("hidden");
       $("manageDateInput").value = "";
       $("manageDateInput").min = todayKey();
       $("manageDateInput").max = addDaysToDateKey(todayKey(), Number(state.manageBooking.maximum_booking_days || 90));
+      renderManageQuickDates();
       $("manageSlots").innerHTML = "";
       $("manageSlotsMessage").textContent = "Choose a date to see available times.";
       $("manageRescheduleConfirm").classList.add("hidden");
@@ -255,6 +298,7 @@ function bookingCard(b, allowCancel = false) {
     async function loadManageAvailableSlots() {
       const b = state.manageBooking;
       const dateKey = $("manageDateInput").value;
+      renderManageQuickDates();
       state.manageSelectedSlot = null;
       $("manageRescheduleConfirm").classList.add("hidden");
 
@@ -333,7 +377,7 @@ function bookingCard(b, allowCancel = false) {
         : "No alternative times are available on this date.";
 
       $("manageSlots").innerHTML = slots.map((slot, idx) => `
-        <button type="button" class="manage-slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-manage-slot-index="${idx}">
+        <button type="button" class="manage-slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-manage-slot-index="${idx}" aria-pressed="false">
           ${escapeHtml(prettyTime(slot.start))}
         </button>
       `).join("");
@@ -348,7 +392,11 @@ function bookingCard(b, allowCancel = false) {
       const slots = $("manageSlots")._slots || [];
       state.manageSelectedSlot = slots[Number(btn.dataset.manageSlotIndex)] || null;
 
-      document.querySelectorAll(".manage-slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
+      document.querySelectorAll(".manage-slot-choice").forEach(el => {
+        const selected = el === btn;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       if (!state.manageSelectedSlot) {
         $("manageRescheduleConfirm").classList.add("hidden");
@@ -399,13 +447,25 @@ function bookingCard(b, allowCancel = false) {
       await loadManagedBooking(state.manageToken);
     }
 
+    function openManageCancelConfirm() {
+      const panel = $("manageCancelConfirm");
+      if (!panel || $("manageCancelBtn").disabled) return;
+      panel.classList.remove("hidden");
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      $("manageConfirmCancelBtn")?.focus();
+    }
+
+    function closeManageCancelConfirm() {
+      $("manageCancelConfirm")?.classList.add("hidden");
+    }
+
     async function cancelManagedBooking() {
       const b = state.manageBooking;
       if (!state.manageToken || !b || b.booking_status !== "confirmed") return;
 
-      if (!window.confirm(`Cancel ${b.service_title} on ${prettyDateTime(b.start_time)}? The appointment time will become available to other customers.`)) return;
+      closeManageCancelConfirm();
 
-      const btn = $("manageCancelBtn");
+      const btn = $("manageConfirmCancelBtn");
       setBusy(btn, true, "Cancelling…");
 
       const { data, error } = await publicClient.rpc("public_cancel_booking", {

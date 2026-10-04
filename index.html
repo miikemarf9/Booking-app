@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=stage6-booking-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=stage7-customer-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=2">
 
   <script type="application/ld+json">
@@ -4128,7 +4128,7 @@
         </div>
         <div class="flex items-center gap-3 text-right">
           <div class="hidden sm:block">
-            <p class="text-xs font-bold text-slate-600">Europe/London</p>
+            <p class="text-xs font-bold text-slate-600">UK time</p>
             <p class="text-[.66rem] text-slate-400">Appointment times</p>
           </div>
           <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[.68rem] font-black text-emerald-700">Secure booking</span>
@@ -4156,9 +4156,9 @@
         <div class="flex min-w-max gap-2">
           <button type="button" class="progress-step" data-progress-key="service" data-progress-target="serviceStep" data-status="current"><span class="progress-dot">1</span>Service</button>
           <button id="progressStaff" type="button" class="progress-step hidden" data-progress-key="staff" data-progress-target="staffStep" data-status="pending"><span class="progress-dot">2</span>Team</button>
-          <button type="button" class="progress-step" data-progress-key="date" data-progress-target="dateStep" data-status="pending"><span class="progress-dot">3</span>Date</button>
-          <button type="button" class="progress-step" data-progress-key="time" data-progress-target="timeStep" data-status="pending"><span class="progress-dot">4</span>Time</button>
-          <button type="button" class="progress-step" data-progress-key="details" data-progress-target="detailsStep" data-status="pending"><span class="progress-dot">5</span>Details</button>
+          <button type="button" class="progress-step" data-progress-key="date" data-progress-target="dateStep" data-status="pending"><span class="progress-dot">2</span>Date</button>
+          <button type="button" class="progress-step" data-progress-key="time" data-progress-target="timeStep" data-status="pending"><span class="progress-dot">3</span>Time</button>
+          <button type="button" class="progress-step" data-progress-key="details" data-progress-target="detailsStep" data-status="pending"><span class="progress-dot">4</span>Details</button>
         </div>
       </nav>
 
@@ -4197,7 +4197,7 @@
             <div id="publicStaffChoices" class="mt-6 grid gap-3 sm:grid-cols-2"></div>
           </article>
 
-          <article id="dateStep" class="booking-step card p-5 opacity-50 sm:p-7">
+          <article id="dateStep" class="booking-step card hidden p-5 sm:p-7">
             <div class="flex items-start gap-3">
               <span id="dateStepNumber" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">2</span>
               <div>
@@ -4205,13 +4205,20 @@
                 <p class="mt-1 text-sm text-slate-500">Pick the day that suits you and we'll show the available appointment times.</p>
               </div>
             </div>
-            <div class="mt-6 max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <label class="label" for="publicDate">Appointment date</label>
-              <input id="publicDate" class="field bg-white" type="date" disabled>
+            <div class="mt-6">
+              <p class="label">Next dates</p>
+              <div id="publicQuickDates" class="booking-date-strip -mx-1 flex gap-2 overflow-x-auto px-1 pb-2" aria-label="Quick date choices"></div>
+              <details class="mt-3 max-w-sm">
+                <summary class="booking-more-date-toggle cursor-pointer text-sm font-bold text-brand-700">Choose another date</summary>
+                <div class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <label class="label" for="publicDate">Appointment date</label>
+                  <input id="publicDate" class="field bg-white" type="date" disabled>
+                </div>
+              </details>
             </div>
           </article>
 
-          <article id="timeStep" class="booking-step card p-5 opacity-50 sm:p-7">
+          <article id="timeStep" class="booking-step card hidden p-5 sm:p-7">
             <div class="flex items-start gap-3">
               <span id="timeStepNumber" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">3</span>
               <div>
@@ -4223,7 +4230,7 @@
             <div id="publicSlots" class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"></div>
           </article>
 
-          <article id="detailsStep" class="booking-step card p-5 opacity-50 sm:p-7">
+          <article id="detailsStep" class="booking-step card hidden p-5 sm:p-7">
             <div class="flex items-start gap-3">
               <span id="detailsStepNumber" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500">4</span>
               <div>
@@ -4256,8 +4263,9 @@
                 <input id="marketingOptIn" class="mt-1 rounded border-slate-300 text-brand-600" type="checkbox" disabled>
                 <span><strong class="text-slate-700">Optional:</strong> Yes, I'd like to receive occasional offers and updates from this business by email. I can unsubscribe at any time.</span>
               </label>
+              <div id="publicPaymentNote" class="sm:col-span-2 rounded-xl bg-brand-50 px-4 py-3 text-sm font-semibold leading-5 text-brand-900"></div>
               <button id="confirmBookingBtn" class="btn btn-primary !py-3.5 sm:col-span-2" type="submit" disabled>Confirm booking</button>
-              <p class="sm:col-span-2 text-center text-[.7rem] leading-5 text-slate-400">Your booking details are shared with this business so they can manage your appointment.</p>
+              <p class="sm:col-span-2 text-center text-[.7rem] leading-5 text-slate-400">Your details are shared only so this business can manage your appointment. Marketing emails are optional.</p>
             </form>
           </article>
 
@@ -4383,9 +4391,17 @@
           <h2 class="text-lg font-bold text-ink">Manage this appointment</h2>
           <p class="mt-1 text-sm leading-6 text-slate-500">You can move the appointment to another available time or cancel it. No account is required.</p>
           <p id="manageCutoffNotice" class="mt-3 hidden rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-800"></p>
-          <div class="mt-5 flex flex-wrap gap-2">
+          <div class="manage-booking-actions mt-5 flex flex-wrap gap-2">
             <button id="manageRescheduleBtn" class="btn btn-primary" type="button">Reschedule</button>
             <button id="manageCancelBtn" class="btn btn-light" type="button">Cancel booking</button>
+          </div>
+          <div id="manageCancelConfirm" class="mt-5 hidden rounded-2xl border border-red-100 bg-red-50 p-4">
+            <p class="font-bold text-red-900">Cancel this appointment?</p>
+            <p class="mt-1 text-sm leading-6 text-red-800">The appointment time will be released for someone else to book.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button id="manageConfirmCancelBtn" class="btn booking-danger-btn" type="button">Yes, cancel booking</button>
+              <button id="manageKeepBookingBtn" class="btn btn-light" type="button">Keep booking</button>
+            </div>
           </div>
         </article>
 
@@ -4398,9 +4414,16 @@
             <button id="manageRescheduleCloseBtn" class="text-sm font-bold text-slate-400 hover:text-slate-700" type="button">Close</button>
           </div>
 
-          <div class="mt-5 max-w-xs">
-            <label class="label" for="manageDateInput">New date</label>
-            <input id="manageDateInput" class="field" type="date">
+          <div class="mt-5">
+            <p class="label">Quick dates</p>
+            <div id="manageQuickDates" class="booking-date-strip -mx-1 flex gap-2 overflow-x-auto px-1 pb-2" aria-label="Quick reschedule dates"></div>
+            <details class="mt-3 max-w-xs">
+              <summary class="booking-more-date-toggle cursor-pointer text-sm font-bold text-brand-700">Choose another date</summary>
+              <div class="mt-3">
+                <label class="label" for="manageDateInput">New date</label>
+                <input id="manageDateInput" class="field" type="date">
+              </div>
+            </details>
           </div>
 
           <div id="manageSlotsMessage" class="mt-5 text-sm text-slate-500">Choose a date to see available times.</div>
@@ -4613,8 +4636,8 @@
   <script src="assets/js/settings.js?v=stage6-booking-1"></script>
   <script src="assets/js/diary.js?v=stage6-booking-1"></script>
   <script src="assets/js/services.js?v=stage6-booking-1"></script>
-  <script src="assets/js/bookings.js"></script>
-  <script src="assets/js/public-booking.js"></script>
+  <script src="assets/js/bookings.js?v=stage7-customer-1"></script>
+  <script src="assets/js/public-booking.js?v=stage7-customer-1"></script>
   <script src="assets/js/landing-preview.js"></script>
   <script src="assets/js/homepage-hero.js?v=2"></script>
   <script src="assets/js/boot.js"></script>
