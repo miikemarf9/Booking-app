@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=stage9-growth-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=stage10-settings-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=2">
 
   <script type="application/ld+json">
@@ -3147,11 +3147,11 @@
         <div class="mb-6">
           <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Business setup</p>
           <h2 class="mt-1 text-2xl font-bold text-ink">Settings</h2>
-          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Your day-to-day dashboard stays simple. Open a section below when you want to change your workspace, business setup or how bookings work.</p>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Manage your workspace, customer-facing details, booking rules and payments from one place.</p>
         </div>
 
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="personalisation">
+        <div class="settings-hub-grid grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="personalisation">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Your workspace</p>
@@ -3162,7 +3162,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="team">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="team">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">People</p>
@@ -3173,7 +3173,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="time-off">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="time-off">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule</p>
@@ -3184,7 +3184,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="booking-rules">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="booking-rules">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Rules</p>
@@ -3195,7 +3195,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="branding">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="branding">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Appearance</p>
@@ -3206,7 +3206,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="business-details">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="business-details">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Business</p>
@@ -3217,7 +3217,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="reminders">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="reminders">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Messages</p>
@@ -3228,7 +3228,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="payments">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="payments">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Money</p>
@@ -3239,7 +3239,7 @@
             </div>
           </button>
 
-          <button class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button" data-go-tab="booking-questions">
+          <button class="settings-hub-card card p-5 text-left" type="button" data-go-tab="booking-questions">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer form</p>
@@ -3682,13 +3682,18 @@
 
       <!-- Branding Tab -->
       <section id="tab-branding" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Appearance</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Branding</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Control the logo, colour and introduction customers see on your booking page.</p>
+        </div>
 
-        <div class="grid gap-6 lg:grid-cols-[.85fr_1.15fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
           <article class="card h-fit p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking page</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Business branding</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Make the customer booking page feel like your business rather than a generic scheduler.</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking page controls</p>
+            <h3 class="mt-1 text-xl font-bold text-ink">Logo, colour & introduction</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Keep the booking journey recognisably yours without changing how the booking flow works.</p>
 
             <form id="brandingForm" class="mt-6 space-y-4">
               <div>
@@ -3727,7 +3732,11 @@
             </form>
           </article>
 
-          <article class="card overflow-hidden">
+          <article class="branding-preview-card card overflow-hidden">
+            <div class="border-b border-slate-100 bg-white px-5 py-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Preview</p>
+              <p class="mt-1 text-sm font-bold text-ink">Customer booking page</p>
+            </div>
             <div id="brandingPreviewHeader" class="p-6 text-white">
               <div class="flex items-center gap-4">
                 <div id="brandingPreviewLogoWrap" class="hidden h-14 w-20 items-center justify-center rounded-xl bg-white/95 p-2">
@@ -3754,12 +3763,17 @@
 
       <!-- Business Details Tab -->
       <section id="tab-business-details" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
-        <div class="grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Business</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Business details</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Set the contact details customers receive with their booking information.</p>
+        </div>
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
           <article class="card h-fit p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Email & contact details</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Business details</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">These details are used in booking confirmations so customers know how to contact or find you.</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer contact details</p>
+            <h3 class="mt-1 text-xl font-bold text-ink">How customers reach you</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-500">These details can appear in booking communications so customers know how to contact or find you.</p>
 
             <form id="businessDetailsForm" class="mt-6 space-y-4">
               <div>
@@ -3779,8 +3793,8 @@
           </article>
 
           <article class="card p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Confirmation emails</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">What customers receive</h2>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking communications</p>
+            <h3 class="mt-1 text-xl font-bold text-ink">What customers receive</h3>
             <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booking confirmed</p>
               <h3 class="mt-2 text-lg font-bold text-ink">Branded with your business name</h3>
@@ -3811,7 +3825,7 @@
                   <span class="block font-bold text-ink">24 hours before</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">A reminder the day before the appointment.</span>
                 </span>
-                <input id="reminder24h" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+                <input id="reminder24h" type="checkbox" class="mt-1 h-5 w-5 accent-brand-600">
               </label>
 
               <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
@@ -3819,7 +3833,7 @@
                   <span class="block font-bold text-ink">2 hours before</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">A final reminder shortly before the appointment.</span>
                 </span>
-                <input id="reminder2h" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+                <input id="reminder2h" type="checkbox" class="mt-1 h-5 w-5 accent-brand-600">
               </label>
 
               <div class="rounded-2xl border border-slate-200 p-4">
@@ -3828,7 +3842,7 @@
                     <span class="block font-bold text-ink">Post-appointment follow-up</span>
                     <span class="mt-1 block text-sm leading-5 text-slate-500">Send a thank-you/follow-up email after the appointment.</span>
                   </span>
-                  <input id="followupEnabled" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+                  <input id="followupEnabled" type="checkbox" class="mt-1 h-5 w-5 accent-brand-600">
                 </label>
 
                 <div id="followupTimingWrap" class="mt-4 hidden">
@@ -3857,101 +3871,119 @@
         </div>
       </section>
 
-      <!-- Payments Tab -->
+            <!-- Payments Tab -->
       <section id="tab-payments" class="dashboard-tab hidden">
         <div class="booking-ops-page-head mb-6">
-          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking payments</p>
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Money</p>
           <h2 class="mt-1 text-2xl font-bold text-ink">Payments & plan</h2>
-          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Connect Stripe, understand what each fee covers and manage the plan that fits your booking volume.</p>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">See whether payments are ready, understand your current plan and change it without hunting through separate settings.</p>
         </div>
-        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
-          <article class="card p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Online payments</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Stripe payments</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Connect Stripe so customers can pay securely when they book. Customers pay exactly the price you set; Grab&Book deducts the platform fee from your proceeds.</p>
 
-            <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <div class="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Payment status</p>
-                  <p id="stripeStatusText" class="mt-1 font-bold text-ink">Not connected</p>
-                </div>
-                <span id="stripeStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Not connected</span>
+        <div class="payments-settings-grid grid gap-6 lg:grid-cols-2">
+          <article class="payments-status-card card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Payment account</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">Stripe</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Stripe securely handles online customer payments and sends the business proceeds to your connected account.</p>
               </div>
-              <p id="stripeStatusHelp" class="mt-3 text-xs leading-5 text-slate-500">Connect your Stripe account before customers can complete paid bookings.</p>
+              <span id="stripeStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Not connected</span>
             </div>
 
-            <div class="mt-5 flex flex-wrap gap-2">
+            <div class="payment-readiness-panel mt-5">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Payment readiness</p>
+              <p id="stripeStatusText" class="mt-1 text-lg font-bold text-ink">Not connected</p>
+              <p id="stripeStatusHelp" class="mt-2 text-xs leading-5 text-slate-500">Connect your Stripe account before customers can complete paid bookings.</p>
+            </div>
+
+            <div class="payments-card-actions mt-5 flex flex-wrap gap-2">
               <button id="connectStripeBtn" class="btn btn-primary" type="button">Connect Stripe</button>
               <button id="refreshStripeBtn" class="btn btn-light" type="button">Check connection</button>
             </div>
+
+            <details class="payment-fee-disclosure mt-5">
+              <summary>How customer payments and fees work <span aria-hidden="true">⌄</span></summary>
+              <div class="payment-fee-disclosure-body">
+                <div><strong>Customer pays your price</strong><span>Grab&Book does not add a separate customer surcharge at checkout.</span></div>
+                <div><strong>Stripe processing</strong><span>Stripe processing fees apply separately and can vary by card or payment method.</span></div>
+                <div><strong>Grab&Book platform fee</strong><span>Free is 2% per paid booking. Pro reduces the Grab&Book platform fee to 0%.</span></div>
+              </div>
+            </details>
           </article>
 
-          <article class="card p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">How money moves</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Simple for the customer</h2>
-            <div class="booking-summary-list mt-5 text-sm leading-6 text-slate-500">
-              <div class="booking-summary-row"><strong>1 · Customer pays your price</strong><span>No Grab&Book surcharge is added at checkout.</span></div>
-              <div class="booking-summary-row"><strong>2 · Stripe processes it</strong><span>Stripe processing is separate on Free and Pro. Standard UK cards are currently 1.5% + 20p; other payments can cost more.</span></div>
-              <div class="booking-summary-row"><strong>3 · Grab&Book applies its fee</strong><span>Free is 2% per paid booking. Pro removes only the Grab&Book platform fee.</span></div>
-            </div>
-          </article>
-
-          <article class="card p-5 sm:p-6 lg:col-span-2">
-            <div class="flex flex-wrap items-start justify-between gap-4">
+          <article class="payments-status-card card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Grab&Book plan</p>
-                <h2 class="mt-1 text-xl font-bold text-ink">Free or Pro</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-500">At about £1,450/month in paid bookings, Free&apos;s 2% Grab&Book fee equals the £29 Pro subscription.</p>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Current plan</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">Your Grab&Book plan</h3>
               </div>
               <span id="planStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Free</span>
             </div>
 
-            <div class="mt-6 grid gap-4 md:grid-cols-2">
-              <div class="rounded-2xl border border-slate-200 p-5">
-                <div class="flex items-end justify-between gap-3">
-                  <strong class="text-lg text-ink">Free</strong>
-                  <span class="text-sm font-bold text-slate-500">£0/month</span>
+            <div class="payment-readiness-panel mt-5">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Subscription status</p>
+              <p id="planStatusText" class="mt-1 text-lg font-bold text-ink">Free plan</p>
+              <p id="planStatusHelp" class="mt-2 text-xs leading-5 text-slate-500">You are currently on Free. Pro removes the 2% Grab&Book platform fee. Stripe processing fees still apply to online payments.</p>
+            </div>
+
+            <div class="payments-card-actions mt-5 flex flex-wrap gap-2">
+              <button id="upgradeProBtn" class="btn btn-primary" type="button">Upgrade to Pro – £29/month</button>
+              <button id="manageProBtn" class="btn btn-light hidden" type="button">Manage subscription</button>
+              <button id="refreshPlanBtn" class="btn btn-light" type="button">Check plan</button>
+            </div>
+
+            <div class="payment-break-even mt-5">
+              <strong>When Pro costs less in Grab&Book fees</strong>
+              <span>At about £1,450/month in paid bookings, Free&apos;s 2% platform fee equals the £29 monthly Pro subscription.</span>
+            </div>
+          </article>
+
+          <article class="card p-5 sm:p-6 lg:col-span-2">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Plan comparison</p>
+              <h3 class="mt-1 text-xl font-bold text-ink">Choose the payment flexibility you need</h3>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">The booking tools stay connected on both plans. The main difference is how Grab&Book charges and which customer payment options you can offer.</p>
+            </div>
+
+            <div class="plan-choice-grid mt-6 grid gap-4 md:grid-cols-2">
+              <div id="planFreeCard" class="plan-choice-card rounded-2xl border border-slate-200 p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Free</p>
+                    <p class="mt-1 text-2xl font-bold text-ink">£0<span class="ml-1 text-sm font-semibold text-slate-400">/month</span></p>
+                  </div>
+                  <span id="planFreeCurrent" class="hidden rounded-full bg-brand-100 px-2.5 py-1 text-[.68rem] font-bold text-brand-700">Current plan</span>
                 </div>
-                <div class="mt-4 space-y-2 text-sm leading-6 text-slate-500">
-                  <p>2% Grab&Book platform fee on each paid booking</p>
-                  <p>Minimum service price £10</p>
-                  <p>Full online payment required</p>
+                <div class="plan-feature-list mt-5">
+                  <div><strong>2%</strong><span>Grab&Book platform fee on each paid booking</span></div>
+                  <div><strong>£10</strong><span>Minimum service price</span></div>
+                  <div><strong>Full</strong><span>Online payment required at booking</span></div>
                 </div>
               </div>
 
-              <div class="rounded-2xl border border-brand-200 bg-brand-50 p-5">
-                <div class="flex items-end justify-between gap-3">
-                  <strong class="text-lg text-ink">Pro</strong>
-                  <span class="text-sm font-bold text-brand-700">£29/month</span>
+              <div id="planProCard" class="plan-choice-card plan-choice-card-pro rounded-2xl border border-brand-200 bg-brand-50/60 p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Pro</p>
+                    <p class="mt-1 text-2xl font-bold text-ink">£29<span class="ml-1 text-sm font-semibold text-slate-400">/month</span></p>
+                  </div>
+                  <span id="planProCurrent" class="hidden rounded-full bg-emerald-100 px-2.5 py-1 text-[.68rem] font-bold text-emerald-700">Current plan</span>
                 </div>
-                <div class="mt-4 space-y-2 text-sm leading-6 text-slate-600">
-                  <p><strong class="text-slate-800">0% Grab&Book platform fee</strong></p>
-                  <p>Pay later, fixed deposit, percentage deposit or full payment</p>
-                  <p>No Grab&Book minimum service price</p>
+                <div class="plan-feature-list mt-5">
+                  <div><strong>0%</strong><span>Grab&Book platform fee</span></div>
+                  <div><strong>Flexible</strong><span>Pay later, fixed deposit, percentage deposit or full payment</span></div>
+                  <div><strong>None</strong><span>No Grab&Book minimum service price</span></div>
                 </div>
               </div>
             </div>
 
-            <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <div class="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Current subscription</p>
-                  <p id="planStatusText" class="mt-1 font-bold text-ink">Free plan</p>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  <button id="upgradeProBtn" class="btn btn-primary" type="button">Upgrade to Pro – £29/month</button>
-                  <button id="manageProBtn" class="btn btn-light hidden" type="button">Manage subscription</button>
-                  <button id="refreshPlanBtn" class="btn btn-light" type="button">Check plan</button>
-                </div>
-              </div>
-              <p id="planStatusHelp" class="mt-3 text-xs leading-5 text-slate-500">You are currently on Free. Pro removes the 2% Grab&Book platform fee. Stripe processing fees still apply to online card payments.</p>
-            </div>
+            <p class="mt-5 text-xs leading-5 text-slate-400">Stripe processing fees are separate from the Grab&Book platform fee and still apply when online payment is taken.</p>
           </article>
         </div>
       </section>
 
-      <!-- Diary Calendar View -->
+<!-- Diary Calendar View -->
       <section id="tab-calendar" class="dashboard-tab hidden space-y-6">
         <div class="booking-ops-page-head flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -4633,7 +4665,7 @@
   </div>
 
   <!-- JavaScript Application Logic -->
-  <script src="assets/js/core.js?v=stage8-crm-1"></script>
+  <script src="assets/js/core.js?v=stage10-settings-1"></script>
   <script src="assets/js/acquisition.js"></script>
   <script src="assets/js/growth-tracking.js"></script>
   <script src="assets/js/growth.js?v=stage9-growth-1"></script>
@@ -4648,7 +4680,7 @@
   <script src="assets/js/customers.js?v=stage8-crm-1"></script>
   <script src="assets/js/campaign-history.js?v=stage8-crm-1"></script>
   <script src="assets/js/customer-management.js?v=stage8-crm-1"></script>
-  <script src="assets/js/settings.js?v=stage6-booking-1"></script>
+  <script src="assets/js/settings.js?v=stage10-settings-1"></script>
   <script src="assets/js/diary.js?v=stage6-booking-1"></script>
   <script src="assets/js/services.js?v=stage6-booking-1"></script>
   <script src="assets/js/bookings.js?v=stage7-customer-1"></script>
