@@ -3,6 +3,7 @@
 function bookingCard(b, allowCancel = false) {
       const srv = b.services || state.services.find(s => s.id === b.service_id) || {};
       const member = b.staff_members || state.staff.find(s => s.id === b.staff_id) || null;
+      const memberLabel = member ? member.name + (member.deleted_at ? " · Former team member" : "") : "";
       const cancelled = b.status === "cancelled";
       return `
         <div class="flex flex-col gap-3 rounded-2xl border ${cancelled ? "border-slate-200 bg-slate-50 opacity-75" : "border-slate-200"} p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -10,7 +11,7 @@ function bookingCard(b, allowCancel = false) {
             <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
               <h3 class="font-bold text-ink">${escapeHtml(b.customer_name)}</h3>
               <span class="text-xs font-semibold text-brand-600">${escapeHtml(srv.title || "Service")}</span>
-              ${member ? `<span class="rounded-full bg-violet-50 px-2 py-0.5 text-[.68rem] font-bold text-violet-700">${escapeHtml(member.name)}</span>` : ""}
+              ${member ? `<span class="rounded-full bg-violet-50 px-2 py-0.5 text-[.68rem] font-bold text-violet-700">${escapeHtml(memberLabel)}</span>` : ""}
               ${b.flexible_staff_booking ? `<span class="rounded-full bg-violet-100 px-2 py-0.5 text-[.68rem] font-bold text-violet-800">Flexible team${b.staff_assigned_automatically ? " · auto assigned" : ""}</span>` : ""}
               ${cancelled ? '<span class="rounded-full bg-slate-200 px-2 py-0.5 text-[.68rem] font-bold text-slate-600">Cancelled</span>' : ""}
             </div>
@@ -75,7 +76,7 @@ function bookingCard(b, allowCancel = false) {
     }
 
     async function refreshBookings() {
-      const res = await supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), staff_members(name, job_title, photo_url), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", state.profile.id).order("start_time");
+      const res = await supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), staff_members(name, job_title, photo_url, deleted_at), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", state.profile.id).order("start_time");
       state.bookings = res.data || [];
       state.bookingsError = res.error || null;
       renderBookings();
