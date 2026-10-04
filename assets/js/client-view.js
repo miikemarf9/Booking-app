@@ -140,7 +140,7 @@ function renderDiary(data) {
   const upcoming = upcomingBookings(data);
   const services = data.services || [];
   $("preview-diary").innerHTML = `
-    ${heading("Book", "Diary", "Upcoming appointments and the service setup behind the client’s booking operation.")}
+    ${heading("Booking", "Appointments", "Upcoming appointments and the service setup behind the client’s booking operation.")}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       ${card("Upcoming", number(upcoming.length), "non-cancelled appointments")}
       ${card("Services", number(services.length), "configured")}
@@ -204,7 +204,7 @@ function renderCustomers(data) {
   }).join("");
 
   $("preview-customers").innerHTML = `
-    ${heading("CRM", "Customers", "A read-only support representation of the client’s customer database. Private notes and unsubscribe tokens are deliberately excluded.")}
+    ${heading("CRM", "Customer overview", "A read-only support view of the client’s customer database. Private notes and unsubscribe tokens are deliberately excluded.")}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       ${card("Customers", number(data.summary?.customer_count ?? customers.length), "all customer profiles")}
       ${card("Previewed", number(customers.length), customers.length >= 250 ? "most recently updated 250" : "active customer profiles")}
@@ -366,6 +366,7 @@ function setPreviewTab(tab) {
     const active = button.dataset.previewTab === next;
     button.classList.toggle("preview-nav-active", active);
     button.classList.toggle("text-slate-500", !active);
+    button.setAttribute("aria-current", active ? "page" : "false");
   });
   document.querySelectorAll(".preview-panel").forEach(panel => {
     panel.classList.toggle("is-active", panel.id === "preview-" + next);
