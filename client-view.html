@@ -23,9 +23,14 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="assets/css/app.css?v=stage4-first-run-1">
+  <link rel="stylesheet" href="assets/css/app.css?v=stage11-secondary-1">
   <style>
-    .preview-nav-active{background:#fff;color:#172033;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+    .preview-nav{min-height:44px;white-space:nowrap;color:#667085;transition:background-color .16s ease,color .16s ease,box-shadow .16s ease}
+    .preview-nav:hover{background:rgba(255,255,255,.72);color:#075b98}
+    .preview-nav-active{background:#fff;color:#075b98;box-shadow:0 2px 8px rgba(23,32,51,.07)}
+    .preview-nav-shell{scrollbar-width:none;overscroll-behavior-x:contain}
+    .preview-nav-shell::-webkit-scrollbar{display:none}
+    .preview-settings-btn.preview-nav-active{border-color:#0872bd!important;background:#0872bd!important;color:#fff!important;box-shadow:0 5px 14px rgba(8,114,189,.16)}
     .preview-panel{display:none}.preview-panel.is-active{display:block}
     .preview-disabled{pointer-events:none;opacity:.58}
 
@@ -55,7 +60,7 @@
     body.preview-dark main .text-slate-400{color:#94a3b8!important}
     body.preview-dark main .border-slate-100,
     body.preview-dark main .border-slate-200{border-color:#334155!important}
-    body.preview-dark .preview-nav-active{background:#1e293b!important;color:#f8fafc!important}
+    body.preview-dark .preview-nav-active{background:#1e293b!important;color:#7dd3fc!important}
     body.preview-dark aside .card{background:#111827!important;border-color:#334155!important}
   </style>
 </head>
@@ -79,58 +84,52 @@
 
   <section id="clientViewApp" class="hidden min-h-screen">
     <div class="sticky top-0 z-50 border-b border-amber-200 bg-amber-50/95 backdrop-blur">
-      <div class="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-3">
-          <span class="rounded-full bg-amber-200 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wider text-amber-900">Admin · Read only</span>
-          <p class="text-sm font-semibold text-amber-950">You are viewing <span id="previewBusinessBanner">this client</span> as they see Grab&Book. Nothing on this page can be edited.</p>
+      <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <div class="flex min-w-0 items-center gap-3">
+          <span class="shrink-0 rounded-full bg-amber-200 px-2.5 py-1 text-[.68rem] font-bold uppercase tracking-wider text-amber-900">Admin · Read only</span>
+          <p class="min-w-0 text-sm font-semibold text-amber-950">Support preview for <span id="previewBusinessBanner">this client</span>, using their current data and workspace preferences.</p>
         </div>
         <a id="previewExitBtn" href="admin.html" class="btn btn-light">Exit client view</a>
       </div>
     </div>
 
     <header class="border-b border-slate-200 bg-white/95">
-      <div class="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-3">
-          <img src="grabandbook-icon.svg" alt="" class="h-10 w-10 rounded-2xl">
-          <div>
-            <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Grab&Book</p>
-            <h1 id="previewBusinessName" class="font-bold text-ink">Client dashboard</h1>
+      <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div class="flex min-w-0 items-center gap-3">
+          <img src="grabandbook-logo.svg" alt="Grab&Book" class="h-8 w-auto max-w-[150px] shrink-0">
+          <div class="min-w-0 border-l border-slate-200 pl-3">
+            <p class="text-[.68rem] font-bold uppercase tracking-[.14em] text-slate-400">Client dashboard</p>
+            <h1 id="previewBusinessName" class="truncate font-bold text-ink">Client dashboard</h1>
           </div>
         </div>
         <div class="flex items-center gap-2">
           <span id="previewPlanBadge" class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold uppercase text-slate-600">—</span>
-          <a id="previewPublicBookingLink" href="#" target="_blank" rel="noopener" class="btn btn-light">Public booking page ↗</a>
+          <a id="previewPublicBookingLink" href="#" target="_blank" rel="noopener" class="btn btn-light">Booking page ↗</a>
+          <button class="preview-settings-btn btn btn-light preview-nav" data-preview-tab="settings" type="button">Settings</button>
         </div>
       </div>
     </header>
 
-    <main class="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <div class="grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
-        <aside>
-          <nav class="card sticky top-28 space-y-1 p-2" aria-label="Client dashboard preview">
-            <button class="preview-nav preview-nav-active flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold" data-preview-tab="home" type="button"><span>⌂</span> Home</button>
-            <button class="preview-nav flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-500" data-preview-tab="diary" type="button"><span>▦</span> Diary</button>
-            <button class="preview-nav flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-500" data-preview-tab="customers" type="button"><span>◎</span> Customers</button>
-            <button class="preview-nav flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-500" data-preview-tab="growth" type="button"><span>↗</span> Growth</button>
-            <button class="preview-nav flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-500" data-preview-tab="settings" type="button"><span>⚙</span> Settings</button>
-          </nav>
-        </aside>
-
-        <div class="min-w-0">
-          <div id="previewNotice" class="mb-5 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
-            This is a support preview built from the client’s current Grab&Book data. Edit, booking-management, messaging and settings controls are intentionally disabled.
-          </div>
-
-          <section id="preview-home" class="preview-panel is-active space-y-6"></section>
-          <section id="preview-diary" class="preview-panel space-y-6"></section>
-          <section id="preview-customers" class="preview-panel space-y-6"></section>
-          <section id="preview-growth" class="preview-panel space-y-6"></section>
-          <section id="preview-settings" class="preview-panel space-y-6"></section>
-        </div>
+    <div class="border-b border-slate-200 bg-white/90">
+      <div class="preview-nav-shell mx-auto max-w-7xl overflow-x-auto px-4 py-2 sm:px-6 lg:px-8">
+        <nav class="inline-flex min-w-max gap-1 rounded-2xl border border-slate-200 bg-slate-100/90 p-1" aria-label="Client dashboard preview">
+          <button class="preview-nav preview-nav-active rounded-xl px-4 py-2 text-sm font-bold" data-preview-tab="home" type="button">Home</button>
+          <button class="preview-nav rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-preview-tab="diary" type="button">Booking</button>
+          <button class="preview-nav rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-preview-tab="customers" type="button">CRM</button>
+          <button class="preview-nav rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-preview-tab="growth" type="button">Growth</button>
+        </nav>
       </div>
+    </div>
+
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <section id="preview-home" class="preview-panel is-active space-y-6"></section>
+      <section id="preview-diary" class="preview-panel space-y-6"></section>
+      <section id="preview-customers" class="preview-panel space-y-6"></section>
+      <section id="preview-growth" class="preview-panel space-y-6"></section>
+      <section id="preview-settings" class="preview-panel space-y-6"></section>
     </main>
   </section>
 
-  <script src="assets/js/client-view.js"></script>
+  <script src="assets/js/client-view.js?v=stage11-secondary-1"></script>
 </body>
 </html>
