@@ -4161,4 +4161,27 @@
 }
 #landingView .home-chapter-faq{background:linear-gradient(180deg,var(--home-mist),#fff 65%);}
 #landingView .home-chapter-pricing{background:linear-gradient(180deg,#fff,#edf5f9);}
-#landingView .home-chapter-final-shell{background:linear-gradient(180deg,#edf5f9,#f7fafc);}
+/* Bold final invitation: pair its surface and text colours explicitly. */
+#landingView .home-chapter-final-shell{
+  background:linear-gradient(120deg,#075b73 0%,#086b9c 52%,#0872bd 100%);
+  color:#fff;
+}
+#landingView .home-chapter-final-shell .homepage-final-cta{
+  background:transparent;
+  box-shadow:none;
+}
+#landingView .home-chapter-final-shell .homepage-final-kicker,
+#landingView .home-chapter-final-shell .homepage-final-cta h2,
+#landingView .home-chapter-final-shell .homepage-final-copy{color:#fff;}
+#landingView .home-chapter-final-shell .homepage-final-cta h2{text-wrap:balance;}
+#landingView .home-chapter-final-shell .homepage-final-button{
+  background:#fff;
+  color:#075b73;
+  border-color:#fff;
+  box-shadow:0 8px 24px rgba(0,30,49,.18);
+}
+#landingView .home-chapter-final-shell .homepage-final-button:hover{background:#eaf5fa;}
+#landingView .home-chapter-final-shell .homepage-final-button:focus-visible{
+  outline:3px solid #fff;
+  outline-offset:5px;
+}
