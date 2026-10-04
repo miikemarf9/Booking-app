@@ -262,9 +262,20 @@ async function loadPublicBookingPage(profileId) {
     }
 
     function updatePublicStepNumbers(hasStaff) {
-      $("dateStepNumber").textContent = hasStaff ? "3" : "2";
-      $("timeStepNumber").textContent = hasStaff ? "4" : "3";
-      $("detailsStepNumber").textContent = hasStaff ? "5" : "4";
+      const dateNumber = hasStaff ? "3" : "2";
+      const timeNumber = hasStaff ? "4" : "3";
+      const detailsNumber = hasStaff ? "5" : "4";
+
+      $("dateStepNumber").textContent = dateNumber;
+      $("timeStepNumber").textContent = timeNumber;
+      $("detailsStepNumber").textContent = detailsNumber;
+
+      const dateProgress = document.querySelector('[data-progress-key="date"] .progress-dot');
+      const timeProgress = document.querySelector('[data-progress-key="time"] .progress-dot');
+      const detailsProgress = document.querySelector('[data-progress-key="details"] .progress-dot');
+      if (dateProgress) dateProgress.textContent = dateNumber;
+      if (timeProgress) timeProgress.textContent = timeNumber;
+      if (detailsProgress) detailsProgress.textContent = detailsNumber;
     }
 
     function renderPublicStaffChoices() {
