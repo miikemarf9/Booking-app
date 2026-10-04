@@ -520,7 +520,7 @@ function syncReminderFields() {
                 </div>
                 <p class="mt-2 font-bold text-ink">${escapeHtml(timeOffLabel(block))}</p>
               </div>
-              <button class="btn booking-danger-btn shrink-0 !px-3 !py-2" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button>
+              <div class="booking-record-actions"><button class="btn booking-danger-btn shrink-0 !px-3 !py-2" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button></div>
             </div>
           `;
           }).join("")
@@ -711,7 +711,7 @@ function syncReminderFields() {
                       ? `<p class="mt-1 text-xs text-slate-500">${options.map(escapeHtml).join(" · ")}</p>`
                       : ""}
                   </div>
-                  <div class="flex shrink-0 gap-2">
+                  <div class="booking-record-actions">
                     <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-question-action="edit" data-id="${q.id}">Edit</button>
                     <button class="btn booking-danger-btn !px-3 !py-2 text-sm" type="button" data-question-action="delete" data-id="${q.id}">Delete</button>
                   </div>
