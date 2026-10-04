@@ -271,6 +271,10 @@ function applyDashboardWorkspacePreferences() {
   const teamShortcut = $("workspaceOpenTeamBtn");
   if (teamShortcut) teamShortcut.classList.toggle("hidden", !teamAvailable);
 
+  if (!teamAvailable && !$("tab-workspace-team")?.classList.contains("hidden") && typeof switchArea === "function") {
+    switchArea("home");
+  }
+
   const nav = document.querySelector(".dashboard-area-nav");
   if (nav) {
     const visibleCount = visibleAreas.length + (teamAvailable ? 1 : 0);
