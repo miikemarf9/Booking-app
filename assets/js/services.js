@@ -166,6 +166,7 @@ function updateFreePlanFeePreview() {
       populateTimeOffStaffOptions();
       populateCalendarStaffFilter();
       populateCustomerServiceFilter();
+      if (typeof renderFirstRunSetup === "function") renderFirstRunSetup();
       renderStats();
     }
 
@@ -879,6 +880,7 @@ function updateFreePlanFeePreview() {
       state.blocks = data || [];
       renderBlocks();
       renderCalendarDashboard();
+      if (typeof renderFirstRunSetup === "function") renderFirstRunSetup();
       renderStats();
     }
 
