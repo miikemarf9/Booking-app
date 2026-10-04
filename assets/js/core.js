@@ -1057,7 +1057,9 @@
 
       $("manageRescheduleBtn").addEventListener("click", openManageReschedule);
       $("manageRescheduleCloseBtn").addEventListener("click", closeManageReschedule);
-      $("manageCancelBtn").addEventListener("click", cancelManagedBooking);
+      $("manageCancelBtn").addEventListener("click", openManageCancelConfirm);
+      $("manageConfirmCancelBtn").addEventListener("click", cancelManagedBooking);
+      $("manageKeepBookingBtn").addEventListener("click", closeManageCancelConfirm);
       $("manageQuickDates").addEventListener("click", handleManageQuickDateClick);
       $("manageDateInput").addEventListener("change", loadManageAvailableSlots);
       $("manageSlots").addEventListener("click", handleManageSlotClick);
