@@ -18,7 +18,7 @@ async function loadMarketingCampaignHistory(append = false) {
   $("moreCampaignHistoryBtn").disabled = false;
   if (error) { if (!append) host.textContent = "Campaign history could not be loaded. Use Refresh history to try again."; return; }
   if (!append) host.replaceChildren();
-  if (!data.length && !append) host.textContent = "No campaigns sent yet. Review a message above and choose Send campaign to create your first record.";
+  if (!data.length && !append) host.textContent = "No campaigns sent yet. Review a message above and choose Review & send campaign to create your first record.";
   for (const campaign of data) {
     const detail = document.createElement("details");
     detail.className = "crm-campaign-history-item";
