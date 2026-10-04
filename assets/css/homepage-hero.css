@@ -363,23 +363,7 @@
   justify-self:end;
   padding:0 8px 14px;
 }
-#landingView .home-chapter-hero .gb-demo-wrap:before{
-  display:block;
-  content:"";
-  position:absolute;
-  z-index:0;
-  top:34px;
-  right:-14px;
-  bottom:-8px;
-  left:-14px;
-  border:1px solid rgba(165,197,218,.58);
-  border-radius:28px;
-  background:
-    radial-gradient(circle at 82% 12%,rgba(105,188,226,.15),transparent 35%),
-    linear-gradient(145deg,rgba(255,255,255,.84),rgba(226,240,249,.82));
-  box-shadow:0 28px 70px rgba(45,89,119,.09);
-  pointer-events:none;
-}
+
 #landingView .home-chapter-hero .gb-demo-intro,
 #landingView .home-chapter-hero .gb-demo-window,
 #landingView .home-chapter-hero .gb-demo-disclaimer{
@@ -389,17 +373,8 @@
 #landingView .home-chapter-hero .gb-demo-intro{
   margin:0 12px 18px;
 }
-#landingView .home-chapter-hero .gb-demo-window{
-  border-color:#cedeea;
-  border-radius:18px;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,.98),
-    0 2px 6px rgba(43,77,101,.05),
-    0 22px 52px -24px rgba(31,73,104,.28);
-}
-#landingView .home-chapter-hero .gb-demo-chrome{
-  padding:20px 24px;
-}
+
+
 #landingView .home-chapter-hero .gb-hero-benefits{
   max-width:1180px;
   margin:72px auto 0;
@@ -484,13 +459,7 @@
     padding:0 2px 8px;
     overflow:visible;
   }
-  #landingView .home-chapter-hero .gb-demo-wrap:before{
-    top:30px;
-    right:-7px;
-    bottom:-4px;
-    left:-7px;
-    border-radius:20px;
-  }
+
   #landingView .home-chapter-hero .gb-demo-intro{
     margin:0 4px 14px;
   }
