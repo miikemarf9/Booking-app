@@ -4050,7 +4050,8 @@
   font-size:clamp(2rem,2.9vw,2.7rem);
   line-height:1.1;
 }
-#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy>p,
+#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy>p:first-child,
+#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy>p:nth-of-type(2),
 #landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3,
 #landingView .homepage-priorities-showcase .homepage-priority-benefits strong,
 #landingView .homepage-priorities-showcase .homepage-priority-benefits small,
