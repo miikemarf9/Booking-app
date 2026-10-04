@@ -151,6 +151,7 @@ function renderWorkspaceTasks() {
   const list = $("workspacePriorityList");
   if (!list) return;
 
+  renderWorkspaceAssignmentFilters();
   const allOpen = workspaceTaskState.items.filter(item => item.status === "open");
   const open = workspaceFilteredOpenItems().sort(workspaceTaskSort);
   const todayCount = allOpen.filter(item => workspaceTaskGroup(item) === 0).length;
@@ -160,7 +161,6 @@ function renderWorkspaceTasks() {
   if ($("workspacePriorityTodayCount")) $("workspacePriorityTodayCount").textContent = String(todayCount);
   if ($("workspacePriorityOverdueCount")) $("workspacePriorityOverdueCount").textContent = String(overdueCount);
   if ($("workspacePriorityUpcomingCount")) $("workspacePriorityUpcomingCount").textContent = String(upcomingCount);
-  renderWorkspaceAssignmentFilters();
 
   if (!open.length) {
     const filtered = workspaceTaskState.assignmentFilter !== "all";
