@@ -624,6 +624,11 @@ function calendarDateKey(date) {
       return "settings";
     }
 
+    function jumpDashboardToTop() {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+
     function setDashboardNavButtonState(btn, active) {
       if (!btn) return;
       btn.classList.toggle("active", active);
@@ -728,18 +733,18 @@ function calendarDateKey(date) {
 
       if (tabId === "customers") {
         setDashboardSectionNav("crm-customers-section");
-        window.scrollTo({ top: 0, behavior: "auto" });
+        jumpDashboardToTop();
         return;
       }
 
       if (tabId === "growth") {
         setDashboardSectionNav("growth-overview-section");
         if (typeof loadGrowthAnalytics === "function") loadGrowthAnalytics(false);
-        window.scrollTo({ top: 0, behavior: "auto" });
+        jumpDashboardToTop();
         return;
       }
 
-      window.scrollTo({ top: 0, behavior: "auto" });
+      jumpDashboardToTop();
     }
 
     function buildPublicUrl(profileId) {
