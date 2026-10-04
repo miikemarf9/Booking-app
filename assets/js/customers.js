@@ -330,11 +330,318 @@ function customerBookings(customer) {
       return new Date(reference.getFullYear(), reference.getMonth() - 1, 1);
     }
 
+    function crmBookingValue(booking) {
+      return Number(
+        booking?.booked_price ??
+        booking?.services?.price ??
+        state.services.find(service => service.id === booking?.service_id)?.price ??
+        0
+      ) || 0;
+    }
+
+    function crmChronologicalCompleted(metrics) {
+      return [...(metrics?.past || [])].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    }
+
+    function crmRetentionCohort(allMetrics, newerThanDays, olderThanDays) {
+      const now = Date.now();
+      const dayMs = 86400000;
+      const cohort = allMetrics.filter(({ metrics }) => {
+        const visits = crmChronologicalCompleted(metrics);
+        if (!visits.length) return false;
+        const first = new Date(visits[0].start_time).getTime();
+        const ageDays = (now - first) / dayMs;
+        return ageDays >= newerThanDays && ageDays < olderThanDays;
+      });
+
+      const retained = cohort.filter(({ metrics }) => {
+        const visits = crmChronologicalCompleted(metrics);
+        if (visits.length < 2) return false;
+        const first = new Date(visits[0].start_time).getTime();
+        const second = new Date(visits[1].start_time).getTime();
+        return second > first && second <= first + 90 * dayMs;
+      }).length;
+
+      return {
+        customers: cohort.length,
+        retained,
+        rate: cohort.length ? Math.round((retained / cohort.length) * 100) : null
+      };
+    }
+
+    function crmCompletedMonthSeries(allMetrics, count = 6) {
+      const now = new Date();
+      const months = [];
+      for (let offset = count; offset >= 1; offset -= 1) {
+        const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+        months.push({
+          key: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+          label: date.toLocaleDateString("en-GB", { month: "short", year: "2-digit" }),
+          total: 0,
+          returning: 0
+        });
+      }
+      const byKey = new Map(months.map(month => [month.key, month]));
+
+      allMetrics.forEach(({ metrics }) => {
+        const visits = crmChronologicalCompleted(metrics);
+        visits.forEach((booking, index) => {
+          const date = new Date(booking.start_time);
+          const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+          const month = byKey.get(key);
+          if (!month) return;
+          month.total += 1;
+          if (index > 0) month.returning += 1;
+        });
+      });
+
+      return months.map(month => ({
+        ...month,
+        rate: month.total ? Math.round((month.returning / month.total) * 100) : null
+      }));
+    }
+
+    function renderCrmLifecycleAnalytics(allMetrics) {
+      const rebookingRate = $("crmRebookingRate");
+      if (!rebookingRate) return;
+
+      let completedAppointments = 0;
+      let followedAppointments = 0;
+      let newCustomerValue = 0;
+      let returningCustomerValue = 0;
+      const secondVisitGaps = [];
+
+      allMetrics.forEach(({ metrics }) => {
+        const completed = crmChronologicalCompleted(metrics);
+        const activeChronological = [...metrics.active].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+
+        completed.forEach(booking => {
+          completedAppointments += 1;
+          const start = new Date(booking.start_time).getTime();
+          if (activeChronological.some(other => new Date(other.start_time).getTime() > start)) {
+            followedAppointments += 1;
+          }
+        });
+
+        completed.forEach((booking, index) => {
+          if (index === 0) newCustomerValue += crmBookingValue(booking);
+          else returningCustomerValue += crmBookingValue(booking);
+        });
+
+        if (completed.length >= 2) {
+          const first = new Date(completed[0].start_time).getTime();
+          const second = new Date(completed[1].start_time).getTime();
+          if (Number.isFinite(first) && Number.isFinite(second) && second > first) {
+            secondVisitGaps.push((second - first) / 86400000);
+          }
+        }
+      });
+
+      const appointmentRebookingRate = completedAppointments
+        ? Math.round((followedAppointments / completedAppointments) * 100)
+        : null;
+      rebookingRate.textContent = appointmentRebookingRate === null ? "—" : `${appointmentRebookingRate}%`;
+      $("crmRebookingRateDetail").textContent = completedAppointments
+        ? `${followedAppointments} of ${completedAppointments} completed appointments were followed by another non-cancelled booking`
+        : "Needs completed appointment history";
+
+      const currentCohort = crmRetentionCohort(allMetrics, 90, 180);
+      const previousCohort = crmRetentionCohort(allMetrics, 180, 270);
+      $("crmNinetyDayRetention").textContent = currentCohort.rate === null ? "—" : `${currentCohort.rate}%`;
+      if (currentCohort.rate === null) {
+        $("crmNinetyDayRetentionDetail").textContent = "Needs customers whose first visit was 90–180 days ago";
+      } else {
+        const delta = previousCohort.rate === null ? "" : (() => {
+          const change = currentCohort.rate - previousCohort.rate;
+          return ` · ${change > 0 ? "+" : ""}${change}pp vs previous cohort`;
+        })();
+        $("crmNinetyDayRetentionDetail").textContent =
+          `${currentCohort.retained} of ${currentCohort.customers} first-time customers returned within 90 days${delta}`;
+      }
+
+      const secondGap = medianNumber(secondVisitGaps);
+      $("crmSecondBookingTime").textContent = secondGap === null ? "—" : `${Math.round(secondGap)} days`;
+      $("crmSecondBookingTimeDetail").textContent = secondVisitGaps.length
+        ? `median across ${secondVisitGaps.length} customer${secondVisitGaps.length === 1 ? "" : "s"} who reached a second completed visit`
+        : "Needs customers with at least two completed visits";
+
+      const completedValue = newCustomerValue + returningCustomerValue;
+      const returningValueShare = completedValue
+        ? Math.round((returningCustomerValue / completedValue) * 100)
+        : null;
+      $("crmReturningValueShare").textContent = returningValueShare === null ? "—" : `${returningValueShare}%`;
+      $("crmReturningValueShareDetail").textContent = completedValue
+        ? `${money(returningCustomerValue)} of ${money(completedValue)} completed booked value came after the first visit`
+        : "Needs completed appointment value";
+
+      $("crmNewCustomerValue").textContent = money(newCustomerValue);
+      $("crmReturningCustomerValue").textContent = money(returningCustomerValue);
+
+      const customerValues = allMetrics
+        .map(({ metrics }) => Number(metrics.value || 0))
+        .filter(value => value > 0)
+        .sort((a, b) => b - a);
+      const totalCustomerValue = customerValues.reduce((sum, value) => sum + value, 0);
+      const medianCustomerValue = medianNumber(customerValues);
+      const topCount = customerValues.length ? Math.max(1, Math.ceil(customerValues.length * 0.1)) : 0;
+      const topValue = topCount ? customerValues.slice(0, topCount).reduce((sum, value) => sum + value, 0) : 0;
+      const topShare = totalCustomerValue ? Math.round((topValue / totalCustomerValue) * 100) : null;
+      const completedCustomers = allMetrics.filter(({ metrics }) => metrics.past.length > 0);
+      const oneVisitCustomers = completedCustomers.filter(({ metrics }) => metrics.past.length === 1).length;
+      const oneVisitShare = completedCustomers.length
+        ? Math.round((oneVisitCustomers / completedCustomers.length) * 100)
+        : null;
+
+      $("crmMedianCustomerValue").textContent = medianCustomerValue === null ? "—" : money(medianCustomerValue);
+      $("crmTopCustomerValueShare").textContent = topShare === null ? "—" : `${topShare}%`;
+      $("crmTopCustomerValueShareDetail").textContent = topCount
+        ? `top ${topCount} customer${topCount === 1 ? "" : "s"} by booked value`
+        : "Needs customer value history";
+      $("crmOneVisitShare").textContent = oneVisitShare === null ? "—" : `${oneVisitShare}%`;
+      $("crmOneVisitShareDetail").textContent = completedCustomers.length
+        ? `${oneVisitCustomers} of ${completedCustomers.length} completed customers have only visited once`
+        : "Needs completed customer history";
+
+      const trend = crmCompletedMonthSeries(allMetrics, 6);
+      const trendHost = $("crmReturnTrend");
+      if (trendHost) {
+        const hasData = trend.some(month => month.total > 0);
+        trendHost.innerHTML = hasData
+          ? trend.map(month => {
+              const rate = month.rate ?? 0;
+              return `
+                <div class="grid grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-3">
+                  <span class="text-xs font-bold text-slate-500">${escapeHtml(month.label)}</span>
+                  <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div class="h-full rounded-full bg-brand-400" style="width:${rate}%"></div>
+                  </div>
+                  <span class="text-right text-xs font-bold text-slate-700">${month.rate === null ? "—" : `${month.rate}%`}</span>
+                  <span class="col-start-2 col-span-2 -mt-1 text-[.66rem] text-slate-400">${month.returning} returning of ${month.total} completed visits</span>
+                </div>
+              `;
+            }).join("")
+          : '<p class="text-sm text-slate-400">Return-mix trends will appear after completed appointment history builds up.</p>';
+      }
+    }
+
+    let crmRetentionCampaignAnalyticsCache = {
+      profileId: "",
+      campaign: null,
+      recipients: []
+    };
+    let crmRetentionCampaignAnalyticsLoading = false;
+
+    function renderCrmRetentionCampaignOutcome(campaign, recipients = []) {
+      const status = $("crmRetentionCampaignStatus");
+      if (!status) return;
+
+      if (!campaign) {
+        status.textContent = "No retention campaign yet";
+        $("crmRetentionCampaignContacted").textContent = "—";
+        $("crmRetentionCampaignReturned").textContent = "—";
+        $("crmRetentionCampaignValue").textContent = "—";
+        $("crmRetentionCampaignTracked").textContent = "—";
+        $("crmRetentionCampaignDetail").textContent = "Send a retention audience campaign to start measuring subsequent bookings here.";
+        return;
+      }
+
+      const sentRows = recipients.filter(recipient =>
+        recipient.sent_at && ["sent", "delivered", "delivery_failed"].includes(recipient.status)
+      );
+      const laterBookings = (state.bookings || []).filter(booking => {
+        if (booking.status === "cancelled" || !booking.created_at) return false;
+        return sentRows.some(recipient => {
+          const customer = (state.customers || []).find(item => item.id === recipient.customer_id) || null;
+          const sameCustomer = customer
+            ? booking.customer_id === customer.id
+            : String(booking.customer_email || "").toLowerCase() === String(recipient.email || "").toLowerCase();
+          return sameCustomer && new Date(booking.created_at) >= new Date(recipient.sent_at);
+        });
+      });
+
+      const returnedKeys = new Set(laterBookings.map(booking =>
+        booking.customer_id || String(booking.customer_email || "").toLowerCase()
+      ));
+      const subsequentValue = laterBookings.reduce((sum, booking) => sum + crmBookingValue(booking), 0);
+      const trackedRecipientIds = new Set(sentRows.filter(recipient => {
+        const customer = (state.customers || []).find(item => item.id === recipient.customer_id);
+        return customer?.acquisition_last_touch?.gb_campaign === campaign.id &&
+          customer?.acquisition_last_touch?.gb_recipient === recipient.customer_id;
+      }).map(recipient => recipient.customer_id));
+      const trackedBookings = laterBookings.filter(booking => trackedRecipientIds.has(booking.customer_id));
+
+      status.textContent = `Latest retention campaign · ${new Date(campaign.created_at).toLocaleDateString("en-GB")}`;
+      $("crmRetentionCampaignContacted").textContent = String(sentRows.length);
+      $("crmRetentionCampaignReturned").textContent = sentRows.length
+        ? `${returnedKeys.size} · ${Math.round((returnedKeys.size / sentRows.length) * 100)}%`
+        : "0";
+      $("crmRetentionCampaignValue").textContent = money(subsequentValue);
+      $("crmRetentionCampaignTracked").textContent = String(trackedBookings.length);
+      $("crmRetentionCampaignDetail").textContent =
+        "Returned customers and subsequent value are observed after send and do not prove the campaign caused the booking. Link-tracked bookings are shown separately where analytics consent and tracking are available.";
+    }
+
+    async function ensureCrmRetentionCampaignAnalytics(force = false) {
+      if (!state.profile || !$("crmRetentionCampaignStatus")) return;
+      const profileId = state.profile.id;
+
+      if (!force && crmRetentionCampaignAnalyticsCache.profileId === profileId) {
+        renderCrmRetentionCampaignOutcome(
+          crmRetentionCampaignAnalyticsCache.campaign,
+          crmRetentionCampaignAnalyticsCache.recipients
+        );
+        return;
+      }
+      if (crmRetentionCampaignAnalyticsLoading) return;
+
+      crmRetentionCampaignAnalyticsLoading = true;
+      $("crmRetentionCampaignStatus").textContent = "Checking latest retention campaign…";
+
+      try {
+        const retentionAudiences = ["business-health-retention", "retention_attention", "due_back", "slipping", "lapsed"];
+        const { data: campaigns, error: campaignError } = await supabaseClient
+          .from("marketing_email_campaigns")
+          .select("id,audience_type,status,created_at")
+          .eq("profile_id", profileId)
+          .in("audience_type", retentionAudiences)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        if (campaignError) throw campaignError;
+        const campaign = campaigns?.[0] || null;
+        let recipients = [];
+
+        if (campaign) {
+          const { data, error } = await supabaseClient
+            .from("marketing_campaign_recipients")
+            .select("customer_id,email,status,sent_at")
+            .eq("profile_id", profileId)
+            .eq("campaign_id", campaign.id)
+            .limit(1000);
+          if (error) throw error;
+          recipients = data || [];
+        }
+
+        crmRetentionCampaignAnalyticsCache = { profileId, campaign, recipients };
+        if (state.profile?.id === profileId) renderCrmRetentionCampaignOutcome(campaign, recipients);
+      } catch (error) {
+        console.error("CRM retention campaign analytics failed", error);
+        if (state.profile?.id === profileId) {
+          $("crmRetentionCampaignStatus").textContent = "Campaign outcome unavailable";
+          $("crmRetentionCampaignDetail").textContent = "Existing campaign records are unchanged. Refresh the CRM later to retry this read-only summary.";
+        }
+      } finally {
+        crmRetentionCampaignAnalyticsLoading = false;
+      }
+    }
+
     function renderCrmAnalytics(allMetrics) {
       if (!$("crmRepeatRate")) return;
       $("crmAnalyticsPeriod").textContent = allMetrics.length
         ? "All-time customer data"
         : "Waiting for customer data";
+
+      renderCrmLifecycleAnalytics(allMetrics);
 
       const customersWithCompleted = allMetrics.filter(x => x.metrics.past.length >= 1);
       const repeatCustomers = customersWithCompleted.filter(x => x.metrics.past.length >= 2);
@@ -750,6 +1057,7 @@ ${bookingUrl}`;
         const { data, error } = await supabaseClient.functions.invoke("send-marketing-email", { body: { ...payload, request_id: requestId } });
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
+        crmRetentionCampaignAnalyticsCache = { profileId: "", campaign: null, recipients: [] };
         await loadMarketingCampaignHistory();
         if (data?.duplicate || ["queued", "sending", "needs_review"].includes(data?.status)) {
           toast("Campaign is recorded. Check its recipient outcomes in campaign history before taking further action. This request will not send it again.", "info");
@@ -810,6 +1118,7 @@ ${bookingUrl}`;
       ).length;
 
       renderCrmAnalytics(allMetrics);
+      ensureCrmRetentionCampaignAnalytics();
 
       $("crmTotalCustomers").textContent = activeCustomers.length;
       $("crmReturningCustomers").textContent = returning;
