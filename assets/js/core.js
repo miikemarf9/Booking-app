@@ -631,6 +631,8 @@
       populateCalendarStaffFilter();
 
       updateFreePlanFeePreview();
+      populateAvailabilityTimePicker();
+      setBlockStartPicker("");
       bindEvents();
 
       if (paymentState && manageToken) {
@@ -806,7 +808,8 @@
         populateAvailabilityStaffOptions();
         updateCalculatedEnd();
       });
-      $("blkStart").addEventListener("change", updateCalculatedEnd);
+      $("blkStartHour").addEventListener("change", syncBlockStartPicker);
+      $("blkStartMinute").addEventListener("change", syncBlockStartPicker);
       $("blkDate").addEventListener("change", () => {
         $("blkRepeatUntil").min = $("blkDate").value || todayKey();
         if ($("blkRecurrence").value === "weekly") ensureStartWeekdaySelected();
