@@ -1187,6 +1187,144 @@
     }
 
 
+    /* Stage 5 dashboard overview */
+    #tab-overview .overview-heading {
+      padding-top: .1rem;
+    }
+    .overview-kpi-grid {
+      align-items: stretch;
+    }
+    .overview-kpi {
+      min-width: 0;
+      border: 1px solid var(--gb-border-soft);
+      border-radius: 1rem;
+      background: rgba(255,255,255,.82);
+      padding: 1rem 1.05rem;
+    }
+    .overview-kpi-label {
+      color: #667085;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+    .overview-kpi-value {
+      margin-top: .45rem;
+      color: var(--gb-ink);
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+    }
+    .overview-kpi-detail {
+      margin-top: .3rem;
+      overflow: hidden;
+      color: #7d8797;
+      font-size: .75rem;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .overview-priority-chip {
+      display: inline-flex;
+      min-height: 38px;
+      align-items: center;
+      gap: .55rem;
+      border: 1px solid var(--gb-border-soft);
+      border-radius: 999px;
+      background: #f8fafc;
+      padding: .45rem .7rem .45rem .85rem;
+      color: #667085;
+      font-size: .76rem;
+      font-weight: 700;
+    }
+    .overview-priority-chip strong {
+      display: grid;
+      min-width: 1.55rem;
+      height: 1.55rem;
+      place-items: center;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--gb-ink);
+      font-size: .78rem;
+    }
+    .overview-priority-chip-alert {
+      border-color: #fee2e2;
+      background: #fff7f7;
+      color: #b42318;
+    }
+    .overview-priority-chip-alert strong {
+      color: #b42318;
+    }
+    .overview-booking-row {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: .9rem;
+      border-top: 1px solid var(--gb-border-soft);
+      padding: .9rem 0;
+    }
+    .overview-booking-row:first-child {
+      border-top: 0;
+      padding-top: .15rem;
+    }
+    .overview-booking-row:last-child {
+      padding-bottom: .15rem;
+    }
+    .overview-booking-time {
+      display: flex;
+      width: 4.25rem;
+      flex: 0 0 4.25rem;
+      flex-direction: column;
+    }
+    .overview-booking-time strong {
+      color: var(--gb-ink);
+      font-size: .95rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .overview-booking-time span {
+      margin-top: .15rem;
+      color: #98a2b3;
+      font-size: .69rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .overview-booking-value {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: #f8fafc;
+      padding: .4rem .65rem;
+      color: #475467;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    @media (max-width: 639px) {
+      #tab-overview .overview-heading .btn {
+        width: 100%;
+      }
+      .overview-kpi {
+        padding: .9rem 1rem;
+      }
+      .overview-kpi-value {
+        font-size: 1.65rem;
+      }
+      .overview-booking-row {
+        align-items: flex-start;
+        gap: .7rem;
+      }
+      .overview-booking-time {
+        width: 3.75rem;
+        flex-basis: 3.75rem;
+      }
+      .overview-booking-value {
+        display: none;
+      }
+    }
+
+
     /* Standalone public product pages */
     .product-site-shell {
       background:
