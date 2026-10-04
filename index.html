@@ -2643,7 +2643,7 @@
 
       <!-- Services Tab -->
       <section id="tab-services" class="dashboard-tab hidden">
-        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div class="booking-ops-page-head mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking setup</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Services</h2>
@@ -2651,7 +2651,7 @@
           </div>
           <button class="btn btn-light" data-go-tab="availability" type="button">Set availability</button>
         </div>
-        <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Service editor</p>
             <h2 id="serviceFormHeading" class="mt-1 text-xl font-bold text-ink">Add a service</h2>
@@ -2696,7 +2696,7 @@
                 </div>
               </div>
 
-              <div id="srvPaymentCard" class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div id="srvPaymentCard" class="booking-option-card rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <span class="block text-sm font-bold text-slate-700">Payment at booking</span>
@@ -2739,7 +2739,7 @@
                 </div>
               </div>
 
-              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div class="booking-option-card rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <label class="flex cursor-pointer items-center justify-between gap-4">
                   <span>
                     <span class="block text-sm font-bold text-slate-700">Run a promotional offer</span>
@@ -2804,7 +2804,7 @@
                 </div>
               </div>
 
-              <div class="rounded-2xl border border-violet-200 bg-violet-50/60 p-4">
+              <div class="booking-option-card booking-option-card-violet rounded-2xl border border-violet-200 bg-violet-50/60 p-4">
                 <label class="flex cursor-pointer items-center justify-between gap-4">
                   <span>
                     <span class="block text-sm font-bold text-slate-700">Flexible team booking</span>
@@ -2856,7 +2856,7 @@
 
       <!-- Availability Tab -->
       <section id="tab-availability" class="dashboard-tab hidden">
-        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div class="booking-ops-page-head mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking setup</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Availability</h2>
@@ -2864,11 +2864,11 @@
           </div>
           <button class="btn btn-light" data-go-tab="services" type="button">Manage services</button>
         </div>
-        <div class="grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.78fr_1.22fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
             <h2 id="blockFormHeading" class="mt-1 text-xl font-bold text-ink">Add availability</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Choose when this service can be booked. The finish time is calculated automatically from the service duration. Times use Europe/London.</p>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Choose the service, date and start time. Grab&Book calculates the finish time from the service duration.</p>
             <form id="blockForm" class="mt-6 space-y-4">
               <input id="blockEditId" type="hidden">
 
@@ -2877,7 +2877,7 @@
                 <select id="blkService" class="field" required>
                   <option value="">Add a service first</option>
                 </select>
-                <p class="mt-1.5 text-xs leading-5 text-slate-400">This links the availability directly to a service from your Services page.</p>
+                
               </div>
 
               <div>
@@ -2932,7 +2932,7 @@
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                 </select>
-                <p class="mt-1.5 text-xs leading-5 text-slate-400">Recurring schedules are created as one series, so you can remove all future dates together later.</p>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Repeats stay grouped, so future dates can be removed together.</p>
               </div>
 
               <div id="blkRepeatOptions" class="hidden space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -2985,11 +2985,16 @@
 
       <!-- Booking Rules Tab -->
       <section id="tab-booking-rules" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="calendar" type="button">← Back to Booking</button>
-        <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Rules</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Booking rules</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Control notice periods, how far ahead customers can book, and when they can cancel or reschedule.</p>
+        </div>
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
           <article class="card h-fit p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Step 8A</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Booking window</h2>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer booking window</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">When customers can book</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Control how soon customers can book and how far into the future your booking page accepts appointments.</p>
 
             <form id="bookingRulesForm" class="mt-6 space-y-5">
@@ -3097,12 +3102,12 @@
 
       <!-- Diary List View -->
       <section id="tab-bookings" class="dashboard-tab hidden">
-        <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
+        <div class="booking-ops-page-head mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Diary</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Appointments</h2>
           </div>
-          <div class="inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
+          <div class="booking-view-switch inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
             <button class="rounded-lg px-4 py-2 text-slate-500" data-go-tab="calendar" type="button">Calendar</button>
             <button class="rounded-lg bg-white px-4 py-2 text-ink shadow-sm" type="button">List</button>
           </div>
@@ -3440,9 +3445,14 @@
 
       <!-- Team Tab -->
       <section id="tab-team" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">People</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Team</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Add the people customers can book with and connect each person to the services they provide.</p>
+        </div>
 
-        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
           <article class="card h-fit p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Team member</p>
             <h2 id="staffFormHeading" class="mt-1 text-xl font-bold text-ink">Add a team member</h2>
@@ -3500,9 +3510,14 @@
 
       <!-- Time Off Tab -->
       <section id="tab-time-off" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Schedule</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Time off</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Block holidays, days off or a few hours without changing your normal availability.</p>
+        </div>
 
-        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
           <article class="card h-fit p-5 sm:p-6">
                         <h2 class="mt-1 text-xl font-bold text-ink">Add time off</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Block a full day, several days, or just part of a day. Your normal availability stays intact underneath.</p>
@@ -3583,9 +3598,14 @@
 
       <!-- Booking Questions Tab -->
       <section id="tab-booking-questions" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Customer form</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Booking questions</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Collect only the information a service genuinely needs before the appointment.</p>
+        </div>
 
-        <div class="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
           <article class="card h-fit p-5 sm:p-6">
                         <h2 id="bookingQuestionFormHeading" class="mt-1 text-xl font-bold text-ink">Add a booking question</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Questions are attached to a service and appear after the customer chooses an appointment time.</p>
@@ -3760,8 +3780,13 @@
 
       <!-- Reminders Tab -->
       <section id="tab-reminders" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
-        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+        <div class="booking-ops-page-head mb-6">
+          <button class="booking-back-link" data-go-tab="settings" type="button">← Settings</button>
+          <p class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-600">Messages</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Reminders</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Choose which appointment emails are sent automatically and when.</p>
+        </div>
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Automated customer messages</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Reminders & follow-up</h2>
@@ -3826,8 +3851,12 @@
 
       <!-- Payments Tab -->
       <section id="tab-payments" class="dashboard-tab hidden">
-        <button class="mb-4 text-sm font-bold text-brand-600 hover:underline" data-go-tab="settings" type="button">← Back to Settings</button>
-        <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+        <div class="booking-ops-page-head mb-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking payments</p>
+          <h2 class="mt-1 text-2xl font-bold text-ink">Payments & plan</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Connect Stripe, understand what each fee covers and manage the plan that fits your booking volume.</p>
+        </div>
+        <div class="booking-ops-grid grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Online payments</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Stripe payments</h2>
@@ -3925,12 +3954,12 @@
 
       <!-- Diary Calendar View -->
       <section id="tab-calendar" class="dashboard-tab hidden space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="booking-ops-page-head flex flex-wrap items-center justify-between gap-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Diary</p>
             <h2 class="mt-1 text-2xl font-bold text-ink">Appointments</h2>
           </div>
-          <div class="inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
+          <div class="booking-view-switch inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-bold">
             <button class="rounded-lg bg-white px-4 py-2 text-ink shadow-sm" type="button">Calendar</button>
             <button class="rounded-lg px-4 py-2 text-slate-500" data-go-tab="bookings" type="button">List</button>
           </div>
@@ -3955,7 +3984,7 @@
                 <select id="calendarStaffFilter" class="field !w-auto min-w-40 !py-2 text-xs">
                   <option value="all">All team members</option>
                 </select>
-                <div class="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+                <div class="booking-view-switch flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
                   <button id="calendarMonthViewBtn" class="rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm" type="button">Month</button>
                   <button id="calendarWeekViewBtn" class="rounded-lg px-3 py-1.5 text-slate-500" type="button">Week</button>
                 </div>
