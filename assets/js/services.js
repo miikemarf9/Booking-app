@@ -318,7 +318,7 @@ function updateFreePlanFeePreview() {
                       <p class="mt-2 text-xs text-slate-500">${serviceNames.length ? escapeHtml(serviceNames.join(" · ")) : "No services assigned yet"}</p>
                     </div>
                   </div>
-                  <div class="flex shrink-0 gap-2">
+                  <div class="booking-record-actions">
                     <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-staff-action="edit" data-id="${member.id}">Edit</button>
                     <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-staff-action="toggle" data-id="${member.id}">${member.is_active ? "Deactivate" : "Activate"}</button>
                   </div>
