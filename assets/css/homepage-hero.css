@@ -2508,3 +2508,36 @@
     margin-top:3rem;
   }
 }
+
+
+/* Correct audience intro alignment: left-aligned on desktop. */
+#landingView .homepage-audience-intro{
+  max-width:650px;
+  margin-top:0;
+  margin-left:0;
+  margin-right:auto;
+  text-align:left;
+}
+#landingView .homepage-audience-intro h2{
+  max-width:620px;
+  margin-left:0;
+  margin-right:0;
+}
+#landingView .homepage-audience-intro>p:last-child{
+  max-width:570px;
+  margin-left:0;
+  margin-right:0;
+}
+@media(max-width:1023px){
+  #landingView .homepage-audience-intro{
+    max-width:720px;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+  }
+  #landingView .homepage-audience-intro h2,
+  #landingView .homepage-audience-intro>p:last-child{
+    margin-left:auto;
+    margin-right:auto;
+  }
+}
