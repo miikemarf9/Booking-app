@@ -1302,7 +1302,7 @@ function syncReminderFields() {
             ? "Pro remains active until the end of the current billing period."
             : `Pro remains active until ${new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(end)}.`;
         } else {
-          help.textContent = "0% Grab&Book transaction fee is active. Flexible booking payment options are unlocked.";
+          help.textContent = "0% Grab&Book platform fee is active. Stripe processing fees still apply to online card payments. Flexible booking payment options are unlocked.";
         }
 
         upgradeBtn.classList.add("hidden");
@@ -1311,7 +1311,7 @@ function syncReminderFields() {
         badge.textContent = "Free";
         badge.className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
         text.textContent = "Free plan";
-        help.textContent = "You are currently on Free. Pro removes the 3% Grab&Book fee.";
+        help.textContent = "You are currently on Free. Pro removes the 2% Grab&Book platform fee. Stripe processing fees still apply to online card payments.";
         upgradeBtn.classList.remove("hidden");
         manageBtn.classList.toggle("hidden", !row.stripe_customer_id);
       }
