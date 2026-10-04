@@ -172,7 +172,7 @@ function renderWorkspaceTasks() {
     return;
   }
 
-  const visible = workspaceTaskState.showAll ? open : open.slice(0, 8);
+  const visible = workspaceTaskState.showAll ? open : open.slice(0, 5);
   let lastGroup = null;
   list.innerHTML = visible.map(item => {
     const group = workspaceTaskGroup(item);
@@ -209,7 +209,7 @@ function renderWorkspaceTasks() {
 
   const showAll = $("workspaceTasksShowAllBtn");
   if (showAll) {
-    showAll.classList.toggle("hidden", open.length <= 8);
+    showAll.classList.toggle("hidden", open.length <= 5);
     showAll.textContent = workspaceTaskState.showAll ? "Show priority view" : "View all " + open.length;
   }
 }
