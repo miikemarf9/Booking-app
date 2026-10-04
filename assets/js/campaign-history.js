@@ -18,10 +18,10 @@ async function loadMarketingCampaignHistory(append = false) {
   $("moreCampaignHistoryBtn").disabled = false;
   if (error) { if (!append) host.textContent = "Campaign history could not be loaded. Use Refresh history to try again."; return; }
   if (!append) host.replaceChildren();
-  if (!data.length && !append) host.textContent = "No campaigns sent yet. Review a message above and choose Send campaign to create your first record.";
+  if (!data.length && !append) host.textContent = "No campaigns sent yet. Review a message above and choose Review & send campaign to create your first record.";
   for (const campaign of data) {
     const detail = document.createElement("details");
-    detail.className = "rounded-2xl border border-slate-200 p-4";
+    detail.className = "crm-campaign-history-item";
     detail.innerHTML = `<summary class="cursor-pointer text-sm"><strong>${escapeHtml(campaign.subject)}</strong><span class="ml-3 text-slate-500">${escapeHtml(campaignStatusLabels[campaign.status] || campaign.status)}</span><p class="mt-2 text-xs text-slate-500">${escapeHtml(campaignDate(campaign.created_at))} · ${escapeHtml(campaignAudienceLabels[campaign.audience_type] || String(campaign.audience_type).replaceAll("_", " "))}</p><p class="mt-2 text-xs">${campaign.requested_count} identified · ${campaign.sent_count} sent · ${campaign.failed_count} failed${campaign.status === "legacy" ? "" : ` · ${campaign.excluded_count} excluded`}</p></summary>
       <p class="mt-4 text-xs text-slate-500">Started: ${escapeHtml(campaignDate(campaign.started_at))} · Completed: ${escapeHtml(campaignDate(campaign.completed_at))}</p>
       <p class="mt-3 whitespace-pre-wrap break-words rounded-xl bg-slate-50 p-4 text-sm">${escapeHtml(campaign.message_text)}</p>
