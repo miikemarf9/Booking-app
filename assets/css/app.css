@@ -884,6 +884,123 @@
     }
 
 
+    /* Stage 2 navigation and shell */
+    #landingView > header,
+    .product-site-header {
+      box-shadow: 0 1px 0 rgba(23,32,51,.035), 0 8px 24px rgba(23,32,51,.03);
+    }
+    #landingView > header > div:first-child,
+    .product-site-header > div:first-child {
+      min-height: 68px;
+    }
+    .site-desktop-nav a {
+      position: relative;
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      padding: .35rem .1rem;
+      white-space: nowrap;
+    }
+    .product-site-header .site-desktop-nav a[aria-current="page"] {
+      color: var(--gb-brand-hover);
+    }
+    .product-site-header .site-desktop-nav a[aria-current="page"]::after {
+      content: "";
+      position: absolute;
+      left: .1rem;
+      right: .1rem;
+      bottom: .15rem;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--gb-brand-bright);
+    }
+    .landing-mobile-nav > div,
+    .product-mobile-nav > div {
+      scroll-snap-type: x proximity;
+      scroll-padding-inline: .25rem;
+      overscroll-behavior-x: contain;
+    }
+    .landing-mobile-nav a,
+    .product-mobile-nav a {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: start;
+      white-space: nowrap;
+      transition: background-color .15s ease, color .15s ease;
+    }
+    .landing-mobile-nav a:active,
+    .product-mobile-nav a:active {
+      transform: scale(.98);
+    }
+
+    #dashboardView > header > div {
+      min-height: 72px;
+    }
+    #dashboardView .dashboard-area-nav {
+      border-color: var(--gb-border-soft);
+      box-shadow: 0 1px 2px rgba(23,32,51,.03), 0 8px 20px rgba(23,32,51,.035);
+    }
+    #dashboardView .area-tab,
+    #dashboardView .subnav-tab {
+      min-height: 44px;
+      white-space: nowrap;
+    }
+    #dashboardView #dashboardSubnavWrap {
+      scrollbar-width: none;
+      overscroll-behavior-x: contain;
+    }
+    #dashboardView #dashboardSubnavWrap::-webkit-scrollbar {
+      display: none;
+    }
+    #dashboardView .dashboard-subnav {
+      padding: .25rem;
+    }
+    #dashboardView .subnav-tab {
+      padding-top: .62rem;
+      padding-bottom: .62rem;
+    }
+    #dashboardView [id^="crm-"][id$="-section"],
+    #dashboardView [id^="growth-"][id$="-section"] {
+      scroll-margin-top: 7.5rem;
+    }
+
+    @media (max-width: 639px) {
+      #landingView > header > div:first-child,
+      .product-site-header > div:first-child {
+        min-height: 62px;
+      }
+      #dashboardView > header > div {
+        min-height: 0;
+      }
+      #dashboardView .dashboard-header-actions {
+        gap: .5rem;
+      }
+      #dashboardView .dashboard-area-nav {
+        gap: .2rem;
+        padding: .3rem;
+      }
+      #dashboardView .area-tab {
+        padding-left: .5rem;
+        padding-right: .5rem;
+      }
+      #dashboardView #dashboardSubnavWrap {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        scroll-padding-inline: 1rem;
+      }
+      #dashboardView .dashboard-subnav {
+        scroll-snap-type: x proximity;
+      }
+      #dashboardView .dashboard-subnav .subnav-tab {
+        scroll-snap-align: center;
+      }
+    }
+
+
     /* Standalone public product pages */
     .product-site-shell {
       background:
