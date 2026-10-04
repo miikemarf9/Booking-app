@@ -3165,3 +3165,153 @@
     font-size:1.85rem;
   }
 }
+
+
+/* Semrush-style spacing for Scenario Lab and Priorities chapters. */
+#landingView .home-chapter-questions{
+  padding-top:5.4rem!important;
+  padding-bottom:6.6rem!important;
+  background:
+    linear-gradient(180deg,#ffffff 0%,#ffffff 76%,#f8fafc 100%);
+}
+#landingView .homepage-scenario-showcase{
+  max-width:1280px;
+  margin-top:0;
+  border:1px solid rgba(188,214,226,.78);
+  border-radius:1.45rem;
+  padding:3.8rem 3.7rem;
+  background:
+    radial-gradient(circle at 88% 18%,rgba(111,91,183,.08),transparent 28%),
+    radial-gradient(circle at 12% 84%,rgba(47,169,134,.09),transparent 30%),
+    linear-gradient(135deg,#eef7fb 0%,#edf7f4 52%,#f2effa 100%);
+  box-shadow:0 28px 72px -48px rgba(31,73,104,.3);
+}
+#landingView .homepage-scenario-showcase{
+  grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
+  gap:5.25rem;
+}
+#landingView .homepage-scenario-copy{
+  max-width:520px;
+}
+#landingView .homepage-scenario-copy h3{
+  font-size:clamp(1.85rem,2.9vw,2.45rem);
+}
+#landingView .homepage-scenario-copy>p:nth-of-type(2){
+  font-size:.97rem;
+  line-height:1.78;
+}
+#landingView .homepage-scenario-benefits{
+  margin-top:1.9rem;
+}
+#landingView .homepage-scenario-preview{
+  min-height:420px;
+  border-color:rgba(196,214,225,.9);
+  border-radius:1.25rem;
+  background:rgba(255,255,255,.95);
+  box-shadow:0 26px 64px -38px rgba(23,32,51,.28);
+}
+#landingView .homepage-scenario-preview-head{
+  padding:1.35rem 1.45rem;
+}
+#landingView .homepage-scenario-baseline{
+  padding:1.5rem 1.45rem 1.2rem;
+}
+#landingView .homepage-scenario-baseline>div{
+  gap:1rem;
+  margin-top:.9rem;
+}
+#landingView .homepage-scenario-baseline span{
+  padding:1.25rem;
+}
+#landingView .homepage-scenario-change{
+  margin:0 1.45rem 1.45rem;
+  padding:1.2rem;
+}
+#landingView .homepage-scenario-note{
+  margin:0 1.45rem 1.45rem;
+}
+#landingView .homepage-owner-priorities{
+  max-width:1280px;
+  margin-top:6.5rem;
+  padding-top:1rem;
+}
+#landingView .homepage-priorities-layout{
+  grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+  gap:5.4rem;
+}
+#landingView .homepage-owner-priorities-copy{
+  max-width:520px;
+  padding-top:1rem;
+}
+#landingView .homepage-owner-priorities-copy h3{
+  font-size:clamp(1.85rem,2.9vw,2.35rem);
+}
+#landingView .homepage-owner-priorities-copy>p:nth-of-type(2){
+  font-size:.97rem;
+  line-height:1.78;
+}
+#landingView .homepage-priority-benefits{
+  margin-top:1.85rem;
+}
+#landingView .homepage-priority-benefits span{
+  grid-template-columns:9.5rem 1fr;
+  padding:1rem 0;
+}
+#landingView .homepage-owner-priorities-preview{
+  min-height:430px;
+  padding:1.75rem;
+  border-radius:1.25rem;
+  background:
+    linear-gradient(180deg,#fbfcfd 0%,#f5f8fa 100%);
+  box-shadow:0 24px 62px -42px rgba(23,32,51,.28);
+}
+#landingView .homepage-owner-priorities-preview .space-y-3{
+  margin-top:1.1rem;
+}
+#landingView .homepage-owner-priorities-preview .space-y-3>div{
+  padding:1.1rem 1.15rem;
+}
+@media(max-width:1023px){
+  #landingView .home-chapter-questions{
+    padding-top:4.8rem!important;
+    padding-bottom:5.5rem!important;
+  }
+  #landingView .homepage-scenario-showcase{
+    gap:3rem;
+    padding:3rem;
+  }
+  #landingView .homepage-scenario-preview{
+    min-height:0;
+  }
+  #landingView .homepage-owner-priorities{
+    margin-top:5rem;
+  }
+  #landingView .homepage-priorities-layout{
+    gap:3rem;
+  }
+  #landingView .homepage-owner-priorities-preview{
+    min-height:0;
+  }
+}
+@media(max-width:639px){
+  #landingView .home-chapter-questions{
+    padding-top:4rem!important;
+    padding-bottom:4.6rem!important;
+  }
+  #landingView .homepage-scenario-showcase{
+    padding:1.55rem;
+    border-radius:1.15rem;
+  }
+  #landingView .homepage-scenario-copy h3,
+  #landingView .homepage-owner-priorities-copy h3{
+    font-size:1.75rem;
+  }
+  #landingView .homepage-owner-priorities{
+    margin-top:4rem;
+    padding-top:0;
+  }
+  #landingView .homepage-owner-priorities-preview{
+    padding:1.1rem;
+    border-radius:1.05rem;
+  }
+}
