@@ -48,12 +48,12 @@ function harness(customers, options={}) {
       if (options.networkFailure) throw new Error('Connection lost');
       return new Response(JSON.stringify(options.rejectSecond && sends===2 ? {message:'Rejected'} : {id:id(700+sends)}),{status:options.rejectSecond && sends===2 ? 422 : 200});
     }});
-  async function invoke(body={}) { const response=await handler(new Request('https://example.invalid',{method:'POST',headers:{Authorization:'Bearer fake','Content-Type':'application/json'},body:JSON.stringify({customer_ids:customers.map(c=>c.id),subject:'A visit',message_text:'Hello',request_id:id(1000),...body})}));return {status:response.status,data:await response.json()}; }
+  async function invoke(body={}) { const response=await handler(new Request('https://example.invalid',{method:'POST',headers:{Authorization:'Bearer fake','Content-Type':'application/json'},body:JSON.stringify({customer_ids:customers.map(c=>c.id),subject:'A visit',message_text:'Hello',request_id:id(1000),booking_url:`https://grabandbook.com/book.html?business=${id(900)}`,...body})}));return {status:response.status,data:await response.json()}; }
   return {tables,invoke,get sends(){return sends;},get deliveryReads(){return deliveryReads;},providerCalls};
 }
 test('saves exclusions, deduplicates email and preserves unsubscribe link',async()=>{
   const h=harness([customer(1),customer(2,{marketing_email_opt_in:false}),customer(3,{archived_at:'2026-01-01'}),customer(4,{email:'bad'}),customer(5,{email:'test1@example.invalid'})]);
-  const r=await h.invoke();assert.equal(r.status,200);assert.equal(h.sends,1);assert.equal(r.data.excluded,4);assert.equal(h.tables.marketing_campaign_recipients.length,5);assert.match(h.providerCalls[0].body,/unsubscribe/);assert.ok(h.providerCalls[0].headers['Idempotency-Key']);
+  const r=await h.invoke();assert.equal(r.status,200);assert.equal(h.sends,1);assert.equal(r.data.excluded,4);assert.equal(h.tables.marketing_campaign_recipients.length,5);assert.match(h.providerCalls[0].body,/unsubscribe/);assert.match(h.providerCalls[0].body,/gb_campaign/);assert.match(h.providerCalls[0].body,/gb_recipient/);assert.ok(h.tables.marketing_campaign_recipients[0].booking_link.includes('gb_campaign'));assert.ok(h.providerCalls[0].headers['Idempotency-Key']);
 });
 test('duplicate and simultaneous requests send only once',async()=>{
   const h=harness([customer(1)]);await Promise.all([h.invoke(),h.invoke()]);await h.invoke();assert.equal(h.sends,1);assert.equal(h.tables.marketing_email_campaigns.length,1);
