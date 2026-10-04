@@ -4205,3 +4205,36 @@
       #clientViewApp > header > div { align-items:flex-start; }
       #clientViewApp > header > div > div:last-child { width:100%; flex-wrap:wrap; }
     }
+
+
+    /* Stage 12 admin interface */
+    #adminApp .admin-shell-header { box-shadow:0 1px 0 rgba(23,32,51,.03); }
+    #adminApp .admin-stat-card { border-color:#e3e9f1; box-shadow:0 7px 22px rgba(23,32,51,.035); }
+    #adminApp .admin-client-toolbar { background:linear-gradient(180deg,#fff 0%,#fcfdff 100%); }
+    #adminApp .admin-business-row { outline:none; background:#fff; }
+    #adminApp .admin-business-row:hover,
+    #adminApp .admin-business-row:focus-visible { background:#f5faff; }
+    #adminApp .admin-business-row:focus-visible { box-shadow:inset 3px 0 0 #1687d9; }
+    #adminApp .admin-business-row.is-selected { background:#eef8ff; box-shadow:inset 3px 0 0 #1687d9; }
+    #adminApp #adminBusinessDetail { border-color:#dde6ee; box-shadow:0 10px 28px rgba(23,32,51,.045); }
+    #adminApp .admin-business-actions .btn { justify-content:center; }
+    #adminApp .admin-technical-details { overflow:hidden; border:1px solid #e5eaf0; border-radius:.9rem; background:#fff; }
+    #adminApp .admin-technical-details > summary { display:flex; min-height:44px; cursor:pointer; list-style:none; align-items:center; justify-content:space-between; gap:1rem; padding:.65rem .8rem; color:#667085; font-size:.72rem; font-weight:800; }
+    #adminApp .admin-technical-details > summary::-webkit-details-marker { display:none; }
+    #adminApp .admin-technical-details > summary span { transition:transform .16s ease; }
+    #adminApp .admin-technical-details[open] > summary span { transform:rotate(180deg); }
+    #adminApp #adminInspector { scroll-margin-top:5.5rem; border-color:#dde6ee; box-shadow:0 12px 34px rgba(23,32,51,.045); }
+    #adminApp .admin-inspector-tab { min-height:40px; transition:background-color .15s ease,color .15s ease,box-shadow .15s ease; }
+    #adminApp .admin-inspector-tab-active { background:#fff; color:#075b98; box-shadow:0 2px 8px rgba(23,32,51,.07); }
+    #adminApp .admin-inspector-tab[data-inspector-tab="support"].admin-inspector-tab-active { color:#92400e; background:#fffbeb; }
+    #adminApp #adminInspectorHealth { background:#fafcfe; }
+    #adminApp .admin-pause-access { color:#b42318; }
+    #adminApp .admin-pause-access:hover:not(:disabled) { border-color:#fecaca; background:#fff7f7; color:#991b1b; }
+    #adminApp .admin-support-safety { box-shadow:inset 3px 0 0 #1687d9; }
+    #adminApp table { font-variant-numeric:tabular-nums; }
+    @media (max-width:767px) {
+      #adminApp .admin-header-actions { width:100%; display:grid; grid-template-columns:1fr 1fr; }
+      #adminApp .admin-header-actions .btn:first-child { grid-column:1 / -1; }
+      #adminApp .admin-business-actions { grid-template-columns:1fr; }
+      #adminApp .admin-business-actions .sm\:col-span-2 { grid-column:auto; }
+    }
