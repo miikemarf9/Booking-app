@@ -1685,6 +1685,11 @@
       .manage-booking-actions .btn {
         width: 100%;
       }
+      #manageCancelConfirm > div {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      #manageCancelConfirm .btn,
       #manageBookingView #manageRescheduleConfirm .btn {
         width: 100%;
       }
