@@ -2318,7 +2318,7 @@
             </div>
 
             <form id="crmAutomationForm" class="mt-5 grid gap-4 lg:grid-cols-2">
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">Automatic rebooking reminders</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">Send one email when a regular customer reaches their normal return point and has nothing booked.</span>
@@ -2326,7 +2326,7 @@
                 <input id="crmAutoRebooking" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
               </label>
 
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">Automatic win-back emails</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">Contact customers who move well beyond their normal booking rhythm with no future appointment.</span>
@@ -2675,7 +2675,7 @@
                   </div>
                   <div id="srvDescription" class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Add useful details, what’s included, preparation notes or anything customers should know…"></div>
                 </div>
-                <p class="mt-1.5 text-xs leading-5 text-slate-400">Use bold, italic or underline for emphasis. Maximum 2,000 characters.</p>
+                <p class="mt-1.5 text-xs leading-5 text-slate-400">Formatting is optional.</p>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -2827,10 +2827,7 @@
                       <input id="srvFlexibleDiscountValue" class="field" type="number" min="0" max="100" step="0.01" value="10">
                     </div>
                   </div>
-                  <div class="rounded-xl bg-white/75 p-3 text-xs leading-5 text-slate-600">
-                    <strong>How assignment works:</strong> only team members assigned to this service, available at that exact time and not already booked are considered. The person with the fewest upcoming bookings is assigned automatically. You can change the assigned person later from Bookings.
-                  </div>
-                  <p class="text-xs leading-5 text-slate-500">If a scheduled promotional offer also applies, this flexible-team discount is applied afterwards.</p>
+                  <div class="rounded-xl bg-white/75 p-3 text-xs leading-5 text-slate-600">Grab&Book chooses from qualified, available team members and favours the person with fewer upcoming bookings. You can change the assignment later.</div>
                 </div>
               </div>
 
@@ -3075,27 +3072,25 @@
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer experience</p>
             <h2 class="mt-1 text-xl font-bold text-ink">What these rules do</h2>
-            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Stop last-minute bookings</strong>
+            <div class="booking-summary-list mt-5 text-sm leading-6 text-slate-500">
+              <div class="booking-summary-row">
+                <strong>Minimum notice</strong>
                 <span id="minimumNoticeSummary">Customers can currently book without a minimum notice period.</span>
               </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Limit future availability</strong>
+              <div class="booking-summary-row">
+                <strong>Advance booking</strong>
                 <span id="maximumBookingSummary">Customers can currently book up to 90 days ahead.</span>
               </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Cancellation cutoff</strong>
+              <div class="booking-summary-row">
+                <strong>Cancellation</strong>
                 <span id="cancellationCutoffSummary">Customers can currently cancel up to 24 hours before.</span>
               </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Reschedule cutoff</strong>
+              <div class="booking-summary-row">
+                <strong>Rescheduling</strong>
                 <span id="rescheduleCutoffSummary">Customers can currently reschedule up to 24 hours before.</span>
               </div>
-              <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-                These limits are enforced both in the interface and again in the database, so they cannot be bypassed by editing the page.
-              </div>
             </div>
+            <p class="mt-4 text-xs leading-5 text-slate-400">These limits are enforced again when the booking action is submitted.</p>
           </article>
         </div>
       </section>
@@ -3639,7 +3634,7 @@
                 <p class="mt-1.5 text-xs leading-5 text-slate-400">Enter one choice per line. Up to 20 choices.</p>
               </div>
 
-              <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
                 <input id="bookingQuestionRequired" class="mt-1 h-5 w-5 accent-slate-900" type="checkbox">
                 <span>
                   <span class="block font-bold text-ink">Required answer</span>
@@ -3793,7 +3788,7 @@
             <p class="mt-2 text-sm leading-6 text-slate-500">Choose which emails customers receive automatically around their appointment.</p>
 
             <form id="reminderSettingsForm" class="mt-6 space-y-4">
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">24 hours before</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">A reminder the day before the appointment.</span>
@@ -3801,7 +3796,7 @@
                 <input id="reminder24h" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
               </label>
 
-              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">2 hours before</span>
                   <span class="mt-1 block text-sm leading-5 text-slate-500">A final reminder shortly before the appointment.</span>
@@ -3835,15 +3830,10 @@
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">How it works</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Automatic once enabled</h2>
-            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
-              <p>Only <strong class="text-slate-700">confirmed</strong> bookings receive reminders.</p>
-              <p>If a customer cancels, future reminders stop automatically.</p>
-              <p>If a customer reschedules, reminder timing follows the new appointment time.</p>
-              <p>Emails include the service, date, time, business contact details and secure Reschedule / Cancel links.</p>
-              <p>Each reminder is logged so the same reminder is not intentionally sent twice.</p>
-            </div>
-            <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-500">
-              This reminder engine is structured so SMS and WhatsApp can be added later without changing the booking model.
+            <div class="booking-summary-list mt-5 text-sm leading-6 text-slate-500">
+              <div class="booking-summary-row"><strong>Confirmed bookings only</strong><span>Cancelled appointments stop receiving future reminders.</span></div>
+              <div class="booking-summary-row"><strong>Reschedules stay in sync</strong><span>Reminder timing follows the customer's new appointment time.</span></div>
+              <div class="booking-summary-row"><strong>Useful links included</strong><span>Emails contain appointment details plus secure Reschedule / Cancel links, and each send is logged.</span></div>
             </div>
           </article>
         </div>
@@ -3882,19 +3872,10 @@
           <article class="card p-5 sm:p-6">
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">How money moves</p>
             <h2 class="mt-1 text-xl font-bold text-ink">Simple for the customer</h2>
-            <div class="mt-5 space-y-3 text-sm leading-6 text-slate-500">
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Customer pays your advertised price</strong>
-                <span>No Grab&Book surcharge is added at checkout.</span>
-              </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Stripe processes the payment</strong>
-                <span>Stripe charges its processing fee separately on both Free and Pro. Standard UK cards are currently 1.5% + 20p; other cards and payment methods may cost more.</span>
-              </div>
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <strong class="block text-slate-700">Grab&Book keeps its platform fee</strong>
-                <span>Free is 2% per paid booking. Pro removes the Grab&Book platform fee only; Stripe processing fees still apply when a payment is processed online.</span>
-              </div>
+            <div class="booking-summary-list mt-5 text-sm leading-6 text-slate-500">
+              <div class="booking-summary-row"><strong>1 · Customer pays your price</strong><span>No Grab&Book surcharge is added at checkout.</span></div>
+              <div class="booking-summary-row"><strong>2 · Stripe processes it</strong><span>Stripe processing is separate on Free and Pro. Standard UK cards are currently 1.5% + 20p; other payments can cost more.</span></div>
+              <div class="booking-summary-row"><strong>3 · Grab&Book applies its fee</strong><span>Free is 2% per paid booking. Pro removes only the Grab&Book platform fee.</span></div>
             </div>
           </article>
 
@@ -3903,7 +3884,7 @@
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Grab&Book plan</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Free or Pro</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-500">Upgrade when the 2% Free-plan fee starts costing more than the monthly subscription.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">At about £1,450/month in paid bookings, Free&apos;s 2% Grab&Book fee equals the £29 Pro subscription.</p>
               </div>
               <span id="planStatusBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">Free</span>
             </div>
