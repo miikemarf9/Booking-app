@@ -9,7 +9,8 @@ const growthViewState = {
   funnelSummary: null,
   scenarioBaseline: null,
   healthPriority: null,
-  healthMetrics: []
+  healthMetrics: [],
+  retentionCampaignFeedback: null
 };
 
 function growthAnalyticsDays() {
@@ -1913,6 +1914,140 @@ function populateGrowthHealthWhy(priority, metrics) {
   campaignBtn.disabled = priority.key !== "Retention";
 }
 
+function growthRetentionCampaignAge(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "recently";
+  const days = Math.max(0, Math.floor((Date.now() - date.getTime()) / 86400000));
+  if (days === 0) return "today";
+  if (days === 1) return "1 day ago";
+  return days + " days ago";
+}
+
+function growthRetentionCampaignOutcome(campaign, recipients) {
+  const sentRows = (recipients || []).filter(function (recipient) {
+    return recipient.sent_at && ["sent", "delivered", "delivery_failed"].includes(recipient.status);
+  });
+  const laterBookings = (state.bookings || []).filter(function (booking) {
+    if (booking.status === "cancelled" || !booking.created_at) return false;
+    return sentRows.some(function (recipient) {
+      const customer = (state.customers || []).find(function (row) { return row.id === recipient.customer_id; }) || null;
+      const sameCustomer = customer
+        ? booking.customer_id === customer.id
+        : String(booking.customer_email || "").toLowerCase() === String(recipient.email || "").toLowerCase();
+      return sameCustomer && new Date(booking.created_at) >= new Date(recipient.sent_at);
+    });
+  });
+  const rebookedKeys = new Set(laterBookings.map(function (booking) {
+    return booking.customer_id || String(booking.customer_email || "").toLowerCase();
+  }));
+  const bookedValue = laterBookings.reduce(function (sum, booking) {
+    return sum + Number(booking.booked_price ?? booking.services?.price ?? 0);
+  }, 0);
+  const trackedRecipientIds = new Set(sentRows.filter(function (recipient) {
+    const customer = (state.customers || []).find(function (row) { return row.id === recipient.customer_id; });
+    return customer?.acquisition_last_touch?.gb_campaign === campaign.id &&
+      customer?.acquisition_last_touch?.gb_recipient === recipient.customer_id;
+  }).map(function (recipient) { return recipient.customer_id; }));
+  const trackedBookings = laterBookings.filter(function (booking) {
+    return trackedRecipientIds.has(booking.customer_id);
+  });
+  const trackedValue = trackedBookings.reduce(function (sum, booking) {
+    return sum + Number(booking.booked_price ?? booking.services?.price ?? 0);
+  }, 0);
+
+  return {
+    sentCount: sentRows.length,
+    rebookedCustomers: rebookedKeys.size,
+    bookedValue,
+    trackedBookings: trackedBookings.length,
+    trackedValue
+  };
+}
+
+function renderGrowthRetentionCampaignFeedback(campaign, recipients) {
+  const card = $("growthRetentionCampaignFeedback");
+  if (!card) return;
+
+  if (!campaign || !recipients?.length) {
+    growthViewState.retentionCampaignFeedback = null;
+    card.classList.add("hidden");
+    return;
+  }
+
+  const outcome = growthRetentionCampaignOutcome(campaign, recipients);
+  if (!outcome.sentCount) {
+    growthViewState.retentionCampaignFeedback = null;
+    card.classList.add("hidden");
+    return;
+  }
+
+  growthViewState.retentionCampaignFeedback = { campaign, outcome };
+  const when = growthRetentionCampaignAge(campaign.completed_at || campaign.created_at);
+  $("growthRetentionCampaignFeedbackTitle").textContent = "Rebooking campaign sent " + when;
+  $("growthRetentionCampaignFeedbackSummary").textContent =
+    outcome.rebookedCustomers + " of " + outcome.sentCount + " contacted customer" +
+    (outcome.sentCount === 1 ? "" : "s") + " subsequently rebooked · " +
+    money(outcome.bookedValue) + " subsequent booked value.";
+
+  const attribution = $("growthRetentionCampaignFeedbackAttribution");
+  if (outcome.trackedBookings) {
+    attribution.textContent =
+      outcome.trackedBookings + " subsequent booking" + (outcome.trackedBookings === 1 ? "" : "s") +
+      " currently have this campaign link as their latest recorded source · " +
+      money(outcome.trackedValue) +
+      ". Subsequent bookings are not necessarily caused by the campaign; campaign-link tracking depends on analytics consent.";
+  } else {
+    attribution.textContent =
+      "Subsequent bookings are not necessarily caused by the campaign. No campaign-link booking is currently recorded as the customer's latest source; link tracking depends on analytics consent.";
+  }
+
+  const button = $("growthRetentionCampaignResultsBtn");
+  if (button) {
+    button.onclick = function () {
+      if (typeof goDashboardSection === "function") goDashboardSection("crm-campaigns-section");
+      if (typeof loadMarketingCampaignHistory === "function") loadMarketingCampaignHistory();
+    };
+  }
+  card.classList.remove("hidden");
+}
+
+async function loadGrowthRetentionCampaignFeedback() {
+  const card = $("growthRetentionCampaignFeedback");
+  if (!state.profile || !card) return;
+
+  try {
+    const { data: campaigns, error } = await supabaseClient.from("marketing_email_campaigns")
+      .select("id,audience_type,status,sent_count,created_at,completed_at")
+      .eq("profile_id", state.profile.id)
+      .eq("audience_type", "business-health-retention")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw error;
+
+    const campaign = (campaigns || []).find(function (row) {
+      return row.status !== "legacy" && Number(row.sent_count || 0) > 0;
+    }) || null;
+    if (!campaign) {
+      renderGrowthRetentionCampaignFeedback(null, []);
+      return;
+    }
+
+    const { data: recipients, error: recipientError } = await supabaseClient.from("marketing_campaign_recipients")
+      .select("customer_id,email,status,sent_at")
+      .eq("profile_id", state.profile.id)
+      .eq("campaign_id", campaign.id)
+      .order("created_at")
+      .limit(1000);
+    if (recipientError) throw recipientError;
+
+    renderGrowthRetentionCampaignFeedback(campaign, recipients || []);
+  } catch (err) {
+    console.error("Business Health retention campaign feedback error:", err);
+    growthViewState.retentionCampaignFeedback = null;
+    card.classList.add("hidden");
+  }
+}
+
 function renderGrowthBusinessHealthMetrics() {
   if (!$("growthBusinessHealth")) return;
 
@@ -2012,7 +2147,8 @@ async function loadGrowthAnalytics(showToast = false) {
   const tasks = [
     loadGrowthPeriodComparison(),
     loadGrowthChannelAreaAnalytics(false),
-    loadGrowthFunnelAnalytics(false)
+    loadGrowthFunnelAnalytics(false),
+    loadGrowthRetentionCampaignFeedback()
   ];
 
   if (typeof loadGrowthImportHistory === "function") {
