@@ -45,7 +45,7 @@
   </script>
   
     <link rel="stylesheet" href="assets/css/app.css?v=homepage-benefits-1">
-  <link rel="stylesheet" href="assets/css/homepage-hero.css?v=story-depth-1">
+  <link rel="stylesheet" href="assets/css/homepage-hero.css?v=rotating-story-1">
 
   <script type="application/ld+json">
   {
@@ -156,25 +156,23 @@
               <div class="gb-demo-intro"><span>BOOK. UNDERSTAND. GROW.</span></div>
               <div class="gb-demo-window">
                 <div class="gb-demo-chrome"><img src="grabandbook-logo.svg" alt="Grab&Book" width="126" height="28"><span class="gb-demo-business">The Studio <span class="gb-demo-avatar" aria-hidden="true">S</span></span></div>
-                <div class="gb-demo-tabs" role="tablist" aria-label="Explore the connected product">
-                  <button type="button" role="tab" id="gb-tab-book" aria-selected="true" aria-controls="gb-panel-book" data-gb-step="0"><span>01</span> Book</button>
-                  <button type="button" role="tab" id="gb-tab-crm" aria-selected="false" aria-controls="gb-panel-crm" tabindex="-1" data-gb-step="1"><span>02</span> CRM</button>
-                  <button type="button" role="tab" id="gb-tab-growth" aria-selected="false" aria-controls="gb-panel-growth" tabindex="-1" data-gb-step="2"><span>03</span> Growth</button>
+                <div class="gb-story-progress" aria-hidden="true">
+                  <span class="gb-story-dot is-active"></span><span class="gb-story-dot"></span><span class="gb-story-dot"></span>
                 </div>
-                <div class="gb-demo-stage">
-                  <div class="gb-demo-panel" id="gb-panel-book" role="tabpanel" aria-labelledby="gb-tab-book" tabindex="0">
+                <div class="gb-demo-stage" aria-live="polite">
+                  <div class="gb-demo-panel" id="gb-panel-book" data-gb-face="0">
                     <div class="gb-panel-heading"><div><p>BOOK · LESS ADMIN</p><h2>Take bookings while you work.</h2><p class="gb-panel-purpose">Customers choose an available time. Your diary updates.</p></div></div>
                     <div class="gb-diary"><div class="gb-diary-line"><time>13:00</time><div class="gb-appointment gb-muted-appointment"><span>Consultation<small>James · 30 min</small></span><b>£30</b></div></div><div class="gb-diary-line"><time>14:00</time><div class="gb-diary-gap">Time to reset <span>30 min buffer</span></div></div><div class="gb-diary-line"><time>14:30</time><div class="gb-appointment gb-new-appointment"><span>Signature treatment<small>Amelia Taylor · 60 min</small></span><b>£65<small>Confirmed ✓</small></b></div></div></div>
                     <div class="gb-booking-notice"><span class="gb-notice-icon" aria-hidden="true">✓</span><div><strong>A confirmed appointment. No back-and-forth.</strong><p>Spend less time arranging appointments and more time with customers.</p></div></div>
                   </div>
-                  <div class="gb-demo-panel" id="gb-panel-crm" role="tabpanel" aria-labelledby="gb-tab-crm" tabindex="0" hidden>
+                  <div class="gb-demo-panel" id="gb-panel-crm" data-gb-face="1" hidden>
                     <div class="gb-panel-heading"><div><p>CRM · BUILD REPEAT BUSINESS</p><h2>Know who to welcome back.</h2><p class="gb-panel-purpose">See past visits, customer value and the next appointment together.</p></div></div>
                     <div class="gb-customer"><span class="gb-customer-avatar">AT</span><div><h3>Amelia Taylor</h3><p>Returning customer <span>•</span> First found you on Instagram</p></div></div>
                     <div class="gb-customer-stats"><div><strong>3</strong><span>Completed visits</span></div><div><strong>£260</strong><span>Total booked value</span></div><div><strong>14:30</strong><span>Next appointment</span></div></div>
                     <div class="gb-customer-history"><span class="gb-history-dot" aria-hidden="true"></span><div><strong>Signature treatment booked</strong><p>Friday · 14:30 · £65</p></div><span class="gb-status">Upcoming</span></div>
                     <div class="gb-panel-insight"><strong>Make the next visit more personal.</strong> Use customer history to plan a relevant follow-up.</div>
                   </div>
-                  <div class="gb-demo-panel" id="gb-panel-growth" role="tabpanel" aria-labelledby="gb-tab-growth" tabindex="0" hidden>
+                  <div class="gb-demo-panel" id="gb-panel-growth" data-gb-face="2" hidden>
                     <div class="gb-panel-heading"><div><p>GROWTH · MAKE INFORMED DECISIONS</p><h2>Know where to focus your marketing.</h2><p class="gb-panel-purpose">Connect a recorded source to bookings and customer value.</p></div></div>
                     <div class="gb-source-card"><span class="gb-source-icon" aria-hidden="true">◎</span><div><strong>Instagram</strong><p>Amelia’s first recorded source</p></div><span class="gb-status">Tracked link</span></div>
                     <div class="gb-value-heading"><div><span>Amelia’s total booked value</span><strong>£260</strong></div><span>4 bookings<br>including Friday</span></div>
@@ -182,11 +180,7 @@
                     <p class="gb-attribution-note">Cumulative booked value, not payments received. Sources shown when tracking is available.</p>
                   </div>
                 </div>
-                <div class="gb-demo-footer"><span class="gb-demo-caption">Less booking admin. More time for your customers.</span><button type="button" class="gb-demo-control" aria-label="Play product walkthrough">Play demo <span aria-hidden="true">▶</span></button></div>
-              </div>
-              <div class="gb-connected-cards" aria-label="Connected business benefits">
-                <div class="gb-connected-card gb-connected-crm"><span class="gb-connected-label">CRM</span><strong>One customer. A growing history.</strong><div class="gb-connected-detail"><span class="gb-mini-avatar">AT</span><span>Amelia Taylor<small>3 visits · Next booking Friday</small></span></div></div>
-                <div class="gb-connected-card gb-connected-growth"><span class="gb-connected-label">GROWTH</span><strong>See where customer value starts.</strong><div class="gb-connected-detail"><span class="gb-mini-bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Instagram → £260<small>Amelia’s total booked value</small></span></div></div>
+                <div class="gb-demo-footer"><span class="gb-demo-caption">A booking lands in the diary.</span><button type="button" class="gb-demo-control" aria-label="Play product walkthrough">Play demo ▶</button></div>
               </div>
               <p id="gb-demo-disclaimer" class="gb-demo-disclaimer">Illustrative product preview · Example business, customer and figures.</p>
             </div>
@@ -4797,7 +4791,7 @@
   <script src="assets/js/bookings.js?v=stage11-secondary-1"></script>
   <script src="assets/js/public-booking.js?v=stage7-customer-1"></script>
   <script src="assets/js/landing-preview.js"></script>
-  <script src="assets/js/homepage-hero.js?v=story-depth-1"></script>
+  <script src="assets/js/homepage-hero.js?v=rotating-story-1"></script>
   <script src="assets/js/boot.js"></script>
   <script src="assets/js/marketing-site.js" defer></script>
 </body>
