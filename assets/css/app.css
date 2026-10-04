@@ -1535,6 +1535,169 @@
     }
 
 
+    /* Stage 7 customer booking journey */
+    #publicBookingView .booking-step {
+      scroll-margin-top: 6.5rem;
+    }
+    #publicBookingView .service-choice,
+    #publicBookingView .staff-choice {
+      min-height: 4.75rem;
+    }
+    #publicBookingView .service-choice,
+    #publicBookingView .staff-choice,
+    #publicBookingView .slot-choice,
+    #manageBookingView .manage-slot-choice,
+    .booking-date-choice {
+      -webkit-tap-highlight-color: transparent;
+    }
+    #publicBookingView .service-choice:focus-visible,
+    #publicBookingView .staff-choice:focus-visible,
+    #publicBookingView .slot-choice:focus-visible,
+    #manageBookingView .manage-slot-choice:focus-visible,
+    .booking-date-choice:focus-visible {
+      outline: none;
+      box-shadow: var(--gb-focus-ring);
+    }
+    #publicBookingView .slot-choice,
+    #manageBookingView .manage-slot-choice {
+      min-height: 46px;
+      border-radius: .8rem;
+      background: #fff;
+    }
+    .booking-date-strip {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: x proximity;
+    }
+    .booking-date-choice {
+      display: flex;
+      min-width: 5.15rem;
+      min-height: 4.25rem;
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .16rem;
+      border: 1px solid var(--gb-border-soft);
+      border-radius: .95rem;
+      background: #fff;
+      color: #667085;
+      transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease;
+    }
+    .booking-date-choice:not(:disabled):hover {
+      border-color: #b7c7d6;
+      transform: translateY(-1px);
+    }
+    .booking-date-choice span {
+      font-size: .7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .booking-date-choice strong {
+      color: var(--gb-ink);
+      font-size: .88rem;
+      font-weight: 900;
+    }
+    .booking-date-choice.selected {
+      border-color: var(--customer-brand-border, var(--gb-brand-bright));
+      background: var(--customer-brand-soft, var(--gb-brand-soft));
+      color: var(--customer-brand-dark, var(--gb-brand));
+      box-shadow: 0 0 0 1px var(--customer-brand-border, var(--gb-brand-bright));
+    }
+    .booking-date-choice:disabled {
+      cursor: not-allowed;
+      opacity: .42;
+    }
+    .booking-more-date-toggle {
+      display: inline-flex;
+      min-height: 2.5rem;
+      align-items: center;
+      list-style: none;
+    }
+    .booking-more-date-toggle::-webkit-details-marker {
+      display: none;
+    }
+    .booking-more-date-toggle::after {
+      content: "⌄";
+      margin-left: .4rem;
+      color: #98a2b3;
+      font-size: .8rem;
+    }
+    #publicBookingView #publicPaymentNote:empty {
+      display: none;
+    }
+    #publicBookingView #publicPaymentNote {
+      border: 1px solid color-mix(in srgb, var(--customer-brand-border, #1687d9) 18%, white);
+      background: var(--customer-brand-soft, #eef8ff);
+      color: var(--customer-brand-dark, #075b98);
+    }
+    #publicBookingView .progress-step {
+      min-height: 2.65rem;
+    }
+    #publicBookingView .progress-step[data-status="complete"] .progress-dot::after {
+      content: "✓";
+      font-size: .68rem;
+    }
+    #publicBookingView .progress-step[data-status="complete"] .progress-dot {
+      font-size: 0;
+    }
+    #manageBookingView {
+      background: #f7f9fc;
+    }
+    #manageBookingView .manage-slot-choice.selected {
+      border-color: var(--gb-brand-bright);
+      background: var(--gb-brand-soft);
+      color: var(--gb-brand);
+      box-shadow: 0 0 0 1px var(--gb-brand-bright);
+    }
+    #manageBookingView #manageReschedulePanel {
+      scroll-margin-top: 1.5rem;
+    }
+
+    @media (max-width: 639px) {
+      #publicBookingView main {
+        padding-top: 1rem;
+      }
+      #publicBookingView #publicProgress {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      #publicBookingView .booking-step {
+        padding: 1.1rem;
+      }
+      #publicBookingView #publicSlots,
+      #manageBookingView #manageSlots {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      #publicBookingView #confirmBookingBtn {
+        min-height: 3.15rem;
+        font-size: .95rem;
+      }
+      .manage-booking-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .manage-booking-actions .btn {
+        width: 100%;
+      }
+      #manageBookingView #manageRescheduleConfirm .btn {
+        width: 100%;
+      }
+      #bookingSuccess #successManageActions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      #bookingSuccess #successManageActions .btn {
+        width: 100%;
+      }
+    }
+
+
     /* Standalone public product pages */
     .product-site-shell {
       background:
