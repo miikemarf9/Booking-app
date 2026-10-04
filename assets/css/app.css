@@ -301,6 +301,7 @@
     #publicBookingView .text-brand-700 { color: var(--customer-brand-dark) !important; }
     #publicBookingView .border-brand-500 { border-color: var(--customer-brand-border) !important; }
     #publicBookingView .service-choice.selected,
+    #publicBookingView .staff-choice.selected,
     #publicBookingView .slot-choice.selected {
       border-color: var(--customer-brand-border) !important;
       background: var(--customer-brand-soft) !important;
