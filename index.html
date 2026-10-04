@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=stage4-first-run-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=stage5-overview-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=2">
 
   <script type="application/ld+json">
@@ -961,66 +961,69 @@
         </div>
       </article>
 
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          <article class="card p-5">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Services</p>
-            <p id="statServices" class="mt-2 text-3xl font-bold text-ink">0</p>
-            <p class="mt-1 text-xs text-slate-500">available to customers</p>
+        <div class="overview-heading flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-black uppercase tracking-[.16em] text-brand-600">Home</p>
+            <h2 class="mt-1 text-2xl font-black tracking-[-.025em] text-ink">Today at a glance</h2>
+            <p id="overviewDateLabel" class="mt-1 text-sm text-slate-500"></p>
+          </div>
+          <button type="button" class="btn btn-light" data-go-tab="calendar">Open diary →</button>
+        </div>
+
+        <div class="overview-kpi-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <article class="overview-kpi">
+            <p class="overview-kpi-label">Today</p>
+            <p id="statToday" class="overview-kpi-value">0</p>
+            <p class="overview-kpi-detail">appointments today</p>
           </article>
-          <article class="card p-5">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Customers</p>
-            <p id="statCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
-            <p class="mt-1 text-xs text-slate-500">unique customer profiles</p>
+          <article class="overview-kpi">
+            <p class="overview-kpi-label">Next appointment</p>
+            <p id="statNext" class="overview-kpi-value text-[1.65rem]">—</p>
+            <p id="statNextDetail" class="overview-kpi-detail">nothing upcoming</p>
           </article>
-          <article class="card p-5">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Open dates</p>
-            <p id="statDates" class="mt-2 text-3xl font-bold text-ink">0</p>
-            <p class="mt-1 text-xs text-slate-500">with active availability</p>
+          <article class="overview-kpi">
+            <p class="overview-kpi-label">Upcoming</p>
+            <p id="statBookings" class="overview-kpi-value">0</p>
+            <p class="overview-kpi-detail">future appointments</p>
           </article>
-          <article class="card p-5">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Upcoming</p>
-            <p id="statBookings" class="mt-2 text-3xl font-bold text-ink">0</p>
-            <p class="mt-1 text-xs text-slate-500">future appointments</p>
+          <article class="overview-kpi">
+            <p class="overview-kpi-label">Booked value</p>
+            <p id="statValue" class="overview-kpi-value">£0</p>
+            <p class="overview-kpi-detail">from upcoming bookings</p>
           </article>
-          <article class="card p-5">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booked value</p>
-            <p id="statValue" class="mt-2 text-3xl font-bold text-ink">£0</p>
-            <p class="mt-1 text-xs text-slate-500">from upcoming bookings</p>
+          <article class="overview-kpi">
+            <p class="overview-kpi-label">Customers</p>
+            <p id="statCustomers" class="overview-kpi-value">0</p>
+            <p class="overview-kpi-detail">customer profiles</p>
           </article>
         </div>
 
         <article class="card p-5 sm:p-6">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Today & priorities</p>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Priorities</p>
               <h2 class="mt-1 text-xl font-bold text-ink">What needs doing next?</h2>
-              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Tasks and reminders are ordered around today first, then anything overdue, then upcoming work. Within each date group, high-priority work rises to the top.</p>
+              <p class="mt-2 text-sm leading-6 text-slate-500">Today, overdue and next up — kept in one place.</p>
             </div>
-            <button id="workspaceTaskAddBtn" class="btn btn-primary" type="button">Add task / reminder</button>
+            <button id="workspaceTaskAddBtn" class="btn btn-primary" type="button">Add task</button>
           </div>
 
-          <div class="mt-5 grid gap-3 sm:grid-cols-3">
-            <div class="rounded-2xl bg-brand-50 p-4">
-              <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-700">Today</p>
-              <p id="workspacePriorityTodayCount" class="mt-1 text-2xl font-bold text-ink">0</p>
-              <p class="mt-1 text-xs text-slate-500">due or reminding today</p>
+          <div class="overview-priority-counts mt-5 flex flex-wrap gap-2">
+            <div class="overview-priority-chip">
+              <span>Today</span><strong id="workspacePriorityTodayCount">0</strong>
             </div>
-            <div class="rounded-2xl bg-red-50 p-4">
-              <p class="text-[.68rem] font-bold uppercase tracking-wider text-red-700">Needs attention</p>
-              <p id="workspacePriorityOverdueCount" class="mt-1 text-2xl font-bold text-ink">0</p>
-              <p class="mt-1 text-xs text-slate-500">overdue tasks or reminders</p>
+            <div class="overview-priority-chip overview-priority-chip-alert">
+              <span>Overdue</span><strong id="workspacePriorityOverdueCount">0</strong>
             </div>
-            <div class="rounded-2xl bg-slate-50 p-4">
-              <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-500">Upcoming</p>
-              <p id="workspacePriorityUpcomingCount" class="mt-1 text-2xl font-bold text-ink">0</p>
-              <p class="mt-1 text-xs text-slate-500">scheduled ahead</p>
+            <div class="overview-priority-chip">
+              <span>Upcoming</span><strong id="workspacePriorityUpcomingCount">0</strong>
             </div>
           </div>
 
-          <div class="mt-5 flex flex-wrap items-center gap-2">
-            <span class="mr-1 text-xs font-bold uppercase tracking-wider text-slate-400">Assigned</span>
+          <div id="workspaceAssignmentFilters" class="mt-4 flex flex-wrap items-center gap-2">
+            <span class="mr-1 text-xs font-bold uppercase tracking-wider text-slate-400">Show</span>
             <button class="workspace-assignment-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white" data-workspace-assignment-filter="all" type="button">Everyone</button>
-            <button class="workspace-assignment-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-workspace-assignment-filter="mine" type="button">Owner · me</button>
+            <button class="workspace-assignment-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-workspace-assignment-filter="mine" type="button">Mine</button>
             <button class="workspace-assignment-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-workspace-assignment-filter="team" type="button">Team</button>
           </div>
 
@@ -1044,16 +1047,16 @@
             <div id="overviewBookings" class="mt-5 space-y-3"></div>
           </article>
 
-          <article class="card p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer link</p>
-            <h2 class="mt-1 text-xl font-bold text-ink">Share your page</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Send this link to customers or add it to your website and social profiles.</p>
+          <article id="overviewShareCard" class="card p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Booking page</p>
+            <h2 class="mt-1 text-xl font-bold text-ink">Share with customers</h2>
+            <p id="overviewShareHelp" class="mt-2 text-sm leading-6 text-slate-500">Send this link to customers or add it to your website and social profiles.</p>
             <label class="label mt-5" for="publicBookingUrl">Public booking URL</label>
             <div class="flex gap-2">
               <input id="publicBookingUrl" class="field min-w-0 text-xs" type="url" readonly>
               <button id="copyBookingUrlBtn" type="button" class="btn btn-dark shrink-0">Copy</button>
             </div>
-            <button id="mobileOpenBookingPageBtn" type="button" class="btn btn-light mt-3 w-full sm:hidden">View booking page ↗</button>
+            <button id="mobileOpenBookingPageBtn" type="button" class="btn btn-light mt-3 w-full">Preview booking page ↗</button>
           </article>
         </div>
       </section>

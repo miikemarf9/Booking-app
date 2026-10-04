@@ -1445,6 +1445,7 @@
       const mobileButton = $("mobileOpenBookingPageBtn");
       if (headerButton) headerButton.textContent = setup.ready ? "View booking page ↗" : "Preview booking page ↗";
       if (mobileButton) mobileButton.textContent = setup.ready ? "View booking page ↗" : "Preview booking page ↗";
+      renderOverviewPageState();
     }
 
     function renderDashboard() {
@@ -1477,23 +1478,99 @@
       }
     }
 
-    function renderStats() {
+    function upcomingOverviewBookings() {
       const now = Date.now();
-      const upcoming = state.bookings.filter(b => b.status !== "cancelled" && new Date(b.start_time).getTime() >= now);
-      const activeDates = new Set(state.blocks.filter(b => b.is_active && b.block_date >= todayKey()).map(b => b.block_date));
-      const totalVal = upcoming.reduce((acc, b) => acc + Number(b.booked_price ?? b.services?.price ?? state.services.find(s => s.id === b.service_id)?.price ?? 0), 0);
+      return state.bookings
+        .filter(booking => booking.status !== "cancelled" && new Date(booking.start_time).getTime() >= now)
+        .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    }
 
-      $("statServices").textContent = state.services.length;
-      $("statCustomers").textContent = state.customers.filter(c => !c.archived_at).length;
-      $("statDates").textContent = activeDates.size;
-      $("statBookings").textContent = upcoming.length;
+    function renderOverviewPageState() {
+      const setup = firstRunSetupStatus();
+      const shareReady = setup.ready;
+      const help = $("overviewShareHelp");
+      const copyBtn = $("copyBookingUrlBtn");
+
+      if (help) {
+        help.textContent = shareReady
+          ? "Send this link to customers or add it to your website and social profiles."
+          : "Preview the page while you finish setup. The link is ready to share once the setup steps above are complete.";
+      }
+      if (copyBtn) {
+        copyBtn.disabled = !shareReady;
+        copyBtn.title = shareReady ? "Copy booking page link" : "Finish setup before sharing the booking link";
+      }
+    }
+
+    function renderStats() {
+      const upcoming = upcomingOverviewBookings();
+      const today = todayKey();
+      const todayBookings = state.bookings.filter(booking =>
+        booking.status !== "cancelled" &&
+        dateKeyInZone(new Date(booking.start_time)) === today
+      );
+      const next = upcoming[0] || null;
+      const totalVal = upcoming.reduce((acc, booking) => {
+        const service = booking.services || state.services.find(item => item.id === booking.service_id) || {};
+        return acc + Number(booking.booked_price ?? service.price ?? 0);
+      }, 0);
+
+      $("overviewDateLabel").textContent = new Intl.DateTimeFormat("en-GB", {
+        timeZone: BUSINESS_TIME_ZONE,
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+      }).format(new Date());
+
+      $("statToday").textContent = String(todayBookings.length);
+      $("statCustomers").textContent = state.customers.filter(customer => !customer.archived_at).length;
+      $("statBookings").textContent = String(upcoming.length);
       $("statValue").textContent = money(totalVal);
+
+      if (next) {
+        const nextDateKey = dateKeyInZone(new Date(next.start_time));
+        $("statNext").textContent = prettyTime(new Date(next.start_time));
+        $("statNextDetail").textContent =
+          (nextDateKey === today ? "Today" : prettyDate(new Date(next.start_time), false)) +
+          " · " +
+          (next.customer_name || "Customer");
+      } else {
+        $("statNext").textContent = "—";
+        $("statNextDetail").textContent = "nothing upcoming";
+      }
+
+      renderOverviewPageState();
+    }
+
+    function overviewBookingCard(booking) {
+      const service = booking.services || state.services.find(item => item.id === booking.service_id) || {};
+      const member = booking.staff_members || state.staff.find(item => item.id === booking.staff_id) || null;
+      const start = new Date(booking.start_time);
+      const isToday = dateKeyInZone(start) === todayKey();
+      const dateLabel = isToday ? "Today" : prettyDate(start, false);
+      const value = booking.booked_price != null ? money(booking.booked_price) : (service.price != null ? money(service.price) : "");
+
+      return `
+        <div class="overview-booking-row">
+          <div class="overview-booking-time">
+            <strong>${escapeHtml(prettyTime(start))}</strong>
+            <span>${escapeHtml(dateLabel)}</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="truncate font-bold text-ink">${escapeHtml(booking.customer_name || "Customer")}</h3>
+            <p class="mt-0.5 truncate text-sm text-slate-500">
+              ${escapeHtml(service.title || "Service")}${member ? ` · ${escapeHtml(member.name)}` : ""}
+            </p>
+          </div>
+          ${value ? `<span class="overview-booking-value">${escapeHtml(value)}</span>` : ""}
+        </div>
+      `;
     }
 
     function renderOverviewBookings() {
-      const upcoming = state.bookings.filter(b => b.status !== "cancelled" && new Date(b.start_time) >= new Date()).slice(0, 4);
+      const upcoming = upcomingOverviewBookings().slice(0, 4);
       $("overviewBookings").innerHTML = upcoming.length
-        ? upcoming.map(b => bookingCard(b)).join("")
+        ? upcoming.map(overviewBookingCard).join("")
         : emptyState(
             "No upcoming bookings",
             firstRunSetupStatus().ready

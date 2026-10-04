@@ -131,6 +131,14 @@ function workspaceFilteredOpenItems() {
 }
 
 function renderWorkspaceAssignmentFilters() {
+  const activeTeam = (state.staff || []).filter(member => member.is_active);
+  const wrap = $("workspaceAssignmentFilters");
+  if (wrap) wrap.classList.toggle("hidden", activeTeam.length === 0);
+
+  if (!activeTeam.length && workspaceTaskState.assignmentFilter !== "all") {
+    workspaceTaskState.assignmentFilter = "all";
+  }
+
   document.querySelectorAll("[data-workspace-assignment-filter]").forEach(button => {
     const active = button.dataset.workspaceAssignmentFilter === workspaceTaskState.assignmentFilter;
     button.className = active
@@ -143,6 +151,7 @@ function renderWorkspaceTasks() {
   const list = $("workspacePriorityList");
   if (!list) return;
 
+  renderWorkspaceAssignmentFilters();
   const allOpen = workspaceTaskState.items.filter(item => item.status === "open");
   const open = workspaceFilteredOpenItems().sort(workspaceTaskSort);
   const todayCount = allOpen.filter(item => workspaceTaskGroup(item) === 0).length;
@@ -152,24 +161,23 @@ function renderWorkspaceTasks() {
   if ($("workspacePriorityTodayCount")) $("workspacePriorityTodayCount").textContent = String(todayCount);
   if ($("workspacePriorityOverdueCount")) $("workspacePriorityOverdueCount").textContent = String(overdueCount);
   if ($("workspacePriorityUpcomingCount")) $("workspacePriorityUpcomingCount").textContent = String(upcomingCount);
-  renderWorkspaceAssignmentFilters();
 
   if (!open.length) {
     const filtered = workspaceTaskState.assignmentFilter !== "all";
     list.innerHTML = '<div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center">' +
-      '<p class="font-bold text-slate-600">' + (filtered ? "No open tasks in this assignment view" : "Nothing needs your attention") + '</p>' +
-      '<p class="mt-1 text-sm text-slate-400">' + (filtered ? "Switch assignment filters or add a new task." : "Add a task or turn a note into a reminder and it will appear here.") + '</p>' +
+      '<p class="font-bold text-slate-600">' + (filtered ? "No open tasks in this view" : "No priorities right now") + '</p>' +
+      '<p class="mt-1 text-sm text-slate-400">' + (filtered ? "Switch the filter or add a task." : "Add something when there is work you want to keep visible.") + '</p>' +
     '</div>';
     $("workspaceTasksShowAllBtn")?.classList.add("hidden");
     return;
   }
 
-  const visible = workspaceTaskState.showAll ? open : open.slice(0, 8);
+  const visible = workspaceTaskState.showAll ? open : open.slice(0, 5);
   let lastGroup = null;
   list.innerHTML = visible.map(item => {
     const group = workspaceTaskGroup(item);
     const timing = workspaceTaskTiming(item);
-    const source = item.source_label || (item.source_type === "growth_planner" ? "Growth planner" : "Task");
+    const source = item.source_label || (item.source_type === "growth_planner" ? "Growth planner" : "");
     const assignee = workspaceAssigneeLabel(item);
     const mentioned = workspaceMentionedStaff(item.id);
     const groupHeader = group !== lastGroup
@@ -182,9 +190,9 @@ function renderWorkspaceTasks() {
         '<div class="flex flex-wrap items-start justify-between gap-3">' +
           '<div class="min-w-0 flex-1">' +
             '<div class="flex flex-wrap items-center gap-2">' +
-              '<span class="rounded-full px-2.5 py-1 text-[.68rem] font-bold ' + workspacePriorityTone(item.priority) + '">' + escapeHtml(workspacePriorityLabel(item.priority)) + ' priority</span>' +
-              '<span class="rounded-full ' + (item.assignee_staff_id ? "bg-violet-50 text-violet-700" : "bg-brand-50 text-brand-700") + ' px-2.5 py-1 text-[.68rem] font-bold">Assigned · ' + escapeHtml(assignee) + '</span>' +
-              '<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500">' + escapeHtml(source) + '</span>' +
+              '<span class="rounded-full px-2.5 py-1 text-[.68rem] font-bold ' + workspacePriorityTone(item.priority) + '">' + escapeHtml(workspacePriorityLabel(item.priority)) + '</span>' +
+              (item.assignee_staff_id ? '<span class="rounded-full bg-violet-50 px-2.5 py-1 text-[.68rem] font-bold text-violet-700">' + escapeHtml(assignee) + '</span>' : '') +
+              (source ? '<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-500">' + escapeHtml(source) + '</span>' : '') +
             '</div>' +
             '<h3 class="mt-2 font-bold text-ink">' + escapeHtml(item.title) + '</h3>' +
             (item.detail ? '<p class="mt-1 line-clamp-2 text-sm leading-6 text-slate-500">' + escapeHtml(item.detail) + '</p>' : '') +
@@ -201,7 +209,7 @@ function renderWorkspaceTasks() {
 
   const showAll = $("workspaceTasksShowAllBtn");
   if (showAll) {
-    showAll.classList.toggle("hidden", open.length <= 8);
+    showAll.classList.toggle("hidden", open.length <= 5);
     showAll.textContent = workspaceTaskState.showAll ? "Show priority view" : "View all " + open.length;
   }
 }
