@@ -34,6 +34,19 @@
       preview.querySelectorAll("[data-book-count]").forEach(el => {
         el.textContent = (el.dataset.prefix || "") + (el.dataset.bookCount || "0");
       });
+      const appointments = preview.querySelector("[data-book-appointments]");
+      const freeTime = preview.querySelector("[data-book-free-time]");
+      const nextSlot = preview.querySelector("[data-book-next-slot]");
+      const nextDuration = preview.querySelector("[data-book-next-duration]");
+      const slot = preview.querySelector(".book-available-slot");
+      if (appointments) appointments.textContent = "8";
+      if (freeTime) freeTime.textContent = "2h 15m";
+      if (nextSlot) nextSlot.textContent = "16:00";
+      if (nextDuration) nextDuration.textContent = "60 min";
+      if (slot) {
+        slot.classList.add("slot-booked");
+        slot.querySelector(".book-slot-confirmed-state")?.setAttribute("aria-hidden", "false");
+      }
     }
 
     const journey = document.getElementById("bookJourneyPreview");
@@ -64,49 +77,73 @@
     heroObserver.observe(heroCopy);
   }
 
-  // Diary demo: build the working day in a logical order and count live metrics.
+  // Diary demo: show an available slot becoming a confirmed booking.
   const preview = document.getElementById("bookHeroPreview");
   if (preview) {
     const counters = [...preview.querySelectorAll("[data-book-count]")];
+    const appointments = preview.querySelector("[data-book-appointments]");
+    const freeTime = preview.querySelector("[data-book-free-time]");
+    const nextSlot = preview.querySelector("[data-book-next-slot]");
+    const nextDuration = preview.querySelector("[data-book-next-duration]");
+    const availableSlot = preview.querySelector(".book-available-slot");
+    const confirmedState = preview.querySelector(".book-slot-confirmed-state");
     let frame = 0;
 
-    const setFinalCounters = () => {
+    const setCounterValues = useFinal => {
       counters.forEach(el => {
-        el.textContent = (el.dataset.prefix || "") + (el.dataset.bookCount || "0");
+        const value = useFinal ? el.dataset.bookCount : (el.dataset.bookStart ?? el.dataset.bookCount ?? "0");
+        el.textContent = (el.dataset.prefix || "") + value;
       });
     };
+
+    const setSummary = useFinal => {
+      if (appointments) appointments.textContent = useFinal ? "8" : "7";
+      if (freeTime) freeTime.textContent = useFinal ? "2h 15m" : "3h";
+      if (nextSlot) nextSlot.textContent = useFinal ? "16:00" : "14:30";
+      if (nextDuration) nextDuration.textContent = useFinal ? "60 min" : "45 min";
+    };
+
+    const completeBooking = () => {
+      availableSlot?.classList.add("slot-booked");
+      confirmedState?.setAttribute("aria-hidden", "false");
+      setSummary(true);
+
+      const moneyCounter = counters.find(el => el.dataset.prefix === "£");
+      if (!moneyCounter) {
+        setCounterValues(true);
+        return;
+      }
+
+      const from = Number(moneyCounter.dataset.bookStart || 0);
+      const to = Number(moneyCounter.dataset.bookCount || from);
+      const started = performance.now();
+
+      const tickMoney = now => {
+        const p = Math.min(1, (now - started) / 520);
+        const eased = 1 - Math.pow(1 - p, 3);
+        moneyCounter.textContent = "£" + Math.round(from + (to - from) * eased);
+        if (p < 1) frame = requestAnimationFrame(tickMoney);
+        else moneyCounter.textContent = "£" + to;
+      };
+      frame = requestAnimationFrame(tickMoney);
+    };
+
+    setCounterValues(false);
+    setSummary(false);
 
     const previewObserver = new IntersectionObserver(entries => {
       if (!entries.some(entry => entry.isIntersecting)) return;
       previewObserver.disconnect();
       preview.classList.add("book-preview-playing");
 
-      const started = performance.now();
-      const tick = now => {
-        if (reduced.matches || document.hidden) {
-          if (frame) cancelAnimationFrame(frame);
-          setFinalCounters();
-          preview.classList.remove("book-preview-playing");
-          preview.classList.add("book-preview-complete");
-          return;
-        }
+      later(() => completeBooking(), 1550);
 
-        const p = Math.min(1, Math.max(0, (now - started - 220) / 950));
-        const eased = 1 - Math.pow(1 - p, 3);
-
-        counters.forEach(el => {
-          const target = Number(el.dataset.bookCount || 0);
-          el.textContent = (el.dataset.prefix || "") + Math.round(target * eased);
-        });
-
-        if (p < 1) frame = requestAnimationFrame(tick);
-        else later(() => {
-          setFinalCounters();
-          preview.classList.remove("book-preview-playing");
-          preview.classList.add("book-preview-complete");
-        }, 460);
-      };
-      frame = requestAnimationFrame(tick);
+      later(() => {
+        setCounterValues(true);
+        setSummary(true);
+        preview.classList.remove("book-preview-playing");
+        preview.classList.add("book-preview-complete");
+      }, 2400);
     }, { threshold: .15 });
 
     previewObserver.observe(preview);
