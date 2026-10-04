@@ -259,13 +259,23 @@ async function loadDashboardPreferences() {
 function applyDashboardWorkspacePreferences() {
   const preferences = state.dashboardPreferences || defaultDashboardPreferences();
   const visibleAreas = normaliseWorkspaceAreas(preferences.visible_areas);
+  const teamAvailable = (state.staff || []).some(function (member) { return member.is_active; });
 
   document.querySelectorAll(".area-tab[data-area]").forEach(function (button) {
-    button.classList.toggle("hidden", !visibleAreas.includes(button.dataset.area));
+    const visible = button.dataset.area === "team"
+      ? teamAvailable
+      : visibleAreas.includes(button.dataset.area);
+    button.classList.toggle("hidden", !visible);
   });
 
+  const teamShortcut = $("workspaceOpenTeamBtn");
+  if (teamShortcut) teamShortcut.classList.toggle("hidden", !teamAvailable);
+
   const nav = document.querySelector(".dashboard-area-nav");
-  if (nav) nav.style.gridTemplateColumns = "repeat(" + visibleAreas.length + ", minmax(0, 1fr))";
+  if (nav) {
+    const visibleCount = visibleAreas.length + (teamAvailable ? 1 : 0);
+    nav.style.gridTemplateColumns = "repeat(" + Math.max(1, visibleCount) + ", minmax(0, 1fr))";
+  }
 }
 
 function workspaceAreasFromForm() {
