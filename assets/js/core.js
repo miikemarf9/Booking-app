@@ -16,6 +16,7 @@
       dashboardPreferences: null,
       subscription: null,
       plan: null,
+      stripeReady: null,
       services: [],
       staff: [],
       serviceStaff: [],
@@ -701,6 +702,7 @@
       $("pendingLogoutBtn").addEventListener("click", logout);
       $("openBookingPageBtn").addEventListener("click", openPublicBookingPage);
       $("mobileOpenBookingPageBtn").addEventListener("click", openPublicBookingPage);
+      $("firstRunPreviewBtn").addEventListener("click", openPublicBookingPage);
       $("copyBookingUrlBtn").addEventListener("click", copyPublicUrl);
 
       document.querySelectorAll(".nav-tab").forEach(tab => tab.addEventListener("click", () => switchTab(tab.dataset.tab)));
@@ -1066,13 +1068,18 @@
       $("businessNameField").classList.toggle("hidden", !isRegister);
       $("authBusinessName").required = isRegister;
       $("authPassword").autocomplete = isRegister ? "new-password" : "current-password";
-      $("authHeading").textContent = isRegister ? "Create your account" : "Welcome back";
-      $("authSubheading").textContent = isRegister ? "Register your business to start setting up." : "Log in to manage your booking page.";
-      $("authSubmitBtn").textContent = isRegister ? "Register business" : "Log in";
+      $("authHeading").textContent = isRegister ? "Create your Grab&Book account" : "Welcome back";
+      $("authSubheading").textContent = isRegister
+        ? "Start on Free, then set up your service, availability and payments in a clear order."
+        : "Log in to manage your bookings and business.";
+      $("authSubmitBtn").textContent = isRegister ? "Create free account" : "Log in";
       $("forgotPasswordBtn").classList.toggle("hidden", isRegister);
+      $("authCreateNote")?.classList.toggle("hidden", !isRegister);
 
       $("loginModeBtn").className = "auth-mode rounded-lg px-3 py-2 text-sm font-bold " + (isRegister ? "text-slate-500" : "bg-white text-ink shadow-sm");
       $("registerModeBtn").className = "auth-mode rounded-lg px-3 py-2 text-sm font-bold " + (isRegister ? "bg-white text-ink shadow-sm" : "text-slate-500");
+      $("loginModeBtn").setAttribute("aria-selected", String(!isRegister));
+      $("registerModeBtn").setAttribute("aria-selected", String(isRegister));
       $("authMessage").classList.add("hidden");
     }
 
@@ -1279,6 +1286,7 @@
         showOnly("dashboardView");
         if (typeof applyDashboardWorkspacePreferences === "function") applyDashboardWorkspacePreferences();
         if (typeof ensureVisibleWorkspaceLanding === "function") ensureVisibleWorkspaceLanding();
+        if (typeof refreshStripePayments === "function") refreshStripePayments(false);
       } catch (err) {
         showOnly("authView");
         setAuthMessage(friendlyDbError(err, "load your account"), "error");
@@ -1327,8 +1335,99 @@
       renderDashboard();
     }
 
+    function firstRunSetupStatus() {
+      const hasService = state.services.length > 0;
+      const hasAvailability = state.blocks.some(block =>
+        block.is_active &&
+        block.block_date >= todayKey()
+      );
+      const paymentsReady = state.stripeReady === true;
+      const completed = [hasService, hasAvailability, paymentsReady].filter(Boolean).length;
+      return {
+        hasService,
+        hasAvailability,
+        paymentsReady,
+        completed,
+        ready: completed === 3
+      };
+    }
+
+    function setFirstRunStep(iconId, statusId, buttonId, complete, completeText, pendingText, completeButton, pendingButton) {
+      const icon = $(iconId);
+      const status = $(statusId);
+      const button = $(buttonId);
+      if (icon) {
+        icon.textContent = complete ? "✓" : icon.dataset.step || icon.textContent;
+        icon.classList.toggle("first-run-step-complete", complete);
+      }
+      if (status) status.textContent = complete ? completeText : pendingText;
+      if (button) button.textContent = complete ? completeButton : pendingButton;
+    }
+
+    function renderFirstRunSetup() {
+      const panel = $("firstRunSetup");
+      if (!panel) return;
+
+      const setup = firstRunSetupStatus();
+      const hasAnyBooking = state.bookings.some(booking => booking.status !== "cancelled");
+      panel.classList.toggle("hidden", hasAnyBooking);
+      if (hasAnyBooking) return;
+
+      $("firstRunProgressText").textContent = `${setup.completed} / 3`;
+      $("firstRunProgressBar").style.width = `${Math.round((setup.completed / 3) * 100)}%`;
+
+      setFirstRunStep(
+        "firstRunServiceIcon",
+        "firstRunServiceStatus",
+        "firstRunServiceBtn",
+        setup.hasService,
+        "Service added. You can review or add more at any time.",
+        "Create your first service with its price and duration.",
+        "Review services →",
+        "Add service →"
+      );
+      setFirstRunStep(
+        "firstRunAvailabilityIcon",
+        "firstRunAvailabilityStatus",
+        "firstRunAvailabilityBtn",
+        setup.hasAvailability,
+        "Upcoming bookable time is published.",
+        setup.hasService ? "Add at least one upcoming availability block." : "Add a service first, then publish when it can be booked.",
+        "Review availability →",
+        "Set availability →"
+      );
+
+      const stripeChecking = Boolean(state.profile?.stripe_connect_id) && state.stripeReady === null;
+      setFirstRunStep(
+        "firstRunPaymentsIcon",
+        "firstRunPaymentsStatus",
+        "firstRunPaymentsBtn",
+        setup.paymentsReady,
+        "Stripe is ready to take customer payments.",
+        stripeChecking
+          ? "Checking whether Stripe is ready for live payments…"
+          : "Paid bookings need Stripe to be ready before customers can check out.",
+        "Review payments →",
+        state.profile?.stripe_connect_id ? "Finish Stripe setup →" : "Connect Stripe →"
+      );
+
+      $("firstRunReady").classList.toggle("hidden", !setup.ready);
+      $("firstRunReady").classList.toggle("flex", setup.ready);
+      $("firstRunEyebrow").textContent = setup.ready ? "Setup complete" : "Get ready for your first booking";
+      $("firstRunTitle").textContent = setup.ready ? "Your booking page is ready." : "Three things make your booking page ready.";
+      $("firstRunHelp").textContent = setup.ready
+        ? "Preview the customer journey before sharing your booking link."
+        : "Work through these in order. Grab&Book updates the checklist automatically as you complete each step.";
+
+      const headerButton = $("openBookingPageBtn");
+      const mobileButton = $("mobileOpenBookingPageBtn");
+      if (headerButton) headerButton.textContent = setup.ready ? "View booking page ↗" : "Preview booking page ↗";
+      if (mobileButton) mobileButton.textContent = setup.ready ? "View booking page ↗" : "Preview booking page ↗";
+    }
+
     function renderDashboard() {
       renderStats();
+      renderFirstRunSetup();
       syncPaymentFields();
       renderServices();
       renderStaff();
@@ -1373,5 +1472,10 @@
       const upcoming = state.bookings.filter(b => b.status !== "cancelled" && new Date(b.start_time) >= new Date()).slice(0, 4);
       $("overviewBookings").innerHTML = upcoming.length
         ? upcoming.map(b => bookingCard(b)).join("")
-        : emptyState("No upcoming bookings", "New customer appointments will appear here.");
+        : emptyState(
+            "No upcoming bookings",
+            firstRunSetupStatus().ready
+              ? "Your booking page is ready. New customer appointments will appear here."
+              : "Complete the setup steps above, then your first customer appointments will appear here."
+          );
     }
