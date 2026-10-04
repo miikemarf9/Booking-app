@@ -1038,6 +1038,13 @@
       border-top: 1px solid var(--gb-border-soft);
       padding: 1.1rem .15rem 0;
     }
+    .homepage-faq-card {
+      border-top: 1px solid var(--gb-border-soft);
+      padding: 1.15rem .15rem .2rem;
+    }
+    .homepage-faq-card p {
+      max-width: 38rem;
+    }
 
     .product-site-shell .product-feature,
     .product-site-shell .product-point,
@@ -1064,6 +1071,12 @@
     .product-site-shell .product-page-hero .btn {
       min-width: 9rem;
     }
+    .case-method-card {
+      box-shadow: none;
+    }
+    .product-site-shell footer a {
+      transition: color .15s ease;
+    }
 
     @media (max-width: 639px) {
       .landing-audience-point,
@@ -1081,6 +1094,13 @@
       .product-site-shell .product-page-hero .btn {
         width: 100%;
         min-width: 0;
+      }
+      .product-site-shell main > section:last-of-type .btn {
+        width: 100%;
+      }
+      .homepage-final-cta .btn {
+        width: 100%;
+        max-width: 18rem;
       }
     }
 
