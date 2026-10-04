@@ -563,6 +563,81 @@ function updateFreePlanFeePreview() {
       if (!enabled) $("blkRepeatUntil").value = "";
     }
 
+    function populateAvailabilityTimePicker() {
+      const hour = $("blkStartHour");
+      const minute = $("blkStartMinute");
+      if (!hour || !minute) return;
+
+      if (hour.options.length <= 1) {
+        hour.insertAdjacentHTML(
+          "beforeend",
+          Array.from({ length: 24 }, (_, value) => {
+            const label = String(value).padStart(2, "0");
+            return `<option value="${label}">${label}</option>`;
+          }).join("")
+        );
+      }
+
+      if (minute.options.length <= 1) {
+        minute.insertAdjacentHTML(
+          "beforeend",
+          Array.from({ length: 60 }, (_, value) => {
+            const label = String(value).padStart(2, "0");
+            return `<option value="${label}">${label}</option>`;
+          }).join("")
+        );
+      }
+    }
+
+    function renderAvailabilityTimeSelection() {
+      const value = cleanTime($("blkStart")?.value || "");
+      const selected = $("blkStartSelected");
+      const help = $("blkStartPickerHelp");
+      const picker = $("blkStartPicker");
+      const complete = /^\d{2}:\d{2}$/.test(value);
+
+      if (selected) {
+        selected.textContent = complete ? `Selected ${value} ✓` : "";
+        selected.classList.toggle("hidden", !complete);
+      }
+
+      if (help) {
+        help.textContent = complete
+          ? "Start time selected. Change either number to update it."
+          : "Choose an hour, then a minute. Your selection is applied immediately.";
+      }
+
+      if (picker) {
+        picker.classList.toggle("border-emerald-200", complete);
+        picker.classList.toggle("bg-emerald-50/40", complete);
+        picker.classList.toggle("border-slate-200", !complete);
+        picker.classList.toggle("bg-slate-50", !complete);
+      }
+    }
+
+    function syncBlockStartPicker() {
+      const hour = $("blkStartHour")?.value || "";
+      const minute = $("blkStartMinute")?.value || "";
+      $("blkStart").value = hour && minute ? `${hour}:${minute}` : "";
+      renderAvailabilityTimeSelection();
+      updateCalculatedEnd();
+    }
+
+    function setBlockStartPicker(value = "") {
+      populateAvailabilityTimePicker();
+
+      const clean = cleanTime(value || "");
+      const [hour = "", minute = ""] = /^\d{2}:\d{2}$/.test(clean)
+        ? clean.split(":")
+        : ["", ""];
+
+      $("blkStart").value = hour && minute ? `${hour}:${minute}` : "";
+      $("blkStartHour").value = hour;
+      $("blkStartMinute").value = minute;
+      renderAvailabilityTimeSelection();
+      updateCalculatedEnd();
+    }
+
     function addMinutesToTime(time, minutes) {
       const [hours, mins] = cleanTime(time).split(":").map(Number);
       const total = hours * 60 + mins + Number(minutes || 0);
@@ -703,6 +778,8 @@ function updateFreePlanFeePreview() {
         : (useRepeatUntil ? $("blkRepeatUntil").value : defaultRepeatUntil(blockDate));
 
       if (!serviceId || !service) return toast("Choose a service first.", "error");
+      if (!blockDate) return toast("Choose the first date.", "error");
+      if (!/^\d{2}:\d{2}$/.test(startTime)) return toast("Choose a start time.", "error");
       const assignedStaff = staffForService(serviceId);
       if (assignedStaff.length && !staffId) return toast("Choose which team member this availability belongs to.", "error");
       if (staffId && !assignedStaff.some(member => member.id === staffId)) return toast("That team member is not assigned to this service.", "error");
@@ -819,7 +896,7 @@ function updateFreePlanFeePreview() {
         populateAvailabilityStaffOptions();
         $("blkStaff").value = block.staff_id || "";
         $("blkDate").value = block.block_date;
-        $("blkStart").value = cleanTime(block.start_time);
+        setBlockStartPicker(cleanTime(block.start_time));
         $("blkBuffer").value = String(Number(block.buffer_minutes || 0));
         $("blkRecurrence").value = "once";
         $("blkRecurrence").disabled = true;
@@ -943,6 +1020,7 @@ function updateFreePlanFeePreview() {
       $("blkRepeatUntil").required = false;
       $("blkRepeatUntilWrap").classList.add("hidden");
       $("blkAutoRepeatNote").classList.add("hidden");
+      setBlockStartPicker("");
       $("blkCalculatedEnd").textContent = "Choose a service and start time; the finish time will be calculated automatically.";
       $("blockFormHeading").textContent = "Add availability";
       $("blockSubmitBtn").textContent = "Publish availability";
