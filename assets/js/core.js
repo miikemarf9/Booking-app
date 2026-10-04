@@ -625,6 +625,7 @@
       $("timeOffStartDate").value = timeOffToday;
       $("timeOffEndDate").value = timeOffToday;
       $("timeOffDate").value = timeOffToday;
+      if (typeof populateTimeOffTimeOptions === "function") populateTimeOffTimeOptions();
       $("timeOffStartTime").value = "09:00";
       $("timeOffEndTime").value = "17:00";
       syncTimeOffMode();
