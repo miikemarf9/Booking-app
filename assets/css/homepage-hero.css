@@ -600,3 +600,187 @@
     max-width:none;
   }
 }
+
+
+/* Connected journey showcase: Book to CRM to Growth. */
+#landingView .home-chapter-connected{
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(22,135,217,.055),transparent 28%),
+    radial-gradient(circle at 88% 72%,rgba(111,91,183,.07),transparent 30%),
+    linear-gradient(180deg,#ffffff 0%,#fbfdff 48%,#f1f6fb 100%);
+  padding-top:6.25rem;
+  padding-bottom:7rem;
+}
+#landingView .home-chapter-connected::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:92px;
+  z-index:0;
+  background:linear-gradient(180deg,rgba(238,246,251,0),rgba(230,241,249,.88));
+  pointer-events:none;
+}
+#landingView .homepage-connected-inner{
+  max-width:1360px;
+}
+#landingView .homepage-connected-intro{
+  max-width:810px;
+}
+#landingView .homepage-connected-intro h2{
+  max-width:790px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#landingView .homepage-connected-intro>p:last-child{
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#landingView .homepage-connected-grid{
+  position:relative;
+  max-width:1240px;
+  margin:4.75rem auto 0;
+  gap:2.25rem;
+  align-items:stretch;
+}
+#landingView .homepage-connected-grid::before{
+  content:"";
+  position:absolute;
+  top:42px;
+  left:16%;
+  right:16%;
+  height:1px;
+  z-index:0;
+  background:linear-gradient(90deg,rgba(22,135,217,.28),rgba(44,167,136,.26),rgba(111,91,183,.28));
+}
+#landingView .homepage-connected-card{
+  position:relative;
+  z-index:1;
+  min-height:100%;
+  border-color:rgba(205,218,229,.82);
+  border-radius:1.7rem;
+  padding:2rem;
+  background:rgba(255,255,255,.92);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.95) inset,
+    0 20px 55px -32px rgba(23,32,51,.26);
+  backdrop-filter:blur(10px);
+}
+#landingView .homepage-connected-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:1.45rem;
+  right:1.45rem;
+  height:3px;
+  border-radius:0 0 999px 999px;
+}
+#landingView .homepage-connected-card.product-card-book::before{
+  background:linear-gradient(90deg,#1687d9,#75b8e5);
+}
+#landingView .homepage-connected-card.product-card-crm::before{
+  background:linear-gradient(90deg,#32a97f,#87cfb5);
+}
+#landingView .homepage-connected-card.product-card-growth::before{
+  background:linear-gradient(90deg,#6f5bb7,#9b8fd1);
+}
+#landingView .homepage-connected-card:nth-child(-n+2)::after{
+  content:"→";
+  position:absolute;
+  top:25px;
+  right:-1.82rem;
+  display:grid;
+  width:1.45rem;
+  height:1.45rem;
+  place-items:center;
+  border:1px solid rgba(199,213,224,.9);
+  border-radius:999px;
+  background:#fff;
+  color:#8391a2;
+  font-size:.72rem;
+  font-weight:900;
+  box-shadow:0 6px 16px rgba(23,32,51,.06);
+}
+#landingView .homepage-connected-card .feature-icon{
+  background:#fff;
+  box-shadow:0 7px 20px rgba(23,32,51,.06);
+}
+#landingView .homepage-connected-card h3{
+  font-size:1.35rem;
+  letter-spacing:-.025em;
+}
+#landingView .homepage-connected-card>p{
+  min-height:4.5rem;
+  font-size:.9rem;
+  line-height:1.7;
+}
+#landingView .homepage-connected-preview{
+  margin-top:1.65rem;
+  min-height:128px;
+  border-color:rgba(220,228,235,.82);
+  border-radius:1.15rem;
+  padding:1.1rem;
+  background:rgba(248,250,252,.82);
+}
+#landingView .product-card-book .homepage-connected-preview{
+  background:linear-gradient(180deg,#f6fbff,#eef7fd);
+}
+#landingView .product-card-crm .homepage-connected-preview{
+  background:linear-gradient(180deg,#f7fcfa,#eef8f4);
+}
+#landingView .product-card-growth .homepage-connected-preview{
+  background:linear-gradient(180deg,#faf9fd,#f2f0fa);
+}
+@media(hover:hover) and (pointer:fine){
+  #landingView .homepage-connected-card:hover{
+    transform:translateY(-5px);
+    border-color:rgba(159,194,216,.9);
+    box-shadow:0 28px 68px -34px rgba(23,32,51,.32);
+  }
+}
+@media(max-width:1023px){
+  #landingView .home-chapter-connected{
+    padding-top:5rem;
+    padding-bottom:5.75rem;
+  }
+  #landingView .homepage-connected-grid{
+    max-width:760px;
+    margin-top:3.75rem;
+    gap:1.4rem;
+  }
+  #landingView .homepage-connected-grid::before{
+    display:none;
+  }
+  #landingView .homepage-connected-card:nth-child(-n+2)::after{
+    content:"↓";
+    top:auto;
+    right:50%;
+    bottom:-1.45rem;
+    transform:translateX(50%);
+    z-index:2;
+  }
+  #landingView .homepage-connected-card>p{
+    min-height:0;
+  }
+}
+@media(max-width:639px){
+  #landingView .home-chapter-connected{
+    padding-top:4.25rem;
+    padding-bottom:4.75rem;
+  }
+  #landingView .homepage-connected-grid{
+    margin-top:3rem;
+    gap:1.25rem;
+  }
+  #landingView .homepage-connected-card{
+    border-radius:1.4rem;
+    padding:1.4rem;
+  }
+  #landingView .homepage-connected-preview{
+    min-height:0;
+    margin-top:1.35rem;
+  }
+}
