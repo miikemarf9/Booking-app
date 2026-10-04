@@ -3363,3 +3363,27 @@
 #landingView .homepage-connected-card .homepage-product-icon{
   color:#172033;
 }
+
+
+/* Lighter blue clarity bridge before the final dark CTA. */
+#landingView .home-chapter-clarity-bridge{
+  background:
+    radial-gradient(circle at 82% 18%,rgba(89,169,220,.16),transparent 34%),
+    radial-gradient(circle at 14% 82%,rgba(104,89,176,.10),transparent 30%),
+    linear-gradient(145deg,#294b67 0%,#23415b 56%,#1e374f 100%);
+}
+#landingView .home-chapter-clarity-bridge .homepage-clarity-bridge-copy h2{
+  color:#ffffff;
+}
+#landingView .home-chapter-clarity-bridge .homepage-clarity-bridge-copy p{
+  color:#c9e3f4;
+}
+#landingView .home-chapter-clarity-bridge .homepage-clarity-bridge-points strong{
+  color:#e0f1fb;
+}
+#landingView .home-chapter-clarity-bridge .homepage-clarity-bridge-points span{
+  color:#c5d3df;
+}
+#landingView .home-chapter-clarity-bridge .homepage-clarity-bridge-points p{
+  border-bottom-color:rgba(255,255,255,.14);
+}
