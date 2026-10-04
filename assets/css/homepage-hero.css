@@ -3991,116 +3991,97 @@
 }
 
 
-/* Semrush-inspired spike field for Priorities showcase. */
-#landingView .homepage-priorities-showcase{
+/* The decorative field surrounds a separate opaque white content panel. */
+#landingView .homepage-priorities-backdrop{
   position:relative;
   isolation:isolate;
   overflow:hidden;
-  border-color:rgba(179,184,205,.55);
-  background:
-    linear-gradient(180deg,
-      #f4f3f8 0%,
-      #f3f2f8 30%,
-      #f0eff7 55%,
-      #ececf5 72%,
-      #e6eaf1 100%);
-  box-shadow:0 28px 76px -54px rgba(40,49,73,.30);
+  padding:86px max(24px, 7vw) 92px;
+  background:linear-gradient(180deg,#f5f3f7 0%,#eee7f4 48%,#e1cdef 100%);
 }
-#landingView .homepage-priorities-showcase::before{
+#landingView .homepage-priorities-backdrop::before,
+#landingView .homepage-priorities-backdrop::after{
   content:"";
   position:absolute;
-  z-index:-2;
-  left:0;
-  right:0;
-  bottom:0;
-  height:22%;
-  min-height:118px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.08) 18%,rgba(116,199,184,.96) 18.5%,#74c7b8 100%);
-}
-#landingView .homepage-priorities-showcase::after{
-  content:"";
-  position:absolute;
+  inset:auto 0 0;
+  pointer-events:none;
   z-index:-1;
-  left:0;
-  right:0;
-  bottom:13%;
-  height:150px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='150' viewBox='0 0 28 150'%3E%3Cpath d='M0 150 L7 150 L14 0 L21 150 L28 150 Z' fill='%23b38adf'/%3E%3C/svg%3E");
   background-repeat:repeat-x;
   background-position:left bottom;
-  background-size:28px 150px;
-  opacity:.9;
-  pointer-events:none;
 }
+#landingView .homepage-priorities-backdrop::before{
+  height:260px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='260' viewBox='0 0 18 260'%3E%3Cpath d='M0 260 L9 0 L18 260Z' fill='%23b78cce'/%3E%3C/svg%3E");
+  background-size:18px 260px;
+}
+#landingView .homepage-priorities-backdrop::after{
+  height:88px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='88' viewBox='0 0 18 88'%3E%3Cpath d='M0 88 L0 0 L9 70 L18 0 L18 88Z' fill='%237bc4b3'/%3E%3C/svg%3E");
+  background-size:18px 88px;
+}
+#landingView .homepage-priorities-backdrop .homepage-priorities-showcase{
+  position:relative;
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  border:1px solid #fff;
+  border-radius:12px;
+  padding:clamp(28px,4vw,60px);
+  background:#fff;
+  color:#20221f;
+  box-shadow:0 0 0 12px rgba(255,255,255,.32),0 22px 50px -25px rgba(57,39,70,.2);
+}
+#landingView .homepage-priorities-showcase::before,
+#landingView .homepage-priorities-showcase::after{content:none;}
 #landingView .homepage-priorities-showcase .homepage-priorities-layout{
   position:relative;
-  z-index:1;
-}
-#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy>p:first-child{
-  color:#6d4fb0;
-}
-#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3{
-  color:#161821;
-}
-#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy>p:nth-of-type(2){
-  color:#565d6d;
-}
-#landingView .homepage-priorities-showcase .homepage-priority-benefits{
-  border-top-color:rgba(63,69,87,.17);
-}
-#landingView .homepage-priorities-showcase .homepage-priority-benefits span{
-  border-bottom-color:rgba(63,69,87,.14);
-}
-#landingView .homepage-priorities-showcase .homepage-priority-benefits strong{
-  color:#20232c;
-}
-#landingView .homepage-priorities-showcase .homepage-priority-benefits small{
-  color:#606777;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
+  gap:clamp(28px,4vw,58px);
 }
 #landingView .homepage-priorities-showcase .homepage-owner-priorities-preview{
-  border-color:rgba(202,205,214,.92);
+  min-height:0;
+  padding:0;
+  border:0;
+  border-radius:0;
   background:#fff;
-  box-shadow:0 30px 72px -42px rgba(31,37,52,.31);
+  box-shadow:none;
 }
-#landingView .homepage-priorities-showcase .homepage-priority-summary{
-  background:#f6f7f9;
+#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3{
+  font-size:clamp(2rem,2.9vw,2.7rem);
+  line-height:1.1;
 }
-#landingView .homepage-priorities-showcase .homepage-priority-task{
+#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy>p,
+#landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3,
+#landingView .homepage-priorities-showcase .homepage-priority-benefits strong,
+#landingView .homepage-priorities-showcase .homepage-priority-benefits small,
+#landingView .homepage-priorities-showcase .homepage-priority-preview-head p,
+#landingView .homepage-priorities-showcase .homepage-priority-summary strong,
+#landingView .homepage-priorities-showcase .homepage-priority-summary small,
+#landingView .homepage-priorities-showcase .homepage-priority-task>p,
+#landingView .homepage-priorities-showcase .homepage-priority-task>small,
+#landingView .homepage-priorities-showcase .homepage-priority-example{color:#20221f;}
+#landingView .homepage-priorities-showcase .homepage-priority-benefits,
+#landingView .homepage-priorities-showcase .homepage-priority-benefits span{border-color:#e5e5e5;}
+#landingView .homepage-priorities-showcase .homepage-priority-summary,
+#landingView .homepage-priorities-showcase .homepage-priority-task,
+#landingView .homepage-priorities-showcase .homepage-priority-example{
   background:#fff;
+  border-color:#e5e5e5;
+  box-shadow:none;
 }
-#landingView .homepage-priorities-showcase .homepage-priority-task-high{
-  border-color:rgba(238,143,149,.5);
-  background:#fff;
-}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-red-50{background:#f9d8dd;color:#842d3d;}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-violet-50{background:#eadbf3;color:#654079;}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-amber-50{background:#f8e5bc;color:#795214;}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-brand-50{background:#cfece5;color:#285e51;}
+#landingView .homepage-priorities-showcase .homepage-priority-task .bg-slate-100{background:#e9eaed;color:#43464d;}
 @media(max-width:1023px){
-  #landingView .homepage-priorities-showcase::before{
-    height:18%;
-    min-height:105px;
-  }
-  #landingView .homepage-priorities-showcase::after{
-    bottom:10%;
-    height:118px;
-    background-size:24px 118px;
-  }
+  #landingView .homepage-priorities-showcase .homepage-priorities-layout{grid-template-columns:1fr;gap:32px;}
+  #landingView .homepage-priorities-showcase .homepage-owner-priorities-copy{max-width:none;}
 }
 @media(max-width:639px){
-  #landingView .homepage-priorities-showcase{
-    background:
-      linear-gradient(180deg,
-        #f4f3f8 0%,
-        #f3f2f8 42%,
-        #eeeff5 72%,
-        #e7ebf1 100%);
-  }
-  #landingView .homepage-priorities-showcase::before{
-    height:15%;
-    min-height:88px;
-  }
-  #landingView .homepage-priorities-showcase::after{
-    bottom:8%;
-    height:88px;
-    background-size:20px 88px;
-    opacity:.78;
-  }
+  #landingView .homepage-priorities-backdrop{padding:42px 24px 62px;}
+  #landingView .homepage-priorities-backdrop .homepage-priorities-showcase{padding:24px 18px;border-radius:10px;box-shadow:0 0 0 7px rgba(255,255,255,.35);}
+  #landingView .homepage-priorities-backdrop::before{height:200px;background-size:14px 200px;}
+  #landingView .homepage-priorities-backdrop::after{height:60px;background-size:14px 60px;}
+  #landingView .homepage-priorities-showcase .homepage-owner-priorities-copy h3{font-size:2rem;}
 }
