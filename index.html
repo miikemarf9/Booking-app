@@ -888,9 +888,9 @@
 
           <nav class="dashboard-subnav hidden min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="crm" aria-label="CRM navigation">
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-customers-section" type="button">Customers</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-analytics-section" type="button">Analytics</button>
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-retention-section" type="button">Retention</button>
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-campaigns-section" type="button">Campaigns</button>
-            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="crm-analytics-section" type="button">Analytics</button>
           </nav>
 
           <nav class="dashboard-subnav hidden min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="growth" aria-label="Growth navigation">
@@ -2249,7 +2249,7 @@
               <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <h2 class="mt-1 text-xl font-bold text-ink">Customers</h2>
-                  <p class="mt-2 text-sm leading-6 text-slate-500">Every booking now builds one customer profile instead of treating repeat visits as separate people.</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-500">Search, filter and open a customer to see their history, value and next action.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                   <span id="customerCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 customers</span>
@@ -2295,7 +2295,7 @@
               <div id="customerProfileEmpty">
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer profile</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Choose a customer</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-500">Select someone from the list to view their contact details, booking history, value and private business notes.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Select a customer to open their profile, booking pattern, notes and activity.</p>
               </div>
 
               <div id="customerProfile" class="hidden">
@@ -2462,7 +2462,7 @@
             </article>
           </div>
 
-          <article id="crm-analytics-section" class="card scroll-mt-32 p-5 sm:p-6">
+          <article id="crm-analytics-section" class="crm-secondary-section card scroll-mt-32 p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM analytics</p>
@@ -2525,7 +2525,7 @@
             </div>
           </article>
 
-          <article id="crm-retention-section" class="card scroll-mt-32 p-5 sm:p-6">
+          <article id="crm-retention-section" class="crm-secondary-section card scroll-mt-32 p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM automation</p>
@@ -2564,7 +2564,7 @@
             </form>
           </article>
 
-          <article id="crm-campaigns-section" class="card scroll-mt-32 p-5 sm:p-6">
+          <article id="crm-campaigns-section" class="crm-secondary-section card scroll-mt-32 p-5 sm:p-6">
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer communications</p>
@@ -2658,7 +2658,7 @@
             </div>
           </article>
 
-          <article class="card p-5 sm:p-6" id="crm-campaign-history-section">
+          <article class="crm-secondary-section card p-5 sm:p-6" id="crm-campaign-history-section">
             <div class="flex flex-wrap items-center justify-between gap-3">
               <div><h2 class="text-xl font-bold text-ink">Campaign history</h2>
                 <p class="mt-2 text-sm text-slate-500">Review your messages, recipients and exclusions. Sent means accepted by the email provider; delivery is only confirmed when available.</p></div>
