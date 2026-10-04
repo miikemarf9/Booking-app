@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=stage8-crm-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=stage9-growth-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=2">
 
   <script type="application/ld+json">
@@ -1067,10 +1067,10 @@
           <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div>
               <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Growth</p>
-              <h2 class="mt-1 text-2xl font-bold text-ink">Acquire more valuable customers</h2>
-              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Understand where customers come from, what turns traffic into bookings and which channels create the strongest long-term customer value.</p>
+              <h2 class="mt-1 text-2xl font-bold text-ink">Understand what is driving growth</h2>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">See where customers come from, what turns visits into bookings and which channels create lasting customer value.</p>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="growth-page-toolbar flex flex-wrap items-center gap-2">
               <label class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
                 Period
                 <select id="growthPeriodSelect" class="ml-2 bg-transparent font-bold text-ink outline-none">
@@ -1091,13 +1091,28 @@
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Business health</p>
-                <h3 class="mt-1 text-xl font-bold text-ink">Where should you focus?</h3>
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Grab&Book will bring together your booking, customer and growth data to highlight the area that most deserves your attention.</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">What may need attention?</h3>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Grab&Book uses booking, customer and growth data to surface the area that may be most useful to review next.</p>
               </div>
               <span id="growthHealthDataStatus" class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600">Building your baseline</span>
             </div>
 
-            <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <div class="mt-5 rounded-2xl border border-brand-100 bg-brand-50/60 p-4 sm:p-5 growth-health-primary">
+              <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Priority signal</p>
+              <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <p id="growthHealthPrimaryTitle" class="text-lg font-bold text-ink">Building your business baseline</p>
+                  <p id="growthHealthPrimaryReason" class="mt-1 max-w-3xl text-sm leading-6 text-slate-600">Once there is enough reliable data, Grab&Book will explain which area appears to deserve attention and why. Until then, no issue will be assumed.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button id="growthHealthWhyBtn" type="button" class="btn btn-light" disabled>See why</button>
+                  <button id="growthHealthActionBtn" type="button" class="btn btn-light hidden">Review this area</button>
+                  <button id="growthHealthCampaignBtn" type="button" class="btn btn-primary hidden">Create rebooking campaign</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-5 growth-health-grid">
               <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div class="flex items-center justify-between gap-3">
                   <p class="text-sm font-bold text-ink">Demand</p>
@@ -1135,21 +1150,6 @@
               </div>
             </div>
 
-            <div class="mt-4 rounded-2xl border border-brand-100 bg-brand-50/60 p-4 sm:p-5">
-              <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Biggest opportunity</p>
-              <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <p id="growthHealthPrimaryTitle" class="text-lg font-bold text-ink">Building your business baseline</p>
-                  <p id="growthHealthPrimaryReason" class="mt-1 max-w-3xl text-sm leading-6 text-slate-600">Once there is enough reliable data, Grab&Book will explain which area appears to deserve attention and why. Until then, no issue will be assumed.</p>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  <button id="growthHealthWhyBtn" type="button" class="btn btn-light" disabled>See why</button>
-                  <button id="growthHealthActionBtn" type="button" class="btn btn-light hidden">Review this area</button>
-                  <button id="growthHealthCampaignBtn" type="button" class="btn btn-primary hidden">Create rebooking campaign</button>
-                </div>
-              </div>
-            </div>
-
             <div id="growthRetentionCampaignFeedback" class="mt-4 hidden rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 sm:p-5">
               <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="min-w-0">
@@ -1181,15 +1181,18 @@
             </div>
           </article>
 
-          <article id="growthScenarioLab" class="card mb-5 overflow-hidden p-5 sm:p-6">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-              <div>
+          <details id="growthScenarioLab" class="card mb-5 overflow-hidden p-5 sm:p-6 growth-scenario-lab">
+            <summary class="growth-scenario-summary">
+              <div class="min-w-0">
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Scenario Lab</p>
-                <h3 class="mt-1 text-xl font-bold text-ink">Explore what a change could mean.</h3>
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Use your current business data as the baseline, change one assumption and compare the mathematical scenario with where you are now.</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">Explore what a change could mean</h3>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Optional planning tool: change one assumption and compare the maths with your current baseline.</p>
               </div>
-              <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800">Scenario, not forecast</span>
-            </div>
+              <div class="growth-scenario-summary-actions">
+                <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800">Scenario, not forecast</span>
+                <span class="growth-scenario-chevron" aria-hidden="true">⌄</span>
+              </div>
+            </summary>
 
             <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
               <div class="flex gap-3">
@@ -1318,9 +1321,9 @@
                 <p id="growthScenarioDisclaimer" class="mt-4 text-[.68rem] leading-5 text-slate-500"><strong class="text-slate-600">Scenario, not forecast.</strong> Results will be mathematical illustrations based on the baseline and assumptions shown above. They will not guarantee future bookings, demand or revenue.</p>
               </div>
             </div>
-          </article>
+          </details>
 
-          <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 growth-kpi-grid">
             <article class="card p-4">
               <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Tracked visits</p>
               <div class="mt-1 flex items-end justify-between gap-3">
@@ -1355,17 +1358,24 @@
             </article>
           </div>
 
-          <div class="mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Data coverage & privacy</p>
-                <p class="mt-1 max-w-3xl text-xs leading-5 text-slate-500">First-party booking-journey figures include only visitors who allowed optional analytics. Connected platforms can use different attribution rules and may report with delays, so their totals may not exactly match Grab&Book. Raw anonymous funnel events are automatically removed after 400 days; booking and CRM records are not affected by that cleanup.</p>
+          <details class="growth-data-notes mb-5 rounded-2xl border border-slate-200 bg-slate-50/70">
+            <summary>
+              <span><strong>How Growth data is measured</strong><small>Attribution, consent and privacy notes</small></span>
+              <span class="growth-data-notes-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="growth-data-notes-body">
+              <p>First-party journey figures include visitors who allowed optional analytics. Connected platforms can use different attribution rules and reporting delays, so totals may not match exactly.</p>
+              <div class="growth-data-notes-grid">
+                <span><strong>First + last touch</strong>Source, medium, campaign, referral and device can stay with the booking.</span>
+                <span><strong>CRM linked</strong>Acquisition context can follow a customer into retention and value analysis.</span>
+                <span><strong>Staff bookings separated</strong>Internal bookings do not overwrite genuine marketing attribution.</span>
+                <span><strong>Privacy controlled</strong>Anonymous funnel events are removed after 400 days; booking and CRM records are unaffected.</span>
               </div>
-              <span class="rounded-full bg-slate-200 px-3 py-1 text-[.68rem] font-bold text-slate-600">No automatic campaign changes</span>
+              <p class="growth-data-note-foot">Grab&Book does not automatically change campaigns, budgets or business settings.</p>
             </div>
-          </div>
+          </details>
 
-          <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 growth-planner-summary">
             <button class="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-300 hover:shadow-sm" type="button" data-go-section="growth-planner-section">
               <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Open tasks</p>
               <p id="growthPlannerOpenTasks" class="mt-1 text-2xl font-bold text-ink">0</p>
@@ -1388,29 +1398,7 @@
             </button>
           </div>
 
-          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Foundation</p>
-              <p class="mt-2 text-xl font-bold text-ink">First + last touch</p>
-              <p class="mt-2 text-sm leading-6 text-slate-500">Bookings can now retain source, medium, campaign, referral and device attribution.</p>
-            </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Customer link</p>
-              <p class="mt-2 text-xl font-bold text-ink">CRM connected</p>
-              <p class="mt-2 text-sm leading-6 text-slate-500">Acquisition source can follow a customer beyond their first booking into retention and value analysis.</p>
-            </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Internal bookings</p>
-              <p class="mt-2 text-xl font-bold text-ink">Kept separate</p>
-              <p class="mt-2 text-sm leading-6 text-slate-500">Staff-assisted bookings do not overwrite genuine marketing attribution.</p>
-            </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booking journey</p>
-              <p class="mt-2 text-xl font-bold text-ink">Funnel tracking active</p>
-              <p class="mt-2 text-sm leading-6 text-slate-500">Growth now measures consented journeys from booking-page visit through completed appointment.</p>
-            </article>
-          </div>
-        </div>
+                  </div>
 
         <article id="growth-channels-section" class="card scroll-mt-32 p-5 sm:p-6">
           <div class="flex flex-wrap items-start justify-between gap-4">
@@ -1419,7 +1407,7 @@
               <h3 class="mt-1 text-xl font-bold text-ink">Compare where customers come from</h3>
               <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Compare acquisition channels on the same Grab&Book metrics: tracked visits, completed bookings, conversion, new customers and booked value.</p>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="growth-channel-toolbar flex flex-wrap items-center gap-2">
               <span id="growthChannelsWindow" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Live: last 30 days</span>
               <select id="growthChannelTypeFilter" class="field !w-auto !py-2 text-xs font-semibold">
                 <option value="all">All channels</option>
@@ -1430,7 +1418,7 @@
                 <option value="Referral">Referral</option>
                 <option value="Other">Other</option>
               </select>
-              <button id="growthImportBtn" class="btn btn-primary" type="button">Import existing data</button>
+              <button id="growthImportBtn" class="btn btn-primary" type="button">Import data</button>
               <button id="growthImportTemplateBtn" class="btn btn-light" type="button">CSV template</button>
               <button id="growthChannelsRefreshBtn" class="btn btn-light" type="button">Refresh</button>
               <input id="growthImportCsvInput" class="hidden" type="file" accept=".csv,text/csv">
@@ -2129,8 +2117,8 @@
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Growth planner</p>
-              <h3 class="mt-1 text-xl font-bold text-ink">Turn every thought into a clear next action</h3>
-              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Keep tasks, ideas, goals and channel-specific notes in one place so marketing decisions and future experiments do not get lost across different apps.</p>
+              <h3 class="mt-1 text-xl font-bold text-ink">Plan the next action</h3>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Keep tasks, ideas, goals and channel notes together without needing another planning tool.</p>
             </div>
             <button id="growthPlannerAddBtn" class="btn btn-primary" type="button">Add planner item</button>
           </div>
@@ -2161,18 +2149,18 @@
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Opportunities</p>
-              <h3 class="mt-1 text-xl font-bold text-ink">Evidence worth reviewing</h3>
+              <h3 class="mt-1 text-xl font-bold text-ink">Recommendations worth reviewing</h3>
               <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Grab&Book looks for patterns in the data and suggests areas that may be worth investigating. It does not automatically change campaigns, budgets, pricing or business settings.</p>
             </div>
-            <button id="growthOpportunitiesRefreshBtn" class="btn btn-light" type="button">Refresh recommendations</button>
+            <button id="growthOpportunitiesRefreshBtn" class="btn btn-light" type="button">Refresh</button>
           </div>
 
-          <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-            <p class="font-bold text-slate-700">How to use these recommendations</p>
-            <p class="mt-1">These are automated data signals based on the information currently available to Grab&Book. They may be affected by small samples, attribution limits, consent choices, delayed platform reporting or tracking configuration. They are not guarantees, instructions, or financial/legal advice. Review the evidence and your wider business context before acting.</p>
-          </div>
+          <details class="growth-guidance-disclosure mt-5 rounded-2xl border border-slate-200 bg-slate-50/70">
+            <summary>How recommendations work <span aria-hidden="true">⌄</span></summary>
+            <p>Recommendations are cautious, threshold-based signals using the data currently available to Grab&Book. Small samples, attribution limits, consent choices and delayed platform reporting can affect them. Review the supporting numbers and wider business context before acting; Grab&Book does not automatically change campaigns, budgets, pricing or settings.</p>
+          </details>
 
-          <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 growth-opportunity-summary">
             <div class="rounded-2xl bg-emerald-50 p-4">
               <p class="text-[.68rem] font-bold uppercase tracking-wider text-emerald-700">Potential growth</p>
               <p id="growthOpportunityGrowthCount" class="mt-1 text-2xl font-bold text-emerald-950">0</p>
@@ -2196,7 +2184,7 @@
           </div>
 
           <div class="mt-5 flex flex-wrap gap-2">
-            <button class="growth-opportunity-filter rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white" data-opportunity-filter="active" type="button">Active</button>
+            <button class="growth-opportunity-filter rounded-full bg-brand-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm" data-opportunity-filter="active" type="button">Active</button>
             <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="growth" type="button">Potential growth</button>
             <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="review" type="button">Worth reviewing</button>
             <button class="growth-opportunity-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600" data-opportunity-filter="issue" type="button">Possible issues</button>
@@ -2206,11 +2194,7 @@
 
           <div id="growthOpportunityList" class="mt-5 space-y-3"></div>
 
-          <div class="mt-5 rounded-2xl bg-slate-50 p-4">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Recommendation policy</p>
-            <p class="mt-1 text-xs leading-5 text-slate-500">Grab&Book uses threshold-based rules and displays the supporting numbers. Recommendations use cautious language such as “consider reviewing” and “may indicate.” They do not promise outcomes or state that changing spend, content or pricing will produce a particular result.</p>
-          </div>
-        </article>
+          </article>
       </section>
 
       <!-- Customers Tab -->
@@ -4652,7 +4636,7 @@
   <script src="assets/js/core.js?v=stage8-crm-1"></script>
   <script src="assets/js/acquisition.js"></script>
   <script src="assets/js/growth-tracking.js"></script>
-  <script src="assets/js/growth.js"></script>
+  <script src="assets/js/growth.js?v=stage9-growth-1"></script>
   <script src="assets/js/ga4.js"></script>
   <script src="assets/js/search-console.js"></script>
   <script src="assets/js/google-ads.js"></script>
