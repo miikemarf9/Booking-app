@@ -1228,7 +1228,12 @@ function syncReminderFields() {
           help.textContent = "Stripe is linked, but live card payments are not enabled yet.";
           connectBtn.textContent = "Continue Stripe setup";
         } else {
-          populateStripePayments();
+          state.stripeReady = false;
+          badge.textContent = "Not connected";
+          badge.className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
+          text.textContent = "Not connected";
+          help.textContent = "Connect Stripe before customers can complete paid bookings.";
+          connectBtn.textContent = "Connect Stripe";
         }
 
         if (typeof renderFirstRunSetup === "function") renderFirstRunSetup();
@@ -1237,7 +1242,7 @@ function syncReminderFields() {
         }
         return ready;
       } catch (err) {
-        state.stripeReady = null;
+        state.stripeReady = false;
         if (typeof renderFirstRunSetup === "function") renderFirstRunSetup();
         if (showMessage) toast(err?.message || "Could not check Stripe.", "error");
         return false;
