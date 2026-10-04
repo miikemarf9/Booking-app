@@ -8,7 +8,7 @@
   const control = demo.querySelector(".gb-demo-control");
   const caption = demo.querySelector(".gb-demo-caption");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const captions = ["Less booking admin. More time for your customers.", "Use customer history to encourage the next visit.", "Focus your marketing using recorded customer value."];
+  const captions = ["A booking lands in the diary.", "That booking becomes useful customer history.", "That customer history helps show where value began."];
   let step = 0;
   let timer = null;
   let playing = false;
