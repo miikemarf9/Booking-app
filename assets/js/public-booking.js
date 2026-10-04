@@ -64,6 +64,7 @@ async function loadPublicBookingPage(profileId) {
         $("publicDate").max = maxDate;
 
         renderPublicServices();
+        renderPublicQuickDates();
         applyCustomerBookingPrefill();
         showOnly("publicBookingView");
       } catch (err) {
@@ -78,6 +79,80 @@ async function loadPublicBookingPage(profileId) {
         `;
         errCard.classList.remove("hidden");
       }
+    }
+
+    function renderPublicQuickDates() {
+      const wrap = $("publicQuickDates");
+      const input = $("publicDate");
+      if (!wrap || !input || !state.publicProfile) return;
+
+      const disabled = input.disabled;
+      const maxDate = addDaysToDateKey(todayKey(), Number(state.publicProfile.maximum_booking_days || 90));
+      const dates = [];
+      for (let offset = 0; offset < 7; offset += 1) {
+        const date = addDaysToDateKey(todayKey(), offset);
+        if (date > maxDate) break;
+        dates.push(date);
+      }
+
+      wrap.innerHTML = dates.map(date => {
+        const d = londonDate(date, "12:00");
+        const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const selected = state.selectedDate === date;
+        return `
+          <button type="button"
+            class="booking-date-choice${selected ? " selected" : ""}"
+            data-public-date="${date}"
+            aria-pressed="${selected ? "true" : "false"}"
+            ${disabled ? "disabled" : ""}>
+            <span>${escapeHtml(weekday)}</span>
+            <strong>${escapeHtml(day)}</strong>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function handlePublicQuickDateClick(e) {
+      const btn = e.target.closest("[data-public-date]");
+      if (!btn || btn.disabled) return;
+      $("publicDate").value = btn.dataset.publicDate;
+      handlePublicDateChange();
+    }
+
+    function currentPublicPrice() {
+      if (!state.selectedService) return 0;
+      const promo = state.selectedDate
+        ? promotionForDate(state.selectedService, state.selectedDate)
+        : { price: Number(state.selectedService.price || 0) };
+      const flexible = state.selectedStaffChoice === "flexible" && state.selectedService.flexible_staff_enabled;
+      return flexible ? flexibleStaffPrice(state.selectedService, promo.price) : Number(promo.price || 0);
+    }
+
+    function renderPublicPaymentNote() {
+      const note = $("publicPaymentNote");
+      if (!note || !state.selectedService) return;
+      const type = state.selectedService.deposit_type || "none";
+      const finalPrice = currentPublicPrice();
+      const rawAmount = Number(state.selectedService.deposit_amount || 0);
+
+      if (type === "none") {
+        note.textContent = "No online payment is due now. You’ll pay the business at the appointment.";
+        return;
+      }
+
+      if (type === "full") {
+        note.textContent = `Next: Stripe will open securely so you can pay ${money(finalPrice)}.`;
+        return;
+      }
+
+      const dueNow = type === "fixed"
+        ? Math.min(rawAmount, finalPrice)
+        : finalPrice * Math.max(0, Math.min(100, rawAmount)) / 100;
+      const remaining = Math.max(0, finalPrice - dueNow);
+      note.textContent = remaining > 0
+        ? `Next: Stripe will open securely for a ${money(dueNow)} deposit. ${money(remaining)} remains to pay to the business.`
+        : `Next: Stripe will open securely so you can pay ${money(dueNow)}.`;
     }
 
     function renderPublicServices() {
@@ -256,6 +331,7 @@ async function loadPublicBookingPage(profileId) {
 
       $("publicDate").disabled = false;
       $("publicDate").value = "";
+      renderPublicQuickDates();
       activateStep("dateStep");
       deactivateStep("timeStep");
       deactivateDetails();
@@ -288,6 +364,7 @@ async function loadPublicBookingPage(profileId) {
 
       $("publicDate").disabled = hasStaff;
       $("publicDate").value = "";
+      renderPublicQuickDates();
       $("confirmBookingBtn").textContent = state.selectedService?.deposit_type === "none"
         ? "Confirm booking"
         : "Continue to secure payment";
@@ -309,6 +386,7 @@ async function loadPublicBookingPage(profileId) {
     async function handlePublicDateChange() {
       state.selectedDate = $("publicDate").value;
       state.selectedSlot = null;
+      renderPublicQuickDates();
 
       deactivateDetails();
       updateSummary();
@@ -567,14 +645,15 @@ async function loadPublicBookingPage(profileId) {
 
     function activateStep(stepId) {
       const el = $(stepId);
-      el.classList.remove("opacity-50");
+      el.classList.remove("hidden", "opacity-50");
       const badge = el.querySelector("span");
       if (badge) badge.className = "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-black text-white";
     }
 
     function deactivateStep(stepId) {
       const el = $(stepId);
-      el.classList.add("opacity-50");
+      el.classList.add("hidden");
+      el.classList.remove("opacity-50");
       const badge = el.querySelector("span");
       if (badge) badge.className = "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-black text-slate-500";
     }
@@ -661,6 +740,8 @@ async function loadPublicBookingPage(profileId) {
         : (selectedStaff || (state.selectedStaffChoice === "any" ? "Any available" : "Not selected"));
       $("summaryDate").textContent = state.selectedDate ? prettyDate(state.selectedDate) : "Not selected";
       $("summaryTime").textContent = state.selectedSlot ? `${prettyTime(state.selectedSlot.start)}–${prettyTime(state.selectedSlot.end)}` : "Not selected";
+
+      renderPublicPaymentNote();
 
       const mobile = $("mobileBookingSummary");
       mobile.classList.toggle("hidden", !state.selectedService);
@@ -880,10 +961,8 @@ async function loadPublicBookingPage(profileId) {
       $("publicStaffChoices").innerHTML = "";
       updatePublicStepNumbers(false);
 
-      ["dateStep", "timeStep", "detailsStep"].forEach(id => {
-        $(id).classList.remove("hidden");
-        deactivateStep(id);
-      });
+      ["dateStep", "timeStep", "detailsStep"].forEach(id => deactivateStep(id));
+      renderPublicQuickDates();
 
       deactivateDetails();
       $("publicSlots").innerHTML = "";
