@@ -624,9 +624,47 @@ function calendarDateKey(date) {
       return "settings";
     }
 
+    function setDashboardNavButtonState(btn, active) {
+      if (!btn) return;
+      btn.classList.toggle("active", active);
+      if (active) btn.setAttribute("aria-current", "page");
+      else btn.removeAttribute("aria-current");
+    }
+
+    function revealDashboardSubnavItem(btn) {
+      const wrap = $("dashboardSubnavWrap");
+      if (!wrap || !btn || !wrap.contains(btn) || btn.offsetParent === null) return;
+
+      window.requestAnimationFrame(() => {
+        const wrapRect = wrap.getBoundingClientRect();
+        const btnRect = btn.getBoundingClientRect();
+        const edge = 16;
+        const outsideLeft = btnRect.left < wrapRect.left + edge;
+        const outsideRight = btnRect.right > wrapRect.right - edge;
+        if (!outsideLeft && !outsideRight) return;
+
+        const targetLeft =
+          wrap.scrollLeft +
+          (btnRect.left - wrapRect.left) -
+          ((wrapRect.width - btnRect.width) / 2);
+
+        wrap.scrollTo({ left: Math.max(0, targetLeft), behavior: "smooth" });
+      });
+    }
+
+    function setDashboardSectionNav(sectionId) {
+      let activeBtn = null;
+      document.querySelectorAll(".subnav-tab[data-go-section]").forEach(btn => {
+        const active = btn.dataset.goSection === sectionId;
+        setDashboardNavButtonState(btn, active);
+        if (active) activeBtn = btn;
+      });
+      revealDashboardSubnavItem(activeBtn);
+    }
+
     function syncDashboardArea(area, activeTab = "") {
       document.querySelectorAll(".area-tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.area === area);
+        setDashboardNavButtonState(btn, btn.dataset.area === area);
       });
 
       document.querySelectorAll("[data-area-subnav]").forEach(nav => {
@@ -637,17 +675,24 @@ function calendarDateKey(date) {
 
       const settingsBtn = $("dashboardSettingsBtn");
       if (settingsBtn) {
-        settingsBtn.classList.toggle("dashboard-settings-active", area === "settings");
-        settingsBtn.classList.toggle("!text-white", area === "settings");
+        const settingsActive = area === "settings";
+        settingsBtn.classList.toggle("dashboard-settings-active", settingsActive);
+        settingsBtn.classList.toggle("!text-white", settingsActive);
+        if (settingsActive) settingsBtn.setAttribute("aria-current", "page");
+        else settingsBtn.removeAttribute("aria-current");
       }
 
-      document.querySelectorAll(".subnav-tab").forEach(btn => {
+      let activeSubnav = null;
+      document.querySelectorAll(".subnav-tab[data-go-tab]").forEach(btn => {
         const target = btn.dataset.goTab || "";
         const active =
           (activeTab === "bookings" && target === "calendar") ||
           target === activeTab;
-        btn.classList.toggle("active", active);
+        setDashboardNavButtonState(btn, active);
+        if (active) activeSubnav = btn;
       });
+
+      revealDashboardSubnavItem(activeSubnav);
     }
 
     function switchArea(area) {
@@ -664,10 +709,7 @@ function calendarDateKey(date) {
       const tabId = area === "crm" ? "customers" : "growth";
       document.querySelectorAll(".dashboard-tab").forEach(el => el.classList.toggle("hidden", el.id !== `tab-${tabId}`));
       syncDashboardArea(area, tabId);
-
-      document.querySelectorAll(".subnav-tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.goSection === sectionId);
-      });
+      setDashboardSectionNav(sectionId);
 
       if (area === "growth" && typeof loadGrowthAnalytics === "function") {
         loadGrowthAnalytics(false);
@@ -685,23 +727,19 @@ function calendarDateKey(date) {
       syncDashboardArea(area, tabId);
 
       if (tabId === "customers") {
-        document.querySelectorAll(".subnav-tab").forEach(btn => {
-          btn.classList.toggle("active", btn.dataset.goSection === "crm-customers-section");
-        });
+        setDashboardSectionNav("crm-customers-section");
         window.scrollTo({ top: 0, behavior: "auto" });
         return;
       }
 
       if (tabId === "growth") {
-        document.querySelectorAll(".subnav-tab").forEach(btn => {
-          btn.classList.toggle("active", btn.dataset.goSection === "growth-overview-section");
-        });
+        setDashboardSectionNav("growth-overview-section");
         if (typeof loadGrowthAnalytics === "function") loadGrowthAnalytics(false);
         window.scrollTo({ top: 0, behavior: "auto" });
         return;
       }
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "auto" });
     }
 
     function buildPublicUrl(profileId) {
