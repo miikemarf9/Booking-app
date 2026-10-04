@@ -2,8 +2,11 @@
 
 function updateFreePlanFeePreview() {
       const customerPays = Math.max(0, Number($("srvPrice")?.value || 0));
-      const fee = customerPays * 0.03;
+      const feeRate = Math.max(0, Number(state.plan?.platform_fee_percent ?? 2));
+      const fee = customerPays * (feeRate / 100);
       const businessReceives = Math.max(0, customerPays - fee);
+
+      if ($("srvFeePlatformLabel")) $("srvFeePlatformLabel").textContent = `Grab&Book platform fee (${feeRate % 1 === 0 ? feeRate.toFixed(0) : feeRate}%)`;
 
       if ($("srvFeeCustomerPays")) $("srvFeeCustomerPays").textContent = money(customerPays);
       if ($("srvFeePlatform")) $("srvFeePlatform").textContent = money(fee);
