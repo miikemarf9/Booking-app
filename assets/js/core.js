@@ -1128,7 +1128,7 @@
             // This wording deliberately does not reveal whether the email was
             // already registered; Supabase may intentionally obscure that.
             setAuthMessage(
-              "Check your email to continue. If this is a new account, use the confirmation link we sent. If you've registered before, use Log in or “Forgot password?”.",
+              "Check your email for the confirmation link. If you already have an account, use Log in or “Forgot password?” instead.",
               "success"
             );
           }
@@ -1357,7 +1357,7 @@
       const status = $(statusId);
       const button = $(buttonId);
       if (icon) {
-        icon.textContent = complete ? "✓" : icon.dataset.step || icon.textContent;
+        icon.textContent = complete ? "✓" : (icon.dataset.step || "");
         icon.classList.toggle("first-run-step-complete", complete);
       }
       if (status) status.textContent = complete ? completeText : pendingText;
@@ -1410,6 +1410,13 @@
         "Review payments →",
         state.profile?.stripe_connect_id ? "Finish Stripe setup →" : "Connect Stripe →"
       );
+
+      const availabilityButton = $("firstRunAvailabilityBtn");
+      if (availabilityButton) {
+        availabilityButton.disabled = !setup.hasService;
+        availabilityButton.classList.toggle("opacity-40", !setup.hasService);
+        availabilityButton.classList.toggle("cursor-not-allowed", !setup.hasService);
+      }
 
       $("firstRunReady").classList.toggle("hidden", !setup.ready);
       $("firstRunReady").classList.toggle("flex", setup.ready);
