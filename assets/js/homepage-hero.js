@@ -1,94 +1,153 @@
 "use strict";
-// An isolated, illustrative walkthrough. Never reads or writes customer data.
+// Illustrative homepage product story. Never reads or writes customer data.
 (() => {
   const demo = document.getElementById("gb-product-demo");
   if (!demo) return;
-  const tabs = [...demo.querySelectorAll("[data-gb-step]")];
-  const panels = [...demo.querySelectorAll('[role="tabpanel"]')];
+
+  const card = demo.querySelector(".gb-demo-window");
+  const panels = [...demo.querySelectorAll("[data-gb-face]")];
+  const dots = [...demo.querySelectorAll(".gb-story-dot")];
   const control = demo.querySelector(".gb-demo-control");
   const caption = demo.querySelector(".gb-demo-caption");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const captions = ["A booking lands in the diary.", "That booking becomes useful customer history.", "That customer history helps show where value began."];
+  const captions = [
+    "A booking lands in the diary.",
+    "That booking becomes useful customer history.",
+    "That customer history helps show where value began."
+  ];
+
+  const DWELL_MS = 5600;
+  const TURN_OUT_MS = 620;
+  const TURN_IN_MS = 700;
+
   let step = 0;
   let timer = null;
   let playing = false;
   let started = false;
   let visible = false;
+  let turning = false;
+  let transitionTimers = [];
+
+  function clearTransitionTimers() {
+    transitionTimers.forEach(clearTimeout);
+    transitionTimers = [];
+  }
 
   function updateControl() {
     control.textContent = playing ? "Pause Ⅱ" : started ? "Resume ▶" : "Play demo ▶";
     control.setAttribute("aria-label", playing ? "Pause product walkthrough" : "Play product walkthrough");
   }
+
+  function renderFace(index, animateContents = true) {
+    step = index;
+    panels.forEach((panel, i) => {
+      panel.hidden = i !== index;
+      panel.classList.remove("gb-panel-enter");
+    });
+    dots.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
+
+    if (animateContents && !reduced.matches) {
+      void panels[index].offsetWidth;
+      panels[index].classList.add("gb-panel-enter");
+    }
+
+    caption.textContent = captions[index];
+    demo.dataset.activeStep = String(index);
+  }
+
   function stop() {
     clearTimeout(timer);
     timer = null;
     playing = false;
     updateControl();
   }
-  function show(index, animate = true) {
-    step = index;
-    tabs.forEach((tab, i) => {
-      tab.setAttribute("aria-selected", String(i === index));
-      tab.tabIndex = i === index ? 0 : -1;
-      panels[i].hidden = i !== index;
-      panels[i].classList.remove("gb-panel-enter");
-    });
-    if (animate && !reduced.matches) {
-      void panels[index].offsetWidth;
-      panels[index].classList.add("gb-panel-enter");
-    }
-    caption.textContent = captions[index];
-    demo.dataset.activeStep = String(index);
-  }
+
   function schedule() {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      if (document.hidden || !visible || reduced.matches) return stop();
-      show((step + 1) % tabs.length);
-      schedule();
-    }, 5500);
+      if (document.hidden || !visible || reduced.matches || !playing) return stop();
+      rotateTo((step + 1) % panels.length);
+    }, DWELL_MS);
   }
+
+  function rotateTo(index) {
+    if (turning || index === step) {
+      if (playing) schedule();
+      return;
+    }
+
+    if (reduced.matches) {
+      renderFace(index, false);
+      if (playing) schedule();
+      return;
+    }
+
+    turning = true;
+    clearTimeout(timer);
+    timer = null;
+    card.classList.remove("gb-turn-in");
+    card.classList.add("gb-turn-out");
+
+    transitionTimers.push(setTimeout(() => {
+      renderFace(index, true);
+      card.classList.remove("gb-turn-out");
+      void card.offsetWidth;
+      card.classList.add("gb-turn-in");
+
+      transitionTimers.push(setTimeout(() => {
+        card.classList.remove("gb-turn-in");
+        turning = false;
+        if (playing && visible && !document.hidden) schedule();
+      }, TURN_IN_MS));
+    }, TURN_OUT_MS));
+  }
+
   function play() {
     stop();
-    if (!started) show(0);
     started = true;
-    // Reduced motion users keep manual, instantaneous tab navigation.
     if (!reduced.matches) {
       playing = true;
       schedule();
     }
     updateControl();
   }
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => { started = true; stop(); show(index); });
-    tab.addEventListener("keydown", event => {
-      let next;
-      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
-      if (event.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
-      if (event.key === "Home") next = 0;
-      if (event.key === "End") next = tabs.length - 1;
-      if (next === undefined) return;
-      event.preventDefault();
-      started = true;
+
+  control.addEventListener("click", () => {
+    if (playing) {
       stop();
-      show(next);
-      tabs[next].focus();
-    });
+      return;
+    }
+    play();
   });
-  control.addEventListener("click", () => playing ? stop() : play());
-  demo.addEventListener("focusin", event => {
-    if (event.target !== control) stop();
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stop();
   });
-  document.addEventListener("visibilitychange", () => { if (document.hidden) stop(); });
-  reduced.addEventListener("change", () => { if (reduced.matches) { stop(); show(step, false); } });
+
+  reduced.addEventListener("change", () => {
+    clearTransitionTimers();
+    turning = false;
+    card.classList.remove("gb-turn-out", "gb-turn-in");
+    if (reduced.matches) {
+      stop();
+      renderFace(step, false);
+    }
+  });
+
   if ("IntersectionObserver" in window) {
     const observer = new IntersectionObserver(entries => {
       visible = entries[0].isIntersecting;
-      if (!visible) return stop();
+      if (!visible) {
+        stop();
+        return;
+      }
       if (!started && !reduced.matches) play();
     }, { threshold: .45 });
     observer.observe(demo);
   } else {
     visible = true;
   }
+
+  renderFace(0, false);
+  updateControl();
 })();
