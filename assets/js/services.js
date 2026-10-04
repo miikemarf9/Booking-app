@@ -16,27 +16,22 @@ function updateFreePlanFeePreview() {
     function renderServices() {
       $("serviceCountBadge").textContent = `${state.services.length} service${state.services.length === 1 ? "" : "s"}`;
       $("servicesList").innerHTML = state.services.length ? state.services.map(s => `
-        <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="booking-record-row">
           <div class="min-w-0 flex-1">
-            <h3 class="truncate font-bold text-ink">${escapeHtml(s.title)}</h3>
-            ${s.description ? `<div class="service-description mt-1.5 max-w-2xl text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</div>` : ""}
-            <p class="mt-2 text-sm text-slate-500">${Number(s.duration_minutes)} minutes · <strong class="text-slate-700">${money(s.price)}</strong></p>
-            <div class="mt-2 inline-flex rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800">${escapeHtml(paymentRequirementLabel(s))}</div>
-            ${s.promotion_enabled ? `
-              <div class="mt-2 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
-                <strong>${escapeHtml(promotionLabel(s))}</strong>
-                <span class="text-emerald-700">${escapeHtml(promotionScheduleText(s))}</span>
-              </div>
-            ` : ""}
-            ${s.flexible_staff_enabled ? `
-              <div class="mt-2 inline-flex rounded-xl bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-800">
-                Flexible team booking · ${escapeHtml(flexibleStaffDiscountLabel(s))}
-              </div>
-            ` : ""}
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-bold text-ink">${escapeHtml(s.title)}</h3>
+              <span class="text-sm font-semibold text-slate-500">${Number(s.duration_minutes)} min · ${money(s.price)}</span>
+            </div>
+            ${s.description ? `<div class="service-description mt-1 line-clamp-2 max-w-2xl text-sm text-slate-500">${sanitiseServiceDescription(s.description)}</div>` : ""}
+            <div class="booking-record-meta mt-2">
+              <span class="booking-meta-pill booking-meta-pill-blue">${escapeHtml(paymentRequirementLabel(s))}</span>
+              ${s.promotion_enabled ? `<span class="booking-meta-pill booking-meta-pill-green">${escapeHtml(promotionLabel(s))}</span>` : ""}
+              ${s.flexible_staff_enabled ? `<span class="booking-meta-pill booking-meta-pill-violet">Flexible team · ${escapeHtml(flexibleStaffDiscountLabel(s))}</span>` : ""}
+            </div>
           </div>
-          <div class="flex shrink-0 gap-2">
-            <button class="btn btn-light !px-3 !py-2" type="button" data-service-action="edit" data-id="${s.id}">Edit</button>
-            <button class="btn !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-service-action="delete" data-id="${s.id}">Delete</button>
+          <div class="booking-record-actions">
+            <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-service-action="edit" data-id="${s.id}">Edit</button>
+            <button class="btn booking-danger-btn !px-3 !py-2 text-sm" type="button" data-service-action="delete" data-id="${s.id}">Delete</button>
           </div>
         </div>
       `).join("") : emptyState("No services yet", "Add your first service using the form.");
@@ -305,7 +300,7 @@ function updateFreePlanFeePreview() {
               .map(link => state.services.find(s => s.id === link.service_id)?.title)
               .filter(Boolean);
             return `
-              <div class="rounded-2xl border ${member.is_active ? "border-slate-200" : "border-slate-200 bg-slate-50 opacity-65"} p-4">
+              <div class="booking-record-row ${member.is_active ? "" : "booking-record-row-muted"}">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div class="flex min-w-0 gap-3">
                     <div class="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-brand-50 font-black text-brand-700">
@@ -726,35 +721,31 @@ function updateFreePlanFeePreview() {
     function renderBlocks() {
       const showPast = $("showPastBlocks").checked;
       const list = state.blocks.filter(b => showPast || b.block_date >= todayKey());
+      const badge = $("blocksCountBadge");
+      if (badge) badge.textContent = `${list.length} ${showPast ? "shown" : "upcoming"}`;
 
       $("blocksList").innerHTML = list.length ? list.map(b => {
         const service = state.services.find(s => s.id === b.service_id);
         const member = state.staff.find(s => s.id === b.staff_id);
         const buffer = Number(b.buffer_minutes || 0);
         return `
-        <div class="flex flex-col gap-3 rounded-2xl border ${b.is_active ? "border-slate-200" : "border-slate-200 bg-slate-50 opacity-65"} p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+        <div class="booking-record-row ${b.is_active ? "" : "booking-record-row-muted"}">
+          <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-center gap-2">
               <h3 class="font-bold text-ink">${escapeHtml(prettyDate(b.block_date))}</h3>
-              <span class="rounded-full px-2 py-0.5 text-[.68rem] font-bold ${b.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}">
-                ${b.is_active ? "Active" : "Paused"}
-              </span>
+              <span class="booking-meta-pill ${b.is_active ? "booking-meta-pill-green" : ""}">${b.is_active ? "Active" : "Paused"}</span>
+              ${b.recurrence_group ? '<span class="booking-meta-pill booking-meta-pill-violet">Repeats</span>' : ''}
             </div>
             <p class="mt-1 text-sm font-semibold text-slate-700">${escapeHtml(service?.title || "No service linked")}</p>
-            <p class="mt-1 text-xs font-semibold text-brand-600">${member ? escapeHtml(member.name) : "Business-wide"}</p>
-            <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))}${buffer ? ` · ${buffer} min between customers` : ""}</p>
-            ${b.recurrence_group ? '<p class="mt-1 text-xs font-semibold text-indigo-600">Part of a recurring series</p>' : ''}
+            <p class="mt-1 text-sm text-slate-500">${escapeHtml(cleanTime(b.start_time))}–${escapeHtml(cleanTime(b.end_time))} · ${member ? escapeHtml(member.name) : "Business-wide"}${buffer ? ` · ${buffer} min buffer` : ""}</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="booking-record-actions">
             <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-block-action="edit" data-id="${b.id}">Edit</button>
             <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-block-action="toggle" data-id="${b.id}">${b.is_active ? "Pause" : "Activate"}</button>
-
             <details class="relative">
               <summary class="btn btn-light !px-3 !py-2 text-sm cursor-pointer list-none select-none">More</summary>
               <div class="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
-                <button class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50" type="button" data-block-action="delete" data-id="${b.id}">
-                  Delete this date
-                </button>
+                <button class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50" type="button" data-block-action="delete" data-id="${b.id}">Delete this date</button>
                 ${b.recurrence_group
                   ? `<button class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50" type="button" data-block-action="delete-series" data-id="${b.id}">Delete future repeats</button>`
                   : `<button class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50" type="button" data-block-action="delete-matching" data-id="${b.id}">Delete future repeats</button>`}
