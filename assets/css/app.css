@@ -3352,13 +3352,14 @@
       gap:.9rem;
       min-height:3.25rem;
       padding:.85rem 1rem;
-      border:1px solid #bbf7d0;
+      border:1px solid #e3e8ef;
       border-radius:1rem;
-      background:#f0fdf4;
-      color:#166534;
+      background:#fff;
+      color:#344054;
       text-align:left;
+      font-weight:700;
       line-height:1.35;
-      box-shadow:0 8px 24px rgba(22,101,52,.055);
+      box-shadow:0 8px 22px rgba(23,32,51,.045);
     }
     .hero-benefit-item > span:not(.hero-benefit-tick) {
       min-width:0;
@@ -3373,12 +3374,13 @@
       height:1.3rem;
       margin-top:0;
       border-radius:999px;
-      background:#16a34a;
-      color:#fff;
+      border:1px solid #bbf7d0;
+      background:#ecfdf3;
+      color:#15803d;
       font-size:.72rem;
       font-weight:900;
       line-height:1;
-      box-shadow:0 3px 9px rgba(22,163,74,.18);
+      box-shadow:none;
     }
     @media (max-width:639px) {
       .hero-proof-grid {
