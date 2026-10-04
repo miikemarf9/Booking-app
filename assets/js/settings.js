@@ -496,7 +496,7 @@ function syncReminderFields() {
         ? upcoming.map(block => {
             const member = state.staff.find(item => item.id === block.staff_id);
             return `
-            <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="booking-record-row">
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="rounded-full bg-rose-50 px-2.5 py-1 text-[.68rem] font-bold text-rose-700">${block.is_all_day ? "Full day" : "Hours blocked"}</span>
@@ -683,7 +683,7 @@ function syncReminderFields() {
             const service = state.services.find(s => s.id === q.service_id);
             const options = Array.isArray(q.options) ? q.options : [];
             return `
-              <div class="rounded-2xl border border-slate-200 p-4">
+              <div class="booking-record-row">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
