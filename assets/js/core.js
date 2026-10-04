@@ -1309,7 +1309,7 @@
         supabaseClient.from("staff_members").select("*").eq("profile_id", pId).order("sort_order").order("created_at"),
         supabaseClient.from("service_staff").select("*").eq("profile_id", pId),
         supabaseClient.from("schedule_blocks").select("*").eq("profile_id", pId).order("block_date", { ascending: true }).order("start_time", { ascending: true }),
-        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), staff_members(name, job_title, photo_url), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", pId).order("start_time", { ascending: true }),
+        supabaseClient.from("bookings").select("*, services(title, duration_minutes, price), staff_members(name, job_title, photo_url, deleted_at), booking_answers(question_label, answer_text, sort_order)").eq("profile_id", pId).order("start_time", { ascending: true }),
         supabaseClient.from("customers").select("*").eq("profile_id", pId).order("updated_at", { ascending: false }),
         supabaseClient.from("booking_questions").select("*").eq("profile_id", pId).order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
         supabaseClient.from("time_off_blocks").select("*").eq("profile_id", pId).order("start_time", { ascending: true }),
@@ -1551,6 +1551,7 @@
     function overviewBookingCard(booking) {
       const service = booking.services || state.services.find(item => item.id === booking.service_id) || {};
       const member = booking.staff_members || state.staff.find(item => item.id === booking.staff_id) || null;
+      const memberLabel = member ? member.name + (member.deleted_at ? " · Former team member" : "") : "";
       const start = new Date(booking.start_time);
       const isToday = dateKeyInZone(start) === todayKey();
       const dateLabel = isToday ? "Today" : prettyDate(start, false);
@@ -1565,7 +1566,7 @@
           <div class="min-w-0 flex-1">
             <h3 class="truncate font-bold text-ink">${escapeHtml(booking.customer_name || "Customer")}</h3>
             <p class="mt-0.5 truncate text-sm text-slate-500">
-              ${escapeHtml(service.title || "Service")}${member ? ` · ${escapeHtml(member.name)}` : ""}
+              ${escapeHtml(service.title || "Service")}${member ? ` · ${escapeHtml(memberLabel)}` : ""}
             </p>
           </div>
           ${value ? `<span class="overview-booking-value">${escapeHtml(value)}</span>` : ""}
