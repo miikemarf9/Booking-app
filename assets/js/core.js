@@ -833,6 +833,7 @@
       $("customerMergeCloseBtn").addEventListener("click", () => closeCustomerModal("customerMergeModal"));
       $("customerMergeCancelBtn").addEventListener("click", () => closeCustomerModal("customerMergeModal"));
       $("customerSearch").addEventListener("input", renderCustomers);
+      $("customerListFilter").addEventListener("change", renderCustomers);
       $("customerFilter").addEventListener("change", syncCustomerFilters);
       $("customerServiceFilter").addEventListener("change", renderCustomers);
       $("customerTagFilter").addEventListener("change", renderCustomers);
@@ -862,19 +863,19 @@
       $("customerRetentionActionBtn").addEventListener("click", sendRetentionMessage);
       $("customerRetentionBookBtn").addEventListener("click", bookSelectedCustomer);
       $("crmRetentionAttentionBtn").addEventListener("click", () => {
-        $("customerFilter").value = "retention_attention";
-        syncCustomerFilters();
-        $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        $("customerListFilter").value = "retention_attention";
+        renderCustomers();
+        goDashboardSection("crm-customers-section");
       });
       $("crmNoFutureBookingBtn").addEventListener("click", () => {
-        $("customerFilter").value = "no_future";
-        syncCustomerFilters();
-        $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        $("customerListFilter").value = "no_future";
+        renderCustomers();
+        goDashboardSection("crm-customers-section");
       });
       $("crmLapsedCustomersBtn").addEventListener("click", () => {
-        $("customerFilter").value = "lapsed";
-        syncCustomerFilters();
-        $("customersList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        $("customerListFilter").value = "lapsed";
+        renderCustomers();
+        goDashboardSection("crm-customers-section");
       });
       $("clearMarketingTargetBtn").addEventListener("click", clearMarketingTarget);
       $("clearMarketingCampaignBtn")?.addEventListener("click", () => clearMarketingCampaignContext());
