@@ -31,7 +31,7 @@
       }}
     }
   </script>
-  <link rel="stylesheet" href="assets/css/app.css?v=stage13-responsive-1">
+  <link rel="stylesheet" href="assets/css/app.css?v=book-hero-complete-1">
 
   <script type="application/ld+json">
   {
@@ -99,18 +99,41 @@
       <div id="bookHeroPreview" class="product-ui-frame book-hero-preview">
         <div class="product-ui-topbar book-preview-topbar"><div><p class="product-ui-eyebrow">Diary</p><p class="font-black text-ink">Friday 9 October</p></div><span class="product-status book-live-status">Live availability</span></div>
         <div class="book-preview-metrics grid grid-cols-2 gap-3 bg-slate-50/80 p-4 sm:grid-cols-4 sm:p-5">
-          <div class="product-metric"><span>Booked</span><strong data-book-count="620" data-prefix="£">£620</strong><small>8 appointments</small></div>
-          <div class="product-metric"><span>Free time</span><strong>2h 15m</strong><small>across the team</small></div>
-          <div class="product-metric"><span>Next slot</span><strong>14:30</strong><small>45 min</small></div>
-          <div class="product-metric"><span>Team</span><strong data-book-count="3">3</strong><small>working today</small></div>
+          <div class="product-metric"><span>Booked</span><strong data-book-count="620" data-book-start="555" data-prefix="£">£555</strong><small><span data-book-appointments>7</span> appointments</small></div>
+          <div class="product-metric"><span>Free time</span><strong data-book-free-time>3h</strong><small>across the team</small></div>
+          <div class="product-metric"><span>Next slot</span><strong data-book-next-slot>14:30</strong><small data-book-next-duration>45 min</small></div>
+          <div class="product-metric"><span>Team</span><strong data-book-count="3" data-book-start="3">3</strong><small>working today</small></div>
         </div>
         <div class="p-4 sm:p-5">
-          <div class="grid gap-3 sm:grid-cols-[82px_1fr]">
-            <div class="hidden space-y-3 text-right text-[.68rem] font-bold text-slate-400 sm:block"><p class="h-14 pt-2">09:00</p><p class="h-14 pt-2">10:00</p><p class="h-14 pt-2">11:00</p><p class="h-14 pt-2">12:00</p></div>
-            <div class="book-diary-items space-y-3">
+          <div class="book-hero-diary">
+            <div class="book-hero-diary-row">
+              <time>10:00</time>
               <div class="book-diary-item rounded-xl border border-brand-100 bg-brand-50 p-3"><div class="flex justify-between gap-3"><div><p class="font-bold text-ink">Consultation</p><p class="text-xs text-slate-500">Alex · 10:00–10:45</p></div><strong class="text-sm text-ink">£50</strong></div></div>
+            </div>
+            <div class="book-hero-diary-row">
+              <time>11:30</time>
               <div class="book-diary-item rounded-xl border border-violet-100 bg-violet-50 p-3"><div class="flex justify-between gap-3"><div><p class="font-bold text-ink">Premium treatment</p><p class="text-xs text-slate-500">Sam · 11:30–12:30</p></div><strong class="text-sm text-ink">£120</strong></div></div>
-              <div class="book-diary-item book-available-slot rounded-xl border border-dashed border-emerald-200 bg-emerald-50 p-3"><p class="text-xs font-bold uppercase tracking-wider text-emerald-700">Available to book</p><p class="mt-1 font-bold text-emerald-950">14:30 · 45 minutes</p></div>
+            </div>
+            <div class="book-hero-diary-row book-hero-gap-row">
+              <time>13:00</time>
+              <div class="book-diary-item book-diary-buffer"><span>Team reset</span><small>30 min buffer</small></div>
+            </div>
+            <div class="book-hero-diary-row">
+              <time>14:30</time>
+              <div class="book-diary-item book-available-slot" aria-live="polite">
+                <div class="book-slot-available-state">
+                  <p>Available to book</p>
+                  <strong>14:30 · 45 minutes</strong>
+                </div>
+                <div class="book-slot-confirmed-state" aria-hidden="true">
+                  <div>
+                    <span>New booking</span>
+                    <strong>Signature treatment</strong>
+                    <small>Amelia · 14:30–15:15</small>
+                  </div>
+                  <b>£65</b>
+                </div>
+              </div>
             </div>
           </div>
           <p class="mt-4 text-[.68rem] text-slate-400">Illustrative demo data.</p>
