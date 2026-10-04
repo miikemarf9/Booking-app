@@ -157,7 +157,7 @@ async function loadPublicBookingPage(profileId) {
 
     function renderPublicServices() {
       $("publicServices").innerHTML = state.publicServices.length ? state.publicServices.map(s => `
-        <button type="button" class="service-choice group rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-500 sm:p-5" data-service-id="${s.id}">
+        <button type="button" class="service-choice group rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-500 sm:p-5" data-service-id="${s.id}" aria-pressed="false">
           <span class="flex items-start justify-between gap-4">
             <span class="min-w-0">
               <span class="block text-base font-black text-ink">${escapeHtml(s.title)}</span>
@@ -178,8 +178,8 @@ async function loadPublicBookingPage(profileId) {
             ` : ""}
           </span>
           <span class="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs font-bold">
-            <span class="text-slate-500">${Number(s.duration_minutes)} minutes</span>
-            <span class="text-brand-700">Choose service →</span>
+            <span class="min-w-0 text-slate-500">${Number(s.duration_minutes)} min · ${escapeHtml(paymentRequirementLabel(s))}</span>
+            <span class="shrink-0 text-brand-700">Choose →</span>
           </span>
         </button>
       `).join("") : emptyState("No services available", "This business has not published any bookable services yet.");
@@ -284,7 +284,7 @@ async function loadPublicBookingPage(profileId) {
 
       const anyChoice = state.selectedService?.flexible_staff_enabled
         ? `
-          <button type="button" class="staff-choice rounded-2xl border border-violet-200 bg-violet-50/50 p-4 text-left transition hover:border-violet-400" data-staff-choice="flexible">
+          <button type="button" class="staff-choice rounded-2xl border border-violet-200 bg-violet-50/50 p-4 text-left transition hover:border-violet-400" data-staff-choice="flexible" aria-pressed="false">
             <span class="flex items-center justify-between gap-3">
               <span class="block font-bold text-ink">Book any available team member</span>
               <span class="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700">${escapeHtml(flexibleStaffDiscountLabel(state.selectedService))}</span>
@@ -293,14 +293,14 @@ async function loadPublicBookingPage(profileId) {
           </button>
         `
         : `
-          <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="any">
+          <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="any" aria-pressed="false">
             <span class="block font-bold text-ink">Any available team member</span>
             <span class="mt-1 block text-sm text-slate-500">Show the earliest times across the whole team.</span>
           </button>
         `;
 
       list.innerHTML = anyChoice + members.map(member => `
-        <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="${member.id}">
+        <button type="button" class="staff-choice rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-500" data-staff-choice="${member.id}" aria-pressed="false">
           <span class="flex items-start gap-3">
             <span class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-brand-50 font-black text-brand-700">
               ${member.photo_url ? `<img src="${escapeHtml(member.photo_url)}" alt="" class="h-full w-full object-cover">` : escapeHtml(String(member.name).slice(0,1).toUpperCase())}
@@ -327,7 +327,11 @@ async function loadPublicBookingPage(profileId) {
         const selectedStaffId = ["any", "flexible"].includes(state.selectedStaffChoice) ? null : state.selectedStaffChoice;
         trackBookingFunnelEvent("staff_selected", { staffId: selectedStaffId });
       }
-      document.querySelectorAll(".staff-choice").forEach(el => el.classList.toggle("selected", el === btn));
+      document.querySelectorAll(".staff-choice").forEach(el => {
+        const selected = el === btn;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       $("publicDate").disabled = false;
       $("publicDate").value = "";
@@ -360,7 +364,11 @@ async function loadPublicBookingPage(profileId) {
       renderPublicQuestions();
       const hasStaff = renderPublicStaffChoices();
 
-      document.querySelectorAll(".service-choice").forEach(el => el.classList.toggle("selected", el.dataset.serviceId === btn.dataset.serviceId));
+      document.querySelectorAll(".service-choice").forEach(el => {
+        const selected = el.dataset.serviceId === btn.dataset.serviceId;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       $("publicDate").disabled = hasStaff;
       $("publicDate").value = "";
@@ -521,7 +529,7 @@ async function loadPublicBookingPage(profileId) {
         $("publicSlots").innerHTML = slots.map((slot, idx) => {
           const member = slot.staffId ? state.publicStaff.find(item => item.id === slot.staffId) : null;
           return `
-            <button type="button" class="slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-slot-index="${idx}">
+            <button type="button" class="slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-slot-index="${idx}" aria-pressed="false">
               <span class="block">${escapeHtml(prettyTime(slot.start))}</span>
               ${state.selectedStaffChoice === "any" && member ? `<span class="mt-0.5 block truncate text-[.65rem] font-semibold text-slate-400">${escapeHtml(member.name)}</span>` : ""}
             </button>
@@ -621,7 +629,11 @@ async function loadPublicBookingPage(profileId) {
       const slots = $("publicSlots")._slots || [];
       state.selectedSlot = slots[Number(btn.dataset.slotIndex)] || null;
 
-      document.querySelectorAll(".slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
+      document.querySelectorAll(".slot-choice").forEach(el => {
+        const selected = el === btn;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       if (state.selectedSlot) {
         if (typeof trackBookingFunnelEvent === "function") {
