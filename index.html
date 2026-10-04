@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=homepage-benefits-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=interactive-diary-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=mobile-slide-1">
 
   <script type="application/ld+json">
@@ -415,60 +415,71 @@
             </div>
           </div>
 
-          <div class="landing-product-preview saas-reveal saas-product-preview">
+          <div id="homepageDiaryDemo" class="landing-product-preview saas-reveal saas-product-preview">
             <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
               <div><p class="text-[.68rem] font-black uppercase tracking-wider text-brand-600">Diary</p><p class="text-sm font-black text-ink">October 2026</p></div>
-              <span class="rounded-full bg-slate-100 px-3 py-1 text-[.68rem] font-bold text-slate-500">Demo view</span>
+              <span class="rounded-full bg-brand-50 px-3 py-1 text-[.68rem] font-bold text-brand-700">Interactive demo</span>
             </div>
             <div class="grid grid-cols-7 border-b border-slate-100 bg-slate-50 text-center text-[.62rem] font-bold uppercase text-slate-400 sm:text-[.68rem]">
               <span class="py-3">Mon</span><span class="py-3">Tue</span><span class="py-3">Wed</span><span class="py-3">Thu</span><span class="py-3">Fri</span><span class="py-3">Sat</span><span class="py-3">Sun</span>
             </div>
-            <div class="grid grid-cols-7 text-center text-xs">
+            <div class="grid grid-cols-7 text-center text-xs" aria-label="October 2026 demo diary">
               <span class="landing-calendar-day text-slate-300">28</span>
               <span class="landing-calendar-day text-slate-300">29</span>
               <span class="landing-calendar-day text-slate-300">30</span>
-              <span class="landing-calendar-day"><strong>1</strong><i></i></span>
-              <span class="landing-calendar-day"><strong>2</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>1</strong></span>
+              <button class="landing-calendar-day landing-calendar-choice" type="button" data-diary-day="2" aria-pressed="false" aria-label="Thursday 2 October, 3 appointments"><strong>2</strong><i></i></button>
               <span class="landing-calendar-day"><strong>3</strong></span>
               <span class="landing-calendar-day"><strong>4</strong></span>
 
-              <span class="landing-calendar-day"><strong>5</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>5</strong></span>
               <span class="landing-calendar-day"><strong>6</strong></span>
-              <span class="landing-calendar-day"><strong>7</strong><i></i></span>
+              <button class="landing-calendar-day landing-calendar-choice" type="button" data-diary-day="7" aria-pressed="false" aria-label="Wednesday 7 October, 4 appointments"><strong>7</strong><i></i></button>
               <span class="landing-calendar-day"><strong>8</strong></span>
-              <span class="landing-calendar-day bg-brand-50"><b class="mx-auto grid h-7 w-7 place-items-center rounded-full bg-brand-600 text-white">9</b><i></i></span>
-              <span class="landing-calendar-day"><strong>10</strong><i></i></span>
+              <button class="landing-calendar-day landing-calendar-choice is-selected" type="button" data-diary-day="9" aria-pressed="true" aria-label="Friday 9 October, 4 appointments"><strong>9</strong><i></i></button>
+              <span class="landing-calendar-day"><strong>10</strong></span>
               <span class="landing-calendar-day"><strong>11</strong></span>
 
-              <span class="landing-calendar-day"><strong>12</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>12</strong></span>
               <span class="landing-calendar-day"><strong>13</strong></span>
               <span class="landing-calendar-day"><strong>14</strong></span>
-              <span class="landing-calendar-day"><strong>15</strong><i></i></span>
-              <span class="landing-calendar-day"><strong>16</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>15</strong></span>
+              <button class="landing-calendar-day landing-calendar-choice" type="button" data-diary-day="16" aria-pressed="false" aria-label="Friday 16 October, 3 appointments"><strong>16</strong><i></i></button>
               <span class="landing-calendar-day"><strong>17</strong></span>
               <span class="landing-calendar-day"><strong>18</strong></span>
 
-              <span class="landing-calendar-day"><strong>19</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>19</strong></span>
               <span class="landing-calendar-day"><strong>20</strong></span>
-              <span class="landing-calendar-day"><strong>21</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>21</strong></span>
               <span class="landing-calendar-day"><strong>22</strong></span>
-              <span class="landing-calendar-day"><strong>23</strong><i></i></span>
+              <button class="landing-calendar-day landing-calendar-choice" type="button" data-diary-day="23" aria-pressed="false" aria-label="Friday 23 October, 5 appointments"><strong>23</strong><i></i></button>
               <span class="landing-calendar-day"><strong>24</strong></span>
               <span class="landing-calendar-day"><strong>25</strong></span>
 
-              <span class="landing-calendar-day"><strong>26</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>26</strong></span>
               <span class="landing-calendar-day"><strong>27</strong></span>
-              <span class="landing-calendar-day"><strong>28</strong><i></i></span>
+              <span class="landing-calendar-day"><strong>28</strong></span>
               <span class="landing-calendar-day"><strong>29</strong></span>
-              <span class="landing-calendar-day"><strong>30</strong><i></i></span>
+              <button class="landing-calendar-day landing-calendar-choice" type="button" data-diary-day="30" aria-pressed="false" aria-label="Friday 30 October, 2 appointments"><strong>30</strong><i></i></button>
               <span class="landing-calendar-day"><strong>31</strong></span>
               <span class="landing-calendar-day text-slate-300">1</span>
             </div>
             <div class="border-t border-slate-100 p-4 sm:p-5">
-              <div class="flex items-start justify-between gap-4">
-                <div><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Friday 9 October</p><p class="mt-1 font-black text-ink">4 appointments · £310 booked</p></div>
-                <span class="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">2 slots free</span>
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p id="homepageDiaryDate" class="text-xs font-bold uppercase tracking-wider text-slate-400">Friday 9 October</p>
+                  <p id="homepageDiarySummary" class="mt-1 font-black text-ink">4 appointments · £310 booked</p>
+                </div>
+                <span id="homepageDiaryFree" class="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">2 slots free</span>
               </div>
+              <p class="mt-3 text-[.68rem] font-semibold text-slate-400">Tap a blue-dot day to explore the diary.</p>
+              <div id="homepageDiaryAgenda" class="landing-calendar-agenda mt-4" aria-live="polite">
+                <div class="landing-calendar-appointment"><time>09:00</time><span><strong>Consultation</strong><small>James · 30 min</small></span><b>£45</b></div>
+                <div class="landing-calendar-appointment"><time>11:00</time><span><strong>Premium treatment</strong><small>Sophie · 60 min</small></span><b>£85</b></div>
+                <div class="landing-calendar-appointment"><time>14:30</time><span><strong>Signature treatment</strong><small>Amelia · 60 min</small></span><b>£65</b></div>
+                <div class="landing-calendar-appointment"><time>16:00</time><span><strong>Extended treatment</strong><small>Olivia · 90 min</small></span><b>£115</b></div>
+              </div>
+              <p class="mt-3 text-[.65rem] leading-5 text-slate-400">Illustrative diary data for the product preview.</p>
             </div>
           </div>
         </div>
@@ -4790,7 +4801,7 @@
   <script src="assets/js/services.js?v=stage14-final-1"></script>
   <script src="assets/js/bookings.js?v=stage11-secondary-1"></script>
   <script src="assets/js/public-booking.js?v=stage7-customer-1"></script>
-  <script src="assets/js/landing-preview.js"></script>
+  <script src="assets/js/landing-preview.js?v=interactive-diary-1"></script>
   <script src="assets/js/homepage-hero.js?v=rotating-story-2"></script>
   <script src="assets/js/boot.js"></script>
   <script src="assets/js/marketing-site.js" defer></script>
