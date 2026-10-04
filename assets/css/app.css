@@ -1001,6 +1001,110 @@
     }
 
 
+    /* Stage 3 public-site hierarchy and clutter reduction */
+    #landingView main > section {
+      position: relative;
+    }
+    .landing-audience-point,
+    .landing-question-point {
+      min-width: 0;
+      border-top: 1px solid var(--gb-border-soft);
+      padding: 1.15rem .15rem .1rem;
+    }
+    .landing-audience-point h3,
+    .landing-question-point h3 {
+      text-wrap: balance;
+    }
+    .landing-process-step {
+      min-width: 0;
+      border-left: 1px solid #dbe8f2;
+      padding: .25rem .25rem .25rem 1.15rem;
+    }
+    .landing-process-step .feature-icon {
+      box-shadow: none;
+    }
+    .pricing-plan-card {
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+    }
+    .pricing-plan-card > .btn {
+      margin-top: auto;
+    }
+    .pricing-plan-card-pro {
+      box-shadow: 0 10px 28px rgba(8,114,189,.08);
+    }
+    .pricing-fee-note {
+      border-top: 1px solid var(--gb-border-soft);
+      padding: 1.1rem .15rem 0;
+    }
+    .homepage-faq-card {
+      border-top: 1px solid var(--gb-border-soft);
+      padding: 1.15rem .15rem .2rem;
+    }
+    .homepage-faq-card p {
+      max-width: 38rem;
+    }
+
+    .product-site-shell .product-feature,
+    .product-site-shell .product-point,
+    .product-site-shell .product-integration {
+      box-shadow: none;
+    }
+    .product-site-shell .product-feature {
+      height: 100%;
+      border-color: var(--gb-border-soft);
+      transition: border-color .16s ease, background-color .16s ease, transform .16s ease;
+    }
+    .product-site-shell .product-feature:hover {
+      border-color: #cbd9e5;
+      background: #fcfdff;
+      transform: translateY(-1px);
+    }
+    .product-site-shell .product-point {
+      border-color: var(--gb-border-soft);
+      background: rgba(255,255,255,.7);
+    }
+    .product-site-shell .product-ui-frame {
+      box-shadow: 0 20px 55px rgba(23,32,51,.085);
+    }
+    .product-site-shell .product-page-hero .btn {
+      min-width: 9rem;
+    }
+    .case-method-card {
+      box-shadow: none;
+    }
+    .product-site-shell footer a {
+      transition: color .15s ease;
+    }
+
+    @media (max-width: 639px) {
+      .landing-audience-point,
+      .landing-question-point {
+        padding-top: 1rem;
+      }
+      .landing-process-step {
+        border-left: 0;
+        border-top: 1px solid #dbe8f2;
+        padding: 1rem 0 0;
+      }
+      .pricing-plan-card {
+        padding: 1.35rem !important;
+      }
+      .product-site-shell .product-page-hero .btn {
+        width: 100%;
+        min-width: 0;
+      }
+      .product-site-shell main > section:last-of-type .btn {
+        width: 100%;
+      }
+      .homepage-final-cta .btn {
+        width: 100%;
+        max-width: 18rem;
+      }
+    }
+
+
     /* Standalone public product pages */
     .product-site-shell {
       background:
