@@ -2851,12 +2851,12 @@
                 <label class="label" for="blkStartHour">Start time</label>
                 <input id="blkStart" type="hidden">
                 <div id="blkStartPicker" class="rounded-2xl border border-slate-200 bg-slate-50 p-2 transition focus-within:border-brand-300 focus-within:bg-white focus-within:shadow-sm">
-                  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-                    <select id="blkStartHour" class="field !bg-white !py-3 !pl-4 !pr-9 text-center font-bold tabular-nums" aria-label="Start time hour">
+                  <div class="grid grid-cols-[minmax(0,7.5rem)_auto_minmax(0,7.5rem)] items-center justify-center gap-2">
+                    <select id="blkStartHour" class="field !bg-white !py-3 !pl-4 !pr-8 text-center font-bold tabular-nums" aria-label="Start time hour">
                       <option value="">Hour</option>
                     </select>
                     <span class="text-lg font-black text-slate-300" aria-hidden="true">:</span>
-                    <select id="blkStartMinute" class="field !bg-white !py-3 !pl-4 !pr-9 text-center font-bold tabular-nums" aria-label="Start time minute">
+                    <select id="blkStartMinute" class="field !bg-white !py-3 !pl-4 !pr-8 text-center font-bold tabular-nums" aria-label="Start time minute">
                       <option value="">Minute</option>
                     </select>
                   </div>
@@ -2864,7 +2864,7 @@
                     <span id="blkStartSelected" class="hidden shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-black text-emerald-700" aria-live="polite"></span>
                   </div>
                 </div>
-                <p id="blkCalculatedEnd" class="mt-1.5 text-xs leading-5 text-slate-400">Finish time appears here once a service and start time are selected.</p>
+                <p id="blkCalculatedEnd" class="mt-1.5 hidden text-xs font-semibold leading-5 text-slate-500"></p>
               </div>
 
               <div>
