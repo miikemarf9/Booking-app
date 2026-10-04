@@ -1181,12 +1181,14 @@ function syncReminderFields() {
       const connectBtn = $("connectStripeBtn");
 
       if (linked) {
+        if (state.stripeReady !== true) state.stripeReady = null;
         badge.textContent = "Linked";
         badge.className = "rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700";
         text.textContent = "Stripe account linked";
         help.textContent = "Click Check connection to confirm Stripe has enabled this business for live payments.";
         connectBtn.textContent = "Continue Stripe setup";
       } else {
+        state.stripeReady = false;
         badge.textContent = "Not connected";
         badge.className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
         text.textContent = "Not connected";
@@ -1207,6 +1209,7 @@ function syncReminderFields() {
         if (data?.error) throw new Error(data.error);
 
         const ready = Boolean(data?.connected && data?.charges_enabled);
+        state.stripeReady = ready;
         const badge = $("stripeStatusBadge");
         const text = $("stripeStatusText");
         const help = $("stripeStatusHelp");
@@ -1225,14 +1228,22 @@ function syncReminderFields() {
           help.textContent = "Stripe is linked, but live card payments are not enabled yet.";
           connectBtn.textContent = "Continue Stripe setup";
         } else {
-          populateStripePayments();
+          state.stripeReady = false;
+          badge.textContent = "Not connected";
+          badge.className = "rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600";
+          text.textContent = "Not connected";
+          help.textContent = "Connect Stripe before customers can complete paid bookings.";
+          connectBtn.textContent = "Connect Stripe";
         }
 
+        if (typeof renderFirstRunSetup === "function") renderFirstRunSetup();
         if (showMessage) {
           toast(ready ? "Stripe is ready to take payments." : "Stripe setup still needs to be completed.", ready ? "success" : "info");
         }
         return ready;
       } catch (err) {
+        state.stripeReady = false;
+        if (typeof renderFirstRunSetup === "function") renderFirstRunSetup();
         if (showMessage) toast(err?.message || "Could not check Stripe.", "error");
         return false;
       } finally {
