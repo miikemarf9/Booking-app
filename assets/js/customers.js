@@ -513,6 +513,10 @@ function customerBookings(customer) {
       return $("customerFilter")?.value || "all";
     }
 
+    function currentCrmListFilter() {
+      return $("customerListFilter")?.value || "all";
+    }
+
     function populateCustomerServiceFilter() {
       const select = $("customerServiceFilter");
       if (!select) return;
@@ -523,8 +527,7 @@ function customerBookings(customer) {
       if (state.services.some(s => s.id === current)) select.value = current;
     }
 
-    function customerMatchesCurrentFilter(customer) {
-      const filter = currentCustomerFilter();
+    function customerMatchesFilter(customer, filter, serviceId = "", tag = "") {
       if (filter === "archived") return Boolean(customer.archived_at);
       if (customer.archived_at) return false;
       if (filter === "opted_in") return Boolean(customer.marketing_email_opt_in);
@@ -532,13 +535,11 @@ function customerBookings(customer) {
       const metrics = customerMetrics(customer);
 
       if (filter === "service") {
-        const serviceId = $("customerServiceFilter")?.value || "";
         if (!serviceId) return false;
         return metrics.active.some(b => b.service_id === serviceId);
       }
 
       if (filter === "tag") {
-        const tag = $("customerTagFilter")?.value || "";
         if (!tag) return false;
         return customerTags(customer).some(customerTag => customerTag === tag);
       }
@@ -554,10 +555,24 @@ function customerBookings(customer) {
       return true;
     }
 
+    function customerMatchesCurrentFilter(customer) {
+      return customerMatchesFilter(
+        customer,
+        currentCustomerFilter(),
+        $("customerServiceFilter")?.value || "",
+        $("customerTagFilter")?.value || ""
+      );
+    }
+
+    function filteredCampaignCustomers() {
+      return [...state.customers].filter(customer => customerMatchesCurrentFilter(customer));
+    }
+
     function filteredCustomersForCrm() {
       const query = String($("customerSearch")?.value || "").trim().toLowerCase();
+      const filter = currentCrmListFilter();
       return [...state.customers]
-        .filter(customer => customerMatchesCurrentFilter(customer))
+        .filter(customer => customerMatchesFilter(customer, filter))
         .filter(customer => {
           if (!query) return true;
           return [customer.name, customer.email, customer.phone]
@@ -586,7 +601,7 @@ function customerBookings(customer) {
         const ids = new Set(state.marketingCampaignCustomerIds || []);
         return state.customers.filter(c => ids.has(c.id));
       }
-      return filteredCustomersForCrm();
+      return filteredCampaignCustomers();
     }
 
     function marketingEligibleCustomers() {
@@ -625,11 +640,9 @@ function customerBookings(customer) {
     }
 
     function openRetentionAttentionCustomers() {
-      clearMarketingCampaignContext(false);
-      clearMarketingTarget(false);
       if ($("customerSearch")) $("customerSearch").value = "";
-      if ($("customerFilter")) $("customerFilter").value = "retention_attention";
-      syncCustomerFilters(true);
+      if ($("customerListFilter")) $("customerListFilter").value = "retention_attention";
+      renderCustomers();
       if (typeof goDashboardSection === "function") {
         goDashboardSection("crm-customers-section");
       } else {
@@ -799,7 +812,9 @@ ${bookingUrl}`;
       $("crmRecentCustomers").textContent = recent;
       $("crmBookedValue").textContent = money(bookedValue);
       $("crmRetentionAttention").textContent = retentionAttention;
-      $("customerCountBadge").textContent = currentCustomerFilter() === "archived" ? `${customers.length} archived` : `${customers.length} shown · ${activeCustomers.length} active${archivedCount ? ` · ${archivedCount} archived` : ""}`;
+      $("customerCountBadge").textContent = currentCrmListFilter() === "archived"
+        ? `${customers.length} archived`
+        : `${customers.length} shown · ${activeCustomers.length} active${archivedCount ? ` · ${archivedCount} archived` : ""}`;
       syncMarketingTargetUi();
       renderMarketingCampaignAudienceSummary();
       const eligible = marketingEligibleCustomers();
@@ -826,27 +841,22 @@ ${bookingUrl}`;
             const highlight = ["lapsed", "slipping", "due_back", "vip", "regular", "new"].find(group => groups.includes(group));
             const tags = customerTags(customer).slice(0, 2);
             return `
-              <button type="button" data-customer-id="${customer.id}" class="w-full rounded-2xl border p-4 text-left transition ${selected ? "border-brand-300 bg-brand-50" : "border-slate-200 hover:border-brand-200 hover:bg-slate-50"}">
-                <div class="flex items-start justify-between gap-3">
+              <button type="button" data-customer-id="${customer.id}" class="crm-customer-row ${selected ? "selected" : ""}">
+                <div class="flex min-w-0 items-start justify-between gap-3">
                   <div class="min-w-0">
-                    <h3 class="truncate font-bold text-ink">${escapeHtml(customer.name)}</h3>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h3 class="truncate font-bold text-ink">${escapeHtml(customer.name)}</h3>
+                      ${highlight ? `<span class="crm-customer-status">${escapeHtml(smartGroupLabel(highlight))}</span>` : ""}
+                    </div>
                     <p class="mt-1 truncate text-xs text-slate-500">${escapeHtml(customer.email)}${customer.phone ? " · " + escapeHtml(customer.phone) : ""}</p>
                   </div>
-                  <div class="flex shrink-0 flex-col items-end gap-1.5">
-                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[.68rem] font-bold text-slate-600">${m.bookingCount} booking${m.bookingCount === 1 ? "" : "s"}</span>
-                    ${customer.marketing_email_opt_in
-                      ? '<span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[.64rem] font-bold text-emerald-700">Marketing ✓</span>'
-                      : '<span class="rounded-full bg-slate-50 px-2.5 py-1 text-[.64rem] font-bold text-slate-400">No marketing</span>'}
-                  </div>
+                  <strong class="shrink-0 text-sm text-ink">${money(m.value)}</strong>
                 </div>
-                <div class="mt-3 flex flex-wrap gap-2">
-                  ${highlight ? `<span class="rounded-full bg-brand-50 px-2.5 py-1 text-[.64rem] font-bold text-brand-700">${escapeHtml(smartGroupLabel(highlight))}</span>` : ""}
-                  ${tags.map(tag => `<span class="rounded-full bg-violet-50 px-2.5 py-1 text-[.64rem] font-bold text-violet-700">${escapeHtml(tag)}</span>`).join("")}
+                <div class="mt-2 flex min-w-0 items-center justify-between gap-3 text-xs text-slate-500">
+                  <span class="truncate">${m.bookingCount} booking${m.bookingCount === 1 ? "" : "s"} · ${escapeHtml(last)}</span>
+                  <span class="shrink-0 ${customer.marketing_email_opt_in ? "text-emerald-700" : "text-slate-400"}">${customer.marketing_email_opt_in ? "Marketing ✓" : "No marketing"}</span>
                 </div>
-                <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                  <span><strong class="text-slate-700">${money(m.value)}</strong> booked</span>
-                  <span>${escapeHtml(last)}</span>
-                </div>
+                ${tags.length ? `<div class="mt-2 flex flex-wrap gap-1.5">${tags.map(tag => `<span class="crm-customer-tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
               </button>
             `;
           }).join("")
