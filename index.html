@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=stage10-settings-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=stage11-secondary-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=2">
 
   <script type="application/ld+json">
@@ -826,20 +826,21 @@
 
   <!-- Pending View -->
   <section id="pendingView" class="hidden min-h-screen items-center justify-center p-5">
-    <div class="card w-full max-w-lg p-8 text-center sm:p-10">
-      <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-amber-50 text-amber-700" aria-hidden="true">
+    <div class="pending-review-card card w-full max-w-lg p-7 text-center sm:p-9">
+      <img src="grabandbook-logo.svg" alt="Grab&Book" class="mx-auto h-8 w-auto max-w-[160px]">
+      <div class="mx-auto mt-7 grid h-14 w-14 place-items-center rounded-2xl bg-amber-50 text-amber-700" aria-hidden="true">
         <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2.5 1.5"></path></svg>
       </div>
-      <p class="mt-6 text-xs font-bold uppercase tracking-[.18em] text-amber-600">Account review</p>
-      <h1 class="mt-2 text-2xl font-bold text-ink">Your account has been created</h1>
-      <p class="mt-3 text-sm leading-6 text-slate-500">We review new businesses before dashboard access is enabled. <strong id="pendingBusinessName" class="text-slate-700">Your business</strong> is waiting for approval.</p>
-      <div class="mt-6 grid gap-2 text-left text-sm">
-        <div class="rounded-xl bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">✓ Account created</div>
-        <div class="rounded-xl bg-amber-50 px-4 py-3 font-semibold text-amber-800">2 · Business approval pending</div>
-        <div class="rounded-xl bg-slate-50 px-4 py-3 text-slate-500">3 · Add services, availability and payments</div>
+      <p class="mt-5 text-xs font-bold uppercase tracking-[.18em] text-amber-600">Awaiting approval</p>
+      <h1 class="mt-2 text-2xl font-bold text-ink">Your account is ready for review</h1>
+      <p class="mt-3 text-sm leading-6 text-slate-500"><strong id="pendingBusinessName" class="text-slate-700">Your business</strong> has been created. Dashboard access will open after the business review is complete.</p>
+      <div class="pending-review-steps mt-6 text-left text-sm">
+        <div class="is-complete"><span>✓</span><strong>Account created</strong></div>
+        <div class="is-current"><span>2</span><strong>Business review</strong><small>Currently pending</small></div>
+        <div><span>3</span><strong>Finish business setup</strong><small>Add services, availability and payments</small></div>
       </div>
       <p class="mt-5 text-xs leading-5 text-slate-400">Your details are saved. You do not need to register again.</p>
-      <button id="pendingLogoutBtn" type="button" class="btn btn-light mt-7">Log out</button>
+      <button id="pendingLogoutBtn" type="button" class="btn btn-light mt-6">Log out</button>
     </div>
   </section>
 
@@ -4316,18 +4317,18 @@
             </form>
           </article>
 
-          <article id="bookingSuccess" class="card hidden border-emerald-200 bg-emerald-50 p-7 text-center sm:p-10">
-            <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500 text-2xl text-white">✓</div>
+          <article id="bookingSuccess" class="booking-success-card card hidden p-7 text-center sm:p-10">
+            <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500 text-2xl text-white shadow-sm">✓</div>
             <p class="mt-5 text-xs font-black uppercase tracking-[.18em] text-emerald-700">Booking confirmed</p>
             <h2 class="mt-2 text-2xl font-black text-ink">You're all booked in</h2>
             <p id="successSummary" class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600"></p>
-            <div id="successManageActions" class="mt-6 hidden flex flex-wrap justify-center gap-2">
+            <div id="successManageActions" class="success-manage-actions mt-6 hidden flex flex-wrap justify-center gap-2">
               <a id="successRescheduleLink" class="btn btn-primary" href="#">Reschedule booking</a>
               <a id="successCancelLink" class="btn btn-light" href="#">Cancel booking</a>
             </div>
-            <p id="successManageNote" class="mx-auto mt-3 hidden max-w-md text-xs leading-5 text-slate-500">Keep these private links safe. No account is required to manage this appointment.</p>
-            <p id="successEmailStatus" class="mx-auto mt-3 max-w-md text-xs leading-5 text-slate-500"></p>
-            <button id="bookAnotherBtn" class="btn btn-light mt-4" type="button">Book another appointment</button>
+            <p id="successManageNote" class="mx-auto mt-3 hidden max-w-md text-xs leading-5 text-slate-500">Your private management links let you make changes without creating an account.</p>
+            <p id="successEmailStatus" class="mx-auto mt-4 max-w-md text-xs leading-5 text-slate-500"></p>
+            <button id="bookAnotherBtn" class="btn btn-light mt-5" type="button">Book another appointment</button>
           </article>
         </div>
 
@@ -4380,17 +4381,17 @@
 
 
   <section id="manageBookingView" class="hidden min-h-screen">
-    <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur">
-      <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4 sm:px-6">
-        <div>
+    <header class="manage-booking-header sticky top-0 z-30 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl">
+      <div class="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+        <div class="min-w-0">
           <p class="text-[.68rem] font-bold uppercase tracking-[.16em] text-brand-600">Manage appointment</p>
-          <h1 id="manageBusinessName" class="text-lg font-bold text-ink">Your booking</h1>
+          <h1 id="manageBusinessName" class="truncate text-lg font-bold text-ink">Your booking</h1>
         </div>
-        <span class="text-xs font-semibold text-slate-400">Secure private link</span>
+        <span class="manage-private-badge shrink-0">Private link</span>
       </div>
     </header>
 
-    <main class="mx-auto max-w-3xl px-4 py-7 sm:px-6 lg:py-10">
+    <main class="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:py-9">
       <article id="manageLoading" class="card p-8 text-center">
         <span class="spinner mx-auto"></span>
         <p class="mt-4 text-sm font-semibold text-slate-500">Loading your booking…</p>
@@ -4399,12 +4400,12 @@
       <article id="manageError" class="card hidden p-8 text-center"></article>
 
       <div id="manageContent" class="hidden space-y-5">
-        <article class="card overflow-hidden">
-          <div class="bg-ink p-5 text-white sm:p-6">
+        <article class="manage-appointment-card card overflow-hidden">
+          <div class="manage-appointment-head p-5 sm:p-6">
             <div class="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-100">Appointment</p>
-                <h2 id="manageServiceName" class="mt-1 text-xl font-bold">Service</h2>
+                <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-600">Your appointment</p>
+                <h2 id="manageServiceName" class="mt-1 text-xl font-bold text-ink">Service</h2>
               </div>
               <span id="manageStatusBadge" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Confirmed</span>
             </div>
@@ -4435,16 +4436,17 @@
         </article>
 
         <article id="manageActionsCard" class="card p-5 sm:p-6">
-          <h2 class="text-lg font-bold text-ink">Manage this appointment</h2>
-          <p class="mt-1 text-sm leading-6 text-slate-500">You can move the appointment to another available time or cancel it. No account is required.</p>
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Appointment options</p>
+          <h2 class="mt-1 text-lg font-bold text-ink">Need to make a change?</h2>
+          <p class="mt-1 text-sm leading-6 text-slate-500">Choose another available time or cancel this appointment. No account is required.</p>
           <p id="manageCutoffNotice" class="mt-3 hidden rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-800"></p>
           <div class="manage-booking-actions mt-5 flex flex-wrap gap-2">
             <button id="manageRescheduleBtn" class="btn btn-primary" type="button">Reschedule</button>
-            <button id="manageCancelBtn" class="btn btn-light" type="button">Cancel booking</button>
+            <button id="manageCancelBtn" class="btn btn-light manage-cancel-trigger" type="button">Cancel booking</button>
           </div>
           <div id="manageCancelConfirm" class="mt-5 hidden rounded-2xl border border-red-100 bg-red-50 p-4">
             <p class="font-bold text-red-900">Cancel this appointment?</p>
-            <p class="mt-1 text-sm leading-6 text-red-800">The appointment time will be released for someone else to book.</p>
+            <p class="mt-1 text-sm leading-6 text-red-800">This cannot be undone from this link. The appointment time will be released for someone else to book.</p>
             <div class="mt-4 flex flex-wrap gap-2">
               <button id="manageConfirmCancelBtn" class="btn booking-danger-btn" type="button">Yes, cancel booking</button>
               <button id="manageKeepBookingBtn" class="btn btn-light" type="button">Keep booking</button>
@@ -4458,7 +4460,7 @@
               <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Reschedule</p>
               <h2 class="mt-1 text-lg font-bold text-ink">Choose a new appointment</h2>
             </div>
-            <button id="manageRescheduleCloseBtn" class="text-sm font-bold text-slate-400 hover:text-slate-700" type="button">Close</button>
+            <button id="manageRescheduleCloseBtn" class="btn btn-light !px-3 !py-2 text-sm" type="button">Close</button>
           </div>
 
           <div class="mt-5">
@@ -4477,15 +4479,16 @@
           <div id="manageSlots" class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"></div>
 
           <div id="manageRescheduleConfirm" class="mt-5 hidden rounded-2xl border border-brand-100 bg-brand-50 p-4">
-            <p class="text-sm text-slate-600">New appointment</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Selected new time</p>
             <p id="manageSelectedTime" class="mt-1 font-bold text-ink"></p>
             <button id="manageConfirmRescheduleBtn" class="btn btn-primary mt-4 w-full sm:w-auto" type="button">Confirm reschedule</button>
           </div>
         </article>
 
-        <article id="manageCancelledMessage" class="card hidden border-slate-200 bg-slate-50 p-6 text-center">
-          <h2 class="text-lg font-bold text-ink">This booking has been cancelled</h2>
-          <p class="mt-2 text-sm text-slate-500">The appointment time has been released and can be booked by another customer.</p>
+        <article id="manageCancelledMessage" class="manage-cancelled-card card hidden p-7 text-center">
+          <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-lg font-bold text-slate-500" aria-hidden="true">✓</div>
+          <h2 class="mt-4 text-lg font-bold text-ink">This booking has been cancelled</h2>
+          <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">The appointment time has been released. There is nothing else you need to do for this booking.</p>
         </article>
       </div>
     </main>
@@ -4683,7 +4686,7 @@
   <script src="assets/js/settings.js?v=stage10-settings-1"></script>
   <script src="assets/js/diary.js?v=stage6-booking-1"></script>
   <script src="assets/js/services.js?v=stage6-booking-1"></script>
-  <script src="assets/js/bookings.js?v=stage7-customer-1"></script>
+  <script src="assets/js/bookings.js?v=stage11-secondary-1"></script>
   <script src="assets/js/public-booking.js?v=stage7-customer-1"></script>
   <script src="assets/js/landing-preview.js"></script>
   <script src="assets/js/homepage-hero.js?v=2"></script>
