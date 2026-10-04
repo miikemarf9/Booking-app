@@ -301,7 +301,7 @@ function updateFreePlanFeePreview() {
               .filter(Boolean);
             return `
               <div class="booking-record-row ${member.is_active ? "" : "booking-record-row-muted"}">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div class="flex w-full flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div class="flex min-w-0 gap-3">
                     <div class="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-brand-50 font-black text-brand-700">
                       ${member.photo_url
