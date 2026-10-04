@@ -3981,3 +3981,150 @@
         grid-template-columns: repeat(2,minmax(0,1fr)) !important;
       }
     }
+
+
+    /* Stage 10 Payments, plans & settings */
+    #tab-settings .settings-hub-grid { align-items: stretch; }
+    #tab-settings .settings-hub-card {
+      position: relative;
+      min-height: 168px;
+      border-color: var(--gb-border-soft);
+      box-shadow: 0 5px 18px rgba(23,32,51,.035);
+      transition: transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease;
+    }
+    #tab-settings .settings-hub-card:hover {
+      transform: translateY(-2px);
+      border-color: #bfd9eb;
+      background: #fcfeff;
+      box-shadow: 0 12px 28px rgba(23,32,51,.055);
+    }
+    #tab-settings .settings-hub-card > div > span:last-child {
+      display: inline-flex;
+      width: 2rem;
+      height: 2rem;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e1e8ef;
+      border-radius: 999px;
+      background: #fff;
+      color: #98a2b3;
+      font-size: .95rem;
+      transition: border-color .16s ease, color .16s ease, transform .16s ease;
+    }
+    #tab-settings .settings-hub-card:hover > div > span:last-child {
+      transform: translateX(2px);
+      border-color: #b8dcf5;
+      color: #0872bd;
+    }
+    #tab-settings .settings-hub-card:focus-visible {
+      outline: 3px solid rgba(22,135,217,.24);
+      outline-offset: 3px;
+    }
+    #tab-branding .branding-preview-card { min-width: 0; }
+    #tab-branding #brandingColourText { max-width: 10rem; }
+    #tab-business-details .booking-summary-row,
+    #tab-reminders .booking-summary-row { min-width: 0; }
+    #tab-payments .payments-status-card {
+      min-width: 0;
+      border-color: var(--gb-border-soft);
+      box-shadow: 0 8px 24px rgba(23,32,51,.04);
+    }
+    #tab-payments .payment-readiness-panel {
+      min-height: 116px;
+      border: 1px solid #e6ebf1;
+      border-radius: 1rem;
+      background: #fafcfe;
+      padding: 1rem;
+    }
+    #tab-payments .payments-card-actions { align-items: center; }
+    #tab-payments .payment-break-even {
+      display: flex;
+      flex-direction: column;
+      gap: .22rem;
+      border-top: 1px solid #edf1f5;
+      padding-top: 1rem;
+      color: #667085;
+      font-size: .75rem;
+      line-height: 1.55;
+    }
+    #tab-payments .payment-break-even strong { color: #344054; font-size: .78rem; }
+    #tab-payments .payment-fee-disclosure {
+      overflow: hidden;
+      border: 1px solid #e6ebf1;
+      border-radius: 1rem;
+      background: #fff;
+    }
+    #tab-payments .payment-fee-disclosure > summary {
+      display: flex;
+      min-height: 48px;
+      cursor: pointer;
+      list-style: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .7rem .85rem;
+      color: #475467;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+    #tab-payments .payment-fee-disclosure > summary::-webkit-details-marker { display: none; }
+    #tab-payments .payment-fee-disclosure > summary span { color: #98a2b3; transition: transform .16s ease; }
+    #tab-payments .payment-fee-disclosure[open] > summary span { transform: rotate(180deg); }
+    #tab-payments .payment-fee-disclosure-body {
+      display: grid;
+      gap: .65rem;
+      border-top: 1px solid #edf1f5;
+      padding: .85rem;
+    }
+    #tab-payments .payment-fee-disclosure-body > div {
+      display: grid;
+      grid-template-columns: minmax(8rem,.65fr) minmax(0,1.35fr);
+      gap: .75rem;
+      border-radius: .75rem;
+      background: #f8fafc;
+      padding: .7rem .8rem;
+      color: #667085;
+      font-size: .72rem;
+      line-height: 1.5;
+    }
+    #tab-payments .payment-fee-disclosure-body strong { color: #344054; }
+    #tab-payments .plan-choice-card {
+      position: relative;
+      min-width: 0;
+      background: #fff;
+      transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+    }
+    #tab-payments .plan-choice-card-pro {
+      background: linear-gradient(145deg, rgba(238,248,255,.9), rgba(255,255,255,.98));
+    }
+    #tab-payments .plan-choice-card.is-current-plan {
+      border-color: #8fc3e8 !important;
+      box-shadow: inset 3px 0 0 #1687d9, 0 8px 20px rgba(23,32,51,.04);
+    }
+    #tab-payments .plan-feature-list { display: grid; gap: .65rem; }
+    #tab-payments .plan-feature-list > div {
+      display: grid;
+      grid-template-columns: 4.5rem minmax(0,1fr);
+      gap: .75rem;
+      align-items: start;
+      border-top: 1px solid #edf1f5;
+      padding-top: .7rem;
+      color: #667085;
+      font-size: .78rem;
+      line-height: 1.45;
+    }
+    #tab-payments .plan-feature-list > div:first-child { border-top: 0; padding-top: 0; }
+    #tab-payments .plan-feature-list strong { color: #172033; font-size: .82rem; }
+    @media (min-width: 1024px) {
+      #tab-branding .branding-preview-card { position: sticky; top: 8rem; }
+    }
+    @media (max-width: 639px) {
+      #tab-settings .settings-hub-card { min-height: 0; padding: 1rem !important; }
+      #tab-branding #brandingColourText { max-width: none; }
+      #tab-payments .payments-card-actions { display: grid; grid-template-columns: 1fr; }
+      #tab-payments .payments-card-actions .btn { width: 100%; }
+      #tab-payments .payment-readiness-panel { min-height: 0; }
+      #tab-payments .payment-fee-disclosure-body > div,
+      #tab-payments .plan-feature-list > div { grid-template-columns: 1fr; gap: .18rem; }
+    }
