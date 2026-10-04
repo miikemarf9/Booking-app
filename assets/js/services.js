@@ -290,11 +290,12 @@ function updateFreePlanFeePreview() {
 
     function renderStaff() {
       if (!$("staffList")) return;
-      $("staffCountBadge").textContent = `${state.staff.length} ${state.staff.length === 1 ? "person" : "people"}`;
+      const managedStaff = state.staff.filter(member => !member.deleted_at);
+      $("staffCountBadge").textContent = `${managedStaff.length} ${managedStaff.length === 1 ? "person" : "people"}`;
       renderStaffServiceChoices();
 
-      $("staffList").innerHTML = state.staff.length
-        ? state.staff.map(member => {
+      $("staffList").innerHTML = managedStaff.length
+        ? managedStaff.map(member => {
             const serviceNames = state.serviceStaff
               .filter(link => link.staff_id === member.id)
               .map(link => state.services.find(s => s.id === link.service_id)?.title)
@@ -321,6 +322,7 @@ function updateFreePlanFeePreview() {
                   <div class="booking-record-actions">
                     <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-staff-action="edit" data-id="${member.id}">Edit</button>
                     <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-staff-action="toggle" data-id="${member.id}">${member.is_active ? "Deactivate" : "Activate"}</button>
+                    ${!member.is_active ? `<button class="btn btn-light !px-3 !py-2 text-sm text-red-600 hover:bg-red-50" type="button" data-staff-action="delete" data-id="${member.id}">Delete</button>` : ""}
                   </div>
                 </div>
               </div>
@@ -437,6 +439,76 @@ function updateFreePlanFeePreview() {
       renderCalendarDashboard();
     }
 
+    async function staffMemberUsage(staffId) {
+      const queries = [
+        supabaseClient.from("bookings").select("id", { count: "exact", head: true }).eq("profile_id", state.profile.id).eq("staff_id", staffId),
+        supabaseClient.from("workspace_tasks").select("id", { count: "exact", head: true }).eq("profile_id", state.profile.id).eq("assignee_staff_id", staffId),
+        supabaseClient.from("workspace_task_mentions").select("task_id", { count: "exact", head: true }).eq("profile_id", state.profile.id).eq("staff_id", staffId),
+        supabaseClient.from("booking_funnel_events").select("id", { count: "exact", head: true }).eq("profile_id", state.profile.id).eq("staff_id", staffId)
+      ];
+      const results = await Promise.all(queries);
+      const failed = results.find(result => result.error);
+      if (failed?.error) throw failed.error;
+      return {
+        bookings: Number(results[0].count || 0),
+        tasks: Number(results[1].count || 0),
+        mentions: Number(results[2].count || 0),
+        funnelEvents: Number(results[3].count || 0)
+      };
+    }
+
+    async function deleteStaffMember(member, button) {
+      if (!state.profile || !member) return;
+      if (member.is_active) {
+        return toast("Deactivate this team member before deleting them.", "error");
+      }
+
+      setBusy(button, true, "Checking…");
+      try {
+        const usage = await staffMemberUsage(member.id);
+        const hasHistory = usage.bookings + usage.tasks + usage.mentions + usage.funnelEvents > 0;
+        const message = hasHistory
+          ? `Remove ${member.name} from your team? They will no longer appear in Team or staff setup. Existing booking and task history will keep their name as a former team member.`
+          : `Permanently delete ${member.name}? They have no booking or task history, so their team record and linked availability can be removed completely.`;
+
+        if (!window.confirm(message)) return;
+
+        if (hasHistory) {
+          const { error } = await supabaseClient
+            .from("staff_members")
+            .update({
+              is_active: false,
+              deleted_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq("id", member.id)
+            .eq("profile_id", state.profile.id);
+          if (error) throw error;
+          toast("Team member removed. Existing history has been kept.");
+        } else {
+          const { error } = await supabaseClient
+            .from("staff_members")
+            .delete()
+            .eq("id", member.id)
+            .eq("profile_id", state.profile.id);
+          if (error) throw error;
+
+          if (member.photo_path) {
+            const { error: photoError } = await supabaseClient.storage.from("staff-photos").remove([member.photo_path]);
+            if (photoError) console.warn("Deleted team member photo cleanup failed:", photoError);
+          }
+          toast("Team member permanently deleted.");
+        }
+
+        if ($("staffEditId")?.value === member.id) resetStaffForm();
+        await refreshStaff();
+      } catch (err) {
+        toast(friendlyDbError(err, "delete this team member"), "error");
+      } finally {
+        setBusy(button, false);
+      }
+    }
+
     async function handleStaffListClick(e) {
       const btn = e.target.closest("[data-staff-action]");
       if (!btn) return;
@@ -467,6 +539,11 @@ function updateFreePlanFeePreview() {
         if (error) return toast(friendlyDbError(error, "update this team member"), "error");
         toast(member.is_active ? "Team member deactivated." : "Team member activated.");
         await refreshStaff();
+        return;
+      }
+
+      if (btn.dataset.staffAction === "delete") {
+        await deleteStaffMember(member, btn);
       }
     }
 
@@ -508,7 +585,7 @@ function updateFreePlanFeePreview() {
       if (!select) return;
       const current = select.value || "all";
       select.innerHTML = '<option value="all">All team members</option><option value="none">Business-wide / unassigned</option>' +
-        state.staff.map(member => `<option value="${member.id}">${escapeHtml(member.name)}</option>`).join("");
+        state.staff.filter(member => !member.deleted_at).map(member => `<option value="${member.id}">${escapeHtml(member.name)}</option>`).join("");
       if ([...select.options].some(option => option.value === current)) select.value = current;
     }
 
