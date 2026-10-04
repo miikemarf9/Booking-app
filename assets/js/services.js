@@ -327,6 +327,9 @@ function updateFreePlanFeePreview() {
             `;
           }).join("")
         : emptyState("No team members yet", "Add the first person who customers can book with.");
+
+      if (typeof applyDashboardWorkspacePreferences === "function") applyDashboardWorkspacePreferences();
+      if (typeof renderTeamWorkspace === "function") renderTeamWorkspace();
     }
 
     function resetStaffForm() {
