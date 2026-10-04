@@ -319,3 +319,185 @@
 #landingView .home-chapter-final-shell .homepage-final-cta{
   box-shadow:0 30px 80px rgba(8,114,189,.18);
 }
+
+
+/* Homepage hero composition pass: spacing, proportions and demo framing. */
+#landingView .home-chapter-hero .gb-hero-inner{
+  max-width:1360px;
+  padding:82px 40px 78px;
+}
+#landingView .home-chapter-hero .gb-hero-layout{
+  grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
+  gap:82px;
+  align-items:center;
+}
+#landingView .home-chapter-hero .gb-hero-copy{
+  max-width:540px;
+  padding-bottom:0;
+}
+#landingView .home-chapter-hero .gb-eyebrow{
+  font-size:10px;
+  letter-spacing:.15em;
+}
+#landingView .home-chapter-hero .gb-hero-copy h1{
+  max-width:590px;
+  margin:27px 0 24px;
+  font-size:clamp(46px,4.75vw,66px);
+  line-height:1.035;
+  letter-spacing:-.058em;
+}
+#landingView .home-chapter-hero .gb-hero-description{
+  max-width:500px;
+  font-size:18px;
+  line-height:1.78;
+}
+#landingView .home-chapter-hero .gb-hero-actions{
+  margin-top:34px;
+}
+#landingView .home-chapter-hero .gb-hero-reassurance{
+  margin-top:23px;
+}
+#landingView .home-chapter-hero .gb-demo-wrap{
+  width:100%;
+  max-width:700px;
+  justify-self:end;
+  padding:0 8px 14px;
+}
+#landingView .home-chapter-hero .gb-demo-wrap:before{
+  display:block;
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:34px;
+  right:-14px;
+  bottom:-8px;
+  left:-14px;
+  border:1px solid rgba(165,197,218,.58);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 82% 12%,rgba(105,188,226,.15),transparent 35%),
+    linear-gradient(145deg,rgba(255,255,255,.84),rgba(226,240,249,.82));
+  box-shadow:0 28px 70px rgba(45,89,119,.09);
+  pointer-events:none;
+}
+#landingView .home-chapter-hero .gb-demo-intro,
+#landingView .home-chapter-hero .gb-demo-window,
+#landingView .home-chapter-hero .gb-demo-disclaimer{
+  position:relative;
+  z-index:1;
+}
+#landingView .home-chapter-hero .gb-demo-intro{
+  margin:0 12px 18px;
+}
+#landingView .home-chapter-hero .gb-demo-window{
+  border-color:#cedeea;
+  border-radius:18px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.98),
+    0 2px 6px rgba(43,77,101,.05),
+    0 22px 52px -24px rgba(31,73,104,.28);
+}
+#landingView .home-chapter-hero .gb-demo-chrome{
+  padding:20px 24px;
+}
+#landingView .home-chapter-hero .gb-hero-benefits{
+  max-width:1180px;
+  margin:72px auto 0;
+  gap:12px;
+}
+#landingView .home-chapter-hero .gb-hero-benefits .hero-benefit-item{
+  border:1px solid rgba(201,218,230,.7);
+  background:rgba(255,255,255,.78);
+  padding:13px 16px;
+  backdrop-filter:blur(8px);
+}
+#landingView .home-chapter-hero .homepage-product-entry{
+  margin-top:34px;
+}
+
+@media(max-width:1199px){
+  #landingView .home-chapter-hero .gb-hero-inner{
+    padding:68px 30px 64px;
+  }
+  #landingView .home-chapter-hero .gb-hero-layout{
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+    gap:52px;
+  }
+  #landingView .home-chapter-hero .gb-hero-copy h1{
+    font-size:clamp(44px,4.8vw,58px);
+  }
+  #landingView .home-chapter-hero .gb-hero-description{
+    font-size:17px;
+  }
+}
+@media(max-width:899px){
+  #landingView .home-chapter-hero .gb-hero-inner{
+    padding:58px 24px 54px;
+  }
+  #landingView .home-chapter-hero .gb-hero-layout{
+    grid-template-columns:1fr;
+    gap:52px;
+  }
+  #landingView .home-chapter-hero .gb-hero-copy{
+    max-width:680px;
+    margin:0 auto;
+  }
+  #landingView .home-chapter-hero .gb-hero-copy h1{
+    max-width:680px;
+    margin-left:auto;
+    margin-right:auto;
+    font-size:clamp(42px,7vw,58px);
+  }
+  #landingView .home-chapter-hero .gb-hero-description{
+    max-width:560px;
+  }
+  #landingView .home-chapter-hero .gb-demo-wrap{
+    max-width:650px;
+    justify-self:center;
+    margin:0 auto;
+  }
+  #landingView .home-chapter-hero .gb-hero-benefits{
+    margin-top:52px;
+  }
+}
+@media(max-width:479px){
+  #landingView .home-chapter-hero .gb-hero-inner{
+    padding:42px 18px 40px;
+  }
+  #landingView .home-chapter-hero .gb-hero-layout{
+    gap:34px;
+  }
+  #landingView .home-chapter-hero .gb-hero-copy h1{
+    margin-top:21px;
+    margin-bottom:20px;
+    font-size:clamp(31px,9.4vw,43px);
+    line-height:1.06;
+  }
+  #landingView .home-chapter-hero .gb-hero-description{
+    font-size:15px;
+    line-height:1.72;
+  }
+  #landingView .home-chapter-hero .gb-hero-actions{
+    margin-top:25px;
+  }
+  #landingView .home-chapter-hero .gb-demo-wrap{
+    padding:0 2px 8px;
+    overflow:visible;
+  }
+  #landingView .home-chapter-hero .gb-demo-wrap:before{
+    top:30px;
+    right:-7px;
+    bottom:-4px;
+    left:-7px;
+    border-radius:20px;
+  }
+  #landingView .home-chapter-hero .gb-demo-intro{
+    margin:0 4px 14px;
+  }
+  #landingView .home-chapter-hero .gb-demo-chrome{
+    padding:15px 16px;
+  }
+  #landingView .home-chapter-hero .gb-hero-benefits{
+    margin-top:38px;
+  }
+}
