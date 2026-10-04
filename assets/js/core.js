@@ -117,7 +117,7 @@
         select.value = "full";
         select.disabled = true;
         $("srvPrice").min = "10";
-        note.textContent = "Full online payment is required on Free so every booking contributes to the platform.";
+        note.textContent = "Free requires full online payment so the 2% Grab&Book platform fee can be collected automatically.";
         freeNote.classList.remove("hidden");
       } else {
         select.disabled = false;
