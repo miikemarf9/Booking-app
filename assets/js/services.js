@@ -588,19 +588,12 @@ function updateFreePlanFeePreview() {
     function renderAvailabilityTimeSelection() {
       const value = cleanTime($("blkStart")?.value || "");
       const selected = $("blkStartSelected");
-      const help = $("blkStartPickerHelp");
       const picker = $("blkStartPicker");
       const complete = /^\d{2}:\d{2}$/.test(value);
 
       if (selected) {
         selected.textContent = complete ? `Selected ${value} ✓` : "";
         selected.classList.toggle("hidden", !complete);
-      }
-
-      if (help) {
-        help.textContent = complete
-          ? "Start time selected. Change either number to update it."
-          : "Choose an hour, then a minute. Your selection is applied immediately.";
       }
 
       if (picker) {
