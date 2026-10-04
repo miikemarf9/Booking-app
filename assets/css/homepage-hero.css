@@ -3315,3 +3315,51 @@
     border-radius:1.05rem;
   }
 }
+
+
+/* Stronger connected-card colour fade into white. */
+#landingView .homepage-connected-card.product-card-book{
+  border-color:rgba(76,154,203,.34);
+  background:
+    radial-gradient(circle at 82% 10%,rgba(255,255,255,.22),transparent 28%),
+    linear-gradient(180deg,
+      #9fd2ef 0%,
+      #b9def2 28%,
+      #d7ebf7 58%,
+      #eef7fc 78%,
+      #ffffff 100%);
+}
+#landingView .homepage-connected-card.product-card-crm{
+  border-color:rgba(65,157,124,.32);
+  background:
+    radial-gradient(circle at 82% 10%,rgba(255,255,255,.20),transparent 28%),
+    linear-gradient(180deg,
+      #a8ddc8 0%,
+      #bfe7d7 28%,
+      #d8f0e7 58%,
+      #eef8f4 78%,
+      #ffffff 100%);
+}
+#landingView .homepage-connected-card.product-card-growth{
+  border-color:rgba(109,91,184,.3);
+  background:
+    radial-gradient(circle at 82% 10%,rgba(255,255,255,.20),transparent 28%),
+    linear-gradient(180deg,
+      #bdb1e8 0%,
+      #cec5ed 28%,
+      #e0daf4 58%,
+      #f1eef9 78%,
+      #ffffff 100%);
+}
+#landingView .homepage-connected-card .homepage-connected-title h3{
+  color:#132033;
+}
+#landingView .homepage-connected-card>p{
+  color:#4f6072;
+}
+#landingView .homepage-connected-explore{
+  color:#3f5267;
+}
+#landingView .homepage-connected-card .homepage-product-icon{
+  color:#172033;
+}
