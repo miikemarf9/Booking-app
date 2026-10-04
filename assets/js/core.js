@@ -948,6 +948,7 @@
 
       $("publicServices").addEventListener("click", handlePublicServiceClick);
       $("publicStaffChoices").addEventListener("click", handlePublicStaffClick);
+      $("publicQuickDates").addEventListener("click", handlePublicQuickDateClick);
       $("publicDate").addEventListener("change", handlePublicDateChange);
       $("publicSlots").addEventListener("click", handlePublicSlotClick);
       $("customerBookingForm").addEventListener("focusin", handleBookingDetailsInteraction);
@@ -1057,6 +1058,7 @@
       $("manageRescheduleBtn").addEventListener("click", openManageReschedule);
       $("manageRescheduleCloseBtn").addEventListener("click", closeManageReschedule);
       $("manageCancelBtn").addEventListener("click", cancelManagedBooking);
+      $("manageQuickDates").addEventListener("click", handleManageQuickDateClick);
       $("manageDateInput").addEventListener("change", loadManageAvailableSlots);
       $("manageSlots").addEventListener("click", handleManageSlotClick);
       $("manageConfirmRescheduleBtn").addEventListener("click", confirmManagedReschedule);
