@@ -623,6 +623,7 @@ function calendarDateKey(date) {
       if (["calendar", "bookings", "services", "availability", "payments"].includes(tabId)) return "booking";
       if (tabId === "customers") return "crm";
       if (tabId === "growth") return "growth";
+      if (tabId === "workspace-team") return "team";
       return "settings";
     }
 
@@ -712,14 +713,21 @@ function calendarDateKey(date) {
       const section = $(sectionId);
       if (!section) return;
 
-      const area = sectionId.startsWith("crm-") ? "crm" : "growth";
-      const tabId = area === "crm" ? "customers" : "growth";
+      const area = sectionId.startsWith("crm-")
+        ? "crm"
+        : sectionId.startsWith("team-")
+          ? "team"
+          : "growth";
+      const tabId = area === "crm" ? "customers" : area === "team" ? "workspace-team" : "growth";
       document.querySelectorAll(".dashboard-tab").forEach(el => el.classList.toggle("hidden", el.id !== `tab-${tabId}`));
       syncDashboardArea(area, tabId);
       setDashboardSectionNav(sectionId);
 
       if (area === "growth" && typeof loadGrowthAnalytics === "function") {
         loadGrowthAnalytics(false);
+      }
+      if (area === "team" && typeof renderTeamWorkspace === "function") {
+        renderTeamWorkspace();
       }
       window.setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
     }
@@ -742,6 +750,13 @@ function calendarDateKey(date) {
       if (tabId === "growth") {
         setDashboardSectionNav("growth-overview-section");
         if (typeof loadGrowthAnalytics === "function") loadGrowthAnalytics(false);
+        jumpDashboardToTop();
+        return;
+      }
+
+      if (tabId === "workspace-team") {
+        setDashboardSectionNav("team-today-section");
+        if (typeof renderTeamWorkspace === "function") renderTeamWorkspace();
         jumpDashboardToTop();
         return;
       }
