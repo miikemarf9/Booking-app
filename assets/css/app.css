@@ -1704,6 +1704,187 @@
     }
 
 
+    /* Stage 8 CRM */
+    .crm-kpi-grid {
+      align-items: stretch;
+    }
+    .crm-kpi {
+      min-width: 0;
+      border: 1px solid var(--gb-border-soft);
+      border-radius: 1rem;
+      background: rgba(255,255,255,.82);
+      padding: 1rem 1.05rem;
+      box-shadow: none;
+    }
+    .crm-kpi-label {
+      color: #667085;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+    .crm-kpi-action {
+      cursor: pointer;
+      transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+    }
+    .crm-kpi-action:hover {
+      border-color: #bfd7e9;
+      background: #fbfdff;
+      transform: translateY(-1px);
+    }
+    .crm-secondary-section {
+      box-shadow: 0 1px 2px rgba(23,32,51,.025), 0 8px 22px rgba(23,32,51,.035);
+    }
+    .crm-customer-row {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--gb-border-soft);
+      border-radius: 1rem;
+      background: var(--gb-surface);
+      padding: .9rem 1rem;
+      text-align: left;
+      transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+    }
+    .crm-customer-row:hover {
+      border-color: #c7d5e2;
+      background: #fcfdff;
+    }
+    .crm-customer-row.selected {
+      border-color: #9cc7e5;
+      background: var(--gb-brand-soft);
+      box-shadow: inset 3px 0 0 var(--gb-brand);
+    }
+    .crm-customer-status {
+      display: inline-flex;
+      min-height: 1.45rem;
+      align-items: center;
+      border-radius: 999px;
+      background: #eef8ff;
+      padding: .2rem .5rem;
+      color: #0b6ba9;
+      font-size: .62rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .crm-customer-tag {
+      display: inline-flex;
+      min-height: 1.4rem;
+      align-items: center;
+      border-radius: 999px;
+      background: #f5f3ff;
+      padding: .18rem .5rem;
+      color: #6d28d9;
+      font-size: .61rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .crm-profile-actions > details {
+      position: relative;
+    }
+    .crm-profile-metrics {
+      align-items: stretch;
+    }
+    .crm-profile-metric {
+      min-width: 0;
+      border-top: 1px solid var(--gb-border-soft);
+      padding: .85rem .15rem .15rem;
+    }
+    .crm-profile-metric-label {
+      color: #98a2b3;
+      font-size: .66rem;
+      font-weight: 800;
+      letter-spacing: .07em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    #customerProfile > .mt-4.rounded-2xl.border {
+      border-color: var(--gb-border-soft);
+      box-shadow: none;
+    }
+    #customerRetentionPanel {
+      border-color: #d7e8f5 !important;
+      background: #f8fbfe !important;
+    }
+    #customerTimeline > div {
+      border-color: var(--gb-border-soft);
+      border-radius: .9rem;
+      padding: .85rem;
+    }
+    .crm-campaign-history-item {
+      border: 1px solid var(--gb-border-soft);
+      border-radius: 1rem;
+      background: var(--gb-surface);
+      padding: .9rem 1rem;
+      transition: border-color .15s ease, background-color .15s ease;
+    }
+    .crm-campaign-history-item[open] {
+      border-color: #cad8e4;
+      background: #fcfdff;
+    }
+    .crm-campaign-history-item > summary {
+      list-style: none;
+    }
+    .crm-campaign-history-item > summary::-webkit-details-marker {
+      display: none;
+    }
+    .crm-campaign-history-item > summary::after {
+      content: "›";
+      float: right;
+      margin-left: .75rem;
+      color: #98a2b3;
+      font-size: 1.1rem;
+      line-height: 1;
+      transform: rotate(90deg);
+      transition: transform .15s ease;
+    }
+    .crm-campaign-history-item[open] > summary::after {
+      transform: rotate(-90deg);
+    }
+    #crm-campaigns-section #marketingEmailForm,
+    #crm-retention-section #crmAutomationForm {
+      min-width: 0;
+    }
+    #crm-campaigns-section #marketingRecipientText {
+      max-width: 34rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 639px) {
+      .crm-kpi {
+        padding: .9rem 1rem;
+      }
+      .crm-profile-actions {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
+      .crm-profile-actions > .btn,
+      .crm-profile-actions > details,
+      .crm-profile-actions > details > summary {
+        width: 100%;
+      }
+      .crm-profile-actions > details > div {
+        left: 0;
+        right: auto;
+        width: min(15rem, calc(100vw - 2rem));
+      }
+      #crm-customers-section > article:first-child > div:first-child {
+        align-items: stretch;
+      }
+      #crm-customers-section > article:first-child > div:first-child > div:last-child {
+        width: 100%;
+      }
+      #crm-customers-section > article:first-child > div:first-child > div:last-child > .btn,
+      #crm-customers-section > article:first-child > div:first-child > div:last-child > details {
+        flex: 1 1 auto;
+      }
+      #crm-customers-section > article:first-child > div:first-child > div:last-child > details > summary {
+        width: 100%;
+      }
+    }
+
+
     /* Standalone public product pages */
     .product-site-shell {
       background:
