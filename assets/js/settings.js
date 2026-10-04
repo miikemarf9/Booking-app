@@ -1313,6 +1313,15 @@ function syncReminderFields() {
 
       if (!badge || !text || !help || !upgradeBtn || !manageBtn) return;
 
+      const freeCard = $("planFreeCard");
+      const proCard = $("planProCard");
+      const freeCurrent = $("planFreeCurrent");
+      const proCurrent = $("planProCurrent");
+      freeCard?.classList.toggle("is-current-plan", !isPro);
+      proCard?.classList.toggle("is-current-plan", isPro);
+      freeCurrent?.classList.toggle("hidden", isPro);
+      proCurrent?.classList.toggle("hidden", !isPro);
+
       if (isPro) {
         badge.textContent = status === "past_due" ? "Payment issue" : "Pro";
         badge.className = status === "past_due"
