@@ -1736,3 +1736,286 @@
     line-height:1.7;
   }
 }
+
+
+/* Final homepage design-system unification pass. */
+#landingView{
+  --home-system-max:1280px;
+  --home-section-y:6.25rem;
+  --home-section-y-tablet:5.1rem;
+  --home-section-y-mobile:4.35rem;
+  --home-radius-sm:.9rem;
+  --home-radius-md:1.15rem;
+  --home-radius-lg:1.55rem;
+  --home-border:rgba(205,218,227,.84);
+  --home-border-soft:rgba(220,229,234,.9);
+  --home-shadow:0 20px 55px -38px rgba(23,32,51,.27);
+  --home-shadow-raised:0 28px 68px -40px rgba(23,32,51,.32);
+  --home-muted:#667587;
+}
+#landingView .home-chapter{
+  scroll-margin-top:5.5rem;
+}
+#landingView .home-chapter:not(.home-chapter-hero):not(.home-chapter-final-shell){
+  padding-top:var(--home-section-y);
+  padding-bottom:var(--home-section-y);
+}
+#landingView .home-chapter-audience{
+  padding-top:5.25rem!important;
+  padding-bottom:5.75rem!important;
+}
+#landingView .home-chapter-health{
+  padding-top:6.75rem!important;
+  padding-bottom:6.75rem!important;
+}
+#landingView .home-chapter-dark{
+  padding-top:6rem!important;
+  padding-bottom:6rem!important;
+}
+#landingView .home-chapter-faq{
+  padding-top:5.75rem!important;
+  padding-bottom:5.75rem!important;
+}
+#landingView .landing-section-eyebrow{
+  font-size:.68rem;
+  letter-spacing:.155em;
+  line-height:1.3;
+}
+#landingView #product-book h2,
+#landingView #product-crm h2,
+#landingView #product-growth h2,
+#landingView .homepage-owner-intro h2,
+#landingView .homepage-pricing-intro h2,
+#landingView .homepage-faq-accordion~* h2{
+  text-wrap:balance;
+}
+#landingView #product-book h2,
+#landingView #product-crm h2,
+#landingView #product-growth h2{
+  font-size:clamp(2rem,3.45vw,2.8rem);
+  line-height:1.1;
+  letter-spacing:-.04em;
+}
+#landingView #product-book .saas-reveal>p:not(.landing-section-eyebrow),
+#landingView #product-crm .saas-reveal>p:not(.landing-section-eyebrow),
+#landingView #product-growth .saas-reveal>p:not(.landing-section-eyebrow){
+  color:var(--home-muted);
+  line-height:1.75;
+}
+#landingView #product-book>div,
+#landingView #product-crm>div,
+#landingView #product-growth>div{
+  max-width:var(--home-system-max);
+  column-gap:5rem;
+}
+#landingView .landing-product-preview{
+  border-color:var(--home-border);
+  border-radius:var(--home-radius-lg);
+  box-shadow:var(--home-shadow);
+}
+#landingView .saas-product-preview.reveal-in{
+  box-shadow:var(--home-shadow);
+}
+#landingView .homepage-connected-card,
+#landingView .homepage-health-process,
+#landingView .homepage-health-example,
+#landingView .homepage-owner-priorities-preview,
+#landingView .homepage-pricing-card{
+  border-radius:var(--home-radius-lg);
+  box-shadow:var(--home-shadow);
+}
+#landingView .homepage-connected-preview,
+#landingView .homepage-health-workflow,
+#landingView .homepage-health-metric{
+  border-radius:var(--home-radius-md);
+}
+#landingView #product-book .landing-benefit,
+#landingView #product-crm .landing-benefit,
+#landingView #product-growth .landing-benefit{
+  border:0;
+  border-top:1px solid var(--home-border-soft);
+  border-radius:0;
+  background:transparent;
+  padding:1rem .1rem .95rem;
+}
+#landingView #product-book .landing-benefit strong,
+#landingView #product-crm .landing-benefit strong,
+#landingView #product-growth .landing-benefit strong{
+  font-size:.86rem;
+}
+#landingView #product-book .landing-benefit span,
+#landingView #product-crm .landing-benefit span,
+#landingView #product-growth .landing-benefit span{
+  color:#6d7a8a;
+  font-size:.78rem;
+  line-height:1.6;
+}
+#landingView #product-book .landing-product-preview,
+#landingView #product-crm .landing-product-preview,
+#landingView #product-growth .landing-product-preview{
+  overflow:hidden;
+  background:rgba(255,255,255,.96);
+}
+#landingView #product-book .landing-product-preview>div:first-child,
+#landingView #product-crm .landing-product-preview>div:first-child,
+#landingView #product-growth .landing-product-preview>div:first-child{
+  min-height:68px;
+}
+#landingView .homepage-connected-card,
+#landingView .homepage-pricing-card,
+#landingView .homepage-health-example{
+  border-color:var(--home-border);
+}
+#landingView .homepage-connected-card:hover{
+  box-shadow:var(--home-shadow-raised);
+}
+#landingView .btn{
+  min-height:44px;
+  border-radius:.8rem;
+  font-weight:800;
+  letter-spacing:-.005em;
+}
+#landingView .btn-primary{
+  box-shadow:0 8px 20px -14px rgba(8,114,189,.55);
+}
+#landingView .btn-light{
+  border-color:rgba(202,215,224,.9);
+  background:rgba(255,255,255,.92);
+}
+#landingView .homepage-pricing-card .btn,
+#landingView .homepage-final-button{
+  min-height:46px;
+}
+#landingView .homepage-faq-item summary{
+  min-height:4.5rem;
+}
+#landingView .homepage-owner-question h3,
+#landingView .homepage-health-step h3,
+#landingView .homepage-connected-card h3{
+  text-wrap:balance;
+}
+#landingView .home-chapter-book{
+  border-color:rgba(187,211,226,.46);
+  background:
+    radial-gradient(circle at 84% 18%,rgba(22,135,217,.07),transparent 30%),
+    linear-gradient(180deg,#eef7fc 0%,#eaf5fc 58%,#eef8fc 100%);
+}
+#landingView .home-chapter-crm{
+  background:
+    radial-gradient(circle at 14% 18%,rgba(32,167,126,.065),transparent 29%),
+    linear-gradient(180deg,#f4fbf8 0%,#edf8f4 58%,#f2faf7 100%);
+}
+#landingView .home-chapter-growth{
+  border-color:rgba(205,202,225,.46);
+  background:
+    radial-gradient(circle at 86% 14%,rgba(119,98,177,.075),transparent 29%),
+    linear-gradient(180deg,#f2f7fb 0%,#f1f0fa 58%,#f7f8fc 100%);
+}
+#landingView #product-book .landing-product-preview,
+#landingView #product-crm .landing-product-preview,
+#landingView #product-growth .landing-product-preview{
+  transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease;
+}
+@media(hover:hover) and (pointer:fine){
+  #landingView #product-book .landing-product-preview:hover,
+  #landingView #product-crm .landing-product-preview:hover,
+  #landingView #product-growth .landing-product-preview:hover{
+    transform:translateY(-2px);
+    border-color:rgba(181,204,219,.92);
+    box-shadow:var(--home-shadow-raised);
+  }
+}
+#landingView .home-chapter:not(.home-chapter-final-shell) a,
+#landingView .home-chapter:not(.home-chapter-final-shell) button{
+  -webkit-tap-highlight-color:transparent;
+}
+#landingView .home-chapter:not(.home-chapter-final-shell) a:focus-visible,
+#landingView .home-chapter:not(.home-chapter-final-shell) button:focus-visible,
+#landingView .home-chapter:not(.home-chapter-final-shell) summary:focus-visible{
+  outline:3px solid rgba(22,135,217,.22);
+  outline-offset:3px;
+}
+@media(max-width:1023px){
+  #landingView .home-chapter:not(.home-chapter-hero):not(.home-chapter-final-shell){
+    padding-top:var(--home-section-y-tablet);
+    padding-bottom:var(--home-section-y-tablet);
+  }
+  #landingView .home-chapter-audience,
+  #landingView .home-chapter-health,
+  #landingView .home-chapter-dark,
+  #landingView .home-chapter-faq{
+    padding-top:var(--home-section-y-tablet)!important;
+    padding-bottom:var(--home-section-y-tablet)!important;
+  }
+  #landingView #product-book>div,
+  #landingView #product-crm>div,
+  #landingView #product-growth>div{
+    row-gap:3.4rem;
+  }
+}
+@media(max-width:639px){
+  #landingView .home-chapter:not(.home-chapter-hero):not(.home-chapter-final-shell){
+    padding-top:var(--home-section-y-mobile);
+    padding-bottom:var(--home-section-y-mobile);
+  }
+  #landingView .home-chapter-audience,
+  #landingView .home-chapter-health,
+  #landingView .home-chapter-dark,
+  #landingView .home-chapter-faq{
+    padding-top:var(--home-section-y-mobile)!important;
+    padding-bottom:var(--home-section-y-mobile)!important;
+  }
+  #landingView .landing-section-eyebrow{
+    font-size:.62rem;
+    letter-spacing:.135em;
+  }
+  #landingView #product-book h2,
+  #landingView #product-crm h2,
+  #landingView #product-growth h2{
+    font-size:clamp(1.85rem,8.6vw,2.35rem);
+    line-height:1.08;
+  }
+  #landingView #product-book>div,
+  #landingView #product-crm>div,
+  #landingView #product-growth>div{
+    row-gap:2.75rem;
+  }
+  #landingView .landing-product-preview,
+  #landingView .homepage-connected-card,
+  #landingView .homepage-health-process,
+  #landingView .homepage-health-example,
+  #landingView .homepage-owner-priorities-preview,
+  #landingView .homepage-pricing-card{
+    border-radius:1.25rem;
+  }
+  #landingView .homepage-connected-preview,
+  #landingView .homepage-health-workflow,
+  #landingView .homepage-health-metric{
+    border-radius:1rem;
+  }
+  #landingView .btn{
+    min-height:46px;
+  }
+  #landingView .homepage-faq-item summary{
+    min-height:4.2rem;
+  }
+  #landingView .homepage-pricing-card-top{
+    gap:.75rem;
+  }
+  #landingView .homepage-pricing-badge{
+    white-space:normal;
+    text-align:center;
+  }
+}
+@media(max-width:420px){
+  #landingView .homepage-pricing-card-top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  #landingView .homepage-pricing-badge{
+    align-self:flex-start;
+  }
+  #landingView #product-growth .landing-product-preview{
+    font-size:.92em;
+  }
+}
