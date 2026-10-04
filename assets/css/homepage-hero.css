@@ -1382,3 +1382,288 @@
     padding-right:0;
   }
 }
+
+
+/* Pricing polish: clearer Free-to-Pro decision. */
+#landingView .home-chapter-pricing{
+  padding-top:6.5rem;
+  padding-bottom:6.75rem;
+}
+#landingView .homepage-pricing-inner{
+  max-width:1180px;
+}
+#landingView .homepage-pricing-intro{
+  max-width:790px;
+}
+#landingView .homepage-pricing-intro h2{
+  max-width:760px;
+  margin-left:auto;
+  margin-right:auto;
+  font-size:clamp(2.1rem,3.9vw,3rem);
+  line-height:1.1;
+}
+#landingView .homepage-pricing-intro>p:last-child{
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#landingView .homepage-pricing-grid{
+  max-width:1020px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#landingView .homepage-pricing-card{
+  position:relative;
+  display:flex;
+  min-height:100%;
+  flex-direction:column;
+  border:1px solid rgba(211,222,229,.94);
+  border-radius:1.55rem;
+  padding:2rem;
+  background:rgba(255,255,255,.95);
+  box-shadow:0 20px 54px -38px rgba(23,32,51,.28);
+}
+#landingView .homepage-pricing-card-pro{
+  border-color:rgba(130,190,228,.95);
+  background:
+    linear-gradient(180deg,rgba(246,251,255,.98),rgba(238,248,255,.96));
+  box-shadow:0 24px 58px -36px rgba(8,114,189,.26);
+}
+#landingView .homepage-pricing-card-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+}
+#landingView .homepage-pricing-kicker{
+  margin:0 0 .3rem;
+  color:#7b8795;
+  font-size:.66rem;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+#landingView .homepage-pricing-card h3{
+  margin:0;
+  color:#172033;
+  font-size:1.25rem;
+  font-weight:900;
+}
+#landingView .homepage-pricing-badge{
+  border:1px solid rgba(211,222,229,.95);
+  border-radius:999px;
+  background:#fff;
+  padding:.42rem .7rem;
+  color:#627181;
+  font-size:.66rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+#landingView .homepage-pricing-badge-pro{
+  border-color:transparent;
+  background:#0872bd;
+  color:#fff;
+}
+#landingView .homepage-pricing-price{
+  display:flex;
+  align-items:flex-end;
+  gap:.35rem;
+  margin-top:2rem;
+}
+#landingView .homepage-pricing-price span{
+  color:#172033;
+  font-size:3.25rem;
+  font-weight:900;
+  line-height:.95;
+  letter-spacing:-.05em;
+}
+#landingView .homepage-pricing-price small{
+  padding-bottom:.35rem;
+  color:#8a96a5;
+  font-size:.82rem;
+  font-weight:700;
+}
+#landingView .homepage-pricing-summary{
+  min-height:3.15rem;
+  margin-top:1.1rem;
+  color:#667085;
+  font-size:.9rem;
+  line-height:1.7;
+}
+#landingView .homepage-pricing-features{
+  display:grid;
+  gap:.9rem;
+  margin-top:1.65rem;
+  padding-top:1.5rem;
+  border-top:1px solid rgba(222,229,234,.95);
+}
+#landingView .homepage-pricing-features p{
+  display:grid;
+  grid-template-columns:1.1rem 1fr;
+  gap:.55rem;
+  margin:0;
+  color:#586779;
+  font-size:.86rem;
+  line-height:1.55;
+}
+#landingView .homepage-pricing-features p span{
+  color:#1687d9;
+  font-weight:900;
+}
+#landingView .homepage-pricing-card .btn{
+  margin-top:auto;
+  padding-top:.8rem;
+  padding-bottom:.8rem;
+}
+#landingView .homepage-pricing-threshold{
+  display:grid;
+  grid-template-columns:1fr 1.25fr 1fr;
+  max-width:1020px;
+  margin:2rem auto 0;
+  border-top:1px solid rgba(205,217,225,.92);
+  border-bottom:1px solid rgba(205,217,225,.92);
+  background:rgba(255,255,255,.56);
+}
+#landingView .homepage-pricing-threshold>div{
+  min-width:0;
+  padding:1.45rem 1.4rem;
+}
+#landingView .homepage-pricing-threshold>div+div{
+  border-left:1px solid rgba(222,229,234,.95);
+}
+#landingView .homepage-pricing-threshold-side span{
+  display:block;
+  color:#7a8796;
+  font-size:.64rem;
+  font-weight:900;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+#landingView .homepage-pricing-threshold-side strong{
+  display:block;
+  margin-top:.3rem;
+  color:#172033;
+  font-size:1rem;
+}
+#landingView .homepage-pricing-threshold-side small{
+  display:block;
+  margin-top:.28rem;
+  color:#7b8795;
+  font-size:.72rem;
+  line-height:1.5;
+}
+#landingView .homepage-pricing-threshold-center{
+  text-align:center;
+  background:linear-gradient(180deg,rgba(238,248,255,.72),rgba(247,251,254,.6));
+}
+#landingView .homepage-pricing-threshold-center p{
+  margin:0;
+  color:#0872bd;
+  font-size:.66rem;
+  font-weight:900;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+#landingView .homepage-pricing-threshold-center strong{
+  display:block;
+  margin-top:.35rem;
+  color:#172033;
+  font-size:1.15rem;
+}
+#landingView .homepage-pricing-threshold-center span{
+  display:block;
+  margin-top:.3rem;
+  color:#667085;
+  font-size:.72rem;
+}
+#landingView .homepage-pricing-threshold-pro{
+  text-align:right;
+}
+#landingView .homepage-pricing-fee-details{
+  max-width:1020px;
+  margin:1.4rem auto 0;
+  border-bottom:1px solid rgba(214,223,230,.9);
+}
+#landingView .homepage-pricing-fee-details summary{
+  position:relative;
+  list-style:none;
+  cursor:pointer;
+  padding:1rem 2.6rem 1rem .1rem;
+  color:#526174;
+  font-size:.82rem;
+  font-weight:800;
+}
+#landingView .homepage-pricing-fee-details summary::-webkit-details-marker{
+  display:none;
+}
+#landingView .homepage-pricing-fee-details summary::after{
+  content:"+";
+  position:absolute;
+  right:.15rem;
+  top:50%;
+  transform:translateY(-50%);
+  color:#748193;
+  font-size:1rem;
+}
+#landingView .homepage-pricing-fee-details[open] summary::after{
+  content:"−";
+  color:#0872bd;
+}
+#landingView .homepage-pricing-fee-details summary:focus-visible{
+  outline:3px solid rgba(22,135,217,.18);
+  outline-offset:3px;
+}
+#landingView .homepage-pricing-fee-content{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem 2rem;
+  padding:0 .1rem 1.45rem;
+}
+#landingView .homepage-pricing-fee-content strong{
+  color:#334155;
+  font-size:.78rem;
+}
+#landingView .homepage-pricing-fee-content p{
+  margin:.35rem 0 0;
+  color:#748193;
+  font-size:.76rem;
+  line-height:1.65;
+}
+#landingView .homepage-pricing-fee-footnote{
+  grid-column:1/-1;
+  margin:0!important;
+  padding-top:1rem;
+  border-top:1px solid rgba(225,232,236,.9);
+  color:#8a96a5!important;
+  font-size:.7rem!important;
+}
+@media(max-width:767px){
+  #landingView .home-chapter-pricing{
+    padding-top:5rem;
+    padding-bottom:5.25rem;
+  }
+  #landingView .homepage-pricing-card{
+    padding:1.5rem;
+  }
+  #landingView .homepage-pricing-summary{
+    min-height:0;
+  }
+  #landingView .homepage-pricing-threshold{
+    grid-template-columns:1fr;
+  }
+  #landingView .homepage-pricing-threshold>div+div{
+    border-left:0;
+    border-top:1px solid rgba(222,229,234,.95);
+  }
+  #landingView .homepage-pricing-threshold-center,
+  #landingView .homepage-pricing-threshold-pro{
+    text-align:left;
+  }
+  #landingView .homepage-pricing-fee-content{
+    grid-template-columns:1fr;
+    gap:1rem;
+  }
+  #landingView .homepage-pricing-fee-footnote{
+    grid-column:auto;
+  }
+}
