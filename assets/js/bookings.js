@@ -232,6 +232,46 @@ function bookingCard(b, allowCancel = false) {
       if (cancelled) closeManageReschedule();
     }
 
+    function renderManageQuickDates() {
+      const wrap = $("manageQuickDates");
+      const input = $("manageDateInput");
+      const booking = state.manageBooking;
+      if (!wrap || !input || !booking) return;
+
+      const maxDate = addDaysToDateKey(todayKey(), Number(booking.maximum_booking_days || 90));
+      const selected = input.value;
+      const dates = [];
+      for (let offset = 0; offset < 7; offset += 1) {
+        const date = addDaysToDateKey(todayKey(), offset);
+        if (date > maxDate) break;
+        dates.push(date);
+      }
+
+      wrap.innerHTML = dates.map(date => {
+        const d = londonDate(date, "12:00");
+        const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE }).format(d);
+        const active = selected === date;
+        return `
+          <button type="button"
+            class="booking-date-choice${active ? " selected" : ""}"
+            data-manage-date="${date}"
+            aria-pressed="${active ? "true" : "false"}">
+            <span>${escapeHtml(weekday)}</span>
+            <strong>${escapeHtml(day)}</strong>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function handleManageQuickDateClick(e) {
+      const btn = e.target.closest("[data-manage-date]");
+      if (!btn) return;
+      $("manageDateInput").value = btn.dataset.manageDate;
+      renderManageQuickDates();
+      loadManageAvailableSlots();
+    }
+
     function openManageReschedule() {
       if (!state.manageBooking || state.manageBooking.booking_status !== "confirmed" || $("manageRescheduleBtn").disabled) return;
       state.manageSelectedSlot = null;
@@ -239,6 +279,7 @@ function bookingCard(b, allowCancel = false) {
       $("manageDateInput").value = "";
       $("manageDateInput").min = todayKey();
       $("manageDateInput").max = addDaysToDateKey(todayKey(), Number(state.manageBooking.maximum_booking_days || 90));
+      renderManageQuickDates();
       $("manageSlots").innerHTML = "";
       $("manageSlotsMessage").textContent = "Choose a date to see available times.";
       $("manageRescheduleConfirm").classList.add("hidden");
@@ -255,6 +296,7 @@ function bookingCard(b, allowCancel = false) {
     async function loadManageAvailableSlots() {
       const b = state.manageBooking;
       const dateKey = $("manageDateInput").value;
+      renderManageQuickDates();
       state.manageSelectedSlot = null;
       $("manageRescheduleConfirm").classList.add("hidden");
 
