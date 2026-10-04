@@ -88,7 +88,8 @@ function workspaceStaffMember(staffId) {
 function workspaceAssigneeLabel(item) {
   if (!item.assignee_staff_id) return "Owner · you";
   const member = workspaceStaffMember(item.assignee_staff_id);
-  return member?.name || "Team member";
+  if (!member) return "Team member";
+  return member.deleted_at ? member.name + " · Former team member" : member.name;
 }
 
 function workspaceMentionedStaff(taskId) {
