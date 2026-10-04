@@ -699,7 +699,7 @@ function syncReminderFields() {
             const options = Array.isArray(q.options) ? q.options : [];
             return `
               <div class="booking-record-row">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
                       <span class="rounded-full bg-brand-50 px-2.5 py-1 text-[.68rem] font-bold text-brand-700">${escapeHtml(service?.title || "Service")}</span>
