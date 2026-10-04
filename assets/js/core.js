@@ -1341,11 +1341,17 @@
         block.is_active &&
         block.block_date >= todayKey()
       );
-      const paymentsReady = state.stripeReady === true;
+      const planRequiresOnlinePayment = Boolean(state.plan?.requires_online_payment);
+      const serviceRequiresOnlinePayment = state.services.some(service =>
+        (service?.deposit_type || "none") !== "none"
+      );
+      const requiresStripe = planRequiresOnlinePayment || serviceRequiresOnlinePayment;
+      const paymentsReady = requiresStripe ? state.stripeReady === true : true;
       const completed = [hasService, hasAvailability, paymentsReady].filter(Boolean).length;
       return {
         hasService,
         hasAvailability,
+        requiresStripe,
         paymentsReady,
         completed,
         ready: completed === 3
@@ -1397,13 +1403,19 @@
         "Set availability →"
       );
 
-      const stripeChecking = Boolean(state.profile?.stripe_connect_id) && state.stripeReady === null;
+      const stripeChecking = setup.requiresStripe && Boolean(state.profile?.stripe_connect_id) && state.stripeReady === null;
+      const paymentsTitle = $("firstRunPaymentsTitle");
+      if (paymentsTitle) {
+        paymentsTitle.textContent = setup.requiresStripe ? "Connect Stripe" : "Payment setup";
+      }
       setFirstRunStep(
         "firstRunPaymentsIcon",
         "firstRunPaymentsStatus",
         "firstRunPaymentsBtn",
         setup.paymentsReady,
-        "Stripe is ready to take customer payments.",
+        setup.requiresStripe
+          ? "Stripe is ready to take customer payments."
+          : "Your current Pro payment settings do not require online payment.",
         stripeChecking
           ? "Checking whether Stripe is ready for live payments…"
           : "Paid bookings need Stripe to be ready before customers can check out.",
