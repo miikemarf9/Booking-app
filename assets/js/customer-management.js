@@ -228,7 +228,7 @@ async function toggleSelectedCustomerArchive() {
     ""
   );
 
-  if (!restoring && currentCustomerFilter() !== "archived") state.selectedCustomerId = "";
+  if (!restoring && (typeof currentCrmListFilter !== "function" || currentCrmListFilter() !== "archived")) state.selectedCustomerId = "";
   renderCustomers();
   toast(restoring ? "Customer restored." : "Customer archived.");
 }
