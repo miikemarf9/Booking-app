@@ -44,7 +44,7 @@
     }
   </script>
   
-    <link rel="stylesheet" href="assets/css/app.css?v=stage7-customer-1">
+    <link rel="stylesheet" href="assets/css/app.css?v=stage8-crm-1">
   <link rel="stylesheet" href="assets/css/homepage-hero.css?v=2">
 
   <script type="application/ld+json">
@@ -1389,23 +1389,23 @@
           </div>
 
           <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Foundation</p>
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Foundation</p>
               <p class="mt-2 text-xl font-bold text-ink">First + last touch</p>
               <p class="mt-2 text-sm leading-6 text-slate-500">Bookings can now retain source, medium, campaign, referral and device attribution.</p>
             </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Customer link</p>
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Customer link</p>
               <p class="mt-2 text-xl font-bold text-ink">CRM connected</p>
               <p class="mt-2 text-sm leading-6 text-slate-500">Acquisition source can follow a customer beyond their first booking into retention and value analysis.</p>
             </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Internal bookings</p>
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Internal bookings</p>
               <p class="mt-2 text-xl font-bold text-ink">Kept separate</p>
               <p class="mt-2 text-sm leading-6 text-slate-500">Staff-assisted bookings do not overwrite genuine marketing attribution.</p>
             </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booking journey</p>
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Booking journey</p>
               <p class="mt-2 text-xl font-bold text-ink">Funnel tracking active</p>
               <p class="mt-2 text-sm leading-6 text-slate-500">Growth now measures consented journeys from booking-page visit through completed appointment.</p>
             </article>
@@ -2216,238 +2216,33 @@
       <!-- Customers Tab -->
       <section id="tab-customers" class="dashboard-tab hidden">
         <div class="space-y-6">
-          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total customers</p>
+          <div class="crm-kpi-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Total customers</p>
               <p id="crmTotalCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
               <p class="mt-1 text-xs text-slate-500">unique customer profiles</p>
             </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Returning</p>
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Returning</p>
               <p id="crmReturningCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
               <p class="mt-1 text-xs text-slate-500">customers with 2+ bookings</p>
             </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Seen recently</p>
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Seen recently</p>
               <p id="crmRecentCustomers" class="mt-2 text-3xl font-bold text-ink">0</p>
               <p class="mt-1 text-xs text-slate-500">appointments in the last 90 days</p>
             </article>
-            <article class="card p-5">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Booked value</p>
+            <article class="crm-kpi">
+              <p class="crm-kpi-label">Booked value</p>
               <p id="crmBookedValue" class="mt-2 text-3xl font-bold text-ink">£0</p>
               <p class="mt-1 text-xs text-slate-500">all non-cancelled customer bookings</p>
             </article>
-            <button id="crmRetentionAttentionBtn" class="card p-5 text-left transition hover:border-brand-300 hover:shadow-md" type="button">
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Needs attention</p>
+            <button id="crmRetentionAttentionBtn" class="crm-kpi crm-kpi-action text-left" type="button">
+              <p class="crm-kpi-label">Needs attention</p>
               <p id="crmRetentionAttention" class="mt-2 text-3xl font-bold text-ink">0</p>
               <p class="mt-1 text-xs text-slate-500">customers due back or drifting away</p>
             </button>
           </div>
-
-          <article id="crm-analytics-section" class="card scroll-mt-32 p-5 sm:p-6">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM analytics</p>
-                <h2 class="mt-1 text-xl font-bold text-ink">Customer performance</h2>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">See whether customers are returning, what they are worth, how often they come back and which services create the strongest repeat behaviour.</p>
-              </div>
-              <span id="crmAnalyticsPeriod" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">All-time customer data</span>
-            </div>
-
-            <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              <div class="rounded-2xl bg-slate-50 p-4">
-                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Repeat booking rate</p>
-                <p id="crmRepeatRate" class="mt-1 text-2xl font-bold text-ink">—</p>
-                <p id="crmRepeatRateDetail" class="mt-1 text-xs text-slate-500">No completed customers yet</p>
-              </div>
-              <div class="rounded-2xl bg-slate-50 p-4">
-                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Average customer value</p>
-                <p id="crmAverageCustomerValue" class="mt-1 text-2xl font-bold text-ink">£0</p>
-                <p class="mt-1 text-xs text-slate-500">non-cancelled booked value per customer</p>
-              </div>
-              <div class="rounded-2xl bg-slate-50 p-4">
-                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Typical return cycle</p>
-                <p id="crmTypicalReturnCycle" class="mt-1 text-2xl font-bold text-ink">—</p>
-                <p id="crmTypicalReturnDetail" class="mt-1 text-xs text-slate-500">Needs repeat customer history</p>
-              </div>
-              <div class="rounded-2xl bg-slate-50 p-4">
-                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">New this month</p>
-                <p id="crmNewThisMonth" class="mt-1 text-2xl font-bold text-ink">0</p>
-                <p id="crmNewThisMonthDetail" class="mt-1 text-xs text-slate-500">first completed appointment this month</p>
-              </div>
-              <button id="crmNoFutureBookingBtn" class="rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-slate-100" type="button">
-                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">No future booking</p>
-                <p id="crmNoFutureBookingRate" class="mt-1 text-2xl font-bold text-ink">—</p>
-                <p id="crmNoFutureBookingDetail" class="mt-1 text-xs text-slate-500">customers with history but nothing ahead</p>
-              </button>
-              <button id="crmLapsedCustomersBtn" class="rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-slate-100" type="button">
-                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Lapsed customers</p>
-                <p id="crmLapsedCustomers" class="mt-1 text-2xl font-bold text-ink">0</p>
-                <p class="mt-1 text-xs text-slate-500">personal return pattern suggests they are lost</p>
-              </button>
-            </div>
-
-            <div class="mt-6 grid gap-5 xl:grid-cols-[.72fr_1.28fr]">
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Customer health</p>
-                <h3 class="mt-1 font-bold text-ink">Retention status</h3>
-                <div id="crmHealthBreakdown" class="mt-4 space-y-3"></div>
-              </div>
-
-              <div class="rounded-2xl border border-slate-200 p-4">
-                <div class="flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Service retention</p>
-                    <h3 class="mt-1 font-bold text-ink">What brings customers back?</h3>
-                  </div>
-                  <span class="text-xs text-slate-400">Completed appointments only</span>
-                </div>
-                <div id="crmServiceRetention" class="mt-4"></div>
-              </div>
-            </div>
-          </article>
-
-          <article id="crm-retention-section" class="card scroll-mt-32 p-5 sm:p-6">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM automation</p>
-                <h2 class="mt-1 text-xl font-bold text-ink">Automatic retention</h2>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Let Grab&Book contact customers when their own booking pattern suggests they are due back or drifting away.</p>
-              </div>
-              <span id="crmAutomationStatus" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Off</span>
-            </div>
-
-            <form id="crmAutomationForm" class="mt-5 grid gap-4 lg:grid-cols-2">
-              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
-                <span>
-                  <span class="block font-bold text-ink">Automatic rebooking reminders</span>
-                  <span class="mt-1 block text-sm leading-5 text-slate-500">Send one email when a regular customer reaches their normal return point and has nothing booked.</span>
-                </span>
-                <input id="crmAutoRebooking" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
-              </label>
-
-              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
-                <span>
-                  <span class="block font-bold text-ink">Automatic win-back emails</span>
-                  <span class="mt-1 block text-sm leading-5 text-slate-500">Contact customers who move well beyond their normal booking rhythm with no future appointment.</span>
-                </span>
-                <input id="crmAutoWinback" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
-              </label>
-
-              <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500 lg:col-span-2">
-                <strong class="text-slate-700">Built-in safeguards:</strong> only marketing-opted-in customers are eligible; Grab&Book needs at least 3 completed appointments to establish a personal pattern; each automation is sent once per booking cycle; and automated CRM emails have a 21-day cooldown.
-              </div>
-
-              <div class="flex flex-wrap items-center gap-3 lg:col-span-2">
-                <button id="crmAutomationSaveBtn" class="btn btn-primary" type="submit">Save automation settings</button>
-                <span id="crmAutomationLastRun" class="text-xs text-slate-500">Not run yet</span>
-              </div>
-            </form>
-          </article>
-
-          <article id="crm-campaigns-section" class="card scroll-mt-32 p-5 sm:p-6">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer communications</p>
-                <h2 class="mt-1 text-xl font-bold text-ink">Email customers</h2>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Filter your customer list, then email the customers in that group who have explicitly opted in to marketing.</p>
-              </div>
-              <span id="marketingEligibleBadge" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">0 eligible</span>
-            </div>
-
-            <div id="marketingCampaignAudienceSummary" class="mt-5 hidden rounded-2xl border border-brand-200 bg-brand-50/65 p-4 sm:p-5">
-              <div class="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Prepared from Business Health</p>
-                  <h3 id="marketingCampaignAudienceTitle" class="mt-1 font-bold text-ink">Rebooking audience prepared</h3>
-                  <p class="mt-1 text-xs leading-5 text-slate-600">Grab&Book has carried the exact retention-attention group into this campaign and checked marketing consent. Review the audience and message before deciding whether to send.</p>
-                </div>
-                <button id="clearMarketingCampaignBtn" type="button" class="text-xs font-bold text-brand-700 hover:underline">Clear prepared audience</button>
-              </div>
-              <div class="mt-4 grid gap-3 sm:grid-cols-3">
-                <div class="rounded-xl bg-white p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Identified</p><p id="marketingCampaignIdentified" class="mt-1 text-xl font-black text-ink">0</p><p class="text-xs text-slate-500">need retention attention</p></div>
-                <div class="rounded-xl bg-white p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Eligible</p><p id="marketingCampaignEligible" class="mt-1 text-xl font-black text-emerald-700">0</p><p class="text-xs text-slate-500">can receive this email</p></div>
-                <div class="rounded-xl bg-white p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Excluded</p><p id="marketingCampaignExcluded" class="mt-1 text-xl font-black text-slate-600">0</p><p class="text-xs text-slate-500">consent or email eligibility</p></div>
-              </div>
-              <p class="mt-3 text-xs font-semibold text-slate-600">Nothing has been sent. The owner must review the draft and confirm the existing send step.</p>
-            </div>
-
-            <div class="mt-5 grid gap-4 lg:grid-cols-[.7fr_1.3fr]">
-              <div class="space-y-4">
-                <div>
-                  <label class="label" for="customerFilter">Customer group</label>
-                  <select id="customerFilter" class="field">
-                    <optgroup label="Customer groups">
-                      <option value="all">All customers</option>
-                      <option value="opted_in">Marketing opted in</option>
-                      <option value="service">Previous customers of a service</option>
-                      <option value="tag">Customer tag</option>
-                      <option value="archived">Archived customers</option>
-                    </optgroup>
-                    <optgroup label="Smart groups">
-                      <option value="new">New customers</option>
-                      <option value="regular">Regular customers</option>
-                      <option value="vip">VIP / high value</option>
-                      <option value="retention_attention">Needs retention attention</option>
-                      <option value="due_back">Due back</option>
-                      <option value="slipping">Slipping away</option>
-                      <option value="lapsed">Lapsed customers</option>
-                      <option value="no_future">No future appointment</option>
-                    </optgroup>
-                  </select>
-                </div>
-
-                <div id="customerServiceFilterWrap" class="hidden">
-                  <label class="label" for="customerServiceFilter">Service</label>
-                  <select id="customerServiceFilter" class="field"></select>
-                </div>
-
-                <div id="customerTagFilterWrap" class="hidden">
-                  <label class="label" for="customerTagFilter">Tag</label>
-                  <select id="customerTagFilter" class="field"></select>
-                </div>
-
-                <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-                  <strong class="text-slate-700">Marketing consent:</strong> only customers who ticked the optional marketing box can receive these emails. Every marketing email includes an unsubscribe link.
-                </div>
-              </div>
-
-              <div id="marketingTargetBanner" class="mb-4 hidden rounded-2xl border border-brand-200 bg-brand-50 p-4">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Direct offer</p>
-                    <p id="marketingTargetText" class="mt-1 text-sm font-bold text-ink">Sending to one customer</p>
-                  </div>
-                  <button id="clearMarketingTargetBtn" class="text-xs font-bold text-brand-700 hover:underline" type="button">Clear</button>
-                </div>
-              </div>
-
-              <form id="marketingEmailForm" class="space-y-4">
-                <div>
-                  <label class="label" for="marketingSubject">Email subject</label>
-                  <input id="marketingSubject" class="field" type="text" maxlength="180" required placeholder="e.g. A little offer for your next visit">
-                </div>
-                <div>
-                  <label class="label" for="marketingMessage">Message</label>
-                  <textarea id="marketingMessage" class="field min-h-36 resize-y" maxlength="10000" required placeholder="Write your message to customers…"></textarea>
-                </div>
-                <div class="flex flex-wrap items-center gap-3">
-                  <button id="sendMarketingEmailBtn" class="btn btn-primary" type="submit">Send campaign</button>
-                  <span id="marketingRecipientText" class="text-xs text-slate-500">No opted-in customers in this group.</span>
-                </div>
-              </form>
-            </div>
-          </article>
-
-          <article class="card p-5 sm:p-6" id="crm-campaign-history-section">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div><h2 class="text-xl font-bold text-ink">Campaign history</h2>
-                <p class="mt-2 text-sm text-slate-500">Review your messages, recipients and exclusions. Sent means accepted by the email provider; delivery is only confirmed when available.</p></div>
-              <button id="refreshCampaignHistoryBtn" class="btn btn-light" type="button">Refresh history</button>
-            </div>
-            <div id="marketingCampaignHistory" class="mt-5 space-y-3" aria-live="polite">Loading campaign history…</div>
-            <button id="moreCampaignHistoryBtn" class="btn btn-light mt-4 hidden" type="button">Load older campaigns</button>
-          </article>
 
           <div id="crm-customers-section" class="grid scroll-mt-32 gap-6 lg:grid-cols-[.9fr_1.1fr]">
             <article class="card p-5 sm:p-6">
@@ -2457,17 +2252,40 @@
                   <p class="mt-2 text-sm leading-6 text-slate-500">Every booking now builds one customer profile instead of treating repeat visits as separate people.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                  <button id="addCustomerBtn" class="btn btn-primary" type="button">Add customer</button>
-                  <button id="importCustomersBtn" class="btn btn-light" type="button">Import CSV</button>
-                  <button id="exportCustomersBtn" class="btn btn-light" type="button">Export CSV</button>
                   <span id="customerCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 customers</span>
+                  <button id="addCustomerBtn" class="btn btn-primary" type="button">Add customer</button>
+                  <details class="relative">
+                    <summary class="btn btn-light cursor-pointer list-none">More</summary>
+                    <div class="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+                      <button id="importCustomersBtn" class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50" type="button">Import CSV</button>
+                      <button id="exportCustomersBtn" class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50" type="button">Export CSV</button>
+                    </div>
+                  </details>
                   <input id="customerCsvInput" class="hidden" type="file" accept=".csv,text/csv">
                 </div>
               </div>
 
-              <div class="mt-5">
-                <label class="label" for="customerSearch">Search customers</label>
-                <input id="customerSearch" class="field" type="search" placeholder="Name, email or phone">
+              <div class="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+                <div>
+                  <label class="label" for="customerSearch">Search customers</label>
+                  <input id="customerSearch" class="field" type="search" placeholder="Name, email or phone">
+                </div>
+                <div>
+                  <label class="label" for="customerListFilter">Show</label>
+                  <select id="customerListFilter" class="field">
+                    <option value="all">Active customers</option>
+                    <option value="new">New</option>
+                    <option value="regular">Regular</option>
+                    <option value="vip">VIP / high value</option>
+                    <option value="retention_attention">Needs attention</option>
+                    <option value="due_back">Due back</option>
+                    <option value="slipping">Slipping away</option>
+                    <option value="lapsed">Lapsed</option>
+                    <option value="no_future">No future booking</option>
+                    <option value="opted_in">Marketing opted in</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </div>
               </div>
 
               <div id="customersList" class="mt-5 max-h-[650px] space-y-2 overflow-y-auto pr-1"></div>
@@ -2491,39 +2309,44 @@
                   <span id="customerProfileBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Customer</span>
                 </div>
 
-                <div class="mt-5 flex flex-wrap gap-2">
+                <div class="crm-profile-actions mt-5 flex flex-wrap gap-2">
                   <button id="customerBookBtn" class="btn btn-primary" type="button">Book appointment</button>
                   <button id="customerEmailBtn" class="btn btn-light" type="button">Email</button>
                   <button id="customerCallBtn" class="btn btn-light" type="button">Call</button>
                   <button id="customerOfferBtn" class="btn btn-light" type="button">Send offer</button>
-                  <button id="customerEditBtn" class="btn btn-light" type="button">Edit details</button>
-                  <button id="customerMergeBtn" class="btn btn-light" type="button">Merge duplicate</button>
-                  <button id="customerArchiveBtn" class="btn btn-light" type="button">Archive</button>
+                  <details class="relative">
+                    <summary class="btn btn-light cursor-pointer list-none">More</summary>
+                    <div class="absolute right-0 z-30 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+                      <button id="customerEditBtn" class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50" type="button">Edit details</button>
+                      <button id="customerMergeBtn" class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50" type="button">Merge duplicate</button>
+                      <button id="customerArchiveBtn" class="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50" type="button">Archive</button>
+                    </div>
+                  </details>
                 </div>
 
-                <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Bookings</p>
+                <div class="crm-profile-metrics mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  <div class="crm-profile-metric">
+                    <p class="crm-profile-metric-label">Bookings</p>
                     <p id="customerProfileBookings" class="mt-1 text-xl font-bold text-ink">0</p>
                   </div>
-                  <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Booked value</p>
+                  <div class="crm-profile-metric">
+                    <p class="crm-profile-metric-label">Booked value</p>
                     <p id="customerProfileValue" class="mt-1 text-xl font-bold text-ink">£0</p>
                   </div>
-                  <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Average booking</p>
+                  <div class="crm-profile-metric">
+                    <p class="crm-profile-metric-label">Average booking</p>
                     <p id="customerProfileAverageValue" class="mt-1 text-xl font-bold text-ink">£0</p>
                   </div>
-                  <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">First appointment</p>
+                  <div class="crm-profile-metric">
+                    <p class="crm-profile-metric-label">First appointment</p>
                     <p id="customerProfileFirstVisit" class="mt-1 text-sm font-bold text-ink">—</p>
                   </div>
-                  <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Last appointment</p>
+                  <div class="crm-profile-metric">
+                    <p class="crm-profile-metric-label">Last appointment</p>
                     <p id="customerProfileLastVisit" class="mt-1 text-sm font-bold text-ink">—</p>
                   </div>
-                  <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Next appointment</p>
+                  <div class="crm-profile-metric">
+                    <p class="crm-profile-metric-label">Next appointment</p>
                     <p id="customerProfileNextBooking" class="mt-1 text-sm font-bold text-ink">—</p>
                   </div>
                 </div>
@@ -2638,6 +2461,214 @@
               </div>
             </article>
           </div>
+
+          <article id="crm-analytics-section" class="card scroll-mt-32 p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM analytics</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Customer performance</h2>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">See whether customers are returning, what they are worth, how often they come back and which services create the strongest repeat behaviour.</p>
+              </div>
+              <span id="crmAnalyticsPeriod" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">All-time customer data</span>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Repeat booking rate</p>
+                <p id="crmRepeatRate" class="mt-1 text-2xl font-bold text-ink">—</p>
+                <p id="crmRepeatRateDetail" class="mt-1 text-xs text-slate-500">No completed customers yet</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Average customer value</p>
+                <p id="crmAverageCustomerValue" class="mt-1 text-2xl font-bold text-ink">£0</p>
+                <p class="mt-1 text-xs text-slate-500">non-cancelled booked value per customer</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Typical return cycle</p>
+                <p id="crmTypicalReturnCycle" class="mt-1 text-2xl font-bold text-ink">—</p>
+                <p id="crmTypicalReturnDetail" class="mt-1 text-xs text-slate-500">Needs repeat customer history</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">New this month</p>
+                <p id="crmNewThisMonth" class="mt-1 text-2xl font-bold text-ink">0</p>
+                <p id="crmNewThisMonthDetail" class="mt-1 text-xs text-slate-500">first completed appointment this month</p>
+              </div>
+              <button id="crmNoFutureBookingBtn" class="rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-slate-100" type="button">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">No future booking</p>
+                <p id="crmNoFutureBookingRate" class="mt-1 text-2xl font-bold text-ink">—</p>
+                <p id="crmNoFutureBookingDetail" class="mt-1 text-xs text-slate-500">customers with history but nothing ahead</p>
+              </button>
+              <button id="crmLapsedCustomersBtn" class="rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-slate-100" type="button">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Lapsed customers</p>
+                <p id="crmLapsedCustomers" class="mt-1 text-2xl font-bold text-ink">0</p>
+                <p class="mt-1 text-xs text-slate-500">personal return pattern suggests they are lost</p>
+              </button>
+            </div>
+
+            <div class="mt-6 grid gap-5 xl:grid-cols-[.72fr_1.28fr]">
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Customer health</p>
+                <h3 class="mt-1 font-bold text-ink">Retention status</h3>
+                <div id="crmHealthBreakdown" class="mt-4 space-y-3"></div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-slate-400">Service retention</p>
+                    <h3 class="mt-1 font-bold text-ink">What brings customers back?</h3>
+                  </div>
+                  <span class="text-xs text-slate-400">Completed appointments only</span>
+                </div>
+                <div id="crmServiceRetention" class="mt-4"></div>
+              </div>
+            </div>
+          </article>
+
+          <article id="crm-retention-section" class="card scroll-mt-32 p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">CRM automation</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Retention automations</h2>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Let Grab&Book contact customers when their own booking pattern suggests they are due back or drifting away.</p>
+              </div>
+              <span id="crmAutomationStatus" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Off</span>
+            </div>
+
+            <form id="crmAutomationForm" class="mt-5 grid gap-4 lg:grid-cols-2">
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <span>
+                  <span class="block font-bold text-ink">Automatic rebooking reminders</span>
+                  <span class="mt-1 block text-sm leading-5 text-slate-500">Send one email when a regular customer reaches their normal return point and has nothing booked.</span>
+                </span>
+                <input id="crmAutoRebooking" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+              </label>
+
+              <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <span>
+                  <span class="block font-bold text-ink">Automatic win-back emails</span>
+                  <span class="mt-1 block text-sm leading-5 text-slate-500">Contact customers who move well beyond their normal booking rhythm with no future appointment.</span>
+                </span>
+                <input id="crmAutoWinback" type="checkbox" class="mt-1 h-5 w-5 accent-slate-900">
+              </label>
+
+              <details class="lg:col-span-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-500">
+                <summary class="cursor-pointer font-bold text-slate-700">Safeguards</summary>
+                <p class="mt-2">Only marketing-opted-in customers are eligible. Grab&Book needs at least 3 completed appointments to establish a personal pattern, sends once per booking cycle and applies a 21-day cooldown.</p>
+              </details>
+
+              <div class="flex flex-wrap items-center gap-3 lg:col-span-2">
+                <button id="crmAutomationSaveBtn" class="btn btn-primary" type="submit">Save automation settings</button>
+                <span id="crmAutomationLastRun" class="text-xs text-slate-500">Not run yet</span>
+              </div>
+            </form>
+          </article>
+
+          <article id="crm-campaigns-section" class="card scroll-mt-32 p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Customer communications</p>
+                <h2 class="mt-1 text-xl font-bold text-ink">Email customers</h2>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Choose a campaign audience, review the eligible count, then write the message. Sending still requires your confirmation.</p>
+              </div>
+              <span id="marketingEligibleBadge" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">0 eligible</span>
+            </div>
+
+            <div id="marketingCampaignAudienceSummary" class="mt-5 hidden rounded-2xl border border-brand-200 bg-brand-50/65 p-4 sm:p-5">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Prepared from Business Health</p>
+                  <h3 id="marketingCampaignAudienceTitle" class="mt-1 font-bold text-ink">Rebooking audience prepared</h3>
+                  <p class="mt-1 text-xs leading-5 text-slate-600">Grab&Book has carried the exact retention-attention group into this campaign and checked marketing consent. Review the audience and message before deciding whether to send.</p>
+                </div>
+                <button id="clearMarketingCampaignBtn" type="button" class="text-xs font-bold text-brand-700 hover:underline">Clear prepared audience</button>
+              </div>
+              <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                <div class="rounded-xl bg-white p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Identified</p><p id="marketingCampaignIdentified" class="mt-1 text-xl font-black text-ink">0</p><p class="text-xs text-slate-500">need retention attention</p></div>
+                <div class="rounded-xl bg-white p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Eligible</p><p id="marketingCampaignEligible" class="mt-1 text-xl font-black text-emerald-700">0</p><p class="text-xs text-slate-500">can receive this email</p></div>
+                <div class="rounded-xl bg-white p-3"><p class="text-[.65rem] font-bold uppercase tracking-wider text-slate-400">Excluded</p><p id="marketingCampaignExcluded" class="mt-1 text-xl font-black text-slate-600">0</p><p class="text-xs text-slate-500">consent or email eligibility</p></div>
+              </div>
+              <p class="mt-3 text-xs font-semibold text-slate-600">Nothing has been sent. The owner must review the draft and confirm the existing send step.</p>
+            </div>
+
+            <div class="mt-5 grid gap-4 lg:grid-cols-[.7fr_1.3fr]">
+              <div class="space-y-4">
+                <div>
+                  <label class="label" for="customerFilter">Campaign audience</label>
+                  <select id="customerFilter" class="field">
+                    <optgroup label="Customer groups">
+                      <option value="all">All customers</option>
+                      <option value="opted_in">Marketing opted in</option>
+                      <option value="service">Previous customers of a service</option>
+                      <option value="tag">Customer tag</option>
+                      <option value="archived">Archived customers</option>
+                    </optgroup>
+                    <optgroup label="Smart groups">
+                      <option value="new">New customers</option>
+                      <option value="regular">Regular customers</option>
+                      <option value="vip">VIP / high value</option>
+                      <option value="retention_attention">Needs retention attention</option>
+                      <option value="due_back">Due back</option>
+                      <option value="slipping">Slipping away</option>
+                      <option value="lapsed">Lapsed customers</option>
+                      <option value="no_future">No future appointment</option>
+                    </optgroup>
+                  </select>
+                </div>
+
+                <div id="customerServiceFilterWrap" class="hidden">
+                  <label class="label" for="customerServiceFilter">Service</label>
+                  <select id="customerServiceFilter" class="field"></select>
+                </div>
+
+                <div id="customerTagFilterWrap" class="hidden">
+                  <label class="label" for="customerTagFilter">Tag</label>
+                  <select id="customerTagFilter" class="field"></select>
+                </div>
+
+                <div class="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+                  <strong class="text-slate-700">Marketing consent:</strong> only customers who ticked the optional marketing box can receive these emails. Every marketing email includes an unsubscribe link.
+                </div>
+              </div>
+
+              <div id="marketingTargetBanner" class="mb-4 hidden rounded-2xl border border-brand-200 bg-brand-50 p-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="text-[.68rem] font-bold uppercase tracking-wider text-brand-600">Direct offer</p>
+                    <p id="marketingTargetText" class="mt-1 text-sm font-bold text-ink">Sending to one customer</p>
+                  </div>
+                  <button id="clearMarketingTargetBtn" class="text-xs font-bold text-brand-700 hover:underline" type="button">Clear</button>
+                </div>
+              </div>
+
+              <form id="marketingEmailForm" class="space-y-4">
+                <div>
+                  <label class="label" for="marketingSubject">Email subject</label>
+                  <input id="marketingSubject" class="field" type="text" maxlength="180" required placeholder="e.g. A little offer for your next visit">
+                </div>
+                <div>
+                  <label class="label" for="marketingMessage">Message</label>
+                  <textarea id="marketingMessage" class="field min-h-36 resize-y" maxlength="10000" required placeholder="Write your message to customers…"></textarea>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                  <button id="sendMarketingEmailBtn" class="btn btn-primary" type="submit">Review & send campaign</button>
+                  <span id="marketingRecipientText" class="text-xs text-slate-500">No opted-in customers in this group.</span>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="card p-5 sm:p-6" id="crm-campaign-history-section">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div><h2 class="text-xl font-bold text-ink">Campaign history</h2>
+                <p class="mt-2 text-sm text-slate-500">Review your messages, recipients and exclusions. Sent means accepted by the email provider; delivery is only confirmed when available.</p></div>
+              <button id="refreshCampaignHistoryBtn" class="btn btn-light" type="button">Refresh history</button>
+            </div>
+            <div id="marketingCampaignHistory" class="mt-5 space-y-3" aria-live="polite">Loading campaign history…</div>
+            <button id="moreCampaignHistoryBtn" class="btn btn-light mt-4 hidden" type="button">Load older campaigns</button>
+          </article>
+
+
         </div>
       </section>
 
@@ -4618,7 +4649,7 @@
   </div>
 
   <!-- JavaScript Application Logic -->
-  <script src="assets/js/core.js?v=stage6-booking-1"></script>
+  <script src="assets/js/core.js?v=stage8-crm-1"></script>
   <script src="assets/js/acquisition.js"></script>
   <script src="assets/js/growth-tracking.js"></script>
   <script src="assets/js/growth.js"></script>
@@ -4630,9 +4661,9 @@
   <script src="assets/js/tasks.js?v=4"></script>
   <script src="assets/js/growth-planner.js?v=tasks2"></script>
   <script src="assets/js/growth-opportunities.js"></script>
-  <script src="assets/js/customers.js"></script>
-  <script src="assets/js/campaign-history.js"></script>
-  <script src="assets/js/customer-management.js"></script>
+  <script src="assets/js/customers.js?v=stage8-crm-1"></script>
+  <script src="assets/js/campaign-history.js?v=stage8-crm-1"></script>
+  <script src="assets/js/customer-management.js?v=stage8-crm-1"></script>
   <script src="assets/js/settings.js?v=stage6-booking-1"></script>
   <script src="assets/js/diary.js?v=stage6-booking-1"></script>
   <script src="assets/js/services.js?v=stage6-booking-1"></script>
