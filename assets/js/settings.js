@@ -520,7 +520,7 @@ function syncReminderFields() {
                 </div>
                 <p class="mt-2 font-bold text-ink">${escapeHtml(timeOffLabel(block))}</p>
               </div>
-              <button class="btn shrink-0 !px-3 !py-2 bg-red-50 text-red-700 hover:bg-red-100" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button>
+              <button class="btn booking-danger-btn shrink-0 !px-3 !py-2" type="button" data-time-off-action="delete" data-id="${block.id}">Remove</button>
             </div>
           `;
           }).join("")
@@ -713,7 +713,7 @@ function syncReminderFields() {
                   </div>
                   <div class="flex shrink-0 gap-2">
                     <button class="btn btn-light !px-3 !py-2 text-sm" type="button" data-question-action="edit" data-id="${q.id}">Edit</button>
-                    <button class="btn !px-3 !py-2 text-sm bg-red-50 text-red-700 hover:bg-red-100" type="button" data-question-action="delete" data-id="${q.id}">Delete</button>
+                    <button class="btn booking-danger-btn !px-3 !py-2 text-sm" type="button" data-question-action="delete" data-id="${q.id}">Delete</button>
                   </div>
                 </div>
               </div>
