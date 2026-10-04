@@ -788,6 +788,10 @@ ${bookingUrl}`;
           return bLast - aLast;
         });
 
+      if (state.selectedCustomerId && !customers.some(customer => customer.id === state.selectedCustomerId)) {
+        state.selectedCustomerId = "";
+      }
+
       const activeCustomers = state.customers.filter(customer => !customer.archived_at);
       const archivedCount = state.customers.length - activeCustomers.length;
       const allMetrics = activeCustomers.map(customer => ({
