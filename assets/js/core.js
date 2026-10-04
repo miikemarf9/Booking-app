@@ -833,6 +833,8 @@
       $("customerTagFilter").addEventListener("change", renderCustomers);
       $("crmAutomationForm").addEventListener("submit", saveCrmAutomationSettings);
       $("marketingEmailForm").addEventListener("submit", sendMarketingEmail);
+      $("refreshCampaignHistoryBtn")?.addEventListener("click", () => loadMarketingCampaignHistory());
+      $("moreCampaignHistoryBtn")?.addEventListener("click", () => loadMarketingCampaignHistory(true));
       $("customersList").addEventListener("click", e => {
         const btn = e.target.closest("[data-customer-id]");
         if (btn) selectCustomer(btn.dataset.customerId);
@@ -1341,6 +1343,7 @@
       populateBranding();
       renderCalendarDashboard();
       if (typeof loadWorkspaceTasks === "function") loadWorkspaceTasks();
+      if (typeof loadMarketingCampaignHistory === "function") loadMarketingCampaignHistory();
 
       const warnEl = $("dashboardDataWarning");
       if (state.bookingsError) {

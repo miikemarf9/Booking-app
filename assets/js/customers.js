@@ -580,36 +580,41 @@ function customerBookings(customer) {
       return state.customers.filter(customer => idSet.has(customer.id) && !customer.archived_at);
     }
 
+    function marketingAudienceCustomers() {
+      if (state.marketingTargetCustomerId) return state.customers.filter(c => c.id === state.marketingTargetCustomerId);
+      if (state.marketingCampaignSource) {
+        const ids = new Set(state.marketingCampaignCustomerIds || []);
+        return state.customers.filter(c => ids.has(c.id));
+      }
+      return filteredCustomersForCrm();
+    }
+
     function marketingEligibleCustomers() {
-      if (state.marketingTargetCustomerId) {
-        const customer = state.customers.find(c => c.id === state.marketingTargetCustomerId);
-        return customer?.marketing_email_opt_in && !customer.archived_at ? [customer] : [];
-      }
-
-      const prepared = preparedMarketingCampaignCustomers();
-      if (prepared.length) {
-        return prepared.filter(customer => Boolean(customer.marketing_email_opt_in));
-      }
-
-      return filteredCustomersForCrm().filter(customer => Boolean(customer.marketing_email_opt_in) && !customer.archived_at);
+      const seen = new Set();
+      return marketingAudienceCustomers().filter(customer => {
+        const email = String(customer.email || "").trim().toLowerCase();
+        if (!customer.marketing_email_opt_in || customer.archived_at || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || seen.has(email)) return false;
+        seen.add(email);
+        return true;
+      });
     }
 
     function renderMarketingCampaignAudienceSummary() {
       const panel = $("marketingCampaignAudienceSummary");
       if (!panel) return;
 
-      const prepared = preparedMarketingCampaignCustomers();
-      const active = state.marketingCampaignSource === "business-health-retention" && prepared.length > 0;
+      const identified = (state.marketingCampaignCustomerIds || []).length;
+      const active = !state.marketingTargetCustomerId && state.marketingCampaignSource === "business-health-retention" && identified > 0;
       panel.classList.toggle("hidden", !active);
       if (!active) return;
 
-      const eligible = prepared.filter(customer => Boolean(customer.marketing_email_opt_in));
-      const excluded = prepared.length - eligible.length;
-      $("marketingCampaignIdentified").textContent = prepared.length;
+      const eligible = marketingEligibleCustomers();
+      const excluded = identified - eligible.length;
+      $("marketingCampaignIdentified").textContent = identified;
       $("marketingCampaignEligible").textContent = eligible.length;
       $("marketingCampaignExcluded").textContent = excluded;
       $("marketingCampaignAudienceTitle").textContent =
-        prepared.length + " customer" + (prepared.length === 1 ? "" : "s") + " need retention attention";
+        identified + " customer" + (identified === 1 ? "" : "s") + " identified for retention follow-up";
     }
 
     function clearMarketingCampaignContext(render = true) {
@@ -663,7 +668,7 @@ ${bookingUrl}`;
         $("marketingEmailForm")?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
 
-      const eligible = affected.filter(customer => Boolean(customer.marketing_email_opt_in)).length;
+      const eligible = marketingEligibleCustomers().length;
       const excluded = affected.length - eligible;
       toast(
         `Rebooking campaign prepared: ${affected.length} identified · ${eligible} eligible · ${excluded} excluded. Nothing has been sent.`,
@@ -700,62 +705,58 @@ ${bookingUrl}`;
       renderCustomers();
     }
 
+    let marketingSendInFlight = false;
+    const marketingAttemptMemory = new Map();
     async function sendMarketingEmail(e) {
       e.preventDefault();
-      if (!state.user || !state.profile) return;
-
+      if (!state.user || !state.profile || marketingSendInFlight) return;
       const recipients = marketingEligibleCustomers();
-      if (!recipients.length) {
-        return toast("There are no marketing-opted-in customers in this group.", "error");
-      }
-
-      if (recipients.length > 100) {
-        return toast("You can send to up to 100 customers at once. Narrow the customer group first.", "error");
-      }
-
+      const audienceIds = state.marketingCampaignSource && !state.marketingTargetCustomerId
+        ? [...state.marketingCampaignCustomerIds] : marketingAudienceCustomers().map(c => c.id);
+      if (!recipients.length) return toast("There are no eligible marketing recipients in this group.", "error");
+      if (recipients.length > 100 || audienceIds.length > 1000) return toast("Narrow the group to no more than 100 eligible recipients and 1,000 identified customers.", "error");
       const subject = $("marketingSubject").value.trim();
       const messageText = $("marketingMessage").value.trim();
       if (!subject || !messageText) return toast("Add an email subject and message first.", "error");
-
-      const confirmed = window.confirm(
-        `Send this marketing email to ${recipients.length} opted-in customer${recipients.length === 1 ? "" : "s"}?`
-      );
-      if (!confirmed) return;
-
+      if (!window.confirm(`Send campaign to ${recipients.length} eligible customer${recipients.length === 1 ? "" : "s"}? ${audienceIds.length - recipients.length} excluded. This saves the message and recipient outcomes in campaign history.`)) return;
+      marketingSendInFlight = true;
       const btn = $("sendMarketingEmailBtn");
-      setBusy(btn, true, "Sending…");
-
+      setBusy(btn, true, "Sending campaign…");
       try {
-        const { data, error } = await supabaseClient.functions.invoke("send-marketing-email", {
-          body: {
-            customer_ids: recipients.map(c => c.id),
-            subject,
-            message_text: messageText
-          }
-        });
-
+        const payload = { customer_ids: audienceIds.sort(), subject, message_text: messageText,
+          audience_type: state.marketingTargetCustomerId ? "direct_customer" : state.marketingCampaignSource || currentCustomerFilter() };
+        // Store only a payload hash + random request ID, never message or customer data.
+        const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify([state.profile.id, payload])));
+        const key = "gb-campaign-" + Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2,"0")).join("");
+        let requestId = marketingAttemptMemory.get(key);
+        try { requestId = requestId || sessionStorage.getItem(key); } catch {}
+        requestId = requestId || crypto.randomUUID();
+        marketingAttemptMemory.set(key, requestId);
+        try { sessionStorage.setItem(key, requestId); } catch {}
+        const { data, error } = await supabaseClient.functions.invoke("send-marketing-email", { body: { ...payload, request_id: requestId } });
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
-
-        const sent = Number(data?.sent || 0);
-        const failed = Number(data?.failed || 0);
-        $("marketingEmailForm").reset();
-
-        recipients.forEach(customer => { delete state.customerTimelineEvents[customer.id]; });
-        if (state.marketingTargetCustomerId) clearMarketingTarget(false);
-        if (state.marketingCampaignSource) clearMarketingCampaignContext(false);
-        renderCustomers();
-
-        if (failed) {
-          toast(`Sent to ${sent} customer${sent === 1 ? "" : "s"}; ${failed} email${failed === 1 ? "" : "s"} failed.`, "info");
-        } else {
-          toast(`Marketing email sent to ${sent} customer${sent === 1 ? "" : "s"}.`);
+        await loadMarketingCampaignHistory();
+        if (data?.duplicate || ["queued", "sending", "needs_review"].includes(data?.status)) {
+          toast("Campaign is recorded. Check its recipient outcomes in campaign history before taking further action. This request will not send it again.", "info");
+          return;
         }
+        marketingAttemptMemory.delete(key);
+        try { sessionStorage.removeItem(key); } catch {}
+        $("marketingEmailForm").reset();
+        recipients.forEach(customer => { delete state.customerTimelineEvents[customer.id]; });
+        clearMarketingTarget(false);
+        clearMarketingCampaignContext(false);
+        const sent = Number(data?.sent || 0), failed = Number(data?.failed || 0), excluded = Number(data?.excluded || 0);
+        toast(`Campaign saved: ${sent} sent · ${failed} failed · ${excluded} excluded.`, failed ? "info" : "success");
       } catch (err) {
-        console.error("Marketing email error:", err);
-        toast(err?.message || "The marketing email could not be sent.", "error");
+        console.error("Marketing campaign error:", err);
+        toast("Campaign request could not be confirmed. Check campaign history; retrying the same request will not send it twice.", "error");
+        await loadMarketingCampaignHistory();
       } finally {
+        marketingSendInFlight = false;
         setBusy(btn, false);
+        renderCustomers();
       }
     }
 
@@ -812,7 +813,7 @@ ${bookingUrl}`;
         : (eligible.length
             ? `${eligible.length} opted-in customer${eligible.length === 1 ? "" : "s"} will receive this email.`
             : "No opted-in customers in this group.");
-      $("sendMarketingEmailBtn").disabled = !eligible.length;
+      $("sendMarketingEmailBtn").disabled = marketingSendInFlight || !eligible.length;
       $("sendMarketingEmailBtn").classList.toggle("opacity-50", !eligible.length);
 
       $("customersList").innerHTML = customers.length
