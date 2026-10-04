@@ -1803,6 +1803,15 @@
       border-color: var(--gb-border-soft);
       box-shadow: none;
     }
+    .crm-profile-context,
+    .crm-profile-tags {
+      border-top: 1px solid var(--gb-border-soft);
+      padding: 1rem .1rem 0;
+    }
+    .crm-profile-context .rounded-xl,
+    .crm-profile-tags .rounded-xl {
+      box-shadow: none;
+    }
     #customerRetentionPanel {
       border-color: #d7e8f5 !important;
       background: #f8fbfe !important;
