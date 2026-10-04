@@ -663,48 +663,85 @@
       </section>
 
       <section id="pricing" class="home-chapter home-chapter-pricing landing-anchor bg-white py-16 sm:py-20">
-        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div class="saas-reveal mx-auto max-w-2xl text-center">
+        <div class="homepage-pricing-inner mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div class="homepage-pricing-intro saas-reveal mx-auto max-w-3xl text-center">
             <p class="landing-section-eyebrow">Simple pricing</p>
             <h2 class="mt-3 text-3xl font-black tracking-[-.03em] text-ink sm:text-4xl">Start free. Upgrade when the paid plan makes sense.</h2>
+            <p class="mt-4 text-base leading-7 text-slate-500">Free keeps your fixed monthly cost at £0. Pro becomes the lower-cost Grab&Book plan at about £1,450/month in paid bookings — or sooner if you want more flexible payment options.</p>
           </div>
 
-          <div class="saas-stagger mt-10 grid gap-5 md:grid-cols-2">
-            <article class="pricing-plan-card card p-7">
-              <p class="text-sm font-black text-ink">Free</p>
-              <div class="mt-3 flex items-end gap-1"><span class="text-4xl font-black text-ink">£0</span><span class="pb-1 text-sm font-semibold text-slate-400">/month</span></div>
-              <p class="mt-4 text-sm leading-6 text-slate-500">A simple way to start taking paid bookings online.</p>
-              <div class="mt-6 space-y-3 text-sm text-slate-600">
-                <p>✓ Core booking and business dashboard</p>
-                <p>✓ Full online payment at booking</p>
-                <p>✓ 2% Grab&Book platform fee per paid booking</p>
-                <p>✓ £10 minimum service price</p>
+          <div class="homepage-pricing-grid saas-stagger mt-12 grid gap-6 md:grid-cols-2">
+            <article class="homepage-pricing-card homepage-pricing-card-free pricing-plan-card">
+              <div class="homepage-pricing-card-top">
+                <div>
+                  <p class="homepage-pricing-kicker">Start here</p>
+                  <h3>Free</h3>
+                </div>
+                <span class="homepage-pricing-badge">No monthly fee</span>
               </div>
-              <button id="landingPricingStartBtn" data-cta="start-free" type="button" class="btn btn-light mt-7 w-full">Start free</button>
+              <div class="homepage-pricing-price"><span>£0</span><small>/month</small></div>
+              <p class="homepage-pricing-summary">A low-risk way to start taking paid bookings online.</p>
+              <div class="homepage-pricing-features">
+                <p><span aria-hidden="true">✓</span>Core booking and business dashboard</p>
+                <p><span aria-hidden="true">✓</span>Full online payment at booking</p>
+                <p><span aria-hidden="true">✓</span>2% Grab&Book platform fee per paid booking</p>
+                <p><span aria-hidden="true">✓</span>£10 minimum service price</p>
+              </div>
+              <button id="landingPricingStartBtn" data-cta="start-free" type="button" class="btn btn-light mt-8 w-full">Start free</button>
             </article>
 
-            <article class="pricing-plan-card pricing-plan-card-pro relative overflow-hidden rounded-[1.25rem] border border-brand-500 bg-brand-50/55 p-7">
-              <span class="absolute right-5 top-5 rounded-full bg-brand-600 px-3 py-1 text-[.68rem] font-black uppercase tracking-wider text-white">0% platform fee</span>
-              <p class="text-sm font-black text-ink">Pro</p>
-              <div class="mt-3 flex items-end gap-1"><span class="text-4xl font-black text-ink">£29</span><span class="pb-1 text-sm font-semibold text-slate-400">/month</span></div>
-              <p class="mt-4 text-sm leading-6 text-slate-600">Manage bookings, understand your customers and see what drives growth — with flexible payments and no Grab&Book platform fee.</p>
-              <div class="mt-6 space-y-3 text-sm text-slate-700">
-                <p>✓ 0% Grab&Book platform fee</p>
-                <p>✓ Pay later, fixed deposit, percentage deposit or full payment</p>
-                <p>✓ No Grab&Book minimum service price</p>
-                <p>✓ Everything in the core booking system</p>
+            <article class="homepage-pricing-card homepage-pricing-card-pro pricing-plan-card">
+              <div class="homepage-pricing-card-top">
+                <div>
+                  <p class="homepage-pricing-kicker">Upgrade when it pays</p>
+                  <h3>Pro</h3>
+                </div>
+                <span class="homepage-pricing-badge homepage-pricing-badge-pro">0% platform fee</span>
               </div>
-              <button id="landingProStartBtn" data-cta="start-free" type="button" class="btn btn-primary mt-7 w-full">Create your account</button>
+              <div class="homepage-pricing-price"><span>£29</span><small>/month</small></div>
+              <p class="homepage-pricing-summary">More payment flexibility with no Grab&Book platform fee.</p>
+              <div class="homepage-pricing-features">
+                <p><span aria-hidden="true">✓</span>0% Grab&Book platform fee</p>
+                <p><span aria-hidden="true">✓</span>Pay later, fixed deposit, percentage deposit or full payment</p>
+                <p><span aria-hidden="true">✓</span>No Grab&Book minimum service price</p>
+                <p><span aria-hidden="true">✓</span>Everything in the core booking system</p>
+              </div>
+              <button id="landingProStartBtn" data-cta="start-free" type="button" class="btn btn-primary mt-8 w-full">Create your account</button>
             </article>
           </div>
 
-          <div class="pricing-fee-note saas-reveal mt-5 text-sm leading-6 text-slate-600">
-            <p class="font-black text-ink">How payment fees work</p>
-            <p class="mt-2"><strong class="text-slate-800">Grab&Book:</strong> Free takes a 2% platform fee from each paid booking. Pro reduces the Grab&Book platform fee to 0%.</p>
-            <p class="mt-1"><strong class="text-slate-800">Stripe:</strong> payment-processing fees apply separately on both plans. Stripe currently lists standard UK card payments at 1.5% + 20p; other card types and payment methods can cost more.</p>
-            <p class="mt-2"><strong class="text-slate-800">When Pro becomes cheaper:</strong> at about £1,450/month in paid bookings, Free's 2% Grab&Book fee equals the £29 Pro subscription.</p>
-            <p class="mt-2 text-xs text-slate-400">The customer pays the service price you set. These fees are deducted from the business proceeds; Grab&Book does not add a separate customer surcharge at checkout. Stripe rates can change.</p>
+          <div class="homepage-pricing-threshold saas-reveal" aria-label="When Pro becomes cheaper">
+            <div class="homepage-pricing-threshold-side">
+              <span>Free</span>
+              <strong>£0 fixed cost</strong>
+              <small>2% Grab&Book fee on paid bookings</small>
+            </div>
+            <div class="homepage-pricing-threshold-center">
+              <p>When Pro becomes cheaper</p>
+              <strong>About £1,450/month</strong>
+              <span>2% of £1,450 = £29</span>
+            </div>
+            <div class="homepage-pricing-threshold-side homepage-pricing-threshold-pro">
+              <span>Pro</span>
+              <strong>£29/month</strong>
+              <small>0% Grab&Book platform fee</small>
+            </div>
           </div>
+
+          <details class="homepage-pricing-fee-details saas-reveal">
+            <summary>How payment fees work</summary>
+            <div class="homepage-pricing-fee-content">
+              <div>
+                <strong>Grab&Book</strong>
+                <p>Free takes a 2% platform fee from each paid booking. Pro reduces the Grab&Book platform fee to 0%.</p>
+              </div>
+              <div>
+                <strong>Stripe</strong>
+                <p>Payment-processing fees apply separately on both plans. Stripe currently lists standard UK card payments at 1.5% + 20p; other card types and payment methods can cost more.</p>
+              </div>
+              <p class="homepage-pricing-fee-footnote">The customer pays the service price you set. These fees are deducted from the business proceeds; Grab&Book does not add a separate customer surcharge at checkout. Stripe rates can change.</p>
+            </div>
+          </details>
         </div>
       </section>
 
