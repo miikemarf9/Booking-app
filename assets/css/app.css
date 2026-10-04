@@ -865,6 +865,112 @@
       border-radius: 999px;
       background: #1687d9;
     }
+    .landing-calendar-choice {
+      width: 100%;
+      appearance: none;
+      cursor: pointer;
+      background: #fff;
+      font: inherit;
+      transition: background-color .16s ease, color .16s ease, box-shadow .16s ease;
+    }
+    .landing-calendar-choice strong {
+      display: grid;
+      width: 1.9rem;
+      height: 1.9rem;
+      place-items: center;
+      border-radius: 999px;
+      transition: background-color .16s ease, color .16s ease, transform .16s ease;
+    }
+    .landing-calendar-choice.is-selected {
+      background: #eef8ff;
+      color: #075b98;
+    }
+    .landing-calendar-choice.is-selected strong {
+      background: #0872bd;
+      color: #fff;
+      transform: scale(1.04);
+    }
+    .landing-calendar-choice.is-selected i {
+      background: #0872bd;
+    }
+    .landing-calendar-choice:focus-visible {
+      z-index: 1;
+      outline: 3px solid rgba(22,135,217,.22);
+      outline-offset: -3px;
+    }
+    @media (hover:hover) and (pointer:fine) {
+      .landing-calendar-choice:hover {
+        background: #f6fbff;
+      }
+      .landing-calendar-choice:hover strong {
+        transform: translateY(-1px);
+      }
+    }
+    .landing-calendar-agenda {
+      display: grid;
+      gap: .45rem;
+    }
+    .landing-calendar-appointment {
+      display: grid;
+      grid-template-columns: 3.25rem minmax(0,1fr) auto;
+      align-items: center;
+      gap: .75rem;
+      min-width: 0;
+      border: 1px solid #edf1f5;
+      border-radius: .8rem;
+      background: #fbfcfe;
+      padding: .65rem .75rem;
+    }
+    .landing-calendar-appointment time {
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .landing-calendar-appointment > span {
+      min-width: 0;
+      text-align: left;
+    }
+    .landing-calendar-appointment strong {
+      display: block;
+      overflow: hidden;
+      color: #172033;
+      font-size: .76rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .landing-calendar-appointment small {
+      display: block;
+      margin-top: .15rem;
+      overflow: hidden;
+      color: #8491a3;
+      font-size: .66rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .landing-calendar-appointment b {
+      color: #344054;
+      font-size: .75rem;
+      font-variant-numeric: tabular-nums;
+    }
+    @media (prefers-reduced-motion:no-preference) {
+      .landing-calendar-agenda.is-changing {
+        animation: homepage-diary-change .28s ease both;
+      }
+      @keyframes homepage-diary-change {
+        from { opacity:.35; transform:translateY(5px); }
+        to { opacity:1; transform:none; }
+      }
+    }
+    @media (max-width:420px) {
+      .landing-calendar-appointment {
+        grid-template-columns: 2.75rem minmax(0,1fr) auto;
+        gap: .5rem;
+        padding: .6rem;
+      }
+      .landing-calendar-appointment strong { font-size: .7rem; }
+      .landing-calendar-appointment small { font-size: .61rem; }
+    }
     @media (max-width: 639px) {
       .landing-anchor {
         scroll-margin-top: 4.8rem;
