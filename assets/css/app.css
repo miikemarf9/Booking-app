@@ -32,6 +32,21 @@
     textarea {
       font: inherit;
     }
+    button:not(:disabled) {
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: not-allowed;
+    }
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid rgba(22, 135, 217, .24);
+      outline-offset: 3px;
+    }
     input[type="checkbox"],
     input[type="radio"] {
       accent-color: var(--gb-brand);
@@ -92,40 +107,46 @@
     }
     .rich-editor-shell {
       overflow: hidden;
-      border: 1px solid #d8dee9;
-      border-radius: .8rem;
-      background: white;
-      transition: border-color .15s, box-shadow .15s;
+      border: 1px solid var(--gb-border);
+      border-radius: var(--gb-control-radius);
+      background: var(--gb-surface);
+      transition: border-color .15s ease, box-shadow .15s ease;
     }
     .rich-editor-shell:focus-within {
-      border-color: #1687d9;
-      box-shadow: 0 0 0 3px rgba(22, 135, 217, .13);
+      border-color: var(--gb-brand-bright);
+      box-shadow: var(--gb-focus-ring);
     }
     .rich-editor-toolbar {
       display: flex;
       gap: .35rem;
       padding: .5rem;
-      border-bottom: 1px solid #e5eaf1;
-      background: #f8fafc;
+      border-bottom: 1px solid var(--gb-border-soft);
+      background: var(--gb-surface-subtle);
     }
     .format-btn {
       display: inline-flex;
-      width: 2rem;
-      height: 2rem;
+      width: 2.15rem;
+      height: 2.15rem;
       align-items: center;
       justify-content: center;
-      border: 1px solid #d8dee9;
-      border-radius: .55rem;
-      background: white;
-      color: #344054;
+      border: 1px solid var(--gb-border);
+      border-radius: .6rem;
+      background: var(--gb-surface);
+      color: var(--gb-text);
       font-size: .82rem;
       font-weight: 800;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
     }
-    .format-btn:hover,
+    .format-btn:hover {
+      border-color: #b8c2d1;
+      background: var(--gb-surface-subtle);
+      color: var(--gb-brand);
+    }
     .format-btn:focus-visible {
-      border-color: #1687d9;
-      color: #0872bd;
+      border-color: var(--gb-brand-bright);
+      color: var(--gb-brand);
       outline: none;
+      box-shadow: var(--gb-focus-ring);
     }
     .rich-editor {
       min-height: 7.5rem;
