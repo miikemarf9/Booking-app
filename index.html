@@ -4395,6 +4395,14 @@
             <button id="manageRescheduleBtn" class="btn btn-primary" type="button">Reschedule</button>
             <button id="manageCancelBtn" class="btn btn-light" type="button">Cancel booking</button>
           </div>
+          <div id="manageCancelConfirm" class="mt-5 hidden rounded-2xl border border-red-100 bg-red-50 p-4">
+            <p class="font-bold text-red-900">Cancel this appointment?</p>
+            <p class="mt-1 text-sm leading-6 text-red-800">The appointment time will be released for someone else to book.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button id="manageConfirmCancelBtn" class="btn booking-danger-btn" type="button">Yes, cancel booking</button>
+              <button id="manageKeepBookingBtn" class="btn btn-light" type="button">Keep booking</button>
+            </div>
+          </div>
         </article>
 
         <article id="manageReschedulePanel" class="card hidden p-5 sm:p-6">
