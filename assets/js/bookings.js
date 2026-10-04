@@ -158,8 +158,9 @@ function bookingCard(b, allowCancel = false) {
         const card = $("manageError");
         card.classList.remove("hidden");
         card.innerHTML = `
-          <h2 class="text-xl font-bold text-ink">This booking link is not available</h2>
-          <p class="mt-2 text-sm leading-6 text-slate-500">The link may be invalid or the booking may no longer exist.</p>
+          <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-lg font-bold text-slate-500" aria-hidden="true">!</div>
+          <h2 class="mt-4 text-xl font-bold text-ink">This booking link is not available</h2>
+          <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">The private link may be invalid, expired, or the booking may no longer exist.</p>
         `;
         return;
       }
