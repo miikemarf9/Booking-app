@@ -377,7 +377,7 @@ function bookingCard(b, allowCancel = false) {
         : "No alternative times are available on this date.";
 
       $("manageSlots").innerHTML = slots.map((slot, idx) => `
-        <button type="button" class="manage-slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-manage-slot-index="${idx}">
+        <button type="button" class="manage-slot-choice rounded-xl border border-slate-200 px-2 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-500" data-manage-slot-index="${idx}" aria-pressed="false">
           ${escapeHtml(prettyTime(slot.start))}
         </button>
       `).join("");
@@ -392,7 +392,11 @@ function bookingCard(b, allowCancel = false) {
       const slots = $("manageSlots")._slots || [];
       state.manageSelectedSlot = slots[Number(btn.dataset.manageSlotIndex)] || null;
 
-      document.querySelectorAll(".manage-slot-choice").forEach(el => el.classList.toggle("selected", el === btn));
+      document.querySelectorAll(".manage-slot-choice").forEach(el => {
+        const selected = el === btn;
+        el.classList.toggle("selected", selected);
+        el.setAttribute("aria-pressed", String(selected));
+      });
 
       if (!state.manageSelectedSlot) {
         $("manageRescheduleConfirm").classList.add("hidden");
