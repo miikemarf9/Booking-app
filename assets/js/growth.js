@@ -964,6 +964,7 @@ function openGrowthScenarioFromHealth(type, assumption) {
     handleGrowthScenarioAssumptionInput();
   }
 
+  if (lab.tagName === "DETAILS") lab.open = true;
   lab.scrollIntoView({ behavior: "smooth", block: "start" });
   window.setTimeout(function () {
     if (!input.disabled) input.focus({ preventScroll: true });
