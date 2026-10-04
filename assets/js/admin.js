@@ -74,7 +74,7 @@ function filteredBusinesses() {
 function renderStats() {
   const all = adminState.businesses;
   $("adminStatBusinesses").textContent = String(all.length);
-  $("adminStatApproved").textContent = String(all.filter(x => x.is_approved).length);
+  $("adminStatPending").textContent = String(all.filter(x => !x.is_approved).length);
   $("adminStatPro").textContent = String(all.filter(x => String(x.plan_code).toLowerCase() === "pro").length);
   $("adminStatValue").textContent = money(all.reduce((sum, x) => sum + Number(x.booked_value || 0), 0));
 }
@@ -85,7 +85,7 @@ function renderBusinesses() {
   $("adminEmpty").classList.toggle("hidden", businesses.length > 0);
   $("adminBusinessRows").innerHTML = businesses.map(business => {
     const selected = business.profile_id === adminState.selectedId;
-    return `<tr class="cursor-pointer transition hover:bg-brand-50/60 ${selected ? "bg-brand-50" : ""}" data-admin-business="${escapeHtml(business.profile_id)}">
+    return `<tr tabindex="0" role="button" aria-selected="${selected ? "true" : "false"}" class="admin-business-row cursor-pointer transition ${selected ? "is-selected" : ""}" data-admin-business="${escapeHtml(business.profile_id)}">
       <td class="px-5 py-4">
         <p class="font-bold text-ink">${escapeHtml(business.business_name || "Unnamed business")}</p>
         <p class="mt-1 max-w-[240px] truncate text-xs text-slate-400">${escapeHtml(business.owner_email || "No owner email")}</p>
@@ -99,7 +99,13 @@ function renderBusinesses() {
   }).join("");
 
   document.querySelectorAll("[data-admin-business]").forEach(row => {
-    row.addEventListener("click", () => selectBusiness(row.dataset.adminBusiness));
+    const open = () => selectBusiness(row.dataset.adminBusiness);
+    row.addEventListener("click", open);
+    row.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      open();
+    });
   });
 }
 
@@ -141,7 +147,7 @@ function selectBusiness(profileId) {
       <div>
         <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Business overview</p>
         <h3 class="mt-1 text-xl font-bold text-ink">${escapeHtml(business.business_name || "Unnamed business")}</h3>
-        <p class="mt-1 text-xs text-slate-400">ID ${escapeHtml(profileId)}</p>
+        <p class="mt-1 text-xs text-slate-400">${escapeHtml(business.owner_email || "No owner email")}</p>
       </div>
       <div class="flex gap-2">${planBadge(business.plan_code)}${accountBadge(Boolean(business.is_approved))}</div>
     </div>
@@ -176,13 +182,16 @@ function selectBusiness(profileId) {
       </dl>
     </div>
 
-    <div class="mt-6 flex flex-wrap gap-2">
-      <a class="btn btn-primary" href="${bookingUrl}" target="_blank" rel="noopener">Open booking page ↗</a>
-      <a class="btn btn-light" href="client-view.html?business=${encodeURIComponent(profileId)}" target="_blank" rel="noopener">View as client ↗</a>
-      <button class="btn btn-light" type="button" data-scroll-inspector>Inspect setup ↓</button>
+    <div class="admin-business-actions mt-6 grid gap-2 sm:grid-cols-2">
+      <a class="btn btn-primary" href="client-view.html?business=${encodeURIComponent(profileId)}" target="_blank" rel="noopener">View client dashboard ↗</a>
+      <a class="btn btn-light" href="${bookingUrl}" target="_blank" rel="noopener">Open booking page ↗</a>
+      <button class="btn btn-light sm:col-span-2" type="button" data-scroll-inspector>Inspect setup</button>
     </div>
-    <p class="mt-3 text-xs leading-5 text-slate-400">Inspection remains read-only. Any change available under Support is explicit, server-authorised and written to the audit log.</p>
-  `;
+    <details class="admin-technical-details mt-4">
+      <summary>Technical details <span aria-hidden="true">⌄</span></summary>
+      <p class="mt-2 break-all px-3 pb-3 text-xs leading-5 text-slate-400">Business ID: ${escapeHtml(profileId)}</p>
+    </details>
+    <p class="mt-3 text-xs leading-5 text-slate-400">Inspector tabs are read-only. Any change under Support is explicit, server-authorised and recorded in the audit log.</p>  `;
 
   $("adminInspectorBusinessName").textContent = business.business_name || "Unnamed business";
   $("adminInspector").classList.remove("hidden");
@@ -248,10 +257,9 @@ function setInspectorTab(tab) {
   adminState.inspectorTab = allowed.includes(tab) ? tab : "book";
   document.querySelectorAll("[data-inspector-tab]").forEach(button => {
     const active = button.dataset.inspectorTab === adminState.inspectorTab;
-    button.classList.toggle("bg-white", active);
-    button.classList.toggle("text-ink", active);
-    button.classList.toggle("shadow-sm", active);
+    button.classList.toggle("admin-inspector-tab-active", active);
     button.classList.toggle("text-slate-500", !active);
+    button.setAttribute("aria-current", active ? "page" : "false");
   });
   renderInspector();
   if (adminState.inspectorTab === "support" && adminState.selectedId) {
@@ -628,11 +636,13 @@ function renderSupportInspector(support) {
   </tr>`).join("") : '<tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-400">No support actions have been recorded for this business yet.</td></tr>';
 
   const approvalAction = account.is_approved
-    ? `<button type="button" class="btn btn-light" data-support-approval="false">Pause owner dashboard access</button>`
+    ? `<button type="button" class="btn btn-light admin-pause-access" data-support-approval="false">Pause owner dashboard access</button>`
     : `<button type="button" class="btn btn-primary" data-support-approval="true">Approve owner dashboard access</button>`;
 
   return `
-    ${sectionHeading("Support", "Controlled support actions for this business. Every server-side change in this workspace is written to the audit log.")}
+    ${sectionHeading("Support", "Use support actions only when needed. Changes are explicit, server-authorised and written to the audit log.")}
+
+    <div class="admin-support-safety mb-5 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-sm leading-6 text-blue-900"><strong>Read first:</strong> diagnostic and inspector views are read-only. Actions below can affect a client account or send a real customer email, so each action requires confirmation.</div>
 
     <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       ${metricCard("Email issues", number(issues.length), support.email_issue_sample_limited ? "Recent 300 bookings sampled" : "failed or missing sends")}
@@ -802,6 +812,26 @@ async function handleSupportClick(event) {
   }
 }
 
+function resetAdminSelection() {
+  adminState.selectedId = "";
+  adminState.inspectorTab = "book";
+  $("adminBusinessDetail").innerHTML = `
+    <div class="admin-empty-detail py-10 text-center">
+      <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-lg font-bold text-brand-600">→</div>
+      <h3 class="mt-4 font-bold text-ink">Select a business</h3>
+      <p class="mx-auto mt-2 max-w-xs text-sm leading-6 text-slate-500">Choose a row to see the account summary, health checks and support options.</p>
+    </div>`;
+  $("adminInspector").classList.add("hidden");
+  renderBusinesses();
+}
+
+function clearAdminFilters() {
+  $("adminSearch").value = "";
+  $("adminPlanFilter").value = "";
+  $("adminAccountFilter").value = "";
+  renderBusinesses();
+}
+
 async function loadAdminBusinesses(showMessage = false) {
   const btn = $("adminRefreshBtn");
   if (btn) btn.disabled = true;
@@ -816,10 +846,8 @@ async function loadAdminBusinesses(showMessage = false) {
 
     if (adminState.selectedId && adminState.businesses.some(x => x.profile_id === adminState.selectedId)) {
       selectBusiness(adminState.selectedId);
-    } else if (adminState.businesses.length) {
-      selectBusiness(adminState.businesses[0].profile_id);
     } else {
-      $("adminInspector").classList.add("hidden");
+      resetAdminSelection();
     }
 
     show("adminApp");
@@ -858,6 +886,7 @@ $("adminInspectorContent")?.addEventListener("click", handleSupportClick);
 $("adminSearch")?.addEventListener("input", renderBusinesses);
 $("adminPlanFilter")?.addEventListener("change", renderBusinesses);
 $("adminAccountFilter")?.addEventListener("change", renderBusinesses);
+$("adminClearFiltersBtn")?.addEventListener("click", clearAdminFilters);
 $("adminRefreshBtn")?.addEventListener("click", () => loadAdminBusinesses(true));
 $("adminLogoutBtn")?.addEventListener("click", async () => {
   await adminClient.auth.signOut({ scope:"local" });
