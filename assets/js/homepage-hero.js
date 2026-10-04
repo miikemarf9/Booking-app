@@ -34,6 +34,11 @@
   }
 
   function updateControl() {
+    if (reduced.matches) {
+      control.textContent = "Next →";
+      control.setAttribute("aria-label", "Show next product story");
+      return;
+    }
     control.textContent = playing ? "Pause Ⅱ" : started ? "Resume ▶" : "Play demo ▶";
     control.setAttribute("aria-label", playing ? "Pause product walkthrough" : "Play product walkthrough");
   }
@@ -113,6 +118,12 @@
   }
 
   control.addEventListener("click", () => {
+    if (reduced.matches) {
+      started = true;
+      renderFace((step + 1) % panels.length, false);
+      updateControl();
+      return;
+    }
     if (playing) {
       stop();
       return;
