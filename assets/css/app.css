@@ -4238,3 +4238,164 @@
       #adminApp .admin-business-actions { grid-template-columns:1fr; }
       #adminApp .admin-business-actions .sm\:col-span-2 { grid-column:auto; }
     }
+
+
+    /* Stage 13 cross-device pass */
+    #dashboardView .dashboard-tab,
+    #dashboardView .dashboard-tab > *,
+    #dashboardView .booking-ops-grid > *,
+    #dashboardView .payments-settings-grid > *,
+    #adminApp main > *,
+    #clientViewApp main > *,
+    .landing-product-preview,
+    .product-site-shell main > * {
+      min-width: 0;
+    }
+
+    .landing-mobile-nav > div,
+    .product-mobile-nav > div,
+    #clientViewApp .preview-nav-shell {
+      scrollbar-width: none;
+    }
+    .landing-mobile-nav > div::-webkit-scrollbar,
+    .product-mobile-nav > div::-webkit-scrollbar,
+    #clientViewApp .preview-nav-shell::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (min-width:640px) and (max-width:1023px) {
+      #dashboardView > header > div {
+        align-items: flex-start;
+      }
+      #dashboardView .dashboard-header-actions {
+        max-width: 68%;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      #dashboardView .dashboard-header-actions .btn {
+        min-height: 42px;
+      }
+    }
+
+    @media (max-width:639px) {
+      #customerEditorModal,
+      #customerMergeModal,
+      #workspaceTaskModal,
+      #growthPlannerModal,
+      #growthImportModal {
+        align-items: flex-end;
+        padding: .5rem;
+      }
+      #customerEditorModal > .card,
+      #customerMergeModal > .card,
+      #workspaceTaskModal > .card,
+      #growthPlannerModal > .card,
+      #growthImportModal > .card {
+        max-height: calc(100dvh - 1rem);
+        overflow-y: auto;
+        border-radius: 1rem;
+        padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+      }
+      #customerEditorModal [id$="CloseBtn"],
+      #customerMergeModal [id$="CloseBtn"],
+      #workspaceTaskModal [id$="CloseBtn"],
+      #growthPlannerModal [id$="CloseBtn"],
+      #growthImportModal [id$="CloseBtn"] {
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      #blkStartPicker > div:first-child {
+        grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+        width: 100%;
+      }
+      #blkStartHour,
+      #blkStartMinute {
+        width: 100%;
+        min-width: 0;
+        padding-left: .55rem !important;
+        padding-right: 1.7rem !important;
+      }
+
+      #customersList {
+        max-height: none !important;
+        overflow-y: visible !important;
+        padding-right: 0 !important;
+      }
+
+      #calendarHoverCard {
+        display: none !important;
+      }
+
+      #clientViewApp > div:first-child > div > a {
+        width: 100%;
+        justify-content: center;
+      }
+      #clientViewApp > header #previewPublicBookingLink,
+      #clientViewApp > header .preview-settings-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+
+      #adminToast {
+        width: calc(100% - 2rem);
+      }
+      #adminApp #adminInspectorContent,
+      #adminApp #adminInspectorHealth {
+        min-width: 0;
+      }
+
+      #product-growth .growth-detail-row,
+      #landingView #product-growth .growth-detail-row {
+        font-size: .68rem;
+      }
+      #product-growth .growth-detail-row > span,
+      #landingView #product-growth .growth-detail-row > span {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    @media (max-width:359px) {
+      #landingView > header > div:first-child,
+      .product-site-header > div:first-child {
+        padding-left: .75rem;
+        padding-right: .75rem;
+        gap: .4rem;
+      }
+      #landingView > header img,
+      .product-site-header img {
+        max-width: 96px;
+      }
+      #landingView > header .btn,
+      .product-site-header .btn {
+        min-height: 38px;
+        padding: .5rem .52rem;
+        font-size: .68rem;
+      }
+      #dashboardView .area-tab {
+        padding-left: .3rem;
+        padding-right: .3rem;
+        font-size: .68rem;
+      }
+      #manageBookingView .manage-private-badge {
+        padding-left: .5rem;
+        padding-right: .5rem;
+      }
+      #clientViewApp > header img,
+      #adminApp > header img {
+        max-width: 118px;
+      }
+    }
+
+    @supports (padding: max(0px)) {
+      @media (max-width:639px) {
+        #manageBookingView > header > div,
+        #clientViewApp > header > div,
+        #clientViewApp > div:first-child > div,
+        #adminApp > header > div {
+          padding-left: max(1rem, env(safe-area-inset-left));
+          padding-right: max(1rem, env(safe-area-inset-right));
+        }
+      }
+    }
