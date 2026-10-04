@@ -231,3 +231,91 @@
 .gb-demo-stage{height:435px;min-height:435px}
 @media(max-width:479px){.gb-demo-stage{height:450px;min-height:450px}}
 @media(max-width:359px){.gb-demo-stage{height:500px;min-height:500px}}
+
+
+/* Homepage colour journey: visual-only section progression. */
+#landingView{
+  --home-ice:#f3f9fc;
+  --home-cloud:#fbfdff;
+  --home-mint:#edf8f4;
+  --home-mint-deep:#e4f3ee;
+  --home-blue:#eaf5fc;
+  --home-blue-deep:#dfeefa;
+  --home-lilac:#f2f0fb;
+  --home-lilac-blue:#edf3fb;
+  --home-ink:#151c2b;
+  --home-ink-deep:#0f1521;
+}
+#landingView .home-chapter{
+  position:relative;
+  isolation:isolate;
+}
+#landingView .home-chapter>*{
+  position:relative;
+  z-index:1;
+}
+#landingView .home-chapter-hero{
+  background:
+    radial-gradient(ellipse at 86% 17%,rgba(118,190,230,.20),transparent 47%),
+    radial-gradient(ellipse at 12% 4%,rgba(132,220,204,.10),transparent 36%),
+    linear-gradient(180deg,#f7fcfd 0%,#eef7fb 58%,#f6fafc 100%);
+}
+#landingView .home-chapter-audience{
+  background:
+    linear-gradient(180deg,#f6fafc 0%,#fbfdfd 42%,#f3f9f7 100%);
+  border-color:rgba(196,215,221,.55);
+}
+#landingView .home-chapter-overview{
+  background:
+    radial-gradient(circle at 88% 14%,rgba(8,114,189,.045),transparent 25%),
+    #fff;
+}
+#landingView .home-chapter-health{
+  background:
+    radial-gradient(ellipse at 14% 18%,rgba(52,181,193,.09),transparent 34%),
+    linear-gradient(145deg,#edf8fb 0%,#e7f2fb 56%,#eef1fa 100%);
+  border-color:rgba(177,207,225,.62);
+}
+#landingView .home-chapter-book{
+  background:
+    radial-gradient(circle at 84% 22%,rgba(22,135,217,.08),transparent 30%),
+    linear-gradient(180deg,#f0f8fd 0%,#eaf5fc 100%);
+  border-color:rgba(177,207,225,.58);
+}
+#landingView .home-chapter-crm{
+  background:
+    radial-gradient(circle at 14% 18%,rgba(32,167,126,.07),transparent 29%),
+    linear-gradient(180deg,#f5fbf9 0%,#edf8f4 100%);
+}
+#landingView .home-chapter-growth{
+  background:
+    radial-gradient(circle at 86% 14%,rgba(119,98,177,.08),transparent 29%),
+    linear-gradient(180deg,#f2f7fb 0%,#f1f0fa 100%);
+  border-color:rgba(204,202,225,.58);
+}
+#landingView .home-chapter-questions{
+  background:
+    linear-gradient(180deg,#fcfdff 0%,#ffffff 76%,#f8fafc 100%);
+}
+#landingView .home-chapter-dark{
+  background:
+    radial-gradient(ellipse at 80% 22%,rgba(22,135,217,.13),transparent 38%),
+    linear-gradient(155deg,#182234 0%,#141c2b 56%,#101725 100%);
+}
+#landingView .home-chapter-faq{
+  background:
+    linear-gradient(180deg,#f8fafc 0%,#ffffff 50%,#fbfcfd 100%);
+  border-color:rgba(214,221,229,.62);
+}
+#landingView .home-chapter-pricing{
+  background:
+    radial-gradient(circle at 78% 16%,rgba(119,98,177,.055),transparent 30%),
+    linear-gradient(180deg,#fbfcfe 0%,#f1f7fc 100%);
+}
+#landingView .home-chapter-final-shell{
+  background:
+    linear-gradient(180deg,#f1f7fc 0%,#eaf4fb 56%,#f7fafc 100%);
+}
+#landingView .home-chapter-final-shell .homepage-final-cta{
+  box-shadow:0 30px 80px rgba(8,114,189,.18);
+}
