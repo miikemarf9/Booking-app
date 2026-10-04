@@ -2656,7 +2656,7 @@
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Service editor</p>
             <h2 id="serviceFormHeading" class="mt-1 text-xl font-bold text-ink">Add a service</h2>
             <p class="mt-2 text-sm text-slate-500">Create the treatments or appointments customers can book.</p>
-            <form id="serviceForm" class="mt-6 space-y-4">
+            <form id="serviceForm" class="booking-ops-form mt-6 space-y-4">
               <input id="serviceEditId" type="hidden">
               <div>
                 <label class="label" for="srvTitle">Service name</label>
@@ -2846,7 +2846,7 @@
               </div>
               <span id="serviceCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 services</span>
             </div>
-            <div id="servicesList" class="mt-5 space-y-3"></div>
+            <div id="servicesList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
@@ -2866,7 +2866,7 @@
             <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Schedule editor</p>
             <h2 id="blockFormHeading" class="mt-1 text-xl font-bold text-ink">Add availability</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Choose the service, date and start time. Grab&Book calculates the finish time from the service duration.</p>
-            <form id="blockForm" class="mt-6 space-y-4">
+            <form id="blockForm" class="booking-ops-form mt-6 space-y-4">
               <input id="blockEditId" type="hidden">
 
               <div>
@@ -2971,11 +2971,14 @@
                 <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Published schedule</p>
                 <h2 class="mt-1 text-xl font-bold text-ink">Upcoming availability</h2>
               </div>
-              <label class="flex items-center gap-2 text-xs font-bold text-slate-500">
-                <input id="showPastBlocks" type="checkbox" class="rounded border-slate-300 text-brand-600"> Show past dates
-              </label>
+              <div class="flex flex-wrap items-center justify-end gap-3">
+                <span id="blocksCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 upcoming</span>
+                <label class="flex items-center gap-2 text-xs font-bold text-slate-500">
+                  <input id="showPastBlocks" type="checkbox" class="rounded border-slate-300 text-brand-600"> Show past
+                </label>
+              </div>
             </div>
-            <div id="blocksList" class="mt-5 space-y-3"></div>
+            <div id="blocksList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
@@ -2994,7 +2997,7 @@
             <h2 class="mt-1 text-xl font-bold text-ink">When customers can book</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Control how soon customers can book and how far into the future your booking page accepts appointments.</p>
 
-            <form id="bookingRulesForm" class="mt-6 space-y-5">
+            <form id="bookingRulesForm" class="booking-ops-form mt-6 space-y-5">
               <div>
                 <label class="label" for="minimumNoticeHours">Minimum notice</label>
                 <select id="minimumNoticeHours" class="field">
@@ -3120,7 +3123,7 @@
               <option value="all">All bookings</option>
             </select>
           </div>
-          <div id="bookingsList" class="mt-6 space-y-3"></div>
+          <div id="bookingsList" class="booking-record-list mt-6 space-y-3"></div>
         </article>
       </section>
 
@@ -3453,7 +3456,7 @@
             <h2 id="staffFormHeading" class="mt-1 text-xl font-bold text-ink">Add a team member</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Create the people customers can book with and choose which services each person provides.</p>
 
-            <form id="staffForm" class="mt-6 space-y-4">
+            <form id="staffForm" class="booking-ops-form mt-6 space-y-4">
               <input id="staffEditId" type="hidden">
 
               <div>
@@ -3498,7 +3501,7 @@
               </div>
               <span id="staffCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 people</span>
             </div>
-            <div id="staffList" class="mt-5 space-y-3"></div>
+            <div id="staffList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
@@ -3517,7 +3520,7 @@
                         <h2 class="mt-1 text-xl font-bold text-ink">Add time off</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Block a full day, several days, or just part of a day. Your normal availability stays intact underneath.</p>
 
-            <form id="timeOffForm" class="mt-6 space-y-4">
+            <form id="timeOffForm" class="booking-ops-form mt-6 space-y-4">
               <div>
                 <label class="label" for="timeOffStaff">Applies to</label>
                 <select id="timeOffStaff" class="field">
@@ -3582,7 +3585,7 @@
               <span id="timeOffCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 blocks</span>
             </div>
 
-            <div id="timeOffList" class="mt-5 space-y-3"></div>
+            <div id="timeOffList" class="booking-record-list mt-5 space-y-3"></div>
 
             <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
               Adding time off never deletes your normal availability. Remove the time-off block later and the underlying bookable times become available again automatically.
@@ -3605,7 +3608,7 @@
                         <h2 id="bookingQuestionFormHeading" class="mt-1 text-xl font-bold text-ink">Add a booking question</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Questions are attached to a service and appear after the customer chooses an appointment time.</p>
 
-            <form id="bookingQuestionForm" class="mt-6 space-y-4">
+            <form id="bookingQuestionForm" class="booking-ops-form mt-6 space-y-4">
               <input id="bookingQuestionEditId" type="hidden">
 
               <div>
@@ -3657,7 +3660,7 @@
               </div>
               <span id="bookingQuestionCount" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">0 questions</span>
             </div>
-            <div id="bookingQuestionsList" class="mt-5 space-y-3"></div>
+            <div id="bookingQuestionsList" class="booking-record-list mt-5 space-y-3"></div>
           </article>
         </div>
       </section>
@@ -3787,7 +3790,7 @@
             <h2 class="mt-1 text-xl font-bold text-ink">Reminders & follow-up</h2>
             <p class="mt-2 text-sm leading-6 text-slate-500">Choose which emails customers receive automatically around their appointment.</p>
 
-            <form id="reminderSettingsForm" class="mt-6 space-y-4">
+            <form id="reminderSettingsForm" class="booking-ops-form mt-6 space-y-4">
               <label class="booking-toggle-row flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4">
                 <span>
                   <span class="block font-bold text-ink">24 hours before</span>
@@ -3966,8 +3969,8 @@
                   <option value="all">All team members</option>
                 </select>
                 <div class="booking-view-switch flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
-                  <button id="calendarMonthViewBtn" class="rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm" type="button">Month</button>
-                  <button id="calendarWeekViewBtn" class="rounded-lg px-3 py-1.5 text-slate-500" type="button">Week</button>
+                  <button id="calendarMonthViewBtn" class="rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm" type="button" aria-pressed="true">Month</button>
+                  <button id="calendarWeekViewBtn" class="rounded-lg px-3 py-1.5 text-slate-500" type="button" aria-pressed="false">Week</button>
                 </div>
                 <div class="flex flex-wrap gap-3 text-xs font-semibold text-slate-500">
                   <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span>Booking</span>
