@@ -453,6 +453,21 @@ function syncReminderFields() {
 
 
 
+    function populateTimeOffTimeOptions() {
+      ["timeOffStartTime", "timeOffEndTime"].forEach(id => {
+        const select = $(id);
+        if (!select || select.options.length) return;
+        const options = [];
+        for (let minutes = 0; minutes < 24 * 60; minutes += 5) {
+          const hour = String(Math.floor(minutes / 60)).padStart(2, "0");
+          const minute = String(minutes % 60).padStart(2, "0");
+          const value = `${hour}:${minute}`;
+          options.push(`<option value="${value}">${value}</option>`);
+        }
+        select.innerHTML = options.join("");
+      });
+    }
+
     function syncTimeOffMode() {
       const allDay = $("timeOffMode")?.value !== "hours";
       $("timeOffAllDayFields")?.classList.toggle("hidden", !allDay);
