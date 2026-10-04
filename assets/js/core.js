@@ -1487,8 +1487,7 @@
 
     function renderOverviewPageState() {
       const setup = firstRunSetupStatus();
-      const hasAnyBooking = state.bookings.some(booking => booking.status !== "cancelled");
-      const shareReady = setup.ready || hasAnyBooking;
+      const shareReady = setup.ready;
       const help = $("overviewShareHelp");
       const copyBtn = $("copyBookingUrlBtn");
 
