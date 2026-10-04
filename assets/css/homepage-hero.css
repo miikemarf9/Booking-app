@@ -2541,3 +2541,111 @@
     margin-right:auto;
   }
 }
+
+
+/* Simplified Business Health flow: one process line, one focal example. */
+#landingView .homepage-health-process-lite{
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;
+  align-items:center;
+  max-width:1030px;
+  margin:3rem auto 0;
+  border-top:1px solid rgba(180,205,219,.82);
+  border-bottom:1px solid rgba(180,205,219,.82);
+  background:rgba(255,255,255,.34);
+}
+#landingView .homepage-health-process-lite span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.65rem;
+  min-height:72px;
+  padding:.95rem 1rem;
+  text-align:center;
+}
+#landingView .homepage-health-process-lite i{
+  color:#7b8b9c;
+  font-size:.64rem;
+  font-style:normal;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+#landingView .homepage-health-process-lite strong{
+  color:#25364a;
+  font-size:.88rem;
+  font-weight:850;
+}
+#landingView .homepage-health-process-lite>b{
+  color:#97a8b8;
+  font-size:.9rem;
+  font-weight:700;
+}
+#landingView .homepage-health-example{
+  max-width:1180px;
+  margin-top:2.25rem;
+  padding:2.2rem;
+}
+#landingView .homepage-health-example>div:first-child{
+  padding:.15rem .5rem .15rem .1rem;
+}
+#landingView .homepage-health-example h3{
+  max-width:500px;
+  font-size:clamp(1.65rem,2.8vw,2.15rem);
+  line-height:1.15;
+}
+#landingView .homepage-health-example>div:first-child>p:nth-of-type(2){
+  max-width:530px;
+}
+#landingView .homepage-health-workflow{
+  padding:1.1rem;
+}
+#landingView .homepage-health-metric{
+  min-height:126px;
+}
+@media(max-width:1023px){
+  #landingView .homepage-health-process-lite{
+    max-width:760px;
+    grid-template-columns:1fr 1fr;
+    margin-top:2.6rem;
+    border:1px solid rgba(190,211,222,.82);
+    border-radius:1.1rem;
+    overflow:hidden;
+  }
+  #landingView .homepage-health-process-lite>b{
+    display:none;
+  }
+  #landingView .homepage-health-process-lite span{
+    justify-content:flex-start;
+    min-height:64px;
+    border-top:1px solid rgba(205,219,226,.72);
+    text-align:left;
+  }
+  #landingView .homepage-health-process-lite span:nth-of-type(-n+2){
+    border-top:0;
+  }
+  #landingView .homepage-health-process-lite span:nth-of-type(even){
+    border-left:1px solid rgba(205,219,226,.72);
+  }
+  #landingView .homepage-health-example{
+    margin-top:1.8rem;
+  }
+}
+@media(max-width:639px){
+  #landingView .homepage-health-process-lite{
+    grid-template-columns:1fr;
+    margin-top:2.25rem;
+  }
+  #landingView .homepage-health-process-lite span,
+  #landingView .homepage-health-process-lite span:nth-of-type(-n+2),
+  #landingView .homepage-health-process-lite span:nth-of-type(even){
+    min-height:56px;
+    border-left:0;
+    border-top:1px solid rgba(205,219,226,.72);
+  }
+  #landingView .homepage-health-process-lite span:first-of-type{
+    border-top:0;
+  }
+  #landingView .homepage-health-example{
+    padding:1.25rem;
+  }
+}
