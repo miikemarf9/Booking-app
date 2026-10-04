@@ -724,7 +724,8 @@ ${bookingUrl}`;
       setBusy(btn, true, "Sending campaign…");
       try {
         const payload = { customer_ids: audienceIds.sort(), subject, message_text: messageText,
-          audience_type: state.marketingTargetCustomerId ? "direct_customer" : state.marketingCampaignSource || currentCustomerFilter() };
+          audience_type: state.marketingTargetCustomerId ? "direct_customer" : state.marketingCampaignSource || currentCustomerFilter(),
+          booking_url: buildPublicUrl(state.profile.id) };
         // Store only a payload hash + random request ID, never message or customer data.
         const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify([state.profile.id, payload])));
         const key = "gb-campaign-" + Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2,"0")).join("");

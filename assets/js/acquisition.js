@@ -155,7 +155,9 @@ function buildCurrentAcquisitionTouch() {
     gclid: gclid || undefined,
     gbraid: gbraid || undefined,
     wbraid: wbraid || undefined,
-    fbclid: fbclid || undefined
+    fbclid: fbclid || undefined,
+    gb_campaign: (params.get("gb_campaign") || "").slice(0, 36) || undefined,
+    gb_recipient: (params.get("gb_recipient") || "").slice(0, 36) || undefined
   };
 }
 
@@ -174,7 +176,9 @@ function cleanAcquisitionTouch(touch) {
     gclid: 300,
     gbraid: 300,
     wbraid: 300,
-    fbclid: 300
+    fbclid: 300,
+    gb_campaign: 36,
+    gb_recipient: 36
   };
 
   const out = {};

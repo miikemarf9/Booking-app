@@ -182,13 +182,18 @@ Deno.serve(async (req) => {
       }
       return json({ ok: true, updated, message: `Checked ${updated} recipient${updated === 1 ? "" : "s"}. Use Check delivery again to check the next unconfirmed recipients.` });
     }
-    const { customer_ids, subject, message_text, request_id, audience_type } = body;
+    const { customer_ids, subject, message_text, request_id, audience_type, booking_url } = body;
     const ids = Array.isArray(customer_ids) ? [...new Set(customer_ids.map(String))] : [];
     const cleanSubject = String(subject || "").trim();
     const cleanMessage = String(message_text || "").trim();
     const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!ids.length || ids.length > 1000 || ids.some(id => !uuid.test(id))) return json({ error: "Choose between 1 and 1,000 identified customers, with no more than 100 eligible recipients." }, 400);
     if (request_id && !uuid.test(request_id)) return json({ error: "Invalid campaign request." }, 400);
+    let cleanBookingUrl: URL;
+    try {
+      cleanBookingUrl = new URL(String(booking_url || ""));
+      if (cleanBookingUrl.protocol !== "https:" || cleanBookingUrl.searchParams.get("business") !== user.id) throw new Error("Invalid link");
+    } catch { return json({ error: "A secure booking link for this business is required." }, 400); }
     if (!cleanSubject || cleanSubject.length > 180) return json({ error: "Enter a subject up to 180 characters." }, 400);
     if (!cleanMessage || cleanMessage.length > 10000) return json({ error: "Enter a message up to 10,000 characters." }, 400);
     const requestId = request_id || crypto.randomUUID();
@@ -244,12 +249,18 @@ Deno.serve(async (req) => {
       // Persist an uncertain state BEFORE contacting the provider. Interrupted sends are never blindly retried.
       await checked(admin.from("marketing_campaign_recipients").update({ status: "unknown", error_message: "Sending interrupted or awaiting provider outcome" })
         .eq("campaign_id", campaign.id).eq("customer_id", customer.id));
+      const trackedBookingUrl = new URL(cleanBookingUrl);
+      trackedBookingUrl.searchParams.set("gb_campaign", campaign.id);
+      trackedBookingUrl.searchParams.set("gb_recipient", customer.id);
+      await checked(admin.from("marketing_campaign_recipients").update({ booking_link: trackedBookingUrl.toString() })
+        .eq("campaign_id", campaign.id).eq("customer_id", customer.id));
       const unsubscribe = unsubscribeUrl(customer.marketing_unsubscribe_token);
       const html = `
         <div style="font-family:Arial,sans-serif;background:#f8fafc;padding:30px 12px;color:#0f172a">
           <div style="max-width:620px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px">
             <p style="margin-top:0;color:#475569">Hi ${esc(customer.name)},</p>
             <div style="line-height:1.6">${htmlMessage(cleanMessage)}</div>
+            <p style="margin:24px 0"><a href="${esc(trackedBookingUrl.toString())}" style="background:#0872bd;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Book your next visit</a></p>
             <p style="margin-top:28px;color:#64748b;font-size:12px">
               Sent by ${esc(profile.business_name)} because you opted in to receive offers and updates.
               <br><a href="${esc(unsubscribe)}" style="color:#475569">Unsubscribe from marketing emails</a>
