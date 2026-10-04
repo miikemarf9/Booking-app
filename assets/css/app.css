@@ -4128,3 +4128,80 @@
       #tab-payments .payment-fee-disclosure-body > div,
       #tab-payments .plan-feature-list > div { grid-template-columns: 1fr; gap: .18rem; }
     }
+
+
+    /* Stage 11 client view & secondary screens */
+    #pendingView .pending-review-card {
+      border-color: var(--gb-border-soft);
+      box-shadow: 0 22px 60px rgba(23,32,51,.08);
+    }
+    .pending-review-steps { display:grid; gap:.45rem; }
+    .pending-review-steps > div {
+      display:grid; grid-template-columns:2rem minmax(0,1fr); align-items:center; gap:0 .75rem;
+      border:1px solid #e6ebf1; border-radius:.9rem; background:#fafcfe; padding:.75rem .85rem; color:#667085;
+    }
+    .pending-review-steps > div > span {
+      grid-row:1 / span 2; display:grid; width:2rem; height:2rem; place-items:center; border-radius:999px;
+      background:#eef2f6; color:#667085; font-size:.72rem; font-weight:900;
+    }
+    .pending-review-steps strong { color:#344054; font-size:.8rem; }
+    .pending-review-steps small { color:#98a2b3; font-size:.68rem; }
+    .pending-review-steps .is-complete { border-color:#d7eee4; background:#f7fcf9; }
+    .pending-review-steps .is-complete > span { background:#dff5e9; color:#047857; }
+    .pending-review-steps .is-current { border-color:#f0d9a6; background:#fffbeb; }
+    .pending-review-steps .is-current > span { background:#fef3c7; color:#a16207; }
+
+    #bookingSuccess.booking-success-card {
+      border-color:#dbe9e2; background:#fff; box-shadow:0 16px 42px rgba(23,32,51,.055);
+    }
+    #bookingSuccess .success-manage-actions {
+      border:1px solid #e5eaf1; border-radius:1rem; background:#f8fafc; padding:.85rem;
+    }
+
+    #manageBookingView {
+      background:radial-gradient(circle at 15% 0%, rgba(22,135,217,.055), transparent 24rem), #f7f9fc;
+    }
+    #manageBookingView .manage-booking-header { box-shadow:0 1px 0 rgba(23,32,51,.03); }
+    #manageBookingView .manage-private-badge {
+      display:inline-flex; min-height:30px; align-items:center; border:1px solid #e1e8ef; border-radius:999px;
+      background:#f8fafc; padding:.25rem .65rem; color:#667085; font-size:.68rem; font-weight:800;
+    }
+    #manageBookingView .manage-appointment-card {
+      border-color:#dce7f0; box-shadow:0 10px 28px rgba(23,32,51,.045);
+    }
+    #manageBookingView .manage-appointment-head {
+      border-bottom:1px solid #e5edf4; background:linear-gradient(135deg,#eef8ff 0%,#fbfdff 72%);
+    }
+    #manageBookingView .manage-appointment-card dl > div { min-height:48px; align-items:center; }
+    #manageBookingView #manageActionsCard,
+    #manageBookingView #manageReschedulePanel {
+      border-color:var(--gb-border-soft); box-shadow:0 7px 22px rgba(23,32,51,.035);
+    }
+    #manageBookingView .manage-cancel-trigger { color:#b42318; }
+    #manageBookingView .manage-cancel-trigger:hover:not(:disabled) { border-color:#fecaca; background:#fff7f7; color:#991b1b; }
+    #manageBookingView #manageCutoffNotice { border:1px solid #f3dfae; }
+    #manageBookingView #manageCancelConfirm { box-shadow:none; }
+    #manageBookingView #manageReschedulePanel { scroll-margin-top:5.5rem; }
+    #manageBookingView .manage-slot-choice { min-height:48px; box-shadow:none; }
+    #manageBookingView #manageRescheduleConfirm { border-color:#cfe4f3; background:#f3faff; }
+    #manageBookingView .manage-cancelled-card,
+    #manageBookingView #manageError {
+      border-color:#e2e8f0; background:#fff; box-shadow:0 7px 22px rgba(23,32,51,.035);
+    }
+
+    #clientViewApp > header { box-shadow:0 1px 0 rgba(23,32,51,.03); }
+    #clientViewApp main .card { border-color:#e3e9f1; box-shadow:0 8px 24px rgba(23,32,51,.04); }
+    #clientViewApp .preview-panel > div:first-child h2 { text-wrap:balance; }
+    #clientViewApp table { font-variant-numeric:tabular-nums; }
+
+    @media (max-width:639px) {
+      #pendingView .pending-review-card { padding:1.35rem!important; }
+      #bookingSuccess .success-manage-actions { padding:.75rem; }
+      #manageBookingView main { padding-top:1rem; }
+      #manageBookingView .manage-private-badge { font-size:.62rem; }
+      #manageBookingView .manage-appointment-card dl { padding:1rem; }
+      #manageBookingView .manage-appointment-card dl > div { min-height:44px; }
+      #clientViewApp > div:first-child > div { align-items:flex-start; }
+      #clientViewApp > header > div { align-items:flex-start; }
+      #clientViewApp > header > div > div:last-child { width:100%; flex-wrap:wrap; }
+    }
