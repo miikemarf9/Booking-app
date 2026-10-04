@@ -202,6 +202,7 @@ function bookingCard(b, allowCancel = false) {
 
       $("manageActionsCard").classList.toggle("hidden", cancelled);
       $("manageCancelledMessage").classList.toggle("hidden", !cancelled);
+      closeManageCancelConfirm();
 
       if (!cancelled) {
         const startMs = new Date(b.start_time).getTime();
@@ -275,6 +276,7 @@ function bookingCard(b, allowCancel = false) {
     function openManageReschedule() {
       if (!state.manageBooking || state.manageBooking.booking_status !== "confirmed" || $("manageRescheduleBtn").disabled) return;
       state.manageSelectedSlot = null;
+      closeManageCancelConfirm();
       $("manageReschedulePanel").classList.remove("hidden");
       $("manageDateInput").value = "";
       $("manageDateInput").min = todayKey();
@@ -441,13 +443,25 @@ function bookingCard(b, allowCancel = false) {
       await loadManagedBooking(state.manageToken);
     }
 
+    function openManageCancelConfirm() {
+      const panel = $("manageCancelConfirm");
+      if (!panel || $("manageCancelBtn").disabled) return;
+      panel.classList.remove("hidden");
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      $("manageConfirmCancelBtn")?.focus();
+    }
+
+    function closeManageCancelConfirm() {
+      $("manageCancelConfirm")?.classList.add("hidden");
+    }
+
     async function cancelManagedBooking() {
       const b = state.manageBooking;
       if (!state.manageToken || !b || b.booking_status !== "confirmed") return;
 
-      if (!window.confirm(`Cancel ${b.service_title} on ${prettyDateTime(b.start_time)}? The appointment time will become available to other customers.`)) return;
+      closeManageCancelConfirm();
 
-      const btn = $("manageCancelBtn");
+      const btn = $("manageConfirmCancelBtn");
       setBusy(btn, true, "Cancelling…");
 
       const { data, error } = await publicClient.rpc("public_cancel_booking", {
