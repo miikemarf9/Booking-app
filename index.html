@@ -877,6 +877,7 @@
             <button class="area-tab rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="booking" data-default-tab="calendar" type="button">Booking</button>
             <button class="area-tab rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="crm" data-default-tab="customers" type="button">CRM</button>
             <button class="area-tab rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="growth" data-default-tab="growth" type="button">Growth</button>
+            <button id="dashboardTeamAreaBtn" class="area-tab hidden rounded-xl px-2 py-2.5 text-xs font-bold text-slate-600 sm:px-5 sm:text-sm" data-area="team" data-default-tab="workspace-team" type="button">Team</button>
           </nav>
         </div>
 
@@ -905,6 +906,12 @@
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-journey-section" type="button">Journey</button>
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-planner-section" type="button">Planner</button>
             <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="growth-opportunities-section" type="button">Opportunities</button>
+          </nav>
+
+          <nav class="dashboard-subnav hidden min-w-max gap-1 rounded-2xl bg-slate-200/70 p-1" data-area-subnav="team" aria-label="Team navigation">
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="team-today-section" type="button">Today</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="team-tasks-section" type="button">Tasks</button>
+            <button class="subnav-tab rounded-xl px-4 py-2 text-sm font-bold text-slate-500" data-go-section="team-people-section" type="button">People</button>
           </nav>
         </div>
       </div>
@@ -1011,7 +1018,10 @@
               <h2 class="mt-1 text-xl font-bold text-ink">What needs doing next?</h2>
               <p class="mt-2 text-sm leading-6 text-slate-500">Today, overdue and next up — kept in one place.</p>
             </div>
-            <button id="workspaceTaskAddBtn" class="btn btn-primary" type="button">Add task</button>
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="workspaceOpenTeamBtn" class="hidden btn btn-light" data-go-tab="workspace-team" type="button">Open Team →</button>
+              <button id="workspaceTaskAddBtn" class="btn btn-primary" type="button">Add task</button>
+            </div>
           </div>
 
           <div class="overview-priority-counts mt-5 flex flex-wrap gap-2">
@@ -1063,6 +1073,93 @@
               <button id="copyBookingUrlBtn" type="button" class="btn btn-dark shrink-0">Copy</button>
             </div>
             <button id="mobileOpenBookingPageBtn" type="button" class="btn btn-light mt-3 w-full">Preview booking page ↗</button>
+          </article>
+        </div>
+      </section>
+
+      <!-- Team Workspace -->
+      <section id="tab-workspace-team" class="dashboard-tab hidden space-y-6">
+        <div id="team-today-section" class="scroll-mt-32 space-y-5">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Team</p>
+              <h2 class="mt-1 text-2xl font-bold text-ink">Keep the work clear between people</h2>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">See what needs attention, who owns it and the notes attached to the work. Growth, CRM and booking follow-ups can all feed into the same task list.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="btn btn-light" data-go-tab="team" type="button">Manage team</button>
+              <button id="teamWorkspaceAddBtn" class="btn btn-primary" type="button">Add task</button>
+            </div>
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="overview-kpi">
+              <p class="overview-kpi-label">Active team</p>
+              <p id="teamActiveCount" class="overview-kpi-value">0</p>
+              <p class="overview-kpi-detail">people available for assignment</p>
+            </article>
+            <article class="overview-kpi">
+              <p class="overview-kpi-label">Today</p>
+              <p id="teamTodayCount" class="overview-kpi-value">0</p>
+              <p class="overview-kpi-detail">tasks due or reminded today</p>
+            </article>
+            <article class="overview-kpi">
+              <p class="overview-kpi-label">Needs attention</p>
+              <p id="teamOverdueCount" class="overview-kpi-value">0</p>
+              <p class="overview-kpi-detail">overdue team priorities</p>
+            </article>
+            <article class="overview-kpi">
+              <p class="overview-kpi-label">Assigned</p>
+              <p id="teamAssignedCount" class="overview-kpi-value">0</p>
+              <p class="overview-kpi-detail">open tasks owned by team members</p>
+            </article>
+          </div>
+
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Today & attention</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">What needs a response?</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Today’s work and anything overdue, across the owner and active team.</p>
+              </div>
+              <button class="text-sm font-bold text-brand-600 hover:underline" data-go-section="team-tasks-section" type="button">View all tasks →</button>
+            </div>
+            <div id="teamTodayList" class="mt-5 space-y-3">
+              <div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center text-sm text-slate-400">Loading team priorities…</div>
+            </div>
+          </article>
+        </div>
+
+        <div id="team-tasks-section" class="scroll-mt-32 space-y-5">
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Tasks & notes</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">Work owned by the right person</h3>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Assignments, priorities, due dates, reminders and @mentions stay attached to the task instead of disappearing into messages.</p>
+              </div>
+              <button id="teamWorkspaceAddTaskBtn" class="btn btn-primary" type="button">Add task</button>
+            </div>
+            <div id="teamTaskFilters" class="mt-5 flex flex-wrap items-center gap-2"></div>
+            <div id="teamTaskList" class="mt-5 space-y-3">
+              <div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center text-sm text-slate-400">Loading team tasks…</div>
+            </div>
+          </article>
+        </div>
+
+        <div id="team-people-section" class="scroll-mt-32 space-y-5">
+          <article class="card p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-brand-600">People</p>
+                <h3 class="mt-1 text-xl font-bold text-ink">Who has what?</h3>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">A simple workload view for the active people already configured in your booking setup.</p>
+              </div>
+              <button class="btn btn-light" data-go-tab="team" type="button">Manage people →</button>
+            </div>
+            <div id="teamPeopleList" class="mt-5 grid gap-3 md:grid-cols-2">
+              <div class="rounded-2xl border border-dashed border-slate-200 px-5 py-9 text-center text-sm text-slate-400 md:col-span-2">Loading team…</div>
+            </div>
           </article>
         </div>
       </section>
@@ -4615,7 +4712,7 @@
         <div>
           <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Tasks & reminders</p>
           <h2 id="workspaceTaskModalTitle" class="mt-1 text-xl font-bold text-ink">Add task / reminder</h2>
-          <p class="mt-1 text-sm leading-6 text-slate-500">Give it a priority, due date or reminder date and Grab&Book will organise it on Home.</p>
+          <p class="mt-1 text-sm leading-6 text-slate-500">Give it a priority, due date or reminder date and Grab&Book will keep it visible in your priorities.</p>
         </div>
         <button id="workspaceTaskCloseBtn" class="text-xl font-bold text-slate-400 hover:text-slate-700" type="button" aria-label="Close">×</button>
       </div>
@@ -4644,7 +4741,7 @@
             <select id="workspaceTaskAssignee" class="field">
               <option value="">Owner (you)</option>
             </select>
-            <p class="mt-1 text-[.68rem] leading-4 text-slate-400">Uses the people already set up under Book → Team. Assignment organises ownership; it does not message staff yet.</p>
+            <p class="mt-1 text-[.68rem] leading-4 text-slate-400">Uses the people already set up under Settings → Team. Assignment organises ownership; it does not message staff yet.</p>
           </div>
           <div>
             <label class="label" for="workspaceTaskPriority">Priority</label>
@@ -4790,15 +4887,15 @@
   <script src="assets/js/google-ads.js"></script>
   <script src="assets/js/meta.js"></script>
   <script src="assets/js/growth-import.js"></script>
-  <script src="assets/js/tasks.js?v=4"></script>
+  <script src="assets/js/tasks.js?v=team-workspace-1"></script>
   <script src="assets/js/growth-planner.js?v=tasks2"></script>
   <script src="assets/js/growth-opportunities.js"></script>
   <script src="assets/js/customers.js?v=crm-analytics-1"></script>
   <script src="assets/js/campaign-history.js?v=stage8-crm-1"></script>
   <script src="assets/js/customer-management.js?v=stage8-crm-1"></script>
-  <script src="assets/js/settings.js?v=stage10-settings-1"></script>
-  <script src="assets/js/diary.js?v=stage6-booking-1"></script>
-  <script src="assets/js/services.js?v=stage14-final-1"></script>
+  <script src="assets/js/settings.js?v=team-workspace-1"></script>
+  <script src="assets/js/diary.js?v=team-workspace-1"></script>
+  <script src="assets/js/services.js?v=team-workspace-1"></script>
   <script src="assets/js/bookings.js?v=stage11-secondary-1"></script>
   <script src="assets/js/public-booking.js?v=stage7-customer-1"></script>
   <script src="assets/js/landing-preview.js?v=interactive-diary-1"></script>
