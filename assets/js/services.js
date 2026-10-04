@@ -651,17 +651,20 @@ function updateFreePlanFeePreview() {
       const note = $("blkCalculatedEnd");
 
       if (!service || !start) {
-        note.textContent = "Choose a service and start time; the finish time will be calculated automatically.";
+        note.textContent = "";
+        note.classList.add("hidden");
         return;
       }
 
       const end = addMinutesToTime(start, Number(service.duration_minutes));
       if (!end) {
-        note.textContent = "This start time would make the appointment run into the next day. Choose an earlier time.";
+        note.textContent = "This start time would run into the next day. Choose an earlier time.";
+        note.classList.remove("hidden");
         return;
       }
 
-      note.textContent = `${service.title}: ${start}–${end} (${Number(service.duration_minutes)} mins).`;
+      note.textContent = `${service.title}: ${start}–${end} · ${Number(service.duration_minutes)} mins`;
+      note.classList.remove("hidden");
     }
 
     function ensureStartWeekdaySelected() {
@@ -1021,7 +1024,8 @@ function updateFreePlanFeePreview() {
       $("blkRepeatUntilWrap").classList.add("hidden");
       $("blkAutoRepeatNote").classList.add("hidden");
       setBlockStartPicker("");
-      $("blkCalculatedEnd").textContent = "Choose a service and start time; the finish time will be calculated automatically.";
+      $("blkCalculatedEnd").textContent = "";
+      $("blkCalculatedEnd").classList.add("hidden");
       $("blockFormHeading").textContent = "Add availability";
       $("blockSubmitBtn").textContent = "Publish availability";
       $("blockCancelEditBtn").classList.add("hidden");
