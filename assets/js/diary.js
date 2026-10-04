@@ -152,6 +152,8 @@ function calendarDateKey(date) {
       $("calendarWeekViewBtn").className = state.calendarView === "week"
         ? "rounded-lg bg-white px-3 py-1.5 text-ink shadow-sm"
         : "rounded-lg px-3 py-1.5 text-slate-500";
+      $("calendarMonthViewBtn").setAttribute("aria-pressed", String(state.calendarView === "month"));
+      $("calendarWeekViewBtn").setAttribute("aria-pressed", String(state.calendarView === "week"));
 
       renderCalendarDashboard();
     }
