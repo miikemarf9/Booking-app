@@ -1506,7 +1506,10 @@
     function renderStats() {
       const upcoming = upcomingOverviewBookings();
       const today = todayKey();
-      const todayBookings = upcoming.filter(booking => dateKeyInZone(new Date(booking.start_time)) === today);
+      const todayBookings = state.bookings.filter(booking =>
+        booking.status !== "cancelled" &&
+        dateKeyInZone(new Date(booking.start_time)) === today
+      );
       const next = upcoming[0] || null;
       const totalVal = upcoming.reduce((acc, booking) => {
         const service = booking.services || state.services.find(item => item.id === booking.service_id) || {};
@@ -1526,13 +1529,12 @@
       $("statValue").textContent = money(totalVal);
 
       if (next) {
-        const service = next.services || state.services.find(item => item.id === next.service_id) || {};
         const nextDateKey = dateKeyInZone(new Date(next.start_time));
         $("statNext").textContent = prettyTime(new Date(next.start_time));
         $("statNextDetail").textContent =
           (nextDateKey === today ? "Today" : prettyDate(new Date(next.start_time), false)) +
           " · " +
-          (service.title || "Appointment");
+          (next.customer_name || "Customer");
       } else {
         $("statNext").textContent = "—";
         $("statNextDetail").textContent = "nothing upcoming";
